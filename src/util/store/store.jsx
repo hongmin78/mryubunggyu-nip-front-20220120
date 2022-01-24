@@ -1,6 +1,7 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import commonSlice from "./commonSlice";
 
-const reducer = combineReducers({});
+const reducer = combineReducers({ common: commonSlice });
 
 export default function createStore() {
   return configureStore({
