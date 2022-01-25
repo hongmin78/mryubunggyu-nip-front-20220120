@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import I_logo from "../img/icon/I_logo.svg";
+import I_logoText from "../img/icon/I_logoText.svg";
 
 export default function Footer() {
   return (
@@ -11,7 +12,7 @@ export default function Footer() {
 
         <article className="logoBox">
           <img className="logoImg" src={I_logo} alt="" />
-          <p className="logoText">NIP</p>
+          <img className="logoText" src={I_logoText} alt=""/>
         </article>
       </div>
     </FooterBox>
@@ -48,9 +49,7 @@ const FooterBox = styled.footer`
       }
 
       .logoText {
-        font-size: 16px;
-        font-weight: 600;
-        line-height: 16px;
+        height: 18px;
       }
     }
   }

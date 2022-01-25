@@ -16,7 +16,6 @@ export const todoSlice = createSlice({
     },
 
     setPathName: (state, action) => {
-      console.log(action.payload);
       state.pathname = action.payload;
     },
   },

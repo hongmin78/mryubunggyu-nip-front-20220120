@@ -13,4 +13,21 @@ const chkValidEmail = (email) => {
   return re.test(String(email).toLowerCase());
 };
 
-export { strDot, chkValidEmail };
+function putCommaAtPrice(data) {
+  let str;
+
+  if (data !== undefined) {
+    data = Number(data);
+
+    // if (data < 1000)
+    //   return data.toFixed(3);
+
+    str = data.toString().split(".");
+
+    str[0] = `${str[0]}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return str.join(".");
+  }
+  return 0;
+}
+
+export { strDot, chkValidEmail, putCommaAtPrice };

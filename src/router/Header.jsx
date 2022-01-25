@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -7,7 +7,6 @@ import HeaderPopup from "../components/HeaderPopup";
 import I_logo from "../img/icon/I_logo.svg";
 import I_logoText from "../img/icon/I_logoText.svg";
 import I_logoTextWhite from "../img/icon/I_logoTextWhite.svg";
-import { setPathName } from "../util/store/commonSlice";
 import { strDot } from "../util/Util";
 
 export default function Header() {
@@ -40,10 +39,16 @@ export default function Header() {
             >
               Lucky Ticket
             </button>
-            <button style={{ color: isStaking && "#fff" }} onClick={() => {}}>
-              Auto Auction
+            <button
+              style={{ color: isStaking && "#fff" }}
+              onClick={() => navigate("/auction")}
+            >
+              Subscription Auction
             </button>
-            <button style={{ color: isStaking && "#fff" }} onClick={() => {}}>
+            <button
+              style={{ color: isStaking && "#fff" }}
+              onClick={() => navigate("/market")}
+            >
               Marketplece
             </button>
           </nav>
@@ -51,6 +56,10 @@ export default function Header() {
           {isLogin ? (
             <button
               className="menuBtn"
+              style={{
+                color: isStaking && "#000",
+                background: isStaking && "#fff",
+              }}
               onClick={() => setHeaderPopup(!headerPopup)}
             >
               <span className="balanceBox">
@@ -58,7 +67,14 @@ export default function Header() {
                 <p className="unit">USDT</p>
               </span>
 
-              <span className="address">{strDot(isLogin, 4, 4)}</span>
+              <span
+                className="address"
+                style={{
+                  background: isStaking && "#f6f6f6",
+                }}
+              >
+                {strDot(isLogin, 4, 4)}
+              </span>
 
               {headerPopup && <HeaderPopup />}
             </button>
@@ -104,7 +120,7 @@ const HeaderBox = styled.header`
       }
 
       .logoText {
-        height: 16px;
+        height: 24px;
       }
     }
 

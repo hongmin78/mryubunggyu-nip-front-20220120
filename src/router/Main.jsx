@@ -1,18 +1,18 @@
-import { useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import { useState } from "react";
 import styled from "styled-components";
 import I_ltArwWhite from "../img/icon/I_ltArwWhite.svg";
 import I_rtArwWhite from "../img/icon/I_rtArwWhite.svg";
 import E_interview from "../img/main/E_interview.svg";
-import E_headLineImg from "../img/main/E_headLineImg.png";
+import E_cc from "../img/common/E_cc.png";
 import E_issueProf from "../img/main/E_issueProf.png";
-import I_heart from "../img/icon/I_heart.svg";
-import I_heartO from "../img/icon/I_heartO.svg";
 import I_rtArw from "../img/icon/I_rtArw.svg";
 
 import { autoAuctionList, marketPlaceList } from "../data/Dmain";
 import { strDot } from "../util/Util";
 import Footer from "./Footer";
+import AuctionItem from "../components/AuctionItem";
+import MarketItem from "../components/MarketItem";
 
 export default function Main() {
   const headLineRef = useRef();
@@ -54,6 +54,7 @@ export default function Main() {
     if (auctionIndex < pageNum - 1) setAuctionIndex(auctionIndex + 1);
     else setAuctionIndex(0);
   }
+
   function onClickMarketNextBtn() {
     const wrapWidth = marketRef.current.offsetWidth;
     const contWidth = marketRef.current.children[0].offsetWidth;
@@ -62,13 +63,6 @@ export default function Main() {
 
     if (marketIndex < pageNum - 1) setMarketIndex(marketIndex + 1);
     else setMarketIndex(0);
-  }
-
-  function onClickItemLike(index) {
-    let dataObj = likeObj;
-    dataObj[index] = !dataObj[index];
-
-    setLikeObj({ ...dataObj });
   }
 
   useEffect(() => {
@@ -154,7 +148,7 @@ export default function Main() {
 
                   <p className="bottomText">ON THE FRONTIER OF NFTS.</p>
                 </article>
-                <img className="mainImg" src={E_headLineImg} alt="" />
+                <img className="mainImg" src={E_cc} alt="" />
               </li>
             ))}
           </ul>
@@ -191,47 +185,14 @@ export default function Main() {
               <div className="posBox">
                 <ul className="itemList" ref={auctionRef}>
                   {autoAuctionList.map((cont, index) => (
-                    <li key={index} className="item">
-                      <div className="topBar">
-                        <div className="profBox">
-                          <img src={cont.profImg} alt="" />
-                          <p className="address">
-                            {strDot(cont.address, 5, 4)}
-                          </p>
-                        </div>
-
-                        <button
-                          className="likeBtn"
-                          onClick={() => onClickItemLike(index)}
-                        >
-                          <img
-                            src={likeObj[index] ? I_heartO : I_heart}
-                            alt=""
-                          />
-                          <p
-                            className="count"
-                            style={{
-                              color: likeObj[index] && "#ff5050",
-                            }}
-                          >
-                            {cont.like}
-                          </p>
-                        </button>
-                      </div>
-
-                      <img className="itemImg" src={cont.item} alt="" />
-
-                      <div className="infoBox">
-                        <p className="title">{cont.title}</p>
-
-                        <ul className="detailList">
-                          <li>Last sold for</li>
-                          <li>
-                            {cont.price}&nbsp;{cont.unit}
-                          </li>
-                        </ul>
-                      </div>
-                    </li>
+                    <Fragment key={index}>
+                      <AuctionItem
+                        data={cont}
+                        index={index}
+                        likeObj={likeObj}
+                        setLikeObj={setLikeObj}
+                      />
+                    </Fragment>
                   ))}
                 </ul>
                 <button className="nextBtn" onClick={onClickAuctionNextBtn}>
@@ -241,47 +202,14 @@ export default function Main() {
               <div className="posBox">
                 <ul className="itemList">
                   {autoAuctionList.map((cont, index) => (
-                    <li key={index} className="item">
-                      <div className="topBar">
-                        <div className="profBox">
-                          <img src={cont.profImg} alt="" />
-                          <p className="address">
-                            {strDot(cont.address, 5, 4)}
-                          </p>
-                        </div>
-
-                        <button
-                          className="likeBtn"
-                          onClick={() => onClickItemLike(index)}
-                        >
-                          <img
-                            src={likeObj[index] ? I_heartO : I_heart}
-                            alt=""
-                          />
-                          <p
-                            className="count"
-                            style={{
-                              color: likeObj[index] && "#ff5050",
-                            }}
-                          >
-                            {cont.like}
-                          </p>
-                        </button>
-                      </div>
-
-                      <img className="itemImg" src={cont.item} alt="" />
-
-                      <div className="infoBox">
-                        <p className="title">{cont.title}</p>
-
-                        <ul className="detailList">
-                          <li>Last sold for</li>
-                          <li>
-                            {cont.price}&nbsp;{cont.unit}
-                          </li>
-                        </ul>
-                      </div>
-                    </li>
+                    <Fragment key={index}>
+                      <AuctionItem
+                        data={cont}
+                        index={index}
+                        likeObj={likeObj}
+                        setLikeObj={setLikeObj}
+                      />
+                    </Fragment>
                   ))}
                 </ul>
                 <button className="nextBtn">
@@ -297,49 +225,14 @@ export default function Main() {
             <div className="posBox">
               <ul className="itemList" ref={marketRef}>
                 {marketPlaceList.map((cont, index) => (
-                  <li key={index} className="item">
-                    <div className="topBar">
-                      <div className="profBox">
-                        <img src={cont.profImg} alt="" />
-                        <p className="address">{strDot(cont.address, 5, 4)}</p>
-                      </div>
-
-                      <button
-                        className="likeBtn"
-                        onClick={() => onClickItemLike(index)}
-                      >
-                        <img src={likeObj[index] ? I_heartO : I_heart} alt="" />
-                        <p
-                          className="count"
-                          style={{
-                            color: likeObj[index] && "#ff5050",
-                          }}
-                        >
-                          {cont.like}
-                        </p>
-                      </button>
-                    </div>
-
-                    <img className="itemImg" src={cont.item} alt="" />
-
-                    <div className="infoBox">
-                      <p className="title">{cont.title}</p>
-
-                      <ul className="detailList">
-                        <li>
-                          <p>Current bid</p>
-                          <p>Ending in</p>
-                        </li>
-                        <li style={{ color: "#fff" }}>
-                          <p>
-                            {cont.price}&nbsp;{cont.unit}
-                          </p>
-
-                          <p>{cont.time}</p>
-                        </li>
-                      </ul>
-                    </div>
-                  </li>
+                  <Fragment key={index}>
+                    <MarketItem
+                      data={cont}
+                      index={index}
+                      likeObj={likeObj}
+                      setLikeObj={setLikeObj}
+                    />
+                  </Fragment>
                 ))}
               </ul>
               <button className="nextBtn" onClick={onClickMarketNextBtn}>
@@ -508,17 +401,6 @@ const MainBox = styled.div`
         }
       }
 
-      &.marketplaceBox {
-        .detailList {
-          background: #000;
-
-          li {
-            display: flex;
-            justify-content: space-between;
-          }
-        }
-      }
-
       & > .title {
         font-size: 30px;
         line-height: 45px;
@@ -540,77 +422,6 @@ const MainBox = styled.div`
           gap: 40px;
           padding: 20px;
           overflow-x: scroll;
-
-          .item {
-            display: flex;
-            flex-direction: column;
-            width: 330px;
-            min-width: 330px;
-            height: 522px;
-            box-shadow: 0px 3px 20px rgba(0, 0, 0, 0.2);
-            border-radius: 12px;
-            overflow: hidden;
-            cursor: pointer;
-
-            .topBar {
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              height: 60px;
-              padding: 0 16px;
-
-              .profBox {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-              }
-
-              .likeBtn {
-                display: flex;
-                align-items: center;
-                gap: 6px;
-                height: 38px;
-                padding: 0 13px;
-                font-weight: 500;
-                background: #f6f6f6;
-                backdrop-filter: blur(60px);
-                border-radius: 30px;
-              }
-            }
-
-            .itemImg {
-              flex: 1;
-              width: 100%;
-              object-fit: cover;
-            }
-
-            .infoBox {
-              display: flex;
-              flex-direction: column;
-              height: 132px;
-
-              .title {
-                height: 54px;
-                padding: 0 12px;
-                font-size: 20px;
-                font-weight: 600;
-                line-height: 54px;
-              }
-
-              .detailList {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                gap: 6px;
-                padding: 0 12px;
-                font-size: 16px;
-                font-weight: 500;
-                line-height: 19px;
-                color: #7a7a7a;
-              }
-            }
-          }
         }
 
         .nextBtn {

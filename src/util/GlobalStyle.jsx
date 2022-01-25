@@ -24,11 +24,15 @@ const GlobalStyle = createGlobalStyle`
   }
   
   *::-webkit-scrollbar {
-    display: none;
+    width: 0;
   }
   
   *:focus{
     outline:none;
+  }
+
+  *:disabled{
+    cursor: not-allowed;
   }
   
   input{

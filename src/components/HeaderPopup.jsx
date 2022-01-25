@@ -5,12 +5,15 @@ import I_book from "../img/icon/I_book.svg";
 import I_bookWhite from "../img/icon/I_bookWhite.svg";
 import I_power from "../img/icon/I_power.svg";
 import I_powerWhite from "../img/icon/I_powerWhite.svg";
+import { useNavigate } from "react-router-dom";
 
 export default function HeaderPopup() {
+  const navigate = useNavigate();
+
   return (
     <HeaderPopupBox>
       <nav>
-        <button className="mypageBtn" onClick={() => {}}>
+        <button className="mypageBtn" onClick={() => navigate('/mypage')}>
           <img src={I_person} alt="" />
           <p>My page</p>
         </button>

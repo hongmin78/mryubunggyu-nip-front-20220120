@@ -3,9 +3,14 @@ import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { HashRouter, Route, Routes, useLocation } from "react-router-dom";
 import styled from "styled-components";
+import Auction from "./router/Auction";
+import AuctionDetail from "./router/AuctionDetail";
 import ConnectWallet from "./router/ConnectWallet";
 import Header from "./router/Header";
 import Main from "./router/Main";
+import Market from "./router/Market";
+import MarketDetail from "./router/MarketDetail";
+import Mypage from "./router/Mypage";
 import Staking from "./router/Staking";
 import GlobalStyle from "./util/GlobalStyle";
 
@@ -26,6 +31,10 @@ function App() {
         href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap"
         rel="stylesheet"
       />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Red+Hat+Mono:wght@500&display=swap"
+        rel="stylesheet"
+      />
 
       <GlobalStyle />
       <HashRouter>
@@ -34,6 +43,14 @@ function App() {
           <Route path="/" element={<Main />} />
           <Route path="/connectwallet" element={<ConnectWallet />} />
           <Route path="/staking" element={<Staking />} />
+
+          <Route path="/auction" element={<Auction />} />
+          <Route path="/auction/detail/:id" element={<AuctionDetail />} />
+
+          <Route path="/market" element={<Market />} />
+          <Route path="/market/detail/:id" element={<MarketDetail />} />
+
+          <Route path="/mypage" element={<Mypage />} />
         </Routes>
       </HashRouter>
     </AppBox>
