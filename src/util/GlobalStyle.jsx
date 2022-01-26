@@ -67,9 +67,10 @@ const GlobalStyle = createGlobalStyle`
     background: #373737;
   }
 
-  .nospace{
+  .noSpace{
     width: 0;
     height: 0;
+    position: absolute;
   }
 
   .defaultPopup {

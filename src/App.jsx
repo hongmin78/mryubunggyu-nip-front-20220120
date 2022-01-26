@@ -6,11 +6,13 @@ import styled from "styled-components";
 import Auction from "./router/Auction";
 import AuctionDetail from "./router/AuctionDetail";
 import ConnectWallet from "./router/ConnectWallet";
+import EditProf from "./router/EditProf";
 import Header from "./router/Header";
 import Main from "./router/Main";
 import Market from "./router/Market";
 import MarketDetail from "./router/MarketDetail";
 import Mypage from "./router/Mypage";
+import Resell from "./router/Resell";
 import Staking from "./router/Staking";
 import GlobalStyle from "./util/GlobalStyle";
 
@@ -51,6 +53,9 @@ function App() {
           <Route path="/market/detail/:id" element={<MarketDetail />} />
 
           <Route path="/mypage" element={<Mypage />} />
+          <Route path="/editprof" element={<EditProf />} />
+
+          <Route path="/resell" element={<Resell />} />
         </Routes>
       </HashRouter>
     </AppBox>

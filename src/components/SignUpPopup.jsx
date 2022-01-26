@@ -7,7 +7,6 @@ import { setLogin } from "../util/store/commonSlice";
 import { chkValidEmail } from "../util/Util";
 
 export default function SignUpPopup({walletAddress}) {
-  console.log(walletAddress);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [email, setEmail] = useState("");

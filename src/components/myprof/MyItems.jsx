@@ -10,8 +10,12 @@ import { putCommaAtPrice } from "../../util/Util";
 import { useState } from "react";
 import PopupBg from "../../components/PopupBg";
 import { D_sortList } from "../../data/DmyPage";
+import { useNavigate } from "react-router-dom";
+import SelectPopup from "../SelectPopup";
 
 export default function MyItems() {
+  const navigate = useNavigate();
+
   const [filter, setFilter] = useState(0);
   const [sortOpt, setSortOpt] = useState(D_sortList[1]);
   const [sortPopup, setSortPopup] = useState(false);
@@ -39,17 +43,13 @@ export default function MyItems() {
 
           {sortPopup && (
             <>
-              <ul className="sortPopup" onClick={() => setSortPopup(false)}>
-                {D_sortList.map((cont, index) => (
-                  <li
-                    key={index}
-                    className={sortOpt === cont && "select"}
-                    onClick={() => setSortOpt(cont)}
-                  >
-                    {cont}
-                  </li>
-                ))}
-              </ul>
+              <SelectPopup
+                off={setSortPopup}
+                dataList={D_sortList}
+                select={sortOpt}
+                setFunc={setSortOpt}
+              />
+
               <PopupBg off={setSortPopup} />
             </>
           )}
@@ -254,7 +254,9 @@ export default function MyItems() {
             </div>
 
             <div className="btnBox">
-              <button className="actionBtn">Sell</button>
+              <button className="actionBtn" onClick={() => navigate("/resell")}>
+                Sell
+              </button>
               <button className="actionBtn">Staking</button>
             </div>
 
@@ -312,33 +314,6 @@ const MyItemsBox = styled.section`
         font-weight: 500;
         border: 1px solid #d9d9d9;
         border-radius: 12px;
-      }
-
-      .sortPopup {
-        width: inherit;
-        padding: 6px 10px;
-        background: #fff;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-        border-radius: 12px;
-        position: absolute;
-        transform: translate(0, 10px);
-        z-index: 6;
-
-        li {
-          display: flex;
-          align-items: center;
-          height: 46px;
-          padding: 0 14px;
-          font-size: 16px;
-          font-weight: 500;
-          border-radius: 8px;
-          cursor: pointer;
-
-          &.select {
-            color: #fff;
-            background: #000;
-          }
-        }
       }
     }
   }

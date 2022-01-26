@@ -6,6 +6,7 @@ import Footer from "./Footer";
 import PopupBg from "../components/PopupBg";
 import MarketItem from "../components/MarketItem";
 import { D_marketItemList, D_sortList } from "../data/Dmarket";
+import SelectPopup from "../components/SelectPopup";
 
 export default function Market() {
   const [search, setSearch] = useState("");
@@ -39,17 +40,12 @@ export default function Market() {
 
               {sortPopup && (
                 <>
-                  <ul className="sortPopup" onClick={() => setSortPopup(false)}>
-                    {D_sortList.map((cont, index) => (
-                      <li
-                        key={index}
-                        className={sortOpt === cont && "select"}
-                        onClick={() => setSortOpt(cont)}
-                      >
-                        {cont}
-                      </li>
-                    ))}
-                  </ul>
+                  <SelectPopup
+                    off={setSortPopup}
+                    dataList={D_sortList}
+                    select={sortOpt}
+                    setFunc={setSortOpt}
+                  />
                   <PopupBg off={setSortPopup} />
                 </>
               )}
@@ -150,33 +146,6 @@ const MarketBox = styled.div`
           font-weight: 500;
           border: 1px solid #d9d9d9;
           border-radius: 12px;
-        }
-
-        .sortPopup {
-          width: inherit;
-          padding: 6px 10px;
-          background: #fff;
-          box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-          border-radius: 12px;
-          position: absolute;
-          transform: translate(0, 10px);
-          z-index: 6;
-
-          li {
-            display: flex;
-            align-items: center;
-            height: 46px;
-            padding: 0 14px;
-            font-size: 16px;
-            font-weight: 500;
-            border-radius: 8px;
-            cursor: pointer;
-
-            &.select {
-              color: #fff;
-              background: #000;
-            }
-          }
         }
       }
     }

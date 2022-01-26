@@ -4,19 +4,23 @@ import E_prof from "../img/mypage/E_prof.png";
 import I_copy from "../img/icon/I_copy.svg";
 import I_3dot from "../img/icon/I_3dot.svg";
 import I_upload from "../img/icon/I_upload.svg";
+import I_clip from "../img/icon/I_clip.svg";
 
 import Footer from "./Footer";
 import { strDot } from "../util/Util";
 import { useSelector } from "react-redux";
 import { useState } from "react";
-import { D_sortList } from "../data/DmyPage";
 import MyItems from "../components/myprof/MyItems";
 import Recommend from "../components/myprof/Recommend";
+import PopupBg from "../components/PopupBg";
+import { useNavigate } from "react-router-dom";
 
 export default function Mypage() {
+  const navigate = useNavigate();
   const isLogin = useSelector((state) => state.common.isLogin);
 
   const [category, setCategory] = useState(0);
+  const [morePopup, setMorePopup] = useState(false);
 
   return (
     <>
@@ -39,7 +43,7 @@ export default function Mypage() {
             </div>
 
             <div className="btnBox">
-              <button className="moreBtn" onClick={() => {}}>
+              <button className="moreBtn" onClick={() => setMorePopup(true)}>
                 <img src={I_3dot} alt="" />
               </button>
 
@@ -47,6 +51,24 @@ export default function Mypage() {
                 <img src={I_upload} alt="" />
                 <p>Share</p>
               </button>
+
+              {morePopup && (
+                <>
+                  <div className="morePopup" onClick={() => setMorePopup()}>
+                    <button
+                      className="editBtn"
+                      onClick={() => navigate("/editprof")}
+                    >
+                      <p>Edit Profile</p>
+                    </button>
+                    <button className="copyBtn" onClick={() => {}}>
+                      <img src={I_clip} alt="" />
+                      <p>Copy Link</p>
+                    </button>
+                  </div>
+                  <PopupBg off={setMorePopup} />
+                </>
+              )}
             </div>
           </div>
         </article>
@@ -171,8 +193,9 @@ const MypageBox = styled.section`
       .btnBox {
         display: flex;
         gap: 15px;
+        position: relative;
 
-        button {
+        & > button {
           display: flex;
           justify-content: center;
           align-items: center;
@@ -194,6 +217,39 @@ const MypageBox = styled.section`
             width: 128px;
             padding: 0 24px;
             border-radius: 30px;
+          }
+        }
+
+        .morePopup {
+          display: flex;
+          background: #fff;
+          border-radius: 12px;
+          right: 0;
+          bottom: 0;
+          position: absolute;
+          transform: translate(0, -64px);
+          z-index: 6;
+
+          button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 44px;
+            font-size: 18px;
+            font-weight: 500;
+
+            &.editBtn {
+              padding: 0 16px 0 20px;
+            }
+
+            &.copyBtn {
+              padding: 0 20px 0 16px;
+            }
+
+            p {
+              white-space: nowrap;
+              font-family: "Roboto", sans-serif;
+            }
           }
         }
       }
@@ -236,4 +292,3 @@ const MypageBox = styled.section`
 `;
 
 const categoryList = ["My Items", "Recommend"];
-const filterList = ["All 8", "Available 7", "Sold 0"];

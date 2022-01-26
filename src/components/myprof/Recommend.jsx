@@ -1,8 +1,13 @@
 import styled from "styled-components";
 import I_copy from "../../img/icon/I_copy.svg";
+import I_circleChk from "../../img/icon/I_circleChk.svg";
 import { D_recommendList } from "../../data/DmyPage";
+import { useState } from "react";
 
 export default function Recommend() {
+  const [toggleCode, setToggleCode] = useState(false);
+  const [toggleLink, setToggleLink] = useState(false);
+
   return (
     <RecommendBox>
       <p className="title">Referals</p>
@@ -28,7 +33,9 @@ export default function Recommend() {
               <strong className="key">Code</strong>
               <span className="value">
                 <p>98Dd4DBE</p>
-                <img src={I_copy} alt="" />
+                <button className="copyBtn" onClick={() => setToggleCode(true)}>
+                  <img src={toggleCode ? I_circleChk : I_copy} alt="" />
+                </button>
               </span>
             </li>
             <li>
@@ -37,7 +44,9 @@ export default function Recommend() {
                 <p>
                   https://ausp.io/market/?ref=0x97b155a698d4bdec4c4bf3a92e9071190093cafb
                 </p>
-                <img src={I_copy} alt="" />
+                <button className="copyBtn" onClick={() => setToggleLink(true)}>
+                  <img src={toggleLink ? I_circleChk : I_copy} alt="" />
+                </button>
               </span>
             </li>
           </ul>
