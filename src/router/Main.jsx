@@ -9,10 +9,10 @@ import E_issueProf from "../img/main/E_issueProf.png";
 import I_rtArw from "../img/icon/I_rtArw.svg";
 
 import { autoAuctionList, marketPlaceList } from "../data/Dmain";
-import { strDot } from "../util/Util";
 import Footer from "./Footer";
 import AuctionItem from "../components/AuctionItem";
 import MarketItem from "../components/MarketItem";
+import Header from "./Header";
 
 export default function Main() {
   const headLineRef = useRef();
@@ -128,6 +128,7 @@ export default function Main() {
 
   return (
     <>
+      <Header />
       <MainBox>
         <section className="headLineContainer">
           <ul ref={headLineRef}>

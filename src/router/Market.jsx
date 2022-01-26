@@ -7,6 +7,8 @@ import PopupBg from "../components/PopupBg";
 import MarketItem from "../components/MarketItem";
 import { D_marketItemList, D_sortList } from "../data/Dmarket";
 import SelectPopup from "../components/SelectPopup";
+import { useSelector } from "react-redux";
+import Header from "./Header";
 
 export default function Market() {
   const [search, setSearch] = useState("");
@@ -15,71 +17,238 @@ export default function Market() {
   const [likeObj, setLikeObj] = useState({});
   const [limit, setLimit] = useState(8);
 
-  return (
-    <>
-      <MarketBox>
-        <section className="topBar">
-          <p className="title">Marketplece All NFTs</p>
+  const isMobile = useSelector((state) => state.common.isMobile);
 
-          <article className="rightBox">
-            <div className="searchBox">
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search"
-              />
+  if (isMobile)
+    return (
+      <>
+        <Header />
+        <MmarketBox>
+          <div className="innerBox">
+            <section className="topBar">
+              <p className="title">Marketplece All NFTs</p>
 
-              <img src={I_search} alt="" />
-            </div>
-
-            <div className="sortBox">
-              <button className="sortBtn" onClick={() => setSortPopup(true)}>
-                <p>{sortOpt}</p>
-                <img src={I_dnArw} alt="" />
-              </button>
-
-              {sortPopup && (
-                <>
-                  <SelectPopup
-                    off={setSortPopup}
-                    dataList={D_sortList}
-                    select={sortOpt}
-                    setFunc={setSortOpt}
+              <article className="rightBox">
+                <div className="searchBox">
+                  <input
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Search"
                   />
-                  <PopupBg off={setSortPopup} />
-                </>
-              )}
-            </div>
-          </article>
-        </section>
 
-        <ul className="itemList">
-          {D_marketItemList.map((cont, index) => {
-            if (index < limit)
-              return (
-                <Fragment key={index}>
-                  <MarketItem
-                    data={cont}
-                    index={index}
-                    likeObj={likeObj}
-                    setLikeObj={setLikeObj}
-                  />
-                </Fragment>
-              );
-            else return <Fragment />;
-          })}
-        </ul>
+                  <img src={I_search} alt="" />
+                </div>
 
-        <button className="moreBtn" onClick={() => setLimit(limit + 4)}>
-          Load more
-        </button>
-      </MarketBox>
-      <Footer />
-    </>
-  );
+                <div className="sortBox">
+                  <button
+                    className="sortBtn"
+                    onClick={() => setSortPopup(true)}
+                  >
+                    <p>{sortOpt}</p>
+                    <img src={I_dnArw} alt="" />
+                  </button>
+
+                  {sortPopup && (
+                    <>
+                      <SelectPopup
+                        off={setSortPopup}
+                        dataList={D_sortList}
+                        select={sortOpt}
+                        setFunc={setSortOpt}
+                      />
+                      <PopupBg off={setSortPopup} />
+                    </>
+                  )}
+                </div>
+              </article>
+            </section>
+
+            <ul className="itemList">
+              {D_marketItemList.map((cont, index) => {
+                if (index < limit)
+                  return (
+                    <Fragment key={index}>
+                      <MarketItem
+                        data={cont}
+                        index={index}
+                        likeObj={likeObj}
+                        setLikeObj={setLikeObj}
+                      />
+                    </Fragment>
+                  );
+                else return <Fragment />;
+              })}
+            </ul>
+
+            <button className="moreBtn" onClick={() => setLimit(limit + 4)}>
+              Load more
+            </button>
+          </div>
+        </MmarketBox>
+        <Footer />
+      </>
+    );
+  else
+    return (
+      <>
+        <Header />
+        <PmarketBox>
+          <section className="topBar">
+            <p className="title">Marketplece All NFTs</p>
+
+            <article className="rightBox">
+              <div className="searchBox">
+                <input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search"
+                />
+
+                <img src={I_search} alt="" />
+              </div>
+
+              <div className="sortBox">
+                <button className="sortBtn" onClick={() => setSortPopup(true)}>
+                  <p>{sortOpt}</p>
+                  <img src={I_dnArw} alt="" />
+                </button>
+
+                {sortPopup && (
+                  <>
+                    <SelectPopup
+                      off={setSortPopup}
+                      dataList={D_sortList}
+                      select={sortOpt}
+                      setFunc={setSortOpt}
+                    />
+                    <PopupBg off={setSortPopup} />
+                  </>
+                )}
+              </div>
+            </article>
+          </section>
+
+          <ul className="itemList">
+            {D_marketItemList.map((cont, index) => {
+              if (index < limit)
+                return (
+                  <Fragment key={index}>
+                    <MarketItem
+                      data={cont}
+                      index={index}
+                      likeObj={likeObj}
+                      setLikeObj={setLikeObj}
+                    />
+                  </Fragment>
+                );
+              else return <Fragment />;
+            })}
+          </ul>
+
+          <button className="moreBtn" onClick={() => setLimit(limit + 4)}>
+            Load more
+          </button>
+        </PmarketBox>
+        <Footer />
+      </>
+    );
 }
 
-const MarketBox = styled.div`
+const MmarketBox = styled.div`
+  padding: 56px 0 0 0;
+  margin: 0 auto;
+  .innerBox {
+    padding: 4.44vw 6.11vw 15.55vw 6.11vw;
+
+    & > .topBar {
+      display: flex;
+      flex-direction: column;
+      gap: 4.44vw;
+
+      .title {
+        font-size: 5.55vw;
+        font-weight: 600;
+        line-height: 5.55vw;
+      }
+
+      .rightBox {
+        display: flex;
+        flex-direction: column;
+        gap: 2.77vw;
+
+        * {
+          font-family: "Roboto", sans-serif;
+        }
+
+        .searchBox {
+          display: flex;
+          align-items: center;
+          height: 12.22vw;
+          padding: 0 5vw;
+          border: 1px solid #d9d9d9;
+          border-radius: 3.33vw;
+
+          * {
+            font-size: 5vw;
+            font-size: 500;
+          }
+
+          input {
+            flex: 1;
+
+            &::placeholder {
+              color: #d9d9d9;
+            }
+          }
+        }
+
+        .sortBox {
+          width: 100%;
+          position: relative;
+
+          .sortBtn {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: inherit;
+            height: 12.22vw;
+            padding: 0 5vw;
+            font-size: 5vw;
+            line-height: 5vw;
+            font-weight: 500;
+            border: 1px solid #d9d9d9;
+            border-radius: 3.33vw;
+          }
+        }
+      }
+    }
+
+    .itemList {
+      display: flex;
+      flex-direction: column;
+      gap: 2.77vw;
+      margin: 4.44vw 0 0 0;
+    }
+
+    .moreBtn {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 6.66vw 0 0 0;
+      width: 100%;
+      height: 15vw;
+      font-size: 4.44vw;
+      font-weight: 500;
+      line-height: 4.44vw;
+      color: #fff;
+      background: #000;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+      border-radius: 8.33vw;
+    }
+  }
+`;
+
+const PmarketBox = styled.div`
   display: flex;
   flex-direction: column;
   gap: 44px;

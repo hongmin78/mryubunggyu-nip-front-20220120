@@ -3,9 +3,12 @@ import I_heart from "../img/icon/I_heart.svg";
 import I_heartO from "../img/icon/I_heartO.svg";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export default function AuctionItem({ data, index, likeObj, setLikeObj }) {
   const navigate = useNavigate();
+
+  const isMobile = useSelector((state) => state.common.isMobile);
 
   function onClickItemLike(index) {
     let dataObj = likeObj;
@@ -14,46 +17,162 @@ export default function AuctionItem({ data, index, likeObj, setLikeObj }) {
     setLikeObj({ ...dataObj });
   }
 
-  return (
-    <Item className="item" onClick={() => navigate(`/auction/detail/${index}`)}>
-      <div className="topBar">
-        <div className="profBox">
-          <img src={data.profImg} alt="" />
-          <p className="address">{strDot(data.address, 5, 4)}</p>
+  if (isMobile)
+    return (
+      <Mitem
+        className="item"
+        onClick={() => navigate(`/auction/detail/${index}`)}
+      >
+        <div className="topBar">
+          <div className="profBox">
+            <img src={data.profImg} alt="" />
+            <p className="address">{strDot(data.address, 5, 4)}</p>
+          </div>
+
+          {likeObj && (
+            <button className="likeBtn" onClick={() => onClickItemLike(index)}>
+              <img src={likeObj[index] ? I_heartO : I_heart} alt="" />
+              <p
+                className="count"
+                style={{
+                  color: likeObj[index] && "#ff5050",
+                }}
+              >
+                {data.like}
+              </p>
+            </button>
+          )}
         </div>
 
-        {likeObj && (
-          <button className="likeBtn" onClick={() => onClickItemLike(index)}>
-            <img src={likeObj[index] ? I_heartO : I_heart} alt="" />
-            <p
-              className="count"
-              style={{
-                color: likeObj[index] && "#ff5050",
-              }}
-            >
-              {data.like}
-            </p>
-          </button>
-        )}
-      </div>
+        <img className="itemImg" src={data.item} alt="" />
 
-      <img className="itemImg" src={data.item} alt="" />
+        <div className="infoBox">
+          <p className="title">{data.title}</p>
 
-      <div className="infoBox">
-        <p className="title">{data.title}</p>
+          <ul className="detailList">
+            <li>Last sold for</li>
+            <li>
+              {data.price}&nbsp;{data.unit}
+            </li>
+          </ul>
+        </div>
+      </Mitem>
+    );
+  else
+    return (
+      <Pitem
+        className="item"
+        onClick={() => navigate(`/auction/detail/${index}`)}
+      >
+        <div className="topBar">
+          <div className="profBox">
+            <img src={data.profImg} alt="" />
+            <p className="address">{strDot(data.address, 5, 4)}</p>
+          </div>
 
-        <ul className="detailList">
-          <li>Last sold for</li>
-          <li>
-            {data.price}&nbsp;{data.unit}
-          </li>
-        </ul>
-      </div>
-    </Item>
-  );
+          {likeObj && (
+            <button className="likeBtn" onClick={() => onClickItemLike(index)}>
+              <img src={likeObj[index] ? I_heartO : I_heart} alt="" />
+              <p
+                className="count"
+                style={{
+                  color: likeObj[index] && "#ff5050",
+                }}
+              >
+                {data.like}
+              </p>
+            </button>
+          )}
+        </div>
+
+        <img className="itemImg" src={data.item} alt="" />
+
+        <div className="infoBox">
+          <p className="title">{data.title}</p>
+
+          <ul className="detailList">
+            <li>Last sold for</li>
+            <li>
+              {data.price}&nbsp;{data.unit}
+            </li>
+          </ul>
+        </div>
+      </Pitem>
+    );
 }
 
-const Item = styled.li`
+const Mitem = styled.li`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 136.11vw;
+  box-shadow: 0px 3px 20px rgba(0, 0, 0, 0.2);
+  border-radius: 3.33vw;
+  overflow: hidden;
+  cursor: pointer;
+
+  .topBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 16.66vw;
+    padding: 0 4.44vw;
+
+    .profBox {
+      display: flex;
+      align-items: center;
+      gap: 2.77vw;
+    }
+
+    .likeBtn {
+      display: flex;
+      align-items: center;
+      gap: 1.66vw;
+      height: 10.55vw;
+      padding: 0 3.61vw;
+      font-weight: 500;
+      background: #f6f6f6;
+      backdrop-filter: blur(60px);
+      border-radius: 8.33vw;
+    }
+  }
+
+  .itemImg {
+    flex: 1;
+    width: 100%;
+    object-fit: cover;
+  }
+
+  .infoBox {
+    display: flex;
+    flex-direction: column;
+    height: 132px;
+
+    .title {
+      height: 54px;
+      padding: 0 12px;
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 54px;
+    }
+
+    .detailList {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+      padding: 0 12px;
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 19px;
+      color: #7a7a7a;
+      border-top: 1px solid #f6f6f6;
+    }
+  }
+`;
+
+const Pitem = styled.li`
   display: flex;
   flex-direction: column;
   width: 330px;
@@ -120,6 +239,7 @@ const Item = styled.li`
       font-weight: 500;
       line-height: 19px;
       color: #7a7a7a;
+      border-top: 1px solid #f6f6f6;
     }
   }
 `;

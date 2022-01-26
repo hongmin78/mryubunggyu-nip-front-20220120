@@ -13,6 +13,8 @@ import { autoAuctionList } from "../data/Dmain";
 import AuctionItem from "../components/AuctionItem";
 import Details from "../components/itemDetail/Details";
 import Properties from "../components/itemDetail/Properties";
+import { useSelector } from "react-redux";
+import Header from "./Header";
 
 export default function AuctionDetail() {
   const moreRef = useRef();
@@ -20,6 +22,8 @@ export default function AuctionDetail() {
   const [toggleLike, setToggleLike] = useState(false);
   const [category, setCategory] = useState(0);
   const [moreIndex, setMoreIndex] = useState(0);
+
+  const isMobile = useSelector((state) => state.common.isMobile);
 
   function onClickAuctionNextBtn() {
     const wrapWidth = moreRef.current.offsetWidth;
@@ -44,146 +48,616 @@ export default function AuctionDetail() {
         });
       } else {
         moreRef.current.scrollTo({
-          left: contWidth * itemNumByPage * moreIndex + 160,
+          left: isMobile ? contWidth * itemNumByPage * moreIndex + 40 : contWidth * itemNumByPage * moreIndex + 160,
           behavior: "smooth",
         });
       }
     }
   }, [moreIndex]);
 
-  return (
-    <AuctionDetailBox>
-      <section className="topBar">
-        <button className="copyBtn" onClick={() => {}}>
-          <img src={I_clip} alt="" />
-          Copy Link
-        </button>
-      </section>
+  if (isMobile)
+    return (
+      <>
+        <Header />
 
-      <section className="itemInfoContainer">
-        <img className="itemImg" src={E_detailItem} alt="" />
+        <MauctionDetailBox>
+          <section className="itemInfoContainer">
+            <img className="itemImg" src={E_detailItem} alt="" />
 
-        <article className="infoBox">
-          <div className="itemInfoBox">
-            <div className="titleBox">
-              <strong className="title">Ming #112</strong>
+            <article className="infoBox">
+              <div className="itemInfoBox">
+                <div className="titleBox">
+                  <div className="topBar">
+                    <div className="btnBox">
+                      <button
+                        className="likeBtn"
+                        onClick={() => setToggleLike(!toggleLike)}
+                      >
+                        <img src={toggleLike ? I_heartO : I_heart} alt="" />
+                      </button>
 
-              <div className="btnBox">
-                <button
-                  className="likeBtn"
-                  onClick={() => setToggleLike(!toggleLike)}
-                >
-                  <img src={toggleLike ? I_heartO : I_heart} alt="" />
-                </button>
+                      <button className="moreBtn" onClick={() => {}}>
+                        <img src={I_3dot} alt="" />
+                      </button>
+                    </div>
 
-                <button className="moreBtn" onClick={() => {}}>
-                  <img src={I_3dot} alt="" />
-                </button>
-              </div>
-            </div>
+                    <button className="copyBtn" onClick={() => {}}>
+                      <img src={I_clip} alt="" />
+                      Copy Link
+                    </button>
+                  </div>
 
-            <div className="ownedBox">
-              <p className="key">Owned by</p>
-              <p className="value">@andyfeltham</p>
-            </div>
-
-            <div className="saleBox">
-              <div className="key">
-                <p className="price">Current price</p>
-                <p className="time">Ending in</p>
-              </div>
-
-              <div className="value">
-                <strong className="price">{putCommaAtPrice(100)} USDT</strong>
-
-                <ul className="timeList">
-                  <li>00</li>
-                  <li>12</li>
-                  <li>59</li>
-                  <li>09</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          <div className="categoryBox">
-            <ul className="category">
-              {D_category.map((cont, index) => (
-                <li key={index} onClick={() => setCategory(index)}>
-                  {cont}
-
-                  <div
-                    className="underLine"
-                    style={{
-                      display: category === index && "block",
-                    }}
-                  />
-                </li>
-              ))}
-            </ul>
-
-            <div className="contBox">
-              {category === 0 && <Offer />}
-              {category === 1 && <Details />}
-              {category === 2 && <Properties />}
-            </div>
-          </div>
-        </article>
-      </section>
-
-      <section className="historyBox">
-        <article className="titleBox">
-          <strong className="title">Transaction History</strong>
-        </article>
-
-        <ul className="historyList">
-          {D_transactionHistory.map((cont, index) => (
-            <>
-              {index ? (
-                <div className="sideBarBox">
-                  <span className="sideBar" />
+                  <strong className="title">Ming #112</strong>
                 </div>
-              ) : (
-                <></>
-              )}
-              <li key={index}>
-                <span className="iconBox">
-                  <img src={cont.img} alt="" />
-                </span>
+
+                <div className="ownedBox">
+                  <p className="key">Owned by</p>
+                  <p className="value">@andyfeltham</p>
+                </div>
+
+                <div className="saleBox">
+                  <div className="price">
+                    <p className="key">Current price</p>
+                    <strong className="value">
+                      {putCommaAtPrice(100)} USDT
+                    </strong>
+                  </div>
+
+                  <div className="time">
+                    <p className="key">Ending in</p>
+
+                    <ul className="timeList">
+                      <li>00</li>
+                      <li>12</li>
+                      <li>59</li>
+                      <li>09</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="categoryBox">
+                <ul className="category">
+                  {D_category.map((cont, index) => (
+                    <li key={index} onClick={() => setCategory(index)}>
+                      {cont}
+
+                      <div
+                        className="underLine"
+                        style={{
+                          display: category === index && "block",
+                        }}
+                      />
+                    </li>
+                  ))}
+                </ul>
 
                 <div className="contBox">
-                  <p className="cont">{cont.cont}</p>
-                  <p className="time">{cont.time}</p>
+                  {category === 0 && <Offer />}
+                  {category === 1 && <Details />}
+                  {category === 2 && <Properties />}
                 </div>
-              </li>
-            </>
-          ))}
-        </ul>
-      </section>
+              </div>
+            </article>
+          </section>
 
-      <section className="moreBox">
-        <strong className="title">More from this collection</strong>
+          <section className="historyBox">
+            <article className="titleBox">
+              <strong className="title">Transaction History</strong>
+            </article>
 
-        <div className="listBox">
-          <div className="posBox">
-            <ul className="itemList" ref={moreRef}>
-              {autoAuctionList.map((cont, index) => (
-                <Fragment key={index}>
-                  <AuctionItem data={cont} index={index} />
-                </Fragment>
+            <ul className="historyList">
+              {D_transactionHistory.map((cont, index) => (
+                <>
+                  {index ? (
+                    <div className="sideBarBox">
+                      <span className="sideBar" />
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+                  <li key={index}>
+                    <span className="iconBox">
+                      <img src={cont.img} alt="" />
+                    </span>
+
+                    <div className="contBox">
+                      <p className="cont">{cont.cont}</p>
+                      <p className="time">{cont.time}</p>
+                    </div>
+                  </li>
+                </>
               ))}
             </ul>
-            <button className="nextBtn" onClick={onClickAuctionNextBtn}>
-              <img src={I_rtArw} alt="" />
+          </section>
+
+          <section className="moreBox">
+            <strong className="title">More from this collection</strong>
+
+            <div className="listBox">
+              <div className="posBox">
+                <ul className="itemList" ref={moreRef}>
+                  {autoAuctionList.map((cont, index) => (
+                    <Fragment key={index}>
+                      <AuctionItem data={cont} index={index} />
+                    </Fragment>
+                  ))}
+                </ul>
+                <button className="nextBtn" onClick={onClickAuctionNextBtn}>
+                  <img src={I_rtArw} alt="" />
+                </button>
+              </div>
+            </div>
+          </section>
+        </MauctionDetailBox>
+      </>
+    );
+  else
+    return (
+      <>
+        <Header />
+
+        <PauctionDetailBox>
+          <section className="topBar">
+            <button className="copyBtn" onClick={() => {}}>
+              <img src={I_clip} alt="" />
+              Copy Link
             </button>
-          </div>
-        </div>
-      </section>
-    </AuctionDetailBox>
-  );
+          </section>
+
+          <section className="itemInfoContainer">
+            <img className="itemImg" src={E_detailItem} alt="" />
+
+            <article className="infoBox">
+              <div className="itemInfoBox">
+                <div className="titleBox">
+                  <strong className="title">Ming #112</strong>
+
+                  <div className="btnBox">
+                    <button
+                      className="likeBtn"
+                      onClick={() => setToggleLike(!toggleLike)}
+                    >
+                      <img src={toggleLike ? I_heartO : I_heart} alt="" />
+                    </button>
+
+                    <button className="moreBtn" onClick={() => {}}>
+                      <img src={I_3dot} alt="" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="ownedBox">
+                  <p className="key">Owned by</p>
+                  <p className="value">@andyfeltham</p>
+                </div>
+
+                <div className="saleBox">
+                  <div className="key">
+                    <p className="price">Current price</p>
+                    <p className="time">Ending in</p>
+                  </div>
+
+                  <div className="value">
+                    <strong className="price">
+                      {putCommaAtPrice(100)} USDT
+                    </strong>
+
+                    <ul className="timeList">
+                      <li>00</li>
+                      <li>12</li>
+                      <li>59</li>
+                      <li>09</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="categoryBox">
+                <ul className="category">
+                  {D_category.map((cont, index) => (
+                    <li key={index} onClick={() => setCategory(index)}>
+                      {cont}
+
+                      <div
+                        className="underLine"
+                        style={{
+                          display: category === index && "block",
+                        }}
+                      />
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="contBox">
+                  {category === 0 && <Offer />}
+                  {category === 1 && <Details />}
+                  {category === 2 && <Properties />}
+                </div>
+              </div>
+            </article>
+          </section>
+
+          <section className="historyBox">
+            <article className="titleBox">
+              <strong className="title">Transaction History</strong>
+            </article>
+
+            <ul className="historyList">
+              {D_transactionHistory.map((cont, index) => (
+                <>
+                  {index ? (
+                    <div className="sideBarBox">
+                      <span className="sideBar" />
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+                  <li key={index}>
+                    <span className="iconBox">
+                      <img src={cont.img} alt="" />
+                    </span>
+
+                    <div className="contBox">
+                      <p className="cont">{cont.cont}</p>
+                      <p className="time">{cont.time}</p>
+                    </div>
+                  </li>
+                </>
+              ))}
+            </ul>
+          </section>
+
+          <section className="moreBox">
+            <strong className="title">More from this collection</strong>
+
+            <div className="listBox">
+              <div className="posBox">
+                <ul className="itemList" ref={moreRef}>
+                  {autoAuctionList.map((cont, index) => (
+                    <Fragment key={index}>
+                      <AuctionItem data={cont} index={index} />
+                    </Fragment>
+                  ))}
+                </ul>
+                <button className="nextBtn" onClick={onClickAuctionNextBtn}>
+                  <img src={I_rtArw} alt="" />
+                </button>
+              </div>
+            </div>
+          </section>
+        </PauctionDetailBox>
+      </>
+    );
 }
 
-const AuctionDetailBox = styled.div`
+const MauctionDetailBox = styled.div`
+  padding: 55px 0 0 0;
+
+  * {
+    font-family: "Roboto", sans-serif;
+  }
+
+  .itemInfoContainer {
+    .itemImg {
+      width: 100%;
+      height: 100vw;
+      object-fit: contain;
+    }
+
+    .infoBox {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 100%;
+
+      .itemInfoBox {
+        padding: 5.55vw 5.55vw 0 5.55vw;
+
+        .titleBox {
+          display: flex;
+          flex-direction: column;
+          gap: 3.33vw;
+          font-size: 56px;
+          font-weight: 600;
+          line-height: 84px;
+
+          .topBar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .btnBox {
+              display: flex;
+              gap: 5vw;
+
+              button {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 8.33vw;
+                height: 8.33vw;
+                border-radius: 50%;
+                box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+
+                &.likeBtn {
+                  padding: 1.94vw;
+                }
+
+                &.moreBtn {
+                  padding: 1.38vw;
+                }
+
+                img {
+                  width: 100%;
+                }
+              }
+            }
+
+            .copyBtn {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              gap: 2.22vw;
+              width: 32.22vw;
+              height: 8.33vw;
+              font-size: 3.88vw;
+              font-weight: 500;
+              line-height: 3.88vw;
+              background: #fff;
+              border-radius: 1.66vw;
+              box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+
+              img {
+                height: 5vw;
+              }
+            }
+          }
+
+          .title {
+            font-size: 7.77vw;
+            line-height: 7.77vw;
+            font-family: "Poppins", sans-serif;
+          }
+        }
+
+        .ownedBox {
+          display: flex;
+          gap: 2.22vw;
+          margin: 2.22vw 0 0 0;
+          font-size: 4.44vw;
+          font-weight: 500;
+
+          .key {
+            color: #7a7a7a;
+          }
+        }
+
+        .saleBox {
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+          margin: 4.44vw 0 0 0;
+
+          .price {
+            display: flex;
+            flex-direction: column;
+            gap: 1.11vw;
+
+            .key {
+              font-size: 3.88vw;
+              font-weight: 500;
+              line-height: 3.88vw;
+            }
+
+            .value {
+              font-size: 6.11vw;
+            }
+          }
+
+          .time {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 3.05vw;
+
+            .key {
+              font-size: 5vw;
+              font-weight: 500;
+            }
+
+            .timeList {
+              display: flex;
+              gap: 10px;
+
+              li {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 9.72vw;
+                height: 9.72vw;
+                font-weight: 700;
+                font-size: 5.55vw;
+                line-height: 5.55vw;
+                color: #fff;
+                background: #000;
+                border-radius: 1.66vw;
+              }
+            }
+          }
+        }
+      }
+
+      .categoryBox {
+        .category {
+          display: flex;
+          height: 16.66vw;
+          border-bottom: 1.4px solid #d9d9d9;
+
+          li {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            font-size: 4.44vw;
+            font-weight: 600;
+            font-family: "Poppins", sans-serif;
+            position: relative;
+            cursor: pointer;
+
+            .underLine {
+              display: none;
+              width: 100%;
+              height: 4px;
+              background: #000;
+              bottom: 0;
+              position: absolute;
+            }
+          }
+        }
+
+        .contBox {
+          height: 90.83vw;
+          overflow-y: scroll;
+
+          &::-webkit-scrollbar {
+            width: 10px;
+          }
+
+          &::-webkit-scrollbar-thumb {
+            width: 10px;
+            background-color: #d9d9d9;
+            border-radius: 8px;
+          }
+
+          &::-webkit-scrollbar-track {
+            background-color: #fff;
+          }
+        }
+      }
+    }
+  }
+
+  .historyBox {
+    margin: 9.44vw 0 0 0;
+
+    .titleBox {
+      display: flex;
+      align-items: center;
+      height: 13.88vw;
+      border-bottom: 1.4px solid #d9d9d9;
+
+      .title {
+        font-size: 5vw;
+        line-height: 5vw;
+      }
+    }
+
+    .historyList {
+      display: flex;
+      flex-direction: column;
+      gap: 2.22vw;
+      padding: 40px 20px 0;
+
+      .sideBarBox {
+        display: flex;
+        justify-content: center;
+        width: 10.55vw;
+
+        .sideBar {
+          width: 0.55vw;
+          height: 5.55vw;
+          background: #d9d9d9;
+        }
+      }
+
+      li {
+        display: flex;
+        align-items: center;
+        gap: 3.33vw;
+
+        .iconBox {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 10.55vw;
+          height: 10.55vw;
+          padding: 2.5vw;
+          border-radius: 50%;
+          background: #004ce0;
+
+          img {
+            width: 100%;
+          }
+        }
+
+        .contBox {
+          display: flex;
+          flex-direction: column;
+
+          .cont {
+            font-size: 3.88vw;
+            font-weight: 500;
+          }
+
+          .time {
+            font-size: 3.33vw;
+            color: #7a7a7a;
+          }
+        }
+      }
+    }
+  }
+
+  .moreBox {
+    display: flex;
+    flex-direction: column;
+    gap: 6.66vw;
+    padding: 0;
+    margin: 15.55vw 0 0 0;
+
+    .title {
+      font-size: 5vw;
+    }
+
+    .listBox {
+      .posBox {
+        display: flex;
+        align-items: center;
+        position: relative;
+
+        .itemList {
+          display: flex;
+          gap: 20px;
+          padding: 20px;
+          overflow-x: scroll;
+
+          .item{
+            min-width: 88.9vw;
+          }
+        }
+
+        .nextBtn {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 54px;
+          height: 54px;
+          background: rgba(255, 255, 255, 0.6);
+          border: 1px solid #f6f6f6;
+          border-radius: 50%;
+          box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+          position: absolute;
+          z-index: 2;
+          right: -7px;
+        }
+      }
+    }
+  }
+`;
+
+const PauctionDetailBox = styled.div`
   max-width: 1480px;
   padding: 180px 0 220px 0;
   margin: 0 auto;

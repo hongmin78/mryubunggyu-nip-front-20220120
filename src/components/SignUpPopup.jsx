@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import I_x from "../img/icon/I_x.svg";
 import I_chkWhite from "../img/icon/I_chkWhite.svg";
 import { setLogin } from "../util/store/commonSlice";
 import { chkValidEmail } from "../util/Util";
 
-export default function SignUpPopup({walletAddress}) {
+export default function SignUpPopup({ walletAddress }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const isMobile = useSelector((state) => state.common.isMobile);
+
   const [email, setEmail] = useState("");
   const [emailAlarm, setEmailAlarm] = useState("");
   const [pw, setPw] = useState("");
@@ -32,7 +36,7 @@ export default function SignUpPopup({walletAddress}) {
 
   function onClickSignUpBtn() {
     dispatch(setLogin(walletAddress));
-    navigate("/");
+    navigate("/staking");
   }
 
   useEffect(() => {
@@ -53,119 +57,379 @@ export default function SignUpPopup({walletAddress}) {
     }
   }, [pw, pwConfrim]);
 
-  return (
-    <SignUpPopupBox>
-      <p className="title">Sign up</p>
+  if (isMobile)
+    return (
+      <MsignUpBox>
+        <article className="topBar">
+          <span className="blank" />
 
-      <ul className="inputList">
-        <li>
-          <p className="contTitle">Email</p>
-          <div className="inputContainer">
-            <div className="inputBox">
+          <p className="title">Sign up</p>
+
+          <button className="exitBtn" onClick={() => navigate(-1)}>
+            <img src={I_x} alt="" />
+          </button>
+        </article>
+
+        <ul className="inputList">
+          <li>
+            <p className="contTitle">Email</p>
+            <div className="inputContainer">
               <input
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Please enter your email address"
               />
 
+              {emailAlarm && <p className="alarm">{emailAlarm}</p>}
+
               <button className="registrationBtn" onClick={() => {}}>
                 Registration
               </button>
             </div>
+          </li>
 
-            {emailAlarm && <p className="alarm">{emailAlarm}</p>}
-          </div>
-        </li>
-
-        <li>
-          <p className="contTitle">Password</p>
-          <div className="inputContainer">
-            <div className="inputBox">
-              <input
-                type="password"
-                value={pw}
-                onChange={(e) => setPw(e.target.value)}
-                placeholder="Password"
-              />
+          <li>
+            <p className="contTitle">Password</p>
+            <div className="inputContainer">
+              <div className="inputBox">
+                <input
+                  type="password"
+                  value={pw}
+                  onChange={(e) => setPw(e.target.value)}
+                  placeholder="Password"
+                />
+              </div>
             </div>
-          </div>
-        </li>
+          </li>
 
-        <li>
-          <p className="contTitle">Password</p>
-          <div className="inputContainer">
-            <div className="inputBox">
-              <input
-                type="password"
-                value={pwConfrim}
-                onChange={(e) => setPwConfirm(e.target.value)}
-                placeholder="Password confirmation"
-              />
+          <li>
+            <p className="contTitle">Confirm Password</p>
+            <div className="inputContainer">
+              <div className="inputBox">
+                <input
+                  type="password"
+                  value={pwConfrim}
+                  onChange={(e) => setPwConfirm(e.target.value)}
+                  placeholder="Password confirmation"
+                />
+              </div>
+
+              {pwAlarm && <p className="alarm">{pwAlarm}</p>}
             </div>
+          </li>
 
-            {pwAlarm && <p className="alarm">{pwAlarm}</p>}
-          </div>
-        </li>
-
-        <li>
-          <p className="contTitle">Referals</p>
-          <div className="inputContainer">
-            <div className="inputBox">
-              <input
-                value={referal}
-                onChange={(e) => setReferal(e.target.value)}
-                placeholder="Friend Recommendation"
-              />
+          <li>
+            <p className="contTitle">Referals</p>
+            <div className="inputContainer">
+              <div className="inputBox">
+                <input
+                  value={referal}
+                  onChange={(e) => setReferal(e.target.value)}
+                  placeholder="Friend Recommendation"
+                />
+              </div>
             </div>
-          </div>
-        </li>
-      </ul>
+          </li>
+        </ul>
 
-      <ul className="agreeList">
-        <li>
-          <button
-            className={agreeList[0] ? "chkBtn on" : "chkBtn"}
-            onClick={() => onClickAgreeList(0)}
-          >
-            <img src={I_chkWhite} alt="" />
+        <ul className="agreeList">
+          <li>
+            <button
+              className={agreeList[0] ? "chkBtn on" : "chkBtn"}
+              onClick={() => onClickAgreeList(0)}
+            >
+              <img src={I_chkWhite} alt="" />
+            </button>
+            <p>
+              Subscribe <u>Terms of Service</u> &#40;required&#41;
+            </p>
+          </li>
+
+          <li>
+            <button
+              className="chkBtn"
+              className={agreeList[1] ? "chkBtn on" : "chkBtn"}
+              onClick={() => onClickAgreeList(1)}
+            >
+              <img src={I_chkWhite} alt="" />
+            </button>
+            <p>
+              Personal lnformation Collection and Usage Agreement
+              &#40;required&#41;
+            </p>
+          </li>
+        </ul>
+
+        <ul className="btnBox">
+          <button className="cancelBtn" onClick={() => navigate("/")}>
+            Cancel
           </button>
-          <p>
-            Subscribe <u>Terms of Service</u> &#40;required&#41;
-          </p>
-        </li>
-
-        <li>
           <button
-            className="chkBtn"
-            className={agreeList[1] ? "chkBtn on" : "chkBtn"}
-            onClick={() => onClickAgreeList(1)}
+            className="confirmBtn"
+            disabled={disableConfirm}
+            onClick={onClickSignUpBtn}
           >
-            <img src={I_chkWhite} alt="" />
+            Sign up
           </button>
-          <p>
-            Personal lnformation Collection and Usage Agreement
-            &#40;required&#41;
-          </p>
-        </li>
-      </ul>
+        </ul>
+      </MsignUpBox>
+    );
+  else
+    return (
+      <PsignUpPopupBox>
+        <p className="title">Sign up</p>
 
-      <ul className="btnBox">
-        <button className="cancelBtn" onClick={() => navigate("/")}>
-          Cancel
-        </button>
-        <button
-          className="confirmBtn"
-          disabled={disableConfirm}
-          onClick={onClickSignUpBtn}
-        >
-          Sign up
-        </button>
-      </ul>
-    </SignUpPopupBox>
-  );
+        <ul className="inputList">
+          <li>
+            <p className="contTitle">Email</p>
+            <div className="inputContainer">
+              <div className="inputBox">
+                <input
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Please enter your email address"
+                />
+
+                <button className="registrationBtn" onClick={() => {}}>
+                  Registration
+                </button>
+              </div>
+
+              {emailAlarm && <p className="alarm">{emailAlarm}</p>}
+            </div>
+          </li>
+
+          <li>
+            <p className="contTitle">Password</p>
+            <div className="inputContainer">
+              <div className="inputBox">
+                <input
+                  type="password"
+                  value={pw}
+                  onChange={(e) => setPw(e.target.value)}
+                  placeholder="Password"
+                />
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <p className="contTitle">Password</p>
+            <div className="inputContainer">
+              <div className="inputBox">
+                <input
+                  type="password"
+                  value={pwConfrim}
+                  onChange={(e) => setPwConfirm(e.target.value)}
+                  placeholder="Password confirmation"
+                />
+              </div>
+
+              {pwAlarm && <p className="alarm">{pwAlarm}</p>}
+            </div>
+          </li>
+
+          <li>
+            <p className="contTitle">Referals</p>
+            <div className="inputContainer">
+              <div className="inputBox">
+                <input
+                  value={referal}
+                  onChange={(e) => setReferal(e.target.value)}
+                  placeholder="Friend Recommendation"
+                />
+              </div>
+            </div>
+          </li>
+        </ul>
+
+        <ul className="agreeList">
+          <li>
+            <button
+              className={agreeList[0] ? "chkBtn on" : "chkBtn"}
+              onClick={() => onClickAgreeList(0)}
+            >
+              <img src={I_chkWhite} alt="" />
+            </button>
+            <p>
+              Subscribe <u>Terms of Service</u> &#40;required&#41;
+            </p>
+          </li>
+
+          <li>
+            <button
+              className="chkBtn"
+              className={agreeList[1] ? "chkBtn on" : "chkBtn"}
+              onClick={() => onClickAgreeList(1)}
+            >
+              <img src={I_chkWhite} alt="" />
+            </button>
+            <p>
+              Personal lnformation Collection and Usage Agreement
+              &#40;required&#41;
+            </p>
+          </li>
+        </ul>
+
+        <ul className="btnBox">
+          <button className="cancelBtn" onClick={() => navigate("/")}>
+            Cancel
+          </button>
+          <button
+            className="confirmBtn"
+            disabled={disableConfirm}
+            onClick={onClickSignUpBtn}
+          >
+            Sign up
+          </button>
+        </ul>
+      </PsignUpPopupBox>
+    );
 }
 
-const SignUpPopupBox = styled.div`
+const MsignUpBox = styled.section`
+  display: flex;
+  flex-direction: column;
+
+  .topBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 56px;
+    padding: 0 15px;
+
+    .blank,
+    .exitBtn img {
+      width: 15px;
+    }
+
+    .title {
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 16px;
+    }
+  }
+
+  .inputList {
+    display: flex;
+    flex-direction: column;
+    gap: 6.66vw;
+    padding: 8.33vw 5.55vw 9.44vw 5.55vw;
+
+    li {
+      display: flex;
+      flex-direction: column;
+      gap: 4.44vw;
+
+      .contTitle {
+        font-size: 4.44vw;
+        font-weight: 600;
+      }
+
+      .inputContainer {
+        display: flex;
+        flex-direction: column;
+
+        input {
+          width: 100%;
+          height: 12.22vw;
+          padding: 0 4.44vw;
+          font-size: 4.44vw;
+          border: 1px solid #d9d9d9;
+          border-radius: 3.33vw;
+
+          &::placeholder {
+            color: #d9d9d9;
+          }
+        }
+
+        .registrationBtn {
+          height: 12.22vw;
+          margin: 1.66vw 0 0 0;
+          font-size: 5vw;
+          font-weight: 500;
+          color: #fff;
+          background: #000;
+          border-radius: 3.33vw;
+        }
+
+        .alarm {
+          margin: 2.77vw 0;
+          font-size: 3.88vw;
+          color: #ff5050;
+        }
+      }
+    }
+  }
+
+  .agreeList {
+    display: flex;
+    flex-direction: column;
+    gap: 3.61vw;
+    margin: 7.22vw 0 0 0;
+    padding: 0 5.55vw;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 3.88vw;
+      font-size: 3.88vw;
+      line-height: 3.88vw;
+
+      .chkBtn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 6.11vw;
+        height: 6.11vw;
+        border: 1px solid #000;
+        border-radius: 1.11vw;
+
+        &.on {
+          background: #000;
+        }
+      }
+
+      p {
+        flex: 1;
+      }
+    }
+  }
+
+  .btnBox {
+    display: flex;
+    gap: 24px;
+    margin: 8.33vw 0 0 0;
+    padding: 0 5.55vw;
+
+    button {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 13.88vw;
+      font-size: 4.44vw;
+      font-weight: 500;
+      border-radius: 3.33vw;
+
+      &.cancelBtn {
+        border: 1.4px solid #000000;
+      }
+
+      &.confirmBtn {
+        color: #fff;
+        background: #000;
+
+        &:disabled {
+          background: #aaa;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+`;
+
+const PsignUpPopupBox = styled.div`
   display: flex;
   flex-direction: column;
   gap: 44px;

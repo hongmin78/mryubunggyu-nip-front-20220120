@@ -1,14 +1,16 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import I_metaMask from "../img/icon/I_metaMask.svg";
 import PopupBg from "../components/PopupBg";
 import SignUpPopup from "../components/SignUpPopup";
+import { useSelector } from "react-redux";
+import Header from "./Header";
 
 export default function ConnectWallet() {
-  const dispatch = useDispatch();
+  const isMobile = useSelector((state) => state.common.isMobile);
   const navigate = useNavigate();
+
   const [signUpPopup, setSignUpPopup] = useState(false);
   const [walletAddress, setWalletAddress] = useState("");
 
@@ -19,7 +21,8 @@ export default function ConnectWallet() {
     ethereum.request({ method: "eth_requestAccounts" }).then((res) => {
       let address = res[0];
       setWalletAddress(address);
-      setSignUpPopup(true);
+      if (isMobile) navigate("/signup");
+      else setSignUpPopup(true);
 
       // navigate(-1);
       // dispatch(setLogin(address));
@@ -27,19 +30,28 @@ export default function ConnectWallet() {
   }
 
   return (
-    <ConnectWalletBox>
-      <p className="explain">Login with your wallet</p>
-      <button className="connectBtn" onClick={requestconnect}>
-        <img src={I_metaMask} alt="" />
-      </button>
+    <>
+      <Header />
+      <ConnectWalletBox>
+        <p className="explain">Login with your wallet</p>
+        <button className="connectBtn" onClick={requestconnect}>
+          <img src={I_metaMask} alt="" />
+        </button>
 
-      {signUpPopup && (
-        <>
-          <SignUpPopup walletAddress={walletAddress} />
-          <PopupBg blur off={setSignUpPopup} />
-        </>
-      )}
-    </ConnectWalletBox>
+        {signUpPopup && (
+          <>
+            <SignUpPopup walletAddress={walletAddress} />
+            <PopupBg blur off={setSignUpPopup} />
+          </>
+        )}
+
+        {/* {isMobile && (
+        <Routes>
+          <Route path="signup" element={<SignUpPopup />} />
+        </Routes>
+      )} */}
+      </ConnectWalletBox>
+    </>
   );
 }
 
