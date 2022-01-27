@@ -51,7 +51,10 @@ export default function MmenuPopup({ off }) {
               <img src={I_openBox} alt="" />
               <p>Auto Auction</p>
             </button>
-            <button className="marketPlaceBtn" onClick={() => navigate('/market')}>
+            <button
+              className="marketPlaceBtn"
+              onClick={() => navigate("/market")}
+            >
               <img src={I_market} alt="" />
               <p>Marketplece</p>
             </button>
@@ -59,7 +62,7 @@ export default function MmenuPopup({ off }) {
               <img src={I_book} alt="" />
               <p>FAQ</p>
             </button>
-            <button className="mypageBtn" onClick={() => {}}>
+            <button className="mypageBtn" onClick={() => navigate('/mypage')}>
               <img src={I_person} alt="" />
               <p>Mypage</p>
             </button>

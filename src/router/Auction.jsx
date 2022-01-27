@@ -8,7 +8,7 @@ import Footer from "./Footer";
 import PopupBg from "../components/PopupBg";
 import SelectPopup from "../components/SelectPopup";
 import { useSelector } from "react-redux";
-import Header from "./Header";
+import Header from "../components/header/Header";
 
 export default function Auction() {
   const [search, setSearch] = useState("");
@@ -76,7 +76,7 @@ export default function Auction() {
                       />
                     </Fragment>
                   );
-                else return <Fragment />;
+                else return <Fragment key={index} />;
               })}
             </ul>
 
@@ -141,7 +141,7 @@ export default function Auction() {
                     />
                   </Fragment>
                 );
-              else return <Fragment />;
+              else return <Fragment key={index} />;
             })}
           </ul>
 
@@ -159,7 +159,7 @@ const MauctionBox = styled.div`
   margin: 0 auto;
 
   .innerBox {
-    padding: 4.44vw 6.11vw 15.55vw 6.11vw;
+    padding: 4.44vw 20px 15.55vw 20px;
 
     & > .topBar {
       display: flex;

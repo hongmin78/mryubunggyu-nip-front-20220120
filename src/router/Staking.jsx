@@ -1,21 +1,21 @@
 import styled from "styled-components";
 import B_staking from "../img/staking/B_staking.png";
 import I_tIcon from "../img/icon/I_tIcon.png";
-import E_cc from "../img/common/E_cc.png";
+import E_staking from "../img/common/E_staking.png";
 import E_title from "../img/staking/E_title.svg";
 import { useState } from "react";
 import PopupBg from "../components/PopupBg";
 import StakingPopup from "../components/StakingPopup";
-import Header from "./Header";
+
 import { useSelector } from "react-redux";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import Header from "../components/header/Header";
 
 export default function Staking() {
   const navigate = useNavigate();
-  const isMobile = useSelector((state) => state.common.isMobile);
   const param = useParams();
 
-  console.log(param);
+  const isMobile = useSelector((state) => state.common.isMobile);
 
   const [price, setPrice] = useState("");
   const [stakingPopup, setStakingPopup] = useState(false);
@@ -31,11 +31,11 @@ export default function Staking() {
                 <img src={I_tIcon} alt="" />
               </span>
 
-              <span className="tokenTitle">USDT-MOONG</span>
+              <span className="tokenTitle">LUCKY TICKET</span>
             </div>
 
             <div className="imgBox">
-              <img className="mainImg" src={E_cc} alt="" />
+              <img className="mainImg" src={E_staking} alt="" />
             </div>
           </article>
 
@@ -87,10 +87,10 @@ export default function Staking() {
                 <img src={I_tIcon} alt="" />
               </span>
 
-              <span className="tokenTitle">USDT-MOONG</span>
+              <span className="tokenTitle">LUCKY TICKET</span>
             </div>
 
-            <img className="mainImg" src={E_cc} alt="" />
+            <img className="mainImg" src={E_staking} alt="" />
           </article>
 
           <article className="settingContainer">
@@ -353,7 +353,7 @@ const PstakingBox = styled.div`
     }
 
     .mainImg {
-      width: 258px;
+      width: 328px;
     }
   }
 

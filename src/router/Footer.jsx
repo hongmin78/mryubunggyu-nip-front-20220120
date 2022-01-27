@@ -41,7 +41,7 @@ const MfooterBox = styled.footer`
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 0 20px 50px 20px;
+  padding: 0 20px 30px 20px;
 
   .copyright {
     font-size: 12px;

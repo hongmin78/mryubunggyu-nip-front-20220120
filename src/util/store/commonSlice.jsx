@@ -17,7 +17,6 @@ export const todoSlice = createSlice({
     },
 
     setMobile: (state, action) => {
-      console.log(action.payload);
       state.isMobile = action.payload;
     },
 

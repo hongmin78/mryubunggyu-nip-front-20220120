@@ -14,16 +14,16 @@ import AuctionItem from "../components/AuctionItem";
 import Details from "../components/itemDetail/Details";
 import Properties from "../components/itemDetail/Properties";
 import { useSelector } from "react-redux";
-import Header from "./Header";
+import Header from "../components/header/Header";
 
 export default function AuctionDetail() {
   const moreRef = useRef();
 
+  const isMobile = useSelector((state) => state.common.isMobile);
+
   const [toggleLike, setToggleLike] = useState(false);
   const [category, setCategory] = useState(0);
   const [moreIndex, setMoreIndex] = useState(0);
-
-  const isMobile = useSelector((state) => state.common.isMobile);
 
   function onClickAuctionNextBtn() {
     const wrapWidth = moreRef.current.offsetWidth;
@@ -48,7 +48,11 @@ export default function AuctionDetail() {
         });
       } else {
         moreRef.current.scrollTo({
-          left: isMobile ? contWidth * itemNumByPage * moreIndex + 40 : contWidth * itemNumByPage * moreIndex + 160,
+          left: isMobile
+            ? moreRef.current.scrollLeft +
+              moreRef.current.children[moreIndex].getBoundingClientRect().left -
+              20
+            : contWidth * itemNumByPage * moreIndex + itemNumByPage * 40,
           behavior: "smooth",
         });
       }
@@ -148,9 +152,9 @@ export default function AuctionDetail() {
 
             <ul className="historyList">
               {D_transactionHistory.map((cont, index) => (
-                <>
+                <Fragment key={index}>
                   {index ? (
-                    <div className="sideBarBox">
+                    <div key={0} className="sideBarBox">
                       <span className="sideBar" />
                     </div>
                   ) : (
@@ -166,7 +170,7 @@ export default function AuctionDetail() {
                       <p className="time">{cont.time}</p>
                     </div>
                   </li>
-                </>
+                </Fragment>
               ))}
             </ul>
           </section>
@@ -196,7 +200,6 @@ export default function AuctionDetail() {
     return (
       <>
         <Header />
-
         <PauctionDetailBox>
           <section className="topBar">
             <button className="copyBtn" onClick={() => {}}>
@@ -285,7 +288,7 @@ export default function AuctionDetail() {
 
             <ul className="historyList">
               {D_transactionHistory.map((cont, index) => (
-                <>
+                <Fragment key={index}>
                   {index ? (
                     <div className="sideBarBox">
                       <span className="sideBar" />
@@ -293,7 +296,7 @@ export default function AuctionDetail() {
                   ) : (
                     <></>
                   )}
-                  <li key={index}>
+                  <li>
                     <span className="iconBox">
                       <img src={cont.img} alt="" />
                     </span>
@@ -303,7 +306,7 @@ export default function AuctionDetail() {
                       <p className="time">{cont.time}</p>
                     </div>
                   </li>
-                </>
+                </Fragment>
               ))}
             </ul>
           </section>
@@ -489,6 +492,8 @@ const MauctionDetailBox = styled.div`
       }
 
       .categoryBox {
+        margin: 10vw 0 0 0;
+
         .category {
           display: flex;
           height: 16.66vw;
@@ -549,6 +554,7 @@ const MauctionDetailBox = styled.div`
       border-bottom: 1.4px solid #d9d9d9;
 
       .title {
+        padding: 0 20px;
         font-size: 5vw;
         line-height: 5vw;
       }
@@ -613,11 +619,12 @@ const MauctionDetailBox = styled.div`
   .moreBox {
     display: flex;
     flex-direction: column;
-    gap: 6.66vw;
+    gap: 1.38vw;
     padding: 0;
     margin: 15.55vw 0 0 0;
 
     .title {
+      padding: 0 20px;
       font-size: 5vw;
     }
 
@@ -633,8 +640,8 @@ const MauctionDetailBox = styled.div`
           padding: 20px;
           overflow-x: scroll;
 
-          .item{
-            min-width: 88.9vw;
+          .item {
+            min-width: 100%;
           }
         }
 
@@ -923,6 +930,7 @@ const PauctionDetailBox = styled.div`
     margin: 120px 0 0 0;
 
     .title {
+      padding: 0 20px;
       font-size: 30px;
     }
 

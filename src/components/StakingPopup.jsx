@@ -10,9 +10,10 @@ import { useNavigate } from "react-router-dom";
 
 export default function StakingPopup({ off }) {
   const navigate = useNavigate();
+  
+  const isMobile = useSelector((state) => state.common.isMobile);
 
   const [termChk, setTermChk] = useState(false);
-  const isMobile = useSelector((state) => state.common.isMobile);
 
   if (isMobile)
     return (

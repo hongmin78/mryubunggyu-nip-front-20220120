@@ -8,16 +8,17 @@ import MarketItem from "../components/MarketItem";
 import { D_marketItemList, D_sortList } from "../data/Dmarket";
 import SelectPopup from "../components/SelectPopup";
 import { useSelector } from "react-redux";
-import Header from "./Header";
+import Header from "../components/header/Header";
 
 export default function Market() {
+  const isMobile = useSelector((state) => state.common.isMobile);
+  
   const [search, setSearch] = useState("");
   const [sortOpt, setSortOpt] = useState(D_sortList[1]);
   const [sortPopup, setSortPopup] = useState(false);
   const [likeObj, setLikeObj] = useState({});
   const [limit, setLimit] = useState(8);
 
-  const isMobile = useSelector((state) => state.common.isMobile);
 
   if (isMobile)
     return (
@@ -76,7 +77,7 @@ export default function Market() {
                       />
                     </Fragment>
                   );
-                else return <Fragment />;
+                else return <Fragment key={index}/>;
               })}
             </ul>
 
@@ -141,7 +142,7 @@ export default function Market() {
                     />
                   </Fragment>
                 );
-              else return <Fragment />;
+              else return <Fragment key={index}/>;
             })}
           </ul>
 
@@ -158,7 +159,7 @@ const MmarketBox = styled.div`
   padding: 56px 0 0 0;
   margin: 0 auto;
   .innerBox {
-    padding: 4.44vw 6.11vw 15.55vw 6.11vw;
+    padding: 4.44vw 20px 15.55vw 20px;
 
     & > .topBar {
       display: flex;

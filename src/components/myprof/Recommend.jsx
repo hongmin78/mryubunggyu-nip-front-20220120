@@ -3,85 +3,298 @@ import I_copy from "../../img/icon/I_copy.svg";
 import I_circleChk from "../../img/icon/I_circleChk.svg";
 import { D_recommendList } from "../../data/DmyPage";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 
 export default function Recommend() {
+  const isMobile = useSelector((state) => state.common.isMobile);
+
   const [toggleCode, setToggleCode] = useState(false);
   const [toggleLink, setToggleLink] = useState(false);
 
-  return (
-    <RecommendBox>
-      <p className="title">Referals</p>
+  if (isMobile)
+    return (
+      <MrecommendBox>
+        <p className="title">Referals</p>
 
-      <ul className="contList">
-        <li className="friendBox">
-          <strong className="contTitle">Friend Recommendation</strong>
+        <ul className="contList">
+          <li className="friendBox">
+            <strong className="contTitle">Friend Recommendation</strong>
 
-          <p className="explain">
-            Share your referral link! When a new user who accesses this link
-            purchases a product,
-            <br />
-            an additional 2% of the sales amount is paid. Referral rewards are
-            paid in lump sum every month.
-          </p>
-        </li>
+            <p className="explain">
+              Share your referral link! When a new user who accesses this link
+              purchases a product,
+              <br />
+              an additional 2% of the sales amount is paid. Referral rewards are
+              paid in lump sum every month.
+            </p>
+          </li>
 
-        <li className="recommendBox">
-          <strong className="contTitle">Recommend</strong>
+          <li className="recommendBox">
+            <strong className="contTitle">Recommend</strong>
 
-          <ul>
-            <li>
-              <strong className="key">Code</strong>
-              <span className="value">
-                <p>98Dd4DBE</p>
-                <button className="copyBtn" onClick={() => setToggleCode(true)}>
-                  <img src={toggleCode ? I_circleChk : I_copy} alt="" />
-                </button>
-              </span>
-            </li>
-            <li>
-              <strong className="key">Link</strong>
-              <span className="value">
-                <p>
-                  https://ausp.io/market/?ref=0x97b155a698d4bdec4c4bf3a92e9071190093cafb
-                </p>
-                <button className="copyBtn" onClick={() => setToggleLink(true)}>
-                  <img src={toggleLink ? I_circleChk : I_copy} alt="" />
-                </button>
-              </span>
-            </li>
-          </ul>
-        </li>
-
-        <li className="recommenderBox">
-          <strong className="contTitle">My recommender</strong>
-
-          <div className="listBox">
-            <ul className="listHeader">
-              {headerList.map((cont, index) => (
-                <li key={index}>{cont}</li>
-              ))}
+            <ul>
+              <li className="codeBox">
+                <strong className="key">Code</strong>
+                <span className="value">
+                  <p>98Dd4DBE</p>
+                  <button
+                    className="copyBtn"
+                    onClick={() => setToggleCode(true)}
+                  >
+                    <img src={toggleCode ? I_circleChk : I_copy} alt="" />
+                  </button>
+                </span>
+              </li>
+              <li className="linkBox">
+                <strong className="key">
+                  Link{" "}
+                  <button
+                    className="copyBtn"
+                    onClick={() => setToggleLink(true)}
+                  >
+                    <img src={toggleLink ? I_circleChk : I_copy} alt="" />
+                  </button>
+                </strong>
+                <span className="value">
+                  <p>
+                    https://ausp.io/market/?ref=0x97b155a698d4bdec4c4bf3a92e9071190093cafb
+                  </p>
+                </span>
+              </li>
             </ul>
+          </li>
+
+          <li className="recommenderBox">
+            <strong className="contTitle">My recommender</strong>
 
             <ul className="dataList">
               {D_recommendList.map((cont, index) => (
                 <li key={index}>
-                  <span>{String(index + 1).padStart(2, "0")}</span>
-                  <span>{cont.account}</span>
-                  <span>{cont.symbol ? cont.symbol : "-"}</span>
-                  <span>{cont.level} Level</span>
-                  <span>{cont.date}</span>
-                  <span>{cont.point} USDT</span>
+                  <div>
+                    <p className="account">{cont.account}</p>
+                    <p className="symbol">{cont.symbol ? cont.symbol : "-"}</p>
+                  </div>
+                  <div>
+                    <p className="level">{cont.level} Level</p>
+                  </div>
+                  <div>
+                    <p className="point">{cont.point} USDT</p>
+                    <p className="date">{cont.date}</p>
+                  </div>
                 </li>
               ))}
             </ul>
-          </div>
-        </li>
-      </ul>
-    </RecommendBox>
-  );
+          </li>
+        </ul>
+      </MrecommendBox>
+    );
+  else
+    return (
+      <PrecommendBox>
+        <p className="title">Referals</p>
+
+        <ul className="contList">
+          <li className="friendBox">
+            <strong className="contTitle">Friend Recommendation</strong>
+
+            <p className="explain">
+              Share your referral link! When a new user who accesses this link
+              purchases a product,
+              <br />
+              an additional 2% of the sales amount is paid. Referral rewards are
+              paid in lump sum every month.
+            </p>
+          </li>
+
+          <li className="recommendBox">
+            <strong className="contTitle">Recommend</strong>
+
+            <ul>
+              <li className="codeBox">
+                <strong className="key">Code</strong>
+                <span className="value">
+                  <p>98Dd4DBE</p>
+                  <button
+                    className="copyBtn"
+                    onClick={() => setToggleCode(true)}
+                  >
+                    <img src={toggleCode ? I_circleChk : I_copy} alt="" />
+                  </button>
+                </span>
+              </li>
+              <li className="linkBox">
+                <strong className="key">Link</strong>
+                <span className="value">
+                  <p>
+                    https://ausp.io/market/?ref=0x97b155a698d4bdec4c4bf3a92e9071190093cafb
+                  </p>
+                  <button
+                    className="copyBtn"
+                    onClick={() => setToggleLink(true)}
+                  >
+                    <img src={toggleLink ? I_circleChk : I_copy} alt="" />
+                  </button>
+                </span>
+              </li>
+            </ul>
+          </li>
+
+          <li className="recommenderBox">
+            <strong className="contTitle">My recommender</strong>
+
+            <div className="listBox">
+              <ul className="listHeader">
+                {headerList.map((cont, index) => (
+                  <li key={index}>{cont}</li>
+                ))}
+              </ul>
+
+              <ul className="dataList">
+                {D_recommendList.map((cont, index) => (
+                  <li key={index}>
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    <span>{cont.account}</span>
+                    <span>{cont.symbol ? cont.symbol : "-"}</span>
+                    <span>{cont.level} Level</span>
+                    <span>{cont.date}</span>
+                    <span>{cont.point} USDT</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </PrecommendBox>
+    );
 }
 
-const RecommendBox = styled.section`
+const MrecommendBox = styled.section`
+  padding: 9.16vw 5.55vw 0 5.55vw;
+
+  * {
+    font-family: "Roboto", sans-serif;
+  }
+
+  .title {
+    font-size: 5vw;
+  }
+
+  .contList {
+    margin: 5vw 0 0 0;
+
+    & > li {
+      display: flex;
+      flex-direction: column;
+      gap: 3.88vw;
+      padding: 6.66vw 0;
+      border-top: 1px solid #e1e1e1;
+
+      .contTitle {
+        font-size: 4.44vw;
+      }
+
+      &.friendBox {
+        padding-top: 0;
+        border-top: none;
+
+        .explain {
+          font-size: 3.88vw;
+        }
+      }
+
+      &.recommendBox {
+        ul {
+          display: flex;
+          flex-direction: column;
+          gap: 2.77vw;
+
+          li {
+            display: flex;
+            padding: 4.44vw;
+            background: #f7f7f7;
+            border-radius: 3.33vw;
+
+            .key {
+              font-size: 3.88vw;
+            }
+
+            .value {
+              flex: 1;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              font-size: 4.44vw;
+            }
+
+            img {
+              width: 5.55vw;
+              cursor: pointer;
+            }
+
+            &.codeBox {
+              align-items: center;
+
+              .key {
+                width: 13.88vw;
+              }
+            }
+
+            &.linkBox {
+              flex-direction: column;
+              gap: 2.22vw;
+              word-break: break-all;
+
+              .key {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+              }
+            }
+          }
+        }
+      }
+
+      &.recommenderBox {
+        .dataList {
+          display: flex;
+          flex-direction: column;
+          gap: 4.44vw;
+
+          li {
+            display: flex;
+            flex-direction: column;
+            gap: 3.33vw;
+            padding: 4.44vw;
+            box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.25);
+            border-radius: 2.22vw;
+
+            & > div {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              font-size: 3.88vw;
+              font-weight: 500;
+
+              .account {
+                color: #545454;
+              }
+
+              .level {
+                font-size: 5vw;
+              }
+
+              .date {
+                color: #7d7d7d;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const PrecommendBox = styled.section`
   padding: 60px 0 0 0;
 
   * {
@@ -108,6 +321,9 @@ const RecommendBox = styled.section`
       }
 
       &.friendBox {
+        .explain {
+          font-size: 18px;
+        }
       }
 
       &.recommendBox {

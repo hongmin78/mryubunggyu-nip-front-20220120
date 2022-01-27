@@ -105,6 +105,7 @@ const Mitem = styled.li`
   display: flex;
   flex-direction: column;
   width: 100%;
+  min-width: 100%;
   height: 136.11vw;
   box-shadow: 0px 3px 20px rgba(0, 0, 0, 0.2);
   border-radius: 3.33vw;

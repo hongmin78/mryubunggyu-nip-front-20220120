@@ -4,7 +4,7 @@ import E_prof3 from "../img/itemDetail/E_prof3.png";
 import E_prof4 from "../img/itemDetail/E_prof4.png";
 import I_tagWhite from "../img/icon/I_tagWhite.svg";
 import I_arwCrossWhite from "../img/icon/I_arwCrossWhite.svg";
-import I_rtArwWhite from "../img/icon/I_rtArwWhite.svg";
+import I_rtArw3White from "../img/icon/I_rtArw3White.svg";
 
 const D_category = ["Offer", "Details", "Properties"];
 
@@ -167,7 +167,7 @@ const D_transactionHistory = [
     time: "4 minutes ago",
   },
   {
-    img: I_rtArwWhite,
+    img: I_rtArw3White,
     cont: "Transferred from 0xa1b3D3Ef to 0x7bF18b45",
     time: "2 months ago",
   },
@@ -177,7 +177,7 @@ const D_transactionHistory = [
     time: "3 months ago",
   },
   {
-    img: I_rtArwWhite,
+    img: I_rtArw3White,
     cont: "Transferred from 0xE62F2788 to 0xa1b3D3Ef",
     time: "5 months ago",
   },

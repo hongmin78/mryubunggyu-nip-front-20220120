@@ -2,26 +2,26 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import HeaderPopup from "../components/HeaderPopup";
-import I_logo from "../img/icon/I_logo.svg";
-import I_logoText from "../img/icon/I_logoText.svg";
-import I_logoTextWhite from "../img/icon/I_logoTextWhite.svg";
-import I_3line from "../img/icon/I_3line.svg";
-import I_3lineWhite from "../img/icon/I_3lineWhite.svg";
-import { strDot } from "../util/Util";
-import MenuPopup from "../components/header/MmenuPopup";
+import HeaderPopup from "../../components/HeaderPopup";
+import I_logo from "../../img/icon/I_logo.svg";
+import I_logoText from "../../img/icon/I_logoText.svg";
+import I_logoTextWhite from "../../img/icon/I_logoTextWhite.svg";
+import I_3line from "../../img/icon/I_3line.svg";
+import I_3lineWhite from "../../img/icon/I_3lineWhite.svg";
+import { strDot } from "../../util/Util";
+import MmenuPopup from "./MmenuPopup";
 
 export default function Header() {
   const navigate = useNavigate();
   const pathname = useLocation().pathname;
+  let isStaking = pathname.indexOf("/staking") !== -1;
 
   const isMobile = useSelector((state) => state.common.isMobile);
   const isLogin = useSelector((state) => state.common.isLogin);
-  let isStaking = pathname.indexOf("/staking") !== -1;
 
   const [headerPopup, setHeaderPopup] = useState(false);
 
-  const [mMenuPopup, setMmenuPopup] = useState(false);
+  const [menuPopup, setMenuPopup] = useState(false);
 
   if (isMobile) {
     return (
@@ -34,12 +34,12 @@ export default function Header() {
             </p>
           </div>
 
-          <button className="menuBtn" onClick={() => setMmenuPopup(true)}>
-            <img src={isStaking ? I_3lineWhite:I_3line} alt="" />
+          <button className="menuBtn" onClick={() => setMenuPopup(true)}>
+            <img src={isStaking ? I_3lineWhite : I_3line} alt="" />
           </button>
         </MheaderBox>
 
-        {mMenuPopup && <MenuPopup off={setMmenuPopup} />}
+        {menuPopup && <MmenuPopup off={setMenuPopup} />}
       </>
     );
   } else {

@@ -21,6 +21,8 @@ export default function SignUpPopup({ walletAddress }) {
   const [referal, setReferal] = useState("");
   const [agreeList, setAgreeList] = useState(new Array(2).fill(false));
 
+  console.log(walletAddress);
+
   const disableConfirm =
     !(email && pw && pwConfrim && agreeList[0] && agreeList[1]) ||
     emailAlarm ||

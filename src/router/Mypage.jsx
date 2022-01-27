@@ -6,6 +6,7 @@ import I_3dot from "../img/icon/I_3dot.svg";
 import I_upload from "../img/icon/I_upload.svg";
 import I_clip from "../img/icon/I_clip.svg";
 
+import Header from "../components/header/Header";
 import Footer from "./Footer";
 import { strDot } from "../util/Util";
 import { useSelector } from "react-redux";
@@ -17,21 +18,58 @@ import { useNavigate } from "react-router-dom";
 
 export default function Mypage() {
   const navigate = useNavigate();
+
   const isLogin = useSelector((state) => state.common.isLogin);
+  const isMobile = useSelector((state) => state.common.isMobile);
 
   const [category, setCategory] = useState(0);
   const [morePopup, setMorePopup] = useState(false);
 
-  return (
-    <>
-      <MypageBox>
-        <article className="profBox">
-          <img className="bg" src={B_mypage} alt="" />
-          <div className="contBox">
-            <div className="leftBox">
-              <span className="profImg">
-                <img src={E_prof} alt="" />
-              </span>
+  if (isMobile)
+    return (
+      <>
+        <Header />
+        <MmypageBox>
+          <article className="profBox">
+            <img className="bg" src={B_mypage} alt="" />
+            <div className="contBox">
+              <div className="topBar">
+                <span className="profImg">
+                  <img src={E_prof} alt="" />
+                </span>
+
+                <div className="btnBox">
+                  <button
+                    className="moreBtn"
+                    onClick={() => setMorePopup(true)}
+                  >
+                    <img src={I_3dot} alt="" />
+                  </button>
+
+                  <button className="shareBtn" onClick={() => {}}>
+                    <img src={I_upload} alt="" />
+                    <p>Share</p>
+                  </button>
+
+                  {morePopup && (
+                    <>
+                      <div className="morePopup" onClick={() => setMorePopup()}>
+                        <button
+                          className="editBtn"
+                          onClick={() => navigate("/editprof")}
+                        >
+                          <p>Edit Profile</p>
+                        </button>
+                        <button className="copyBtn" onClick={() => {}}>
+                          <img src={I_clip} alt="" />
+                          <p>Copy Link</p>
+                        </button>
+                      </div>
+                      <PopupBg off={setMorePopup} />
+                    </>
+                  )}
+                </div>
+              </div>
 
               <span className="adressContainer">
                 <span className="name">#36185</span>
@@ -41,66 +79,320 @@ export default function Mypage() {
                 </span>
               </span>
             </div>
+          </article>
 
-            <div className="btnBox">
-              <button className="moreBtn" onClick={() => setMorePopup(true)}>
-                <img src={I_3dot} alt="" />
-              </button>
+          <article className="categoryCont">
+            <ul className="categoryBar">
+              {categoryList.map((cont, index) => (
+                <li key={index} onClick={() => setCategory(index)}>
+                  <p>{cont}</p>
 
-              <button className="shareBtn" onClick={() => {}}>
-                <img src={I_upload} alt="" />
-                <p>Share</p>
-              </button>
+                  <div
+                    className="underLine"
+                    style={{
+                      display: category === index && "block",
+                    }}
+                  />
+                </li>
+              ))}
+            </ul>
 
-              {morePopup && (
-                <>
-                  <div className="morePopup" onClick={() => setMorePopup()}>
-                    <button
-                      className="editBtn"
-                      onClick={() => navigate("/editprof")}
-                    >
-                      <p>Edit Profile</p>
-                    </button>
-                    <button className="copyBtn" onClick={() => {}}>
-                      <img src={I_clip} alt="" />
-                      <p>Copy Link</p>
-                    </button>
-                  </div>
-                  <PopupBg off={setMorePopup} />
-                </>
-              )}
+            <div className="contBox">
+              {category === 0 && <MyItems />}
+              {category === 1 && <Recommend />}
             </div>
-          </div>
-        </article>
+          </article>
+        </MmypageBox>
+        <Footer />
+      </>
+    );
+  else
+    return (
+      <>
+        <Header />
+        <PmypageBox>
+          <article className="profBox">
+            <img className="bg" src={B_mypage} alt="" />
+            <div className="contBox">
+              <div className="leftBox">
+                <span className="profImg">
+                  <img src={E_prof} alt="" />
+                </span>
 
-        <article className="categoryCont">
-          <ul className="categoryBar">
-            {categoryList.map((cont, index) => (
-              <li key={index} onClick={() => setCategory(index)}>
-                <p>{cont}</p>
+                <span className="adressContainer">
+                  <span className="name">#36185</span>
+                  <span className="addressBox">
+                    <p>{strDot(isLogin, 4, 4)}</p>
+                    <img src={I_copy} alt="" />
+                  </span>
+                </span>
+              </div>
 
-                <div
-                  className="underLine"
-                  style={{
-                    display: category === index && "block",
-                  }}
-                />
-              </li>
-            ))}
-          </ul>
+              <div className="btnBox">
+                <button className="moreBtn" onClick={() => setMorePopup(true)}>
+                  <img src={I_3dot} alt="" />
+                </button>
 
-          <div className="contBox">
-            {category === 0 && <MyItems />}
-            {category === 1 && <Recommend />}
-          </div>
-        </article>
-      </MypageBox>
-      <Footer />
-    </>
-  );
+                <button className="shareBtn" onClick={() => {}}>
+                  <img src={I_upload} alt="" />
+                  <p>Share</p>
+                </button>
+
+                {morePopup && (
+                  <>
+                    <div className="morePopup" onClick={() => setMorePopup()}>
+                      <button
+                        className="editBtn"
+                        onClick={() => navigate("/editprof")}
+                      >
+                        <p>Edit Profile</p>
+                      </button>
+                      <button className="copyBtn" onClick={() => {}}>
+                        <img src={I_clip} alt="" />
+                        <p>Copy Link</p>
+                      </button>
+                    </div>
+                    <PopupBg off={setMorePopup} />
+                  </>
+                )}
+              </div>
+            </div>
+          </article>
+
+          <article className="categoryCont">
+            <ul className="categoryBar">
+              {categoryList.map((cont, index) => (
+                <li key={index} onClick={() => setCategory(index)}>
+                  <p>{cont}</p>
+
+                  <div
+                    className="underLine"
+                    style={{
+                      display: category === index && "block",
+                    }}
+                  />
+                </li>
+              ))}
+            </ul>
+
+            <div className="contBox">
+              {category === 0 && <MyItems />}
+              {category === 1 && <Recommend />}
+            </div>
+          </article>
+        </PmypageBox>
+        <Footer />
+      </>
+    );
 }
 
-const MypageBox = styled.section`
+const MmypageBox = styled.section`
+  padding: 56px 0 25vw 0;
+
+  .profBox {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 83.33vw;
+    position: relative;
+
+    .bg {
+      width: 100%;
+      height: 67.77vw;
+      object-fit: cover;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -48%);
+      position: absolute;
+    }
+
+    .contBox {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      padding: 0 2.77vw;
+      z-index: 2;
+      position: relative;
+
+      .topBar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 24px;
+        width: 100%;
+
+        .profImg {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 20.55vw;
+          height: 20.55vw;
+          border-radius: 50%;
+          border: 1.66vw solid #fff;
+          overflow: hidden;
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+        }
+
+        .btnBox {
+          display: flex;
+          gap: 1.38vw;
+          position: relative;
+
+          & > button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 10.55vw;
+            font-size: 3.88vw;
+            font-weight: 500;
+            background: #fff;
+            box-shadow: 2px 0px 6px rgba(0, 0, 0, 0.1);
+
+            &.moreBtn {
+              width: 10.55vw;
+              border-radius: 50%;
+            }
+
+            &.shareBtn {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              width: 25vw;
+              padding: 0 3.88vw 0 3.33vw;
+              border-radius: 30px;
+
+              img {
+                height: 4.16vw;
+              }
+            }
+          }
+
+          .morePopup {
+            display: flex;
+            background: #fff;
+            border-radius: 3.33vw;
+            right: 0;
+            top: 0;
+            position: absolute;
+            transform: translate(0, 46px);
+            z-index: 6;
+
+            button {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              height: 12.22vw;
+              font-size: 3.88vw;
+              font-weight: 500;
+
+              &.editBtn {
+                padding: 0 4.44vw 0 5.55vw;
+              }
+
+              &.copyBtn {
+                gap: 2vw;
+                padding: 0 5.55vw 0 4.44vw;
+
+                img {
+                  height: 6vw;
+                }
+              }
+
+              p {
+                white-space: nowrap;
+                font-family: "Roboto", sans-serif;
+              }
+            }
+          }
+        }
+      }
+
+      .adressContainer {
+        display: flex;
+        width: 100%;
+        height: 13.33vw;
+        background: #fff;
+        border-radius: 8.33vw;
+        box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+
+        .name {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 0 7.77vw;
+          font-size: 4.44vw;
+          font-weight: 500;
+          color: #fff;
+          background: #000;
+          border-radius: 8.33vw;
+        }
+
+        .addressBox {
+          flex: 1;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0 5.55vw 0 3.88vw;
+          font-size: 4.44vw;
+          font-weight: 500;
+
+          p {
+            font-family: "Red Hat Mono", monospace;
+          }
+
+          img {
+            width: 6.66vw;
+          }
+        }
+      }
+    }
+  }
+
+  .categoryCont {
+    .categoryBar {
+      display: flex;
+      height: 18.33vw;
+      border-bottom: 1.4px solid #d9d9d9;
+
+      li {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        font-size: 4.44vw;
+        font-weight: 600;
+        position: relative;
+        cursor: pointer;
+
+        .underLine {
+          display: none;
+          width: 100%;
+          height: 4px;
+          background: #000;
+          bottom: 0;
+          position: absolute;
+        }
+      }
+    }
+
+    .contBox {
+    }
+  }
+`;
+
+const PmypageBox = styled.section`
   padding: 160px 0 220px 0;
   margin: 0 auto;
   max-width: 1440px;
