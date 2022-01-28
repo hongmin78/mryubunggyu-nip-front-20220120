@@ -1,7 +1,12 @@
 import { Fragment, useEffect, useRef } from "react";
 import { useState } from "react";
 import styled from "styled-components";
-import { autoAuctionList, D_faqList, marketPlaceList } from "../data/Dmain";
+import {
+  autoAuctionList,
+  D_faqList,
+  D_issueList,
+  marketPlaceList,
+} from "../data/Dmain";
 import Footer from "./Footer";
 import AuctionItem from "../components/AuctionItem";
 import MarketItem from "../components/MarketItem";
@@ -23,10 +28,13 @@ import B_tip3 from "../img/main/B_tip3.png";
 
 export default function Main() {
   const headLineRef = useRef();
+  const issueRef = useRef();
   const auctionRef = useRef();
   const marketRef = useRef();
   const ticketRef = useRef();
   const faqRef = useRef();
+
+  let issueIndex = 0;
 
   const isMobile = useSelector((state) => state.common.isMobile);
 
@@ -107,6 +115,28 @@ export default function Main() {
     if (faqIndex < pageNum - 1) setFaqIndex(faqIndex + 1);
     else setFaqIndex(0);
   }
+
+  useEffect(() => {
+    setInterval(() => {
+      const contHeight = issueRef.current.children[0].offsetHeight;
+      issueIndex++;
+
+      if (issueRef.current?.scrollTo) {
+        if (issueIndex < D_issueList.length) {
+          issueRef.current.scrollTo({
+            top:
+              contHeight * issueIndex + issueIndex * getStyle(issueRef, "gap"),
+            behavior: "smooth",
+          });
+        } else {
+          issueRef.current.scrollTo({
+            top: 0,
+            behavior: "smooth",
+          });
+        }
+      }
+    }, 5000);
+  }, []);
 
   useEffect(() => {
     const wrapWidth = headLineRef.current.offsetWidth;
@@ -255,18 +285,22 @@ export default function Main() {
           </section>
 
           <section className="issueContainer">
-            <article className="issueBox">
-              <div className="infoBox">
-                <div className="profBox">
-                  <img src={E_issueProf} alt="" />
-                  <p className="nickname">@andyfeltham</p>
-                </div>
-                <div className="timeBox">4 mins ago</div>
-              </div>
-              <p className="cont">
-                purchased <u>Ming #122</u> at 158 USDT
-              </p>
-            </article>
+            <ul className="issueList" ref={issueRef}>
+              {[1, 2, 3, 4].map((cont, index) => (
+                <li className="issueBox" key={index}>
+                  <div className="infoBox">
+                    <div className="profBox">
+                      <img src={E_issueProf} alt="" />
+                      <p className="nickname">@andyfeltham</p>
+                    </div>
+                    <div className="timeBox">4 mins ago</div>
+                  </div>
+                  <p className="cont">
+                    purchased <u>Ming #122</u> at 158 USDT
+                  </p>
+                </li>
+              ))}
+            </ul>
           </section>
 
           <section className="itemListContainer">
@@ -451,20 +485,22 @@ export default function Main() {
           </section>
 
           <section className="issueContainer">
-            <article className="issueBox">
-              <div className="contBox">
-                <div className="profBox">
-                  <img src={E_issueProf} alt="" />
-                  <p className="nickname">@andyfeltham</p>
-                </div>
-
-                <p className="cont">
-                  purchased <u>Ming #122</u> at 158 USDT
-                </p>
-              </div>
-
-              <div className="timeBox">4 mins ago</div>
-            </article>
+            <ul className="issueList" ref={issueRef}>
+              {D_issueList.map((cont, index) => (
+                <li className="issueBox" key={index}>
+                  <div className="infoBox">
+                    <div className="profBox">
+                      <img src={E_issueProf} alt="" />
+                      <p className="nickname">@andyfeltham</p>
+                    </div>
+                    <div className="timeBox">4 mins ago</div>
+                  </div>
+                  <p className="cont">
+                    purchased <u>Ming #122</u> at 158 USDT
+                  </p>
+                </li>
+              ))}
+            </ul>
           </section>
 
           <section className="itemListContainer">
@@ -628,6 +664,7 @@ const MmainBox = styled.div`
       width: 100%;
       height: inherit;
       overflow-x: scroll;
+      scroll-snap-type: x mandatory;
 
       li {
         display: flex;
@@ -636,6 +673,7 @@ const MmainBox = styled.div`
         min-width: 100%;
         color: #fff;
         padding: 11.11vw 0;
+        scroll-snap-align: center;
 
         .innerBox {
           display: flex;
@@ -676,9 +714,17 @@ const MmainBox = styled.div`
 
       &.preBtn {
         left: 3.33vw;
+
+        img {
+          height: 3.05vw;
+        }
       }
       &.nextBtn {
         right: 3.33vw;
+
+        img {
+          height: 3.05vw;
+        }
       }
     }
   }
@@ -687,51 +733,58 @@ const MmainBox = styled.div`
     display: flex;
     justify-content: center;
     align-items: flex-end;
-    height: 22.22vw;
-    margin: 4.44vw 0 0 0;
-    padding: 0 20px;
 
-    .issueBox {
+    .issueList {
       display: flex;
       flex-direction: column;
-      gap: 2.77vw;
+      gap: 8.88vw;
+      padding: 4.44vw 5.55vw;
       width: 100%;
-      height: 22.22vw;
-      padding: 3.33vw;
-      border-radius: 2.77vw;
-      box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.16);
+      height: 31.11vw;
+      overflow-y: scroll;
 
-      * {
-        font-family: "Roboto", sans-serif;
-      }
-
-      .infoBox {
+      .issueBox {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+        height: 22.22vw;
+        padding: 3.33vw;
+        border-radius: 2.77vw;
+        box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.16);
 
-        .profBox {
+        * {
+          font-family: "Roboto", sans-serif;
+        }
+
+        .infoBox {
           display: flex;
+          justify-content: space-between;
           align-items: center;
-          gap: 1.66vw;
-          font-size: 3.88vw;
 
-          img {
-            width: 8.33vw;
-            height: 8.33vw;
-            border-radius: 50%;
-            object-fit: cover;
+          .profBox {
+            display: flex;
+            align-items: center;
+            gap: 1.66vw;
+            font-size: 3.88vw;
+
+            img {
+              width: 8.33vw;
+              height: 8.33vw;
+              border-radius: 50%;
+              object-fit: cover;
+            }
+          }
+
+          .timeBox {
+            font-size: 3.33vw;
+            color: #7a7a7a;
           }
         }
 
-        .timeBox {
+        .cont {
           font-size: 3.33vw;
-          color: #7a7a7a;
         }
-      }
-
-      .cont {
-        font-size: 3.33vw;
       }
     }
   }
@@ -768,6 +821,11 @@ const MmainBox = styled.div`
           gap: 40px;
           padding: 20px;
           overflow-x: scroll;
+          scroll-snap-type: x mandatory;
+
+          .item {
+            scroll-snap-align: center;
+          }
         }
 
         .nextBtn {
@@ -783,11 +841,15 @@ const MmainBox = styled.div`
           position: absolute;
           z-index: 2;
           right: 7px;
+
+          img {
+            height: 3.05vw;
+          }
         }
       }
 
       &.autoAuctionBox {
-        padding: 11.11vw 0 0 0;
+        padding: 6.66vw 0 0 0;
       }
 
       &.ticketBox {
@@ -885,6 +947,7 @@ const MmainBox = styled.div`
             }
 
             p {
+              font-size: 4.44vw;
               font-weight: 500;
               text-align: center;
               font-family: "Roboto", sans-serif;
@@ -905,7 +968,7 @@ const MmainBox = styled.div`
             top: 0;
             right: 46px;
             position: absolute;
-            transform: translate(0, -7px);
+            transform: translate(0, -3vw);
 
             button {
               display: flex;
@@ -916,6 +979,10 @@ const MmainBox = styled.div`
               border-radius: 50%;
               background: #000;
               position: relative;
+
+              img {
+                height: 3.05vw;
+              }
             }
           }
         }
@@ -1016,47 +1083,56 @@ const PmainBox = styled.div`
   .issueContainer {
     display: flex;
     justify-content: center;
-    align-items: flex-end;
-    height: 104px;
+    align-items: center;
+    height: 148px;
 
-    .issueBox {
+    .issueList {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-      max-width: 820px;
-      height: 60px;
-      padding: 0 34px;
-      font-size: 18px;
-      line-height: 18px;
-      border-radius: 50px;
-      box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.16);
+      flex-direction: column;
+      gap: 32px;
+      height: 92px;
+      padding: 16px;
+      overflow-y: scroll;
 
-      * {
-        font-family: "Roboto", sans-serif;
-      }
-
-      .contBox {
+      .issueBox {
         display: flex;
+        justify-content: space-between;
         align-items: center;
-        gap: 20px;
+        width: 820px;
+        height: 60px;
+        min-height: 60px;
+        padding: 0 34px;
+        font-size: 18px;
+        line-height: 18px;
+        border-radius: 50px;
+        box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.16);
 
-        .profBox {
+        * {
+          font-family: "Roboto", sans-serif;
+        }
+
+        .infoBox {
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: 20px;
 
-          img {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            object-fit: cover;
+          .profBox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            img {
+              width: 34px;
+              height: 34px;
+              border-radius: 50%;
+              object-fit: cover;
+            }
           }
         }
-      }
 
-      .timeBox {
-        color: #7a7a7a;
+        .timeBox {
+          color: #7a7a7a;
+        }
       }
     }
   }
@@ -1116,7 +1192,7 @@ const PmainBox = styled.div`
       }
 
       &.autoAuctionBox {
-        padding: 60px 0 0 0;
+        padding: 16px 0 0 0;
 
         .detailList {
           border-top: 1px solid #f6f6f6;
@@ -1217,6 +1293,7 @@ const PmainBox = styled.div`
             }
 
             p {
+              font-size: 16px;
               font-weight: 500;
               text-align: center;
               font-family: "Roboto", sans-serif;

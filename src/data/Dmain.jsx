@@ -16,6 +16,8 @@ import E_marketItem2 from "../img/main/E_marketItem2.png";
 import E_marketItem3 from "../img/main/E_marketItem3.png";
 import E_marketItem4 from "../img/main/E_marketItem4.png";
 
+const D_issueList = [1, 2, 3, 4];
+
 const autoAuctionList = [
   {
     profImg: E_auctionProf1,
@@ -244,4 +246,4 @@ const D_faqList = [
   },
 ];
 
-export { autoAuctionList, marketPlaceList, D_faqList };
+export {  D_issueList, autoAuctionList, marketPlaceList, D_faqList };

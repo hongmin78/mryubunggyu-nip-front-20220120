@@ -490,9 +490,10 @@ const PmypageBox = styled.section`
           .addressBox {
             flex: 1;
             display: flex;
+            justify-content: space-between;
             align-items: center;
             gap: 15px;
-            padding: 0 0 0 20px;
+            padding: 0 24px 0 20px;
             font-size: 18px;
             font-weight: 500;
 
@@ -500,7 +501,7 @@ const PmypageBox = styled.section`
               font-family: "Red Hat Mono", monospace;
             }
 
-            img{
+            img {
               cursor: pointer;
             }
           }

@@ -7,7 +7,7 @@ import E_staking from "../../img/common/E_staking.png";
 import E_item3 from "../../img/mypage/E_item3.png";
 
 import { putCommaAtPrice } from "../../util/Util";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import PopupBg from "../../components/PopupBg";
 import { D_sortList } from "../../data/DmyPage";
 import { useNavigate } from "react-router-dom";
@@ -16,6 +16,7 @@ import { useSelector } from "react-redux";
 
 export default function MyItems() {
   const navigate = useNavigate();
+  const sortBtnRef = useRef();
 
   const isMobile = useSelector((state) => state.common.isMobile);
 
@@ -28,7 +29,17 @@ export default function MyItems() {
       <MmyItemsBox>
         <div className="topBar">
           <div className="sortBox">
-            <button className="sortBtn" onClick={() => setSortPopup(true)}>
+            <button
+              className="sortBtn"
+              ref={sortBtnRef}
+              onFocus={() =>
+                (sortBtnRef.current.style.border = "3px solid #000")
+              }
+              onBlur={() =>
+                (sortBtnRef.current.style.border = "1px solid #d9d9d9")
+              }
+              onClick={() => setSortPopup(true)}
+            >
               <p>{sortOpt}</p>
               <img src={I_dnArw} alt="" />
             </button>
@@ -290,7 +301,17 @@ export default function MyItems() {
           </ul>
 
           <div className="sortBox">
-            <button className="sortBtn" onClick={() => setSortPopup(true)}>
+            <button
+              className="sortBtn"
+              ref={sortBtnRef}
+              onFocus={() =>
+                (sortBtnRef.current.style.border = "3px solid #000")
+              }
+              onBlur={() =>
+                (sortBtnRef.current.style.border = "1px solid #d9d9d9")
+              }
+              onClick={() => setSortPopup(true)}
+            >
               <p>{sortOpt}</p>
               <img src={I_dnArw} alt="" />
             </button>

@@ -145,7 +145,9 @@ export default function SignUpPopup({ walletAddress }) {
               <img src={I_chkWhite} alt="" />
             </button>
             <p>
-              Subscribe <u>Terms of Service</u> &#40;required&#41;
+              Subscribe{" "}
+              <u onClick={() => navigate("/term")}>Terms of Service</u>{" "}
+              &#40;required&#41;
             </p>
           </li>
 
@@ -297,7 +299,7 @@ const MsignUpBox = styled.section`
   display: flex;
   flex-direction: column;
   padding: 0 0 9.44vw 0;
-  
+
   .topBar {
     display: flex;
     justify-content: space-between;

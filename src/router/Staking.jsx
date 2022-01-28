@@ -48,12 +48,8 @@ export default function Staking() {
                 <p className="value">0.00 USDT</p>
               </div>
 
-              <div className="inputBox">
-                <input
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  placeholder="0"
-                />
+              <div className="priceBox">
+                <p>100</p>
 
                 <span className="unit">USDT</span>
               </div>
@@ -102,12 +98,8 @@ export default function Staking() {
                 <p className="value">0.00 USDT</p>
               </div>
 
-              <div className="inputBox">
-                <input
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  placeholder="0"
-                />
+              <div className="priceBox">
+                <p>100</p>
 
                 <span className="unit">USDT</span>
               </div>
@@ -234,25 +226,21 @@ const MstakingBox = styled.div`
         }
       }
 
-      .inputBox {
+      .priceBox {
         display: flex;
         align-items: center;
         width: 100%;
         height: 16.66vw;
         margin: 5.55vw 0 0 0;
         padding: 2.77vw 2.77vw 2.77vw 6.66vw;
+        font-weight: 700;
         background: #fff;
         border-radius: 3.33vw;
 
-        * {
-          font-weight: 700;
-        }
-
-        input {
+        p {
           flex: 1;
-          height: 100%;
           font-size: 6.66vw;
-          min-width: 0;
+          line-height: 6.66vw;
         }
 
         .unit {
@@ -262,6 +250,7 @@ const MstakingBox = styled.div`
           height: 100%;
           padding: 0 4.44vw;
           font-size: 6.66vw;
+          line-height: 6.66vw;
           color: #fff;
           background: #000;
           border-radius: 2.77vw;
@@ -386,25 +375,21 @@ const PstakingBox = styled.div`
         }
       }
 
-      .inputBox {
+      .priceBox {
         display: flex;
         align-items: center;
         width: 100%;
         height: 70px;
         margin: 30px 0 0 0;
         padding: 10px 10px 10px 24px;
+        font-weight: 700;
         background: #fff;
         border-radius: 12px;
 
-        * {
-          font-weight: 700;
-        }
-
-        input {
+        p {
           flex: 1;
-          height: 100%;
           font-size: 30px;
-          min-width: 0;
+          line-height: 30px;
         }
 
         .unit {
@@ -414,6 +399,7 @@ const PstakingBox = styled.div`
           height: 100%;
           padding: 0 16px;
           font-size: 28px;
+          line-height: 28px;
           color: #fff;
           background: #000;
           border-radius: 10px;

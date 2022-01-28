@@ -1,11 +1,15 @@
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
 import I_logo from "../img/icon/I_logo.svg";
 import I_logoSky from "../img/icon/I_logoSky.png";
 import I_logoText from "../img/icon/I_logoText.svg";
+import PopupBg from "../components/PopupBg";
+import PdfPopup from "../components/PdfPopup";
 
 export default function Footer() {
   const isMobile = useSelector((state) => state.common.isMobile);
+  const [pdfPopup, setPdfPopup] = useState(false);
 
   if (isMobile)
     return (
@@ -14,26 +18,42 @@ export default function Footer() {
           Copyright © 2022 METACHAIN .LTD. All rights reserved.
         </p>
 
-        <article className="logoBox">
+        <article className="logoBox" onClick={() => setPdfPopup(true)}>
           <img className="logoImg" src={I_logoSky} alt="" />
           <p className="logoText">NIP</p>
         </article>
+
+        {pdfPopup && (
+          <>
+            <PdfPopup />
+            <PopupBg blur off={setPdfPopup} />
+          </>
+        )}
       </MfooterBox>
     );
   else
     return (
-      <PfooterBox>
-        <div className="innerBox">
-          <p className="copyright">
-            Copyright © 2022 METACHAIN .LTD. All rights reserved.
-          </p>
+      <>
+        <PfooterBox>
+          <div className="innerBox">
+            <p className="copyright">
+              Copyright © 2022 METACHAIN .LTD. All rights reserved.
+            </p>
 
-          <article className="logoBox">
-            <img className="logoImg" src={I_logo} alt="" />
-            <img className="logoText" src={I_logoText} alt="" />
-          </article>
-        </div>
-      </PfooterBox>
+            <article className="logoBox" onClick={() => setPdfPopup(true)}>
+              <img className="logoImg" src={I_logo} alt="" />
+              <img className="logoText" src={I_logoText} alt="" />
+            </article>
+          </div>
+        </PfooterBox>
+
+        {pdfPopup && (
+          <>
+            <PdfPopup />
+            <PopupBg blur off={setPdfPopup} />
+          </>
+        )}
+      </>
     );
 }
 
@@ -56,6 +76,7 @@ const MfooterBox = styled.footer`
     align-self: flex-end;
     align-items: center;
     gap: 3px;
+    cursor: pointer;
 
     .logoImg {
       height: 40px;
@@ -96,6 +117,7 @@ const PfooterBox = styled.footer`
       display: flex;
       align-items: flex-end;
       gap: 6px;
+      cursor: pointer;
 
       .logoImg {
         height: 40px;

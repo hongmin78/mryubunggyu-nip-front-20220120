@@ -28,6 +28,9 @@ function App() {
   }
 
   useEffect(() => {
+    if (window.innerWidth > 1024) dispatch(setMobile(false));
+    else dispatch(setMobile(true));
+
     window.addEventListener("resize", handleResize);
     return () => {
       window.removeEventListener("resize", handleResize);

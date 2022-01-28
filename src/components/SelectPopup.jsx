@@ -8,11 +8,7 @@ export default function SelectPopup({ off, dataList, select, setFunc }) {
     return (
       <MselectPopupBox className="sortPopup" onClick={() => off()}>
         {dataList.map((cont, index) => (
-          <li
-            key={index}
-            className={select === cont && "select"}
-            onClick={() => setFunc(cont)}
-          >
+          <li key={index} onClick={() => setFunc(cont)}>
             {cont}
           </li>
         ))}

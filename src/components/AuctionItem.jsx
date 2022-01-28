@@ -76,7 +76,10 @@ export default function AuctionItem({ data, index, likeObj, setLikeObj }) {
           </div>
 
           {likeObj && (
-            <button className="likeBtn" onClick={(e) => onClickItemLike(e, index)}>
+            <button
+              className="likeBtn"
+              onClick={(e) => onClickItemLike(e, index)}
+            >
               <img src={likeObj[index] ? I_heartO : I_heart} alt="" />
               <p
                 className="count"
@@ -128,6 +131,14 @@ const Mitem = styled.li`
       display: flex;
       align-items: center;
       gap: 2.77vw;
+      font-size: 4.44vw;
+
+      img {
+        width: 9.44vw;
+        height: 9.44vw;
+        border-radius: 50%;
+        object-fit: cover;
+      }
     }
 
     .likeBtn {
@@ -136,9 +147,14 @@ const Mitem = styled.li`
       gap: 1.66vw;
       height: 10.55vw;
       padding: 0 3.61vw;
+      font-size: 4.44vw;
       font-weight: 500;
       backdrop-filter: blur(60px);
       border-radius: 8.33vw;
+
+      img {
+        height: 4.44vw;
+      }
     }
   }
 
@@ -151,14 +167,14 @@ const Mitem = styled.li`
   .infoBox {
     display: flex;
     flex-direction: column;
-    height: 132px;
+    height: 36.66vw;
 
     .title {
-      height: 54px;
-      padding: 0 12px;
-      font-size: 20px;
+      height: 12.77vw;
+      padding: 0 4.44vw;
+      font-size: 4.44vw;
       font-weight: 600;
-      line-height: 54px;
+      line-height: 12.77vw;
     }
 
     .detailList {
@@ -166,11 +182,10 @@ const Mitem = styled.li`
       display: flex;
       flex-direction: column;
       justify-content: center;
-      gap: 6px;
-      padding: 0 12px;
-      font-size: 16px;
+      gap: 0.55vw;
+      padding: 0 4.44vw;
+      font-size: 3.88vw;
       font-weight: 500;
-      line-height: 19px;
       color: #7a7a7a;
       border-top: 1px solid #f6f6f6;
     }

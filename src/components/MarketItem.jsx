@@ -127,9 +127,9 @@ const Mitem = styled.li`
   flex-direction: column;
   width: 100%;
   min-width: 100%;
-  height: 522px;
+  height: 136.11vw;
   box-shadow: 0px 3px 20px rgba(0, 0, 0, 0.2);
-  border-radius: 12px;
+  border-radius: 3.33vw;
   overflow: hidden;
   cursor: pointer;
 
@@ -137,27 +137,36 @@ const Mitem = styled.li`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 60px;
-    padding: 0 16px;
+    height: 16.66vw;
+    padding: 0 4.44vw;
 
     .profBox {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 2.77vw;
+      font-size: 4.44vw;
+
+      img {
+        width: 9.44vw;
+        height: 9.44vw;
+        border-radius: 50%;
+        object-fit: cover;
+      }
     }
 
     .likeBtn {
       display: flex;
       align-items: center;
-      gap: 6px;
-      height: 38px;
-      padding: 0 13px;
+      gap: 1.66vw;
+      height: 10.55vw;
+      padding: 0 3.61vw;
+      font-size: 4.44vw;
       font-weight: 500;
       backdrop-filter: blur(60px);
-      border-radius: 30px;
+      border-radius: 8.33vw;
 
-      &:hover {
-        background: #f6f6f6;
+      img {
+        height: 4.44vw;
       }
     }
   }
@@ -171,14 +180,14 @@ const Mitem = styled.li`
   .infoBox {
     display: flex;
     flex-direction: column;
-    height: 132px;
+    height: 36.66vw;
 
     .title {
-      height: 54px;
-      padding: 0 12px;
-      font-size: 20px;
+      height: 12.77vw;
+      padding: 0 4.44vw;
+      font-size: 4.44vw;
       font-weight: 600;
-      line-height: 54px;
+      line-height: 12.77vw;
     }
 
     .detailList {
@@ -186,11 +195,10 @@ const Mitem = styled.li`
       display: flex;
       flex-direction: column;
       justify-content: center;
-      gap: 6px;
-      padding: 0 12px;
-      font-size: 16px;
+      gap: 0.55vw;
+      padding: 0 4.44vw;
+      font-size: 3.88vw;
       font-weight: 500;
-      line-height: 19px;
       color: #7a7a7a;
       background: #000;
 

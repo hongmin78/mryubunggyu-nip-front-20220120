@@ -36,7 +36,7 @@ export default function Market() {
                   <input
                     value={search}
                     onFocus={() =>
-                      (searchBoxRef.current.style.border = "1.4px solid #000")
+                      (searchBoxRef.current.style.border = "3px solid #000")
                     }
                     onBlur={() =>
                       (searchBoxRef.current.style.border = "1px solid #d9d9d9")
@@ -53,7 +53,7 @@ export default function Market() {
                     ref={sortBtnRef}
                     className="sortBtn"
                     onFocus={() =>
-                      (sortBtnRef.current.style.border = "1.4px solid #000")
+                      (sortBtnRef.current.style.border = "3px solid #000")
                     }
                     onBlur={() =>
                       (sortBtnRef.current.style.border = "1px solid #d9d9d9")
@@ -117,7 +117,7 @@ export default function Market() {
                 <input
                   value={search}
                   onFocus={() =>
-                    (searchBoxRef.current.style.border = "1.4px solid #000000")
+                    (searchBoxRef.current.style.border = "3px solid #000000")
                   }
                   onBlur={() =>
                     (searchBoxRef.current.style.border = "1px solid #d9d9d9")
@@ -134,7 +134,7 @@ export default function Market() {
                   ref={sortBtnRef}
                   className="sortBtn"
                   onFocus={() =>
-                    (sortBtnRef.current.style.border = "1.4px solid #000000")
+                    (sortBtnRef.current.style.border = "3px solid #000000")
                   }
                   onBlur={() =>
                     (sortBtnRef.current.style.border = "1px solid #d9d9d9")
@@ -287,7 +287,8 @@ const PmarketBox = styled.div`
   margin: 0 auto;
   max-width: 1440px;
   @media screen and (max-width: 1440px) {
-    padding: 0 20px;
+    padding-left: 20px;
+    padding-right: 20px;
   }
 
   .topBar {
@@ -328,6 +329,17 @@ const PmarketBox = styled.div`
 
           &::placeholder {
             color: #d9d9d9;
+          }
+        }
+
+        button {
+          display: flex;
+          justify-content: center;
+          align-content: center;
+          
+          img {
+            width: 24px;
+            height: 24px;
           }
         }
       }
