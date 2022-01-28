@@ -21,7 +21,9 @@ export default function SignUpPopup({ walletAddress }) {
   const [referal, setReferal] = useState("");
   const [agreeList, setAgreeList] = useState(new Array(2).fill(false));
 
-  console.log(walletAddress);
+  useEffect(() => {
+    console.log(walletAddress);
+  }, []);
 
   const disableConfirm =
     !(email && pw && pwConfrim && agreeList[0] && agreeList[1]) ||
@@ -254,7 +256,9 @@ export default function SignUpPopup({ walletAddress }) {
               <img src={I_chkWhite} alt="" />
             </button>
             <p>
-              Subscribe <u>Terms of Service</u> &#40;required&#41;
+              Subscribe{" "}
+              <u onClick={() => navigate("/term")}>Terms of Service</u>{" "}
+              &#40;required&#41;
             </p>
           </li>
 
@@ -292,7 +296,8 @@ export default function SignUpPopup({ walletAddress }) {
 const MsignUpBox = styled.section`
   display: flex;
   flex-direction: column;
-
+  padding: 0 0 9.44vw 0;
+  
   .topBar {
     display: flex;
     justify-content: space-between;
@@ -316,7 +321,7 @@ const MsignUpBox = styled.section`
     display: flex;
     flex-direction: column;
     gap: 6.66vw;
-    padding: 8.33vw 5.55vw 9.44vw 5.55vw;
+    padding: 8.33vw 5.55vw 0 5.55vw;
 
     li {
       display: flex;
@@ -384,11 +389,16 @@ const MsignUpBox = styled.section`
         align-items: center;
         width: 6.11vw;
         height: 6.11vw;
+        padding: 1vw;
         border: 1px solid #000;
         border-radius: 1.11vw;
 
         &.on {
           background: #000;
+        }
+
+        img {
+          width: 100%;
         }
       }
 
@@ -535,6 +545,12 @@ const PsignUpPopupBox = styled.div`
 
         &.on {
           background: #000;
+        }
+      }
+
+      p {
+        u {
+          cursor: pointer;
         }
       }
     }

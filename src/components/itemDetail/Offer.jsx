@@ -98,6 +98,7 @@ const PofferBox = styled.ul`
     justify-content: space-between;
     align-items: center;
     gap: 16px;
+    width: 100%;
 
     img {
       width: 40px;
@@ -107,8 +108,7 @@ const PofferBox = styled.ul`
     }
 
     .infoBox {
-      display: flex;
-      flex-direction: column;
+      flex: 1;
       gap: 4px;
 
       .info {

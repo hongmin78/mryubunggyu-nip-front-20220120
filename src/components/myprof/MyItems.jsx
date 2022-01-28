@@ -605,7 +605,7 @@ const MmyItemsBox = styled.section`
         .itemImg {
           width: 100%;
           height: 100%;
-          object-fit: cover;
+          object-fit: contain;
           position: absolute;
         }
 
@@ -894,6 +894,7 @@ const PmyItemsBox = styled.section`
     li {
       display: flex;
       justify-content: space-between;
+      gap: 40px;
 
       .imgBox {
         width: 760px;
@@ -902,11 +903,17 @@ const PmyItemsBox = styled.section`
         position: relative;
         overflow: hidden;
 
+        @media screen and (max-width: 1440px) {
+          min-width: 500px;
+          height: 500px;
+        }
+
         .itemImg {
           width: 100%;
           height: 100%;
-          object-fit: cover;
+          object-fit: contain;
           position: absolute;
+          border-radius: 12px;
         }
 
         .topBar {
@@ -932,7 +939,9 @@ const PmyItemsBox = styled.section`
       }
 
       .infoBox {
-        width: 608px;
+        max-width: 608px;
+        min-width: 445px;
+        width: 100%;
 
         .titleBox {
           display: flex;

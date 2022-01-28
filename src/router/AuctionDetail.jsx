@@ -348,7 +348,7 @@ const MauctionDetailBox = styled.div`
       object-fit: contain;
     }
 
-    .infoBox {
+    & > .infoBox {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -651,7 +651,7 @@ const MauctionDetailBox = styled.div`
           align-items: center;
           width: 54px;
           height: 54px;
-          background: rgba(255, 255, 255, 0.6);
+          background: rgba(255, 255, 255, 0.8);
           border: 1px solid #f6f6f6;
           border-radius: 50%;
           box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
@@ -700,18 +700,25 @@ const PauctionDetailBox = styled.div`
   .itemInfoContainer {
     display: flex;
     justify-content: space-between;
+    gap: 40px;
 
     .itemImg {
       width: 760px;
       height: 760px;
       object-fit: contain;
+
+      @media screen and (max-width: 1440px) {
+        min-width: 500px;
+        height: 500px;
+      }
     }
 
-    .infoBox {
+    & > .infoBox {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       max-width: 608px;
+      min-width: 445px;
       width: 100%;
 
       .itemInfoBox {
@@ -943,6 +950,7 @@ const PauctionDetailBox = styled.div`
         .itemList {
           display: flex;
           gap: 40px;
+          width: 100%;
           padding: 20px;
           overflow-x: scroll;
         }
@@ -953,7 +961,7 @@ const PauctionDetailBox = styled.div`
           align-items: center;
           width: 54px;
           height: 54px;
-          background: rgba(255, 255, 255, 0.6);
+          background: rgba(255, 255, 255, 0.8);
           border: 1px solid #f6f6f6;
           border-radius: 50%;
           box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);

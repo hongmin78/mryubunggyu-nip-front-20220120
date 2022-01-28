@@ -14,6 +14,7 @@ import Mypage from "./router/Mypage";
 import Penalty from "./router/Penalty";
 import Resell from "./router/Resell";
 import Staking from "./router/Staking";
+import Term from "./router/Term";
 import Winning from "./router/Winning";
 import GlobalStyle from "./util/GlobalStyle";
 import { setMobile } from "./util/store/commonSlice";
@@ -60,6 +61,8 @@ function App() {
           <Route path="/" element={<Main />} />
           <Route path="/winning" element={<Winning />} />
           <Route path="/penalty" element={<Penalty />} />
+
+          <Route path="/term" element={<Term />} />
 
           <Route path="/connectwallet" element={<ConnectWallet />} />
           <Route path="/connectwallet/:popup" element={<ConnectWallet />} />

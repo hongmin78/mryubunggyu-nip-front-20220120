@@ -23,77 +23,71 @@ export default function Penalty() {
         <LogoHeader />
         <MpenaltyBox>
           <section className="innerBox">
-            <article className="topBar">
-              <button className="exitBtn" onClick={() => navigate("/")}>
-                <img src={I_x} alt="" />
-              </button>
-            </article>
-
-            <article className="contBox">
-              <div className="item">
-                <div className="topBar">
-                  <div className="profBox">
-                    <img src={E_marketProf1} alt="" />
-                    <p className="address">@andyfeltham</p>
-                  </div>
-
-                  <button className="likeBtn" onClick={() => setLike(!like)}>
-                    <img src={like ? I_heartO : I_heart} alt="" />
-                    <p
-                      className="count"
-                      style={{
-                        color: like && "#ff5050",
-                      }}
-                    >
-                      22
-                    </p>
-                  </button>
-                </div>
-
-                <img className="itemImg" src={E_marketItem1} alt="" />
-
-                <div className="infoBox">
-                  <p className="title">Nero #1</p>
-
-                  <ul className="detailList">
-                    <li>
-                      <p>Current bid</p>
-                    </li>
-                    <li style={{ color: "#fff" }}>
-                      <p>688&nbsp;USDT</p>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className="textBox">
-                <div className="explainBox">
+            <article className="textBox">
+              <div className="explainBox">
+                <div className="titleBox">
                   <strong className="title">
                     Yor NFT is
                     <br /> on its way!
                   </strong>
-
-                  <div className="explain">
-                    <p className="cong">
-                      If the winning auction bid amount is not paid by 9:00 on
-                      the same day, the account will be locked and a 10% penalty
-                      will be charged
-                    </p>
-                    <p className="pay">Pay 688 USDT for your NFT transfer</p>
-                  </div>
                 </div>
 
-                <div className="btnBox">
-                  <p className="explain">
-                    If payment is not made by 2022-01-22 21:00:00, payment will
-                    be It will be canceled and your account will be locked.
+                <div className="explain">
+                  <p className="cong">
+                    If the winning auction bid amount is not paid by 9:00 on the
+                    same day, the account will be locked and a 10% penalty will
+                    be charged
                   </p>
-
-                  <button className="confirmBtn" onClick={() => navigate("/")}>
-                    Confirm checkout
-                  </button>
+                  <p className="pay">Pay 688 USDT for your NFT transfer</p>
                 </div>
               </div>
+            </article>
+
+            <article className="item">
+              <div className="topBar">
+                <div className="profBox">
+                  <img src={E_marketProf1} alt="" />
+                  <p className="address">@andyfeltham</p>
+                </div>
+
+                <button className="likeBtn" onClick={() => setLike(!like)}>
+                  <img src={like ? I_heartO : I_heart} alt="" />
+                  <p
+                    className="count"
+                    style={{
+                      color: like && "#ff5050",
+                    }}
+                  >
+                    22
+                  </p>
+                </button>
+              </div>
+
+              <img className="itemImg" src={E_marketItem1} alt="" />
+
+              <div className="infoBox">
+                <p className="title">Nero #1</p>
+
+                <ul className="detailList">
+                  <li className="time">
+                    <p>Last</p>
+                  </li>
+                  <li className="price">
+                    <p>688&nbsp;USDT</p>
+                  </li>
+                </ul>
+              </div>
+            </article>
+
+            <article className="btnBox">
+              <p className="explain">
+                If payment is not made by 2022-01-22 21:00:00, payment will be
+                It will be canceled and your account will be locked.
+              </p>
+
+              <button className="confirmBtn" onClick={() => navigate("/")}>
+                Confirm checkout
+              </button>
             </article>
           </section>
         </MpenaltyBox>
@@ -138,10 +132,10 @@ export default function Penalty() {
                   <p className="title">Nero #1</p>
 
                   <ul className="detailList">
-                    <li>
-                      <p>Current bid</p>
+                    <li className="time">
+                      <p>Last</p>
                     </li>
-                    <li style={{ color: "#fff" }}>
+                    <li className="price">
                       <p>688&nbsp;USDT</p>
                     </li>
                   </ul>
@@ -185,172 +179,158 @@ export default function Penalty() {
 
 const MpenaltyBox = styled.div`
   padding: 56px 0 0 0;
+
   .innerBox {
-    padding: 2.77vw 0 0 0;
-    
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 48px;
-    width: 1144px;
-    height: 764px;
-    padding: 58px 68px;
-    background: #ffffff;
-    box-shadow: 5px 4px 10px rgba(0, 0, 0, 0.25);
-    border-radius: 20px 20px 0px 20px;
-    z-index: 2;
+    gap: 8.33vw;
+    padding: 2.77vw 5.55vw 18.33vw 5.55vw;
 
-    .topBar {
+    .textBox {
       display: flex;
-      justify-content: flex-end;
-      width: 100%;
+      flex-direction: column;
 
-      .exitBtn {
-        img {
-          width: 22px;
+      .explainBox {
+        display: flex;
+        flex-direction: column;
+        gap: 1.66vw;
+
+        .titleBox {
+          display: flex;
+          justify-content: space-between;
+
+          .title {
+            width: 56vw;
+            font-size: 10vw;
+          }
+        }
+
+        .explain {
+          display: flex;
+          flex-direction: column;
+          gap: 3.33vw;
+
+          .cong {
+            font-size: 5vw;
+            font-weight: 500;
+            font-family: "Roboto", sans-serif;
+          }
+
+          .pay {
+            font-size: 3.88vw;
+            font-weight: 600;
+            color: #c4c4c4;
+          }
         }
       }
     }
 
-    .contBox {
+    .item {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-      max-width: 934px;
+      flex-direction: column;
+      box-shadow: 0px 3px 20px rgba(0, 0, 0, 0.2);
+      border-radius: 3.33vw;
+      overflow: hidden;
+      cursor: pointer;
 
-      .item {
+      .topBar {
         display: flex;
-        flex-direction: column;
-        width: 330px;
-        min-width: 330px;
-        height: 522px;
-        box-shadow: 0px 3px 20px rgba(0, 0, 0, 0.2);
-        border-radius: 12px;
-        overflow: hidden;
-        cursor: pointer;
+        justify-content: space-between;
+        align-items: center;
+        height: 16.66vw;
+        padding: 0 4.44vw;
 
-        .topBar {
+        .profBox {
           display: flex;
-          justify-content: space-between;
           align-items: center;
-          height: 60px;
-          padding: 0 16px;
-
-          .profBox {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-          }
-
-          .likeBtn {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            height: 38px;
-            padding: 0 13px;
-            font-weight: 500;
-            background: #f6f6f6;
-            backdrop-filter: blur(60px);
-            border-radius: 30px;
-          }
+          gap: 2.77vw;
         }
 
-        .itemImg {
-          flex: 1;
-          width: 100%;
-          object-fit: cover;
-        }
-
-        .infoBox {
+        .likeBtn {
           display: flex;
-          flex-direction: column;
-          height: 132px;
+          align-items: center;
+          gap: 1.66vw;
+          height: 10vw;
+          padding: 0 13px;
+          font-size: 4.44vw;
+          font-weight: 500;
+          backdrop-filter: blur(60px);
+          border-radius: 8.33vw;
 
-          .title {
-            height: 54px;
-            padding: 0 12px;
-            font-size: 20px;
-            font-weight: 600;
-            line-height: 54px;
-          }
-
-          .detailList {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 6px;
-            padding: 0 12px;
-            font-size: 16px;
-            font-weight: 500;
-            line-height: 19px;
-            color: #7a7a7a;
-            background: #000;
-
-            li {
-              display: flex;
-              justify-content: space-between;
-            }
+          &:hover {
+            background: #f6f6f6;
           }
         }
       }
 
-      .textBox {
+      .itemImg {
+        width: 100%;
+        height: 88.9vw;
+        object-fit: cover;
+      }
+
+      .infoBox {
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
-        width: 540px;
-        height: 100%;
+        height: 27.77vw;
 
-        .explainBox {
+        .title {
+          display: flex;
+          align-items: center;
+          height: 12.5vw;
+          padding: 0 4.44vw;
+          font-size: 4.44vw;
+          font-weight: 600;
+        }
+
+        .detailList {
+          flex: 1;
           display: flex;
           flex-direction: column;
-          gap: 24px;
-          width: 100%;
+          justify-content: center;
+          gap: 1.11vw;
+          padding: 0 4.44vw;
+          font-weight: 500;
+          background: #000;
+          font-weight: 500;
 
-          .title {
-            font-size: 56px;
-          }
-
-          .explain {
+          li {
             display: flex;
-            flex-direction: column;
-            gap: 13px;
+            justify-content: space-between;
 
-            .cong {
-              font-size: 24px;
-              font-weight: 500;
-              font-family: "Roboto", sans-serif;
+            &.time {
+              font-size: 3.88vw;
+              line-height: 3.88vw;
+              color: #7a7a7a;
             }
 
-            .pay {
-              font-size: 20px;
-              font-weight: 600;
-              color: #c4c4c4;
+            &.price {
+              font-size: 4.44vw;
+              line-height: 4.44vw;
+              color: #fff;
             }
           }
         }
+      }
+    }
 
-        .btnBox {
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
+    .btnBox {
+      display: flex;
+      flex-direction: column;
+      gap: 8.88vw;
 
-          .explain {
-            font-size: 16px;
-            font-weight: 600;
-          }
+      .explain {
+        font-size: 3.88vw;
+        font-weight: 600;
+        text-align: center;
+      }
 
-          .confirmBtn {
-            width: 480px;
-            height: 60px;
-            border-radius: 12px;
-            font-size: 20px;
-            font-weight: 600;
-            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
-          }
-        }
+      .confirmBtn {
+        height: 13.88vw;
+        border-radius: 3.33vw;
+        font-size: 5.55vw;
+        font-weight: 600;
+        box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
       }
     }
   }
@@ -368,7 +348,8 @@ const PpenaltyBox = styled.div`
     flex-direction: column;
     align-items: center;
     gap: 48px;
-    width: 1144px;
+    width: 100%;
+    max-width: 1144px;
     height: 764px;
     padding: 58px 68px;
     background: #ffffff;
@@ -401,7 +382,6 @@ const PpenaltyBox = styled.div`
         width: 330px;
         min-width: 330px;
         height: 522px;
-        box-shadow: 0px 3px 20px rgba(0, 0, 0, 0.2);
         border-radius: 12px;
         overflow: hidden;
         cursor: pointer;
@@ -426,9 +406,12 @@ const PpenaltyBox = styled.div`
             height: 38px;
             padding: 0 13px;
             font-weight: 500;
-            background: #f6f6f6;
             backdrop-filter: blur(60px);
             border-radius: 30px;
+
+            &:hover {
+              background: #f6f6f6;
+            }
           }
         }
 
@@ -461,12 +444,19 @@ const PpenaltyBox = styled.div`
             font-size: 16px;
             font-weight: 500;
             line-height: 19px;
-            color: #7a7a7a;
             background: #000;
 
             li {
               display: flex;
               justify-content: space-between;
+
+              &.time {
+                color: #7a7a7a;
+              }
+
+              &.price {
+                color: #fff;
+              }
             }
           }
         }

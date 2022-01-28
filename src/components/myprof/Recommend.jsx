@@ -4,6 +4,7 @@ import I_circleChk from "../../img/icon/I_circleChk.svg";
 import { D_recommendList } from "../../data/DmyPage";
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import { strDot } from "../../util/Util";
 
 export default function Recommend() {
   const isMobile = useSelector((state) => state.common.isMobile);
@@ -153,7 +154,7 @@ export default function Recommend() {
                 {D_recommendList.map((cont, index) => (
                   <li key={index}>
                     <span>{String(index + 1).padStart(2, "0")}</span>
-                    <span>{cont.account}</span>
+                    <span>{strDot(cont.account, 4, 4)}</span>
                     <span>{cont.symbol ? cont.symbol : "-"}</span>
                     <span>{cont.level} Level</span>
                     <span>{cont.date}</span>
@@ -385,22 +386,22 @@ const PrecommendBox = styled.section`
           .listHeader li,
           .dataList span {
             &:nth-of-type(1) {
-              width: 65px;
+              width: 4.64%;
               text-align: center;
             }
             &:nth-of-type(2) {
-              width: 250px;
+              width: 17.85%;
               text-align: center;
             }
             &:nth-of-type(3) {
-              width: 210px;
-              margin: 0 0 0 52px;
+              width: 15%;
+              margin: 0 0 0 3.71%;
             }
             &:nth-of-type(4) {
-              width: 312px;
+              width: 22.28%;
             }
             &:nth-of-type(5) {
-              width: 292px;
+              width: 20.85%;
             }
             &:nth-of-type(6) {
               flex: 1;

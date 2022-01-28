@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import styled from "styled-components";
 import I_search from "../img/icon/I_search.svg";
 import I_dnArw from "../img/icon/I_dnArw.svg";
@@ -11,14 +11,16 @@ import { useSelector } from "react-redux";
 import Header from "../components/header/Header";
 
 export default function Market() {
+  const searchBoxRef = useRef();
+  const sortBtnRef = useRef();
+
   const isMobile = useSelector((state) => state.common.isMobile);
-  
+
   const [search, setSearch] = useState("");
   const [sortOpt, setSortOpt] = useState(D_sortList[1]);
   const [sortPopup, setSortPopup] = useState(false);
   const [likeObj, setLikeObj] = useState({});
   const [limit, setLimit] = useState(8);
-
 
   if (isMobile)
     return (
@@ -30,9 +32,15 @@ export default function Market() {
               <p className="title">Marketplece All NFTs</p>
 
               <article className="rightBox">
-                <div className="searchBox">
+                <div className="searchBox" ref={searchBoxRef}>
                   <input
                     value={search}
+                    onFocus={() =>
+                      (searchBoxRef.current.style.border = "1.4px solid #000")
+                    }
+                    onBlur={() =>
+                      (searchBoxRef.current.style.border = "1px solid #d9d9d9")
+                    }
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="Search"
                   />
@@ -42,7 +50,14 @@ export default function Market() {
 
                 <div className="sortBox">
                   <button
+                    ref={sortBtnRef}
                     className="sortBtn"
+                    onFocus={() =>
+                      (sortBtnRef.current.style.border = "1.4px solid #000")
+                    }
+                    onBlur={() =>
+                      (sortBtnRef.current.style.border = "1px solid #d9d9d9")
+                    }
                     onClick={() => setSortPopup(true)}
                   >
                     <p>{sortOpt}</p>
@@ -77,7 +92,7 @@ export default function Market() {
                       />
                     </Fragment>
                   );
-                else return <Fragment key={index}/>;
+                else return <Fragment key={index} />;
               })}
             </ul>
 
@@ -98,9 +113,15 @@ export default function Market() {
             <p className="title">Marketplece All NFTs</p>
 
             <article className="rightBox">
-              <div className="searchBox">
+              <div className="searchBox" ref={searchBoxRef}>
                 <input
                   value={search}
+                  onFocus={() =>
+                    (searchBoxRef.current.style.border = "1.4px solid #000000")
+                  }
+                  onBlur={() =>
+                    (searchBoxRef.current.style.border = "1px solid #d9d9d9")
+                  }
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search"
                 />
@@ -109,7 +130,17 @@ export default function Market() {
               </div>
 
               <div className="sortBox">
-                <button className="sortBtn" onClick={() => setSortPopup(true)}>
+                <button
+                  ref={sortBtnRef}
+                  className="sortBtn"
+                  onFocus={() =>
+                    (sortBtnRef.current.style.border = "1.4px solid #000000")
+                  }
+                  onBlur={() =>
+                    (sortBtnRef.current.style.border = "1px solid #d9d9d9")
+                  }
+                  onClick={() => setSortPopup(true)}
+                >
                   <p>{sortOpt}</p>
                   <img src={I_dnArw} alt="" />
                 </button>
@@ -142,7 +173,7 @@ export default function Market() {
                     />
                   </Fragment>
                 );
-              else return <Fragment key={index}/>;
+              else return <Fragment key={index} />;
             })}
           </ul>
 
@@ -217,7 +248,6 @@ const MmarketBox = styled.div`
             font-size: 5vw;
             line-height: 5vw;
             font-weight: 500;
-            border: 1px solid #d9d9d9;
             border-radius: 3.33vw;
           }
         }
@@ -256,6 +286,9 @@ const PmarketBox = styled.div`
   padding: 208px 0 220px 0;
   margin: 0 auto;
   max-width: 1440px;
+  @media screen and (max-width: 1440px) {
+    padding: 0 20px;
+  }
 
   .topBar {
     display: flex;
@@ -294,8 +327,7 @@ const PmarketBox = styled.div`
           flex: 1;
 
           &::placeholder {
-            /* color: #d9d9d9; */
-            color: #aaa;
+            color: #d9d9d9;
           }
         }
       }
@@ -325,6 +357,9 @@ const PmarketBox = styled.div`
     display: flex;
     flex-wrap: wrap;
     gap: 40px;
+    @media screen and (max-width: 1440px) {
+      justify-content: center;
+    }
   }
 
   .moreBtn {

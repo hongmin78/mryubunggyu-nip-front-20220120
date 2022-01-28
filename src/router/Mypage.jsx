@@ -1,11 +1,4 @@
 import styled from "styled-components";
-import B_mypage from "../img/mypage/B_mypage.png";
-import E_prof from "../img/mypage/E_prof.png";
-import I_copy from "../img/icon/I_copy.svg";
-import I_3dot from "../img/icon/I_3dot.svg";
-import I_upload from "../img/icon/I_upload.svg";
-import I_clip from "../img/icon/I_clip.svg";
-
 import Header from "../components/header/Header";
 import Footer from "./Footer";
 import { strDot } from "../util/Util";
@@ -16,6 +9,13 @@ import Recommend from "../components/myprof/Recommend";
 import PopupBg from "../components/PopupBg";
 import { useNavigate } from "react-router-dom";
 
+import B_mypage from "../img/mypage/B_mypage.png";
+import E_prof from "../img/mypage/E_prof.png";
+import I_copy from "../img/icon/I_copy.svg";
+import I_3dot from "../img/icon/I_3dot.svg";
+import I_upload from "../img/icon/I_upload.svg";
+import I_clip from "../img/icon/I_clip.svg";
+
 export default function Mypage() {
   const navigate = useNavigate();
 
@@ -23,7 +23,8 @@ export default function Mypage() {
   const isMobile = useSelector((state) => state.common.isMobile);
 
   const [category, setCategory] = useState(0);
-  const [morePopup, setMorePopup] = useState(false);
+  const [showEditBtn, setShowEditBtn] = useState(false);
+  const [showCopyBtn, setShowCopyBtn] = useState(false);
 
   if (isMobile)
     return (
@@ -39,35 +40,49 @@ export default function Mypage() {
                 </span>
 
                 <div className="btnBox">
-                  <button
-                    className="moreBtn"
-                    onClick={() => setMorePopup(true)}
-                  >
-                    <img src={I_3dot} alt="" />
-                  </button>
+                  <div className="posBox">
+                    <button
+                      className="moreBtn hoverBtn"
+                      onClick={() => setShowEditBtn(true)}
+                    >
+                      <img src={I_3dot} alt="" />
+                    </button>
 
-                  <button className="shareBtn" onClick={() => {}}>
-                    <img src={I_upload} alt="" />
-                    <p>Share</p>
-                  </button>
-
-                  {morePopup && (
-                    <>
-                      <div className="morePopup" onClick={() => setMorePopup()}>
+                    {showEditBtn && (
+                      <>
                         <button
-                          className="editBtn"
+                          className="editBtn displayBtn"
                           onClick={() => navigate("/editprof")}
                         >
                           <p>Edit Profile</p>
                         </button>
-                        <button className="copyBtn" onClick={() => {}}>
+                        <PopupBg off={setShowEditBtn} />
+                      </>
+                    )}
+                  </div>
+
+                  <div className="posBox">
+                    <button
+                      className="shareBtn hoverBtn"
+                      onClick={() => setShowCopyBtn(true)}
+                    >
+                      <img src={I_upload} alt="" />
+                      <p>Share</p>
+                    </button>
+
+                    {showCopyBtn && (
+                      <>
+                        <button
+                          className="copyBtn displayBtn"
+                          onClick={() => setShowCopyBtn(false)}
+                        >
                           <img src={I_clip} alt="" />
                           <p>Copy Link</p>
                         </button>
-                      </div>
-                      <PopupBg off={setMorePopup} />
-                    </>
-                  )}
+                        <PopupBg off={setShowCopyBtn} />
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -129,32 +144,34 @@ export default function Mypage() {
               </div>
 
               <div className="btnBox">
-                <button className="moreBtn" onClick={() => setMorePopup(true)}>
-                  <img src={I_3dot} alt="" />
-                </button>
+                <div className="posBox">
+                  <button className="moreBtn hoverBtn" onClick={() => {}}>
+                    <img src={I_3dot} alt="" />
+                  </button>
 
-                <button className="shareBtn" onClick={() => {}}>
-                  <img src={I_upload} alt="" />
-                  <p>Share</p>
-                </button>
+                  <div className="hoverBox">
+                    <button
+                      className="editBtn displayBtn"
+                      onClick={() => navigate("/editprof")}
+                    >
+                      <p>Edit Profile</p>
+                    </button>
+                  </div>
+                </div>
 
-                {morePopup && (
-                  <>
-                    <div className="morePopup" onClick={() => setMorePopup()}>
-                      <button
-                        className="editBtn"
-                        onClick={() => navigate("/editprof")}
-                      >
-                        <p>Edit Profile</p>
-                      </button>
-                      <button className="copyBtn" onClick={() => {}}>
-                        <img src={I_clip} alt="" />
-                        <p>Copy Link</p>
-                      </button>
-                    </div>
-                    <PopupBg off={setMorePopup} />
-                  </>
-                )}
+                <div className="posBox">
+                  <button className="shareBtn hoverBtn" onClick={() => {}}>
+                    <img src={I_upload} alt="" />
+                    <p>Share</p>
+                  </button>
+
+                  <div className="hoverBox">
+                    <button className="copyBtn displayBtn" onClick={() => {}}>
+                      <img src={I_clip} alt="" />
+                      <p>Copy Link</p>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </article>
@@ -248,60 +265,59 @@ const MmypageBox = styled.section`
           gap: 1.38vw;
           position: relative;
 
-          & > button {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 10.55vw;
-            font-size: 3.88vw;
-            font-weight: 500;
-            background: #fff;
-            box-shadow: 2px 0px 6px rgba(0, 0, 0, 0.1);
+          .posBox {
+            position: relative;
 
-            &.moreBtn {
-              width: 10.55vw;
-              border-radius: 50%;
-            }
-
-            &.shareBtn {
+            .hoverBtn {
               display: flex;
-              justify-content: space-between;
+              justify-content: center;
               align-items: center;
-              width: 25vw;
-              padding: 0 3.88vw 0 3.33vw;
-              border-radius: 30px;
+              height: 10.55vw;
+              font-size: 3.88vw;
+              font-weight: 500;
+              background: #fff;
+              box-shadow: 2px 0px 6px rgba(0, 0, 0, 0.1);
 
-              img {
-                height: 4.16vw;
+              &.moreBtn {
+                width: 10.55vw;
+                border-radius: 50%;
+              }
+
+              &.shareBtn {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 25vw;
+                padding: 0 3.88vw 0 3.33vw;
+                border-radius: 30px;
+
+                img {
+                  height: 4.16vw;
+                }
               }
             }
-          }
 
-          .morePopup {
-            display: flex;
-            background: #fff;
-            border-radius: 3.33vw;
-            right: 0;
-            top: 0;
-            position: absolute;
-            transform: translate(0, 46px);
-            z-index: 6;
-
-            button {
+            .displayBtn {
               display: flex;
               justify-content: center;
               align-items: center;
               height: 12.22vw;
+              padding: 0 5.55vw;
               font-size: 3.88vw;
               font-weight: 500;
+              background: #fff;
+              border-radius: 3.33vw;
+              right: 0;
+              top: 0;
+              position: absolute;
+              transform: translate(0, 46px);
+              z-index: 6;
 
               &.editBtn {
-                padding: 0 4.44vw 0 5.55vw;
               }
 
               &.copyBtn {
                 gap: 2vw;
-                padding: 0 5.55vw 0 4.44vw;
 
                 img {
                   height: 6vw;
@@ -353,6 +369,7 @@ const MmypageBox = styled.section`
 
           img {
             width: 6.66vw;
+            cursor: pointer;
           }
         }
       }
@@ -396,6 +413,10 @@ const PmypageBox = styled.section`
   padding: 160px 0 220px 0;
   margin: 0 auto;
   max-width: 1440px;
+
+  @media screen and (max-width: 1440px) {
+    padding: 160px 20px 220px 20px;
+  }
 
   .profBox {
     display: flex;
@@ -478,6 +499,10 @@ const PmypageBox = styled.section`
             p {
               font-family: "Red Hat Mono", monospace;
             }
+
+            img{
+              cursor: pointer;
+            }
           }
         }
       }
@@ -487,60 +512,66 @@ const PmypageBox = styled.section`
         gap: 15px;
         position: relative;
 
-        & > button {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 54px;
-          font-size: 16px;
-          font-weight: 500;
-          background: #fff;
-          box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+        .posBox {
+          position: relative;
 
-          &.moreBtn {
-            width: 54px;
-            border-radius: 50%;
+          &:hover {
+            .hoverBox {
+              display: block;
+            }
           }
 
-          &.shareBtn {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 128px;
-            padding: 0 24px;
-            border-radius: 30px;
-          }
-        }
-
-        .morePopup {
-          display: flex;
-          background: #fff;
-          border-radius: 12px;
-          right: 0;
-          bottom: 0;
-          position: absolute;
-          transform: translate(0, -64px);
-          z-index: 6;
-
-          button {
+          .hoverBtn {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 44px;
-            font-size: 18px;
+            height: 54px;
+            font-size: 16px;
             font-weight: 500;
+            background: #fff;
+            box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
 
-            &.editBtn {
-              padding: 0 16px 0 20px;
+            &.moreBtn {
+              width: 54px;
+              border-radius: 50%;
             }
 
-            &.copyBtn {
-              padding: 0 20px 0 16px;
+            &.shareBtn {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              width: 128px;
+              padding: 0 24px;
+              border-radius: 30px;
             }
+          }
 
-            p {
-              white-space: nowrap;
-              font-family: "Roboto", sans-serif;
+          .hoverBox {
+            display: none;
+            width: 100%;
+            height: 108px;
+            bottom: 0;
+            position: absolute;
+
+            .displayBtn {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              gap: 10px;
+              height: 44px;
+              padding: 0 20px;
+              font-size: 18px;
+              font-weight: 500;
+              background: #fff;
+              border-radius: 12px;
+              right: 0;
+              position: absolute;
+              z-index: 6;
+
+              p {
+                white-space: nowrap;
+                font-family: "Roboto", sans-serif;
+              }
             }
           }
         }

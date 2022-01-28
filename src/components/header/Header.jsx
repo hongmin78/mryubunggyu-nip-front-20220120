@@ -27,7 +27,7 @@ export default function Header() {
     return (
       <>
         <MheaderBox style={{ background: isStaking && "unset" }}>
-          <div className="logoBox">
+          <div className="logoBox" onClick={() => navigate("/")}>
             <img className="logoImg" src={I_logo} alt="" />
             <p className="logoText" style={{ color: isStaking && "#fff" }}>
               NIP
@@ -117,6 +117,36 @@ export default function Header() {
   }
 }
 
+const MheaderBox = styled.header`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 56px;
+  padding: 0 20px;
+  background: #fff;
+  top: 0;
+  right: 0;
+  left: 0;
+  position: fixed;
+  z-index: 4;
+
+  .logoBox {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+
+    .logoImg {
+      width: 22px;
+    }
+
+    .logoText {
+      font-size: 20px;
+      font-weight: 600;
+      color: #063a71;
+    }
+  }
+`;
+
 const PheaderBox = styled.header`
   display: flex;
   justify-content: center;
@@ -134,14 +164,14 @@ const PheaderBox = styled.header`
     align-items: center;
     width: 100%;
     max-width: 1440px;
-    @media screen and (max-width: 1024px) {
+    @media screen and (max-width: 1440px) {
       padding: 0 20px;
     }
 
     .logoBox {
       display: flex;
       align-items: flex-end;
-      gap: 4px;
+      gap: 6px;
 
       .logoImg {
         height: 57px;
@@ -224,36 +254,6 @@ const PheaderBox = styled.header`
       background: #000;
       box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
       border-radius: 30px;
-    }
-  }
-`;
-
-const MheaderBox = styled.header`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 56px;
-  padding: 0 20px;
-  background: #fff;
-  top: 0;
-  right: 0;
-  left: 0;
-  position: fixed;
-  z-index: 4;
-
-  .logoBox {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-
-    .logoImg {
-      width: 22px;
-    }
-
-    .logoText {
-      font-size: 20px;
-      font-weight: 600;
-      color: #063a71;
     }
   }
 `;

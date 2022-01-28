@@ -22,11 +22,7 @@ export default function SelectPopup({ off, dataList, select, setFunc }) {
     return (
       <PselectPopupBox className="sortPopup" onClick={() => off()}>
         {dataList.map((cont, index) => (
-          <li
-            key={index}
-            className={select === cont && "select"}
-            onClick={() => setFunc(cont)}
-          >
+          <li key={index} onClick={() => setFunc(cont)}>
             {cont}
           </li>
         ))}
@@ -54,7 +50,7 @@ const MselectPopupBox = styled.ul`
     border-radius: 2.22vw;
     cursor: pointer;
 
-    &.select {
+    &:hover {
       color: #fff;
       background: #000;
     }
@@ -81,7 +77,7 @@ const PselectPopupBox = styled.ul`
     border-radius: 8px;
     cursor: pointer;
 
-    &.select {
+    &:hover {
       color: #fff;
       background: #000;
     }

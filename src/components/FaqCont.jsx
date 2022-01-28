@@ -33,7 +33,7 @@ const MfaqItem = styled.li`
   width: 100%;
   min-width: 100%;
   padding: 6.66vw;
-  box-shadow: 0px 3px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.16);
   border-radius: 2.77vw;
   overflow: hidden;
   cursor: pointer;
@@ -52,10 +52,11 @@ const PfaqItem = styled.li`
   display: flex;
   flex-direction: column;
   gap: 24px;
-  width: 1440px;
-  min-width: 1440px;
+  width: 100%;
+  max-width: 1440px;
+  min-width: 100%;
   padding: 46px 48px;
-  box-shadow: 0px 3px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.16);
   border-radius: 20px;
   overflow: hidden;
   cursor: pointer;

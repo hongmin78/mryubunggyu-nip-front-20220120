@@ -81,6 +81,9 @@ const PfooterBox = styled.footer`
     align-items: center;
     width: 100%;
     max-width: 1440px;
+    @media screen and (max-width: 1440px) {
+      padding: 0 20px;
+    }
 
     .copyright {
       font-size: 18px;

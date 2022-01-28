@@ -61,7 +61,7 @@ export default function BidPopup({ off }) {
               Placing this bid will start a 24 hour auction for the artwork.
               Once a bid is placed, it cannot be withdrawn.
             </p>
-            <button className="confirmBtn" onClick={() => off()}>
+            <button className="confirmBtn" onClick={() => navigate(-1)}>
               Bid amount is required
             </button>
           </div>
@@ -128,6 +128,11 @@ export default function BidPopup({ off }) {
 
 const MbidPopupBox = styled.section`
   width: 88.9vw;
+  max-height: 80vh;
+  @media screen and (max-height: 190vw) {
+    overflow-y: scroll;
+  }
+
   padding: 0;
   border-radius: 5.55vw;
   background: #fff;

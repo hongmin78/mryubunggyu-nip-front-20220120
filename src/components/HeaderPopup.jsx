@@ -6,14 +6,21 @@ import I_bookWhite from "../img/icon/I_bookWhite.svg";
 import I_power from "../img/icon/I_power.svg";
 import I_powerWhite from "../img/icon/I_powerWhite.svg";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setLogin } from "../util/store/commonSlice";
 
 export default function HeaderPopup() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  function onClickLogout() {
+    dispatch(setLogin());
+  }
 
   return (
     <HeaderPopupBox>
       <nav>
-        <button className="mypageBtn" onClick={() => navigate('/mypage')}>
+        <button className="mypageBtn" onClick={() => navigate("/mypage")}>
           <img src={I_person} alt="" />
           <p>My page</p>
         </button>
@@ -21,7 +28,7 @@ export default function HeaderPopup() {
           <img src={I_book} alt="" />
           <p>FAQ</p>
         </button>
-        <button className="disconnectBtn" onClick={() => {}}>
+        <button className="disconnectBtn" onClick={onClickLogout}>
           <img src={I_power} alt="" />
           <p>Disconnect</p>
         </button>

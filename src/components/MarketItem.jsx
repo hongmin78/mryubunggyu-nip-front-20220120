@@ -10,7 +10,8 @@ export default function MarketItem({ data, index, likeObj, setLikeObj }) {
 
   const isMobile = useSelector((state) => state.common.isMobile);
 
-  function onClickItemLike(index) {
+  function onClickItemLike(e, index) {
+    e.stopPropagation();
     let dataObj = likeObj;
     dataObj[index] = !dataObj[index];
 
@@ -30,7 +31,10 @@ export default function MarketItem({ data, index, likeObj, setLikeObj }) {
           </div>
 
           {likeObj && (
-            <button className="likeBtn" onClick={() => onClickItemLike(index)}>
+            <button
+              className="likeBtn"
+              onClick={(e) => onClickItemLike(e, index)}
+            >
               <img src={likeObj[index] ? I_heartO : I_heart} alt="" />
               <p
                 className="count"
@@ -78,7 +82,10 @@ export default function MarketItem({ data, index, likeObj, setLikeObj }) {
           </div>
 
           {likeObj && (
-            <button className="likeBtn" onClick={() => onClickItemLike(index)}>
+            <button
+              className="likeBtn"
+              onClick={(e) => onClickItemLike(e, index)}
+            >
               <img src={likeObj[index] ? I_heartO : I_heart} alt="" />
               <p
                 className="count"
@@ -146,9 +153,12 @@ const Mitem = styled.li`
       height: 38px;
       padding: 0 13px;
       font-weight: 500;
-      background: #f6f6f6;
       backdrop-filter: blur(60px);
       border-radius: 30px;
+
+      &:hover {
+        background: #f6f6f6;
+      }
     }
   }
 
@@ -223,9 +233,12 @@ const Pitem = styled.li`
       height: 38px;
       padding: 0 13px;
       font-weight: 500;
-      background: #f6f6f6;
       backdrop-filter: blur(60px);
       border-radius: 30px;
+
+      &:hover {
+        background: #f6f6f6;
+      }
     }
   }
 

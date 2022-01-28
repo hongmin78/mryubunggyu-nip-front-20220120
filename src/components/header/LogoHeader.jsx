@@ -1,6 +1,5 @@
-import { useState } from "react";
 import { useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import I_x from "../../img/icon/I_x.svg";
 import I_logoBlue from "../../img/icon/I_logoBlue.png";
@@ -45,7 +44,9 @@ const MheaderBox = styled.header`
   z-index: 4;
 
   .exitBtn {
-    width: 16px;
+    img {
+      width: 16px;
+    }
   }
 `;
 

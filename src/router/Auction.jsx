@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import styled from "styled-components";
 import I_search from "../img/icon/I_search.svg";
 import I_dnArw from "../img/icon/I_dnArw.svg";
@@ -11,13 +11,16 @@ import { useSelector } from "react-redux";
 import Header from "../components/header/Header";
 
 export default function Auction() {
+  const searchBoxRef = useRef();
+  const sortBtnRef = useRef();
+
+  const isMobile = useSelector((state) => state.common.isMobile);
+
   const [search, setSearch] = useState("");
   const [sortOpt, setSortOpt] = useState(D_sortList[1]);
   const [sortPopup, setSortPopup] = useState(false);
   const [likeObj, setLikeObj] = useState({});
   const [limit, setLimit] = useState(8);
-
-  const isMobile = useSelector((state) => state.common.isMobile);
 
   if (isMobile)
     return (
@@ -29,7 +32,7 @@ export default function Auction() {
               <p className="title">Subscription Auction All NFTs</p>
 
               <article className="rightBox">
-                <div className="searchBox">
+                <div className="searchBox" ref={searchBoxRef}>
                   <input
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
@@ -97,18 +100,36 @@ export default function Auction() {
             <p className="title">Subscription Auction All NFTs</p>
 
             <article className="rightBox">
-              <div className="searchBox">
+              <div className="searchBox" ref={searchBoxRef}>
                 <input
                   value={search}
+                  onFocus={() =>
+                    (searchBoxRef.current.style.border = "1.4px solid #000")
+                  }
+                  onBlur={() =>
+                    (searchBoxRef.current.style.border = "1px solid #d9d9d9")
+                  }
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search"
                 />
 
-                <img src={I_search} alt="" />
+                <button className="" onClick={() => {}}>
+                  <img src={I_search} alt="" />
+                </button>
               </div>
 
               <div className="sortBox">
-                <button className="sortBtn" onClick={() => setSortPopup(true)}>
+                <button
+                  ref={sortBtnRef}
+                  className="sortBtn"
+                  onFocus={() =>
+                    (sortBtnRef.current.style.border = "1.4px solid #000")
+                  }
+                  onBlur={() =>
+                    (sortBtnRef.current.style.border = "1px solid #d9d9d9")
+                  }
+                  onClick={() => setSortPopup(true)}
+                >
                   <p>{sortOpt}</p>
                   <img src={I_dnArw} alt="" />
                 </button>
@@ -256,6 +277,9 @@ const PauctionBox = styled.div`
   padding: 208px 0 220px 0;
   margin: 0 auto;
   max-width: 1440px;
+  @media screen and (max-width: 1440px) {
+    padding: 0 20px;
+  }
 
   .topBar {
     display: flex;
@@ -324,6 +348,9 @@ const PauctionBox = styled.div`
     display: flex;
     flex-wrap: wrap;
     gap: 40px;
+    @media screen and (max-width: 1440px) {
+      justify-content: center;
+    }
   }
 
   .moreBtn {

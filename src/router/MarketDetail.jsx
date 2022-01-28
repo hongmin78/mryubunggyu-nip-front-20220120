@@ -646,7 +646,7 @@ const MmarketDetailBox = styled.div`
           align-items: center;
           width: 54px;
           height: 54px;
-          background: rgba(255, 255, 255, 0.6);
+          background: rgba(255, 255, 255, 0.8);
           border: 1px solid #f6f6f6;
           border-radius: 50%;
           box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
@@ -712,11 +712,17 @@ const PmarketDetailBox = styled.div`
   .itemInfoContainer {
     display: flex;
     justify-content: space-between;
+    gap: 40px;
 
     .itemImg {
       width: 760px;
       height: 760px;
       object-fit: contain;
+
+      @media screen and (max-width: 1440px) {
+        min-width: 500px;
+        height: 500px;
+      }
     }
 
     .infoBox {
@@ -970,6 +976,7 @@ const PmarketDetailBox = styled.div`
         .itemList {
           display: flex;
           gap: 40px;
+          width: 100%;
           padding: 20px;
           overflow-x: scroll;
         }
@@ -980,7 +987,7 @@ const PmarketDetailBox = styled.div`
           align-items: center;
           width: 54px;
           height: 54px;
-          background: rgba(255, 255, 255, 0.6);
+          background: rgba(255, 255, 255, 0.8);
           border: 1px solid #f6f6f6;
           border-radius: 50%;
           box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);

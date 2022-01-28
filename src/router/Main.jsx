@@ -1,20 +1,6 @@
 import { Fragment, useEffect, useRef } from "react";
 import { useState } from "react";
 import styled from "styled-components";
-import I_ltArw3White from "../img/icon/I_ltArw3White.svg";
-import E_interview from "../img/main/E_interview.svg";
-import E_cc from "../img/common/E_cc.png";
-import E_issueProf from "../img/main/E_issueProf.png";
-import I_rtArw from "../img/icon/I_rtArw.svg";
-import I_ltArwWhite from "../img/icon/I_ltArwWhite.svg";
-import I_rtArwWhite from "../img/icon/I_rtArwWhite.svg";
-import I_rtArw3White from "../img/icon/I_rtArw3White.svg";
-import I_tIcon from "../img/icon/I_tIcon.png";
-import E_staking from "../img/common/E_staking.png";
-import B_tip1 from "../img/main/B_tip1.png";
-import B_tip2 from "../img/main/B_tip2.png";
-import B_tip3 from "../img/main/B_tip3.png";
-
 import { autoAuctionList, D_faqList, marketPlaceList } from "../data/Dmain";
 import Footer from "./Footer";
 import AuctionItem from "../components/AuctionItem";
@@ -23,6 +9,17 @@ import Header from "../components/header/Header";
 import { useSelector } from "react-redux";
 import { getStyle } from "../util/Util";
 import FaqItem from "../components/FaqCont";
+
+import E_interview from "../img/main/E_interview.svg";
+import E_issueProf from "../img/main/E_issueProf.png";
+import I_rtArw from "../img/icon/I_rtArw.svg";
+import I_ltArwWhite from "../img/icon/I_ltArwWhite.svg";
+import I_rtArwWhite from "../img/icon/I_rtArwWhite.svg";
+import I_tIcon from "../img/icon/I_tIcon.png";
+import E_staking from "../img/common/E_staking.png";
+import B_tip1 from "../img/main/B_tip1.png";
+import B_tip2 from "../img/main/B_tip2.png";
+import B_tip3 from "../img/main/B_tip3.png";
 
 export default function Main() {
   const headLineRef = useRef();
@@ -189,8 +186,9 @@ export default function Main() {
         });
       } else {
         ticketRef.current.scrollTo({
-          left: contWidth * itemNumByPage * ticketIndex +
-              ticketIndex * getStyle(ticketRef, "gap"),
+          left:
+            contWidth * itemNumByPage * ticketIndex +
+            ticketIndex * getStyle(ticketRef, "gap"),
           behavior: "smooth",
         });
       }
@@ -210,9 +208,9 @@ export default function Main() {
         });
       } else {
         faqRef.current.scrollTo({
-          left: 
+          left:
             contWidth * itemNumByPage * faqIndex +
-              faqIndex * getStyle(faqRef, "gap"),
+            faqIndex * getStyle(faqRef, "gap"),
           behavior: "smooth",
         });
       }
@@ -437,7 +435,7 @@ export default function Main() {
 
                     <p className="bottomText">ON THE FRONTIER OF NFTS.</p>
                   </article>
-                  <img className="mainImg" src={E_cc} alt="" />
+                  <img className="mainImg" src={E_staking} alt="" />
                 </li>
               ))}
             </ul>
@@ -778,7 +776,7 @@ const MmainBox = styled.div`
           align-items: center;
           width: 15vw;
           height: 15vw;
-          background: rgba(255, 255, 255, 0.6);
+          background: rgba(255, 255, 255, 0.8);
           border: 1px solid #f6f6f6;
           border-radius: 50%;
           box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
@@ -943,6 +941,9 @@ const PmainBox = styled.div`
     ul {
       display: flex;
       width: 100%;
+      @media screen and (max-width: 1440px) {
+        width: 80%;
+      }
       max-width: 1020px;
       height: 420px;
       overflow-x: scroll;
@@ -1101,13 +1102,16 @@ const PmainBox = styled.div`
           align-items: center;
           width: 54px;
           height: 54px;
-          background: rgba(255, 255, 255, 0.6);
+          background: rgba(255, 255, 255, 0.8);
           border: 1px solid #f6f6f6;
           border-radius: 50%;
           box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+          right: -7px;
+          @media screen and (max-width: 1440px) {
+            right: 20px;
+          }
           position: absolute;
           z-index: 2;
-          right: -7px;
         }
       }
 
@@ -1204,7 +1208,7 @@ const PmainBox = styled.div`
             justify-content: center;
             align-items: center;
             gap: 52px;
-            box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+            box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.16);
             border-radius: 12px;
             cursor: pointer;
 
@@ -1229,6 +1233,7 @@ const PmainBox = styled.div`
 
           .pageBtnBox {
             display: flex;
+            gap: 8px;
             top: 0;
             right: 46px;
             position: absolute;
@@ -1243,6 +1248,7 @@ const PmainBox = styled.div`
               border-radius: 50%;
               background: #000;
               position: relative;
+              right: unset;
             }
           }
         }
