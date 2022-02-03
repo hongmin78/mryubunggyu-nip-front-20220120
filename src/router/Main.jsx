@@ -14,6 +14,7 @@ import Header from "../components/header/Header";
 import { useSelector } from "react-redux";
 import { getStyle } from "../util/Util";
 import FaqItem from "../components/FaqCont";
+import { useNavigate } from "react-router-dom";
 
 import E_interview from "../img/main/E_interview.svg";
 import E_issueProf from "../img/main/E_issueProf.png";
@@ -27,6 +28,8 @@ import B_tip2 from "../img/main/B_tip2.png";
 import B_tip3 from "../img/main/B_tip3.png";
 
 export default function Main() {
+  const navigate = useNavigate();
+
   const headLineRef = useRef();
   const issueRef = useRef();
   const auctionRef = useRef();
@@ -118,6 +121,8 @@ export default function Main() {
 
   useEffect(() => {
     setInterval(() => {
+      if (!issueRef.current.children[0]) return;
+
       const contHeight = issueRef.current.children[0].offsetHeight;
       issueIndex++;
 
@@ -384,7 +389,10 @@ export default function Main() {
 
                       <img src={E_staking} alt="" />
 
-                      <button className="stakeBtn" onClick={() => {}}>
+                      <button
+                        className="stakeBtn"
+                        onClick={() => navigate("/staking")}
+                      >
                         Stake Now
                       </button>
                     </li>
@@ -584,7 +592,10 @@ export default function Main() {
 
                       <img src={E_staking} alt="" />
 
-                      <button className="stakeBtn" onClick={() => {}}>
+                      <button
+                        className="stakeBtn"
+                        onClick={() => navigate("/staking")}
+                      >
                         Stake Now
                       </button>
                     </li>
@@ -938,7 +949,7 @@ const MmainBox = styled.div`
             height: 77.22vw;
             min-height: 77.22vw;
             gap: 10vw;
-            box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+            box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.16);
             border-radius: 3.33vw;
             cursor: pointer;
 

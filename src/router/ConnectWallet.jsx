@@ -58,7 +58,7 @@ const ConnectWalletBox = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 60px;
-  padding: 180px 0 0 0;
+  padding: 280px 0 0 0;
 
   .explain {
     font-size: 24px;

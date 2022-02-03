@@ -2,6 +2,7 @@ import styled from "styled-components";
 import I_heart from "../img/icon/I_heart.svg";
 import I_heartO from "../img/icon/I_heartO.svg";
 import I_3dot from "../img/icon/I_3dot.svg";
+import I_clip from "../img/icon/I_clip.svg";
 import E_detailItem from "../img/market/E_detailItem.png";
 import I_rtArw from "../img/icon/I_rtArw.svg";
 import { Fragment, useEffect, useRef, useState } from "react";
@@ -29,6 +30,7 @@ export default function MarketDetail() {
   const [category, setCategory] = useState(0);
   const [moreIndex, setMoreIndex] = useState(0);
   const [bidPopup, setBidPopup] = useState(false);
+  const [showCopyBtn, setShowCopyBtn] = useState(false);
 
   function onClickAuctionNextBtn() {
     const wrapWidth = moreRef.current.offsetWidth;
@@ -78,16 +80,32 @@ export default function MarketDetail() {
                   <div className="topBar">
                     <div className="btnBox">
                       <button
-                        className="likeBtn"
+                        className="likeBtn hoverBtn"
                         onClick={() => setToggleLike(!toggleLike)}
                       >
                         <img src={toggleLike ? I_heartO : I_heart} alt="" />
                       </button>
 
-                      <button className="moreBtn" onClick={() => {}}>
+                      <button
+                        className="moreBtn hoverBtn"
+                        onClick={() => setShowCopyBtn(true)}
+                      >
                         <img src={I_3dot} alt="" />
                       </button>
                     </div>
+
+                    {showCopyBtn && (
+                      <>
+                        <button
+                          className="copyBtn displayBtn"
+                          onClick={()=>setShowCopyBtn(false)}
+                        >
+                          <img src={I_clip} alt="" />
+                          Copy Link
+                        </button>
+                        <PopupBg off={setShowCopyBtn} />
+                      </>
+                    )}
                   </div>
 
                   <strong className="title">Nero #9</strong>
@@ -220,16 +238,33 @@ export default function MarketDetail() {
                   <strong className="title">Nero #9</strong>
 
                   <div className="btnBox">
-                    <button
-                      className="likeBtn"
-                      onClick={() => setToggleLike(!toggleLike)}
-                    >
-                      <img src={toggleLike ? I_heartO : I_heart} alt="" />
-                    </button>
+                    <div className="posBox">
+                      <button
+                        className="likeBtn hoverBtn"
+                        onClick={() => setToggleLike(!toggleLike)}
+                      >
+                        <img src={toggleLike ? I_heartO : I_heart} alt="" />
+                      </button>
+                    </div>
 
-                    <button className="moreBtn" onClick={() => {}}>
-                      <img src={I_3dot} alt="" />
-                    </button>
+                    <div className="posBox">
+                      <button
+                        className="moreBtn hoverBtn"
+                        onClick={() => setShowCopyBtn(true)}
+                      >
+                        <img src={I_3dot} alt="" />
+                      </button>
+
+                      <div className="hoverBox">
+                        <button
+                          className="copyBtn displayBtn"
+                          onClick={() => setShowCopyBtn(false)}
+                        >
+                          <img src={I_clip} alt="" />
+                          Copy Link
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -408,6 +443,25 @@ const MmarketDetailBox = styled.div`
                 img {
                   width: 100%;
                 }
+              }
+            }
+
+            .copyBtn {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              gap: 2.22vw;
+              width: 32.22vw;
+              height: 8.33vw;
+              font-size: 3.88vw;
+              font-weight: 500;
+              line-height: 3.88vw;
+              background: #fff;
+              border-radius: 1.66vw;
+              box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+
+              img {
+                height: 5vw;
               }
             }
           }
@@ -749,18 +803,53 @@ const PmarketDetailBox = styled.div`
             display: flex;
             gap: 20px;
 
-            button {
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              width: 40px;
-              height: 40px;
-              padding: 10px;
-              border-radius: 50%;
-              box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+            .posBox {
+              position: relative;
 
-              img {
+              &:hover {
+                .hoverBox {
+                  display: flex;
+                  justify-content: flex-end;
+                }
+              }
+
+              .hoverBtn {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 40px;
+                height: 40px;
+                padding: 10px;
+                border-radius: 50%;
+                box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+
+                img {
+                  width: 100%;
+                }
+              }
+
+              .hoverBox {
+                display: none;
                 width: 100%;
+                height: 108px;
+                bottom: 0;
+                position: absolute;
+
+                .copyBtn {
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  gap: 10px;
+                  min-width: 152px;
+                  width: 152px;
+                  height: 44px;
+                  font-size: 18px;
+                  font-weight: 500;
+                  line-height: 18px;
+                  background: #fff;
+                  border-radius: 12px;
+                  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+                }
               }
             }
           }

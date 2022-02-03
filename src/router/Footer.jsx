@@ -1,26 +1,35 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
-import I_logo from "../img/icon/I_logo.svg";
 import I_logoSky from "../img/icon/I_logoSky.png";
-import I_logoText from "../img/icon/I_logoText.svg";
+import I_logoWhite from "../img/icon/I_logoWhite.png";
 import PopupBg from "../components/PopupBg";
 import PdfPopup from "../components/PdfPopup";
+import { useLocation } from "react-router-dom";
 
 export default function Footer() {
+  const pathname = useLocation().pathname;
+  let isStaking = pathname.indexOf("/staking") !== -1;
+
   const isMobile = useSelector((state) => state.common.isMobile);
   const [pdfPopup, setPdfPopup] = useState(false);
 
   if (isMobile)
     return (
-      <MfooterBox>
-        <p className="copyright">
+      <MfooterBox style={{ padding: isStaking && "unset" }}>
+        <p className="copyright" style={{ color: isStaking && "#DBDEE2" }}>
           Copyright © 2022 METACHAIN .LTD. All rights reserved.
         </p>
 
         <article className="logoBox" onClick={() => setPdfPopup(true)}>
-          <img className="logoImg" src={I_logoSky} alt="" />
-          <p className="logoText">NIP</p>
+          <img
+            className="logoImg"
+            src={isStaking ? I_logoWhite : I_logoSky}
+            alt=""
+          />
+          <p className="logoText" style={{ color: isStaking && "#DBDEE2" }}>
+            NIP
+          </p>
         </article>
 
         {pdfPopup && (
@@ -34,15 +43,21 @@ export default function Footer() {
   else
     return (
       <>
-        <PfooterBox>
+        <PfooterBox style={{ background: isStaking && "unset" }}>
           <div className="innerBox">
-            <p className="copyright">
+            <p className="copyright" style={{ color: isStaking && "#DBDEE2" }}>
               Copyright © 2022 METACHAIN .LTD. All rights reserved.
             </p>
 
             <article className="logoBox" onClick={() => setPdfPopup(true)}>
-              <img className="logoImg" src={I_logo} alt="" />
-              <img className="logoText" src={I_logoText} alt="" />
+              <img
+                className="logoImg"
+                src={isStaking ? I_logoWhite : I_logoSky}
+                alt=""
+              />
+              <p className="logoText" style={{ color: isStaking && "#DBDEE2" }}>
+                NIP
+              </p>
             </article>
           </div>
         </PfooterBox>
@@ -59,14 +74,15 @@ export default function Footer() {
 
 const MfooterBox = styled.footer`
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
   gap: 10px;
   padding: 0 20px 30px 20px;
 
   .copyright {
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 500;
-    line-height: 12px;
+    line-height: 10px;
     color: #4f4f4f;
     letter-spacing: -0.04em;
   }
@@ -74,17 +90,18 @@ const MfooterBox = styled.footer`
   .logoBox {
     display: flex;
     align-self: flex-end;
-    align-items: center;
+    align-items: flex-end;
     gap: 3px;
     cursor: pointer;
 
     .logoImg {
-      height: 40px;
+      height: 27px;
     }
 
     .logoText {
-      font-size: 20px;
+      font-size: 14px;
       font-weight: 600;
+      line-height: 14px;
       color: #839cb8;
     }
   }
@@ -93,13 +110,15 @@ const MfooterBox = styled.footer`
 const PfooterBox = styled.footer`
   display: flex;
   justify-content: center;
+  align-items: center;
+  width: 100%;
   height: 108px;
   background: #fff;
 
   .innerBox {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-end;
     width: 100%;
     max-width: 1440px;
     @media screen and (max-width: 1440px) {
@@ -107,9 +126,9 @@ const PfooterBox = styled.footer`
     }
 
     .copyright {
-      font-size: 18px;
+      font-size: 14px;
       font-weight: 500;
-      line-height: 18px;
+      line-height: 14px;
       color: #4f4f4f;
     }
 
@@ -124,7 +143,10 @@ const PfooterBox = styled.footer`
       }
 
       .logoText {
-        height: 18px;
+        font-size: 21px;
+        font-weight: 600;
+        line-height: 21px;
+        color: #839cb8;
       }
     }
   }

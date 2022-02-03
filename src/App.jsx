@@ -14,6 +14,7 @@ import Mypage from "./router/Mypage";
 import Penalty from "./router/Penalty";
 import Resell from "./router/Resell";
 import Staking from "./router/Staking";
+import StakingDetail from "./router/StakingDetail";
 import Term from "./router/Term";
 import Winning from "./router/Winning";
 import GlobalStyle from "./util/GlobalStyle";
@@ -72,6 +73,7 @@ function App() {
 
           <Route path="/staking" element={<Staking />} />
           <Route path="/staking/:popup" element={<Staking />} />
+          <Route path="/staking/detail/:id" element={<StakingDetail />} />
 
           <Route path="/auction" element={<Auction />} />
           <Route path="/auction/detail/:id" element={<AuctionDetail />} />

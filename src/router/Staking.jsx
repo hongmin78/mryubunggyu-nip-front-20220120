@@ -17,7 +17,6 @@ export default function Staking() {
 
   const isMobile = useSelector((state) => state.common.isMobile);
 
-  const [price, setPrice] = useState("");
   const [stakingPopup, setStakingPopup] = useState(false);
 
   if (isMobile)

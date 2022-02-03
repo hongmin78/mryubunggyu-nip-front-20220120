@@ -15,6 +15,7 @@ import Details from "../components/itemDetail/Details";
 import Properties from "../components/itemDetail/Properties";
 import { useSelector } from "react-redux";
 import Header from "../components/header/Header";
+import PopupBg from "../components/PopupBg";
 
 export default function AuctionDetail() {
   const moreRef = useRef();
@@ -24,6 +25,7 @@ export default function AuctionDetail() {
   const [toggleLike, setToggleLike] = useState(false);
   const [category, setCategory] = useState(0);
   const [moreIndex, setMoreIndex] = useState(0);
+  const [showCopyBtn, setShowCopyBtn] = useState(false);
 
   function onClickAuctionNextBtn() {
     const wrapWidth = moreRef.current.offsetWidth;
@@ -74,21 +76,32 @@ export default function AuctionDetail() {
                   <div className="topBar">
                     <div className="btnBox">
                       <button
-                        className="likeBtn"
+                        className="likeBtn hoverBtn"
                         onClick={() => setToggleLike(!toggleLike)}
                       >
                         <img src={toggleLike ? I_heartO : I_heart} alt="" />
                       </button>
 
-                      <button className="moreBtn" onClick={() => {}}>
+                      <button
+                        className="moreBtn hoverBtn"
+                        onClick={() => setShowCopyBtn(true)}
+                      >
                         <img src={I_3dot} alt="" />
                       </button>
                     </div>
 
-                    <button className="copyBtn" onClick={() => {}}>
-                      <img src={I_clip} alt="" />
-                      Copy Link
-                    </button>
+                    {showCopyBtn && (
+                      <>
+                        <button
+                          className="copyBtn displayBtn"
+                          onClick={() => {}}
+                        >
+                          <img src={I_clip} alt="" />
+                          Copy Link
+                        </button>
+                        <PopupBg off={setShowCopyBtn} />
+                      </>
+                    )}
                   </div>
 
                   <strong className="title">Ming #112</strong>
@@ -201,13 +214,6 @@ export default function AuctionDetail() {
       <>
         <Header />
         <PauctionDetailBox>
-          <section className="topBar">
-            <button className="copyBtn" onClick={() => {}}>
-              <img src={I_clip} alt="" />
-              Copy Link
-            </button>
-          </section>
-
           <section className="itemInfoContainer">
             <img className="itemImg" src={E_detailItem} alt="" />
 
@@ -217,16 +223,33 @@ export default function AuctionDetail() {
                   <strong className="title">Ming #112</strong>
 
                   <div className="btnBox">
-                    <button
-                      className="likeBtn"
-                      onClick={() => setToggleLike(!toggleLike)}
-                    >
-                      <img src={toggleLike ? I_heartO : I_heart} alt="" />
-                    </button>
+                    <div className="posBox">
+                      <button
+                        className="likeBtn hoverBtn"
+                        onClick={() => setToggleLike(!toggleLike)}
+                      >
+                        <img src={toggleLike ? I_heartO : I_heart} alt="" />
+                      </button>
+                    </div>
 
-                    <button className="moreBtn" onClick={() => {}}>
-                      <img src={I_3dot} alt="" />
-                    </button>
+                    <div className="posBox">
+                      <button
+                        className="moreBtn hoverBtn"
+                        onClick={() => setShowCopyBtn(true)}
+                      >
+                        <img src={I_3dot} alt="" />
+                      </button>
+
+                      <div className="hoverBox">
+                        <button
+                          className="copyBtn displayBtn"
+                          onClick={() => setShowCopyBtn(false)}
+                        >
+                          <img src={I_clip} alt="" />
+                          Copy Link
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -680,21 +703,6 @@ const PauctionDetailBox = styled.div`
   & > .topBar {
     display: flex;
     justify-content: flex-end;
-
-    .copyBtn {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-      width: 152px;
-      height: 44px;
-      font-size: 18px;
-      font-weight: 500;
-      line-height: 18px;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    }
   }
 
   .itemInfoContainer {
@@ -738,18 +746,53 @@ const PauctionDetailBox = styled.div`
             display: flex;
             gap: 20px;
 
-            button {
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              width: 40px;
-              height: 40px;
-              padding: 10px;
-              border-radius: 50%;
-              box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+            .posBox {
+              position: relative;
 
-              img {
+              &:hover {
+                .hoverBox {
+                  display: flex;
+                  justify-content: flex-end;
+                }
+              }
+
+              .hoverBtn {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 40px;
+                height: 40px;
+                padding: 10px;
+                border-radius: 50%;
+                box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+
+                img {
+                  width: 100%;
+                }
+              }
+
+              .hoverBox {
+                display: none;
                 width: 100%;
+                height: 108px;
+                bottom: 0;
+                position: absolute;
+                
+                .copyBtn {
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  gap: 10px;
+                  min-width: 152px;
+                  width: 152px;
+                  height: 44px;
+                  font-size: 18px;
+                  font-weight: 500;
+                  line-height: 18px;
+                  background: #fff;
+                  border-radius: 12px;
+                  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+                }
               }
             }
           }

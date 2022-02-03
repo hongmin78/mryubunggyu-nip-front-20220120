@@ -43,9 +43,12 @@ export default function MmenuPopup({ off }) {
           )}
 
           <nav>
-            <button className="stakingBtn" onClick={() => navigate("/staking")}>
+            <button
+              className="stakingBtn"
+              onClick={() => navigate(`/staking/detail/${0}`)}
+            >
               <img src={I_rocket} alt="" />
-              <p>Staking</p>
+              <p>Lucky Ticket</p>
             </button>
             <button className="auctionBtn" onClick={() => navigate("/auction")}>
               <img src={I_openBox} alt="" />
@@ -62,7 +65,7 @@ export default function MmenuPopup({ off }) {
               <img src={I_book} alt="" />
               <p>FAQ</p>
             </button>
-            <button className="mypageBtn" onClick={() => navigate('/mypage')}>
+            <button className="mypageBtn" onClick={() => navigate("/mypage")}>
               <img src={I_person} alt="" />
               <p>Mypage</p>
             </button>

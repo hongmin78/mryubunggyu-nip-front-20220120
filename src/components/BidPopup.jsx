@@ -203,6 +203,10 @@ const MbidPopupBox = styled.section`
           height: 100%;
           font-size: 6.66vw;
           min-width: 0;
+
+          &::placeholder {
+            color: #d9d9d9;
+          }
         }
 
         .unit {
@@ -331,6 +335,10 @@ const PbidPopupBox = styled.section`
           font-size: 30px;
           font-weight: 700;
           min-width: 0;
+
+          &::placeholder {
+            color: #d9d9d9;
+          }
         }
 
         .unit {

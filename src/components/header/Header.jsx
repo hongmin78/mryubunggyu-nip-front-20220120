@@ -27,12 +27,14 @@ export default function Header() {
     return (
       <>
         <MheaderBox style={{ background: isStaking && "unset" }}>
-          <div className="logoBox" onClick={() => navigate("/")}>
+          <button className="logoBox" onClick={() => navigate("/")}>
             <img className="logoImg" src={I_logo} alt="" />
-            <p className="logoText" style={{ color: isStaking && "#fff" }}>
-              NIP
-            </p>
-          </div>
+            <img
+              className="logoText"
+              src={isStaking ? I_logoTextWhite : I_logoText}
+              alt=""
+            />
+          </button>
 
           <button className="menuBtn" onClick={() => setMenuPopup(true)}>
             <img src={isStaking ? I_3lineWhite : I_3line} alt="" />
@@ -59,7 +61,7 @@ export default function Header() {
             <nav>
               <button
                 style={{ color: isStaking && "#fff" }}
-                onClick={() => navigate("/staking")}
+                onClick={() => navigate(`/staking/detail/${0}`)}
               >
                 Lucky Ticket
               </button>
@@ -132,17 +134,15 @@ const MheaderBox = styled.header`
 
   .logoBox {
     display: flex;
-    align-items: center;
-    gap: 3px;
+    align-items: flex-end;
+    gap: 6px;
 
     .logoImg {
-      width: 22px;
+      height: 27px;
     }
 
     .logoText {
-      font-size: 20px;
-      font-weight: 600;
-      color: #063a71;
+      height: 12px;
     }
   }
 `;

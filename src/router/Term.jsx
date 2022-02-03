@@ -192,7 +192,10 @@ export default function Term() {
 
 const TermBox = styled.div`
   max-width: 1440px;
-  padding: 100px 20px 0 20px;
+  padding: 220px 20px 0 20px;
+  @media screen and (max-width: 1440px) {
+    padding: 156px 20px 0 20px;
+  }
   margin: 0 auto;
 
   .title {
