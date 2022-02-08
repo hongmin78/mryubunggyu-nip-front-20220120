@@ -7,6 +7,8 @@ import I_chkWhite from "../img/icon/I_chkWhite.svg";
 import { setLogin } from "../util/store/commonSlice";
 import { chkValidEmail } from "../util/Util";
 
+import { signup, verifyEmail } from "../api/auth";
+
 export default function SignUpPopup({ walletAddress }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -15,11 +17,23 @@ export default function SignUpPopup({ walletAddress }) {
 
   const [email, setEmail] = useState("");
   const [emailAlarm, setEmailAlarm] = useState("");
+  const [isAuthEmail, setIsAuthEmail] = useState(false);
   const [pw, setPw] = useState("");
   const [pwConfrim, setPwConfirm] = useState("");
   const [pwAlarm, setPwAlarm] = useState("");
   const [referal, setReferal] = useState("");
   const [agreeList, setAgreeList] = useState(new Array(2).fill(false));
+
+  const clickRegistrationBtn = async () => {
+    const { access } = await verifyEmail(email);
+    if (access) {
+      setIsAuthEmail(true);
+      console.log("success");
+    } else {
+      // setIsAuthEmail(true);
+      console.table("fail");
+    }
+  };
 
   useEffect(() => {
     console.log(walletAddress);
@@ -28,7 +42,8 @@ export default function SignUpPopup({ walletAddress }) {
   const disableConfirm =
     !(email && pw && pwConfrim && agreeList[0] && agreeList[1]) ||
     emailAlarm ||
-    pwAlarm;
+    pwAlarm ||
+    !isAuthEmail;
 
   function onClickAgreeList(index) {
     let dataList = agreeList;
@@ -38,9 +53,21 @@ export default function SignUpPopup({ walletAddress }) {
     setAgreeList([...dataList]);
   }
 
-  function onClickSignUpBtn() {
-    dispatch(setLogin(walletAddress));
-    navigate("/staking");
+  async function onClickSignUpBtn() {
+    const { access } = await signup(
+      walletAddress,
+      email,
+      pw,
+      referal,
+      agreeList[0],
+      agreeList[1]
+    );
+    if (access) {
+      dispatch(setLogin(walletAddress));
+      navigate("/staking");
+    } else {
+      alert("fail signup");
+    }
   }
 
   useEffect(() => {
@@ -86,7 +113,10 @@ export default function SignUpPopup({ walletAddress }) {
 
               {emailAlarm && <p className="alarm">{emailAlarm}</p>}
 
-              <button className="registrationBtn" onClick={() => {}}>
+              <button
+                className="registrationBtn"
+                onClick={clickRegistrationBtn}
+              >
                 Registration
               </button>
             </div>
@@ -196,7 +226,10 @@ export default function SignUpPopup({ walletAddress }) {
                   placeholder="Please enter your email address"
                 />
 
-                <button className="registrationBtn" onClick={() => {}}>
+                <button
+                  className="registrationBtn"
+                  onClick={clickRegistrationBtn}
+                >
                   Registration
                 </button>
               </div>
