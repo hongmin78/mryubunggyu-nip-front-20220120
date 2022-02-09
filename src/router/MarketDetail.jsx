@@ -98,7 +98,7 @@ export default function MarketDetail() {
                       <>
                         <button
                           className="copyBtn displayBtn"
-                          onClick={()=>setShowCopyBtn(false)}
+                          onClick={() => setShowCopyBtn(false)}
                         >
                           <img src={I_clip} alt="" />
                           Copy Link
@@ -108,7 +108,7 @@ export default function MarketDetail() {
                     )}
                   </div>
 
-                  <strong className="title">Nero #9</strong>
+                  <strong className="title">Series Kong #9</strong>
                 </div>
 
                 <div className="ownedBox">
@@ -219,7 +219,7 @@ export default function MarketDetail() {
           )}
 
           <button className="bidBtn" onClick={() => navigate("bid")}>
-            Bid
+            Place bid
           </button>
         </MmarketDetailBox>
       </>
@@ -235,7 +235,7 @@ export default function MarketDetail() {
             <article className="infoBox">
               <div className="itemInfoBox">
                 <div className="titleBox">
-                  <strong className="title">Nero #9</strong>
+                  <strong className="title">Series Kong #9</strong>
 
                   <div className="btnBox">
                     <div className="posBox">
@@ -294,7 +294,7 @@ export default function MarketDetail() {
                 </div>
 
                 <button className="bidBtn" onClick={() => setBidPopup(true)}>
-                  Bid
+                  Place bid
                 </button>
               </div>
 
@@ -791,7 +791,7 @@ const PmarketDetailBox = styled.div`
           display: flex;
           justify-content: space-between;
           align-items: center;
-          font-size: 56px;
+          font-size: 40px;
           font-weight: 600;
           line-height: 84px;
 

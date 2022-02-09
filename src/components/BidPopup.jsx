@@ -26,7 +26,7 @@ export default function BidPopup({ off }) {
         <article className="contBox">
           <div className="itemBox">
             <img src={E_detailItem} alt="" />
-            <p>You are about to purchase a ming #12</p>
+            <p>You are about to purchase a Kingkong #12</p>
           </div>
 
           <div className="priceBox">
@@ -82,7 +82,7 @@ export default function BidPopup({ off }) {
         <article className="contBox">
           <div className="itemBox">
             <img src={E_detailItem} alt="" />
-            <p>You are about to purchase a ming #12</p>
+            <p>You are about to purchase a Kingkong #12</p>
           </div>
 
           <div className="priceBox">

@@ -1,133 +1,90 @@
 import styled from "styled-components";
 import B_staking from "../img/staking/B_staking.png";
-import I_tIcon from "../img/icon/I_tIcon.png";
 import E_staking from "../img/common/E_staking.png";
-import E_title from "../img/staking/E_title.svg";
-import { useState } from "react";
-import PopupBg from "../components/PopupBg";
-import StakingPopup from "../components/StakingPopup";
 
 import { useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import Header from "../components/header/Header";
+import { D_vaultList } from "../data/Dstaking";
+import Footer from "./Footer";
 
 export default function Staking() {
   const navigate = useNavigate();
-  const param = useParams();
 
   const isMobile = useSelector((state) => state.common.isMobile);
 
-  const [stakingPopup, setStakingPopup] = useState(false);
 
   if (isMobile)
     return (
       <>
         <Header />
-        <MstakingBox>
-          <article className="imgContainer">
-            <div className="topBar">
-              <span className="tBox">
-                <img src={I_tIcon} alt="" />
-              </span>
+        <MstakingDetailBox>
+          <article className="listArea">
+            <p className="title">
+              Stake to participate
+              <br /> in the auction!
+            </p>
 
-              <span className="tokenTitle">LUCKY TICKET</span>
-            </div>
+            <ul className="ticketList">
+              {D_vaultList.map((cont, index) => (
+                <li key={index}>
+                  <div className="topBar">
+                    <p className="key">LUCKY TICKET</p>
+                    <p className="value">#00001</p>
+                  </div>
 
-            <div className="imgBox">
-              <img className="mainImg" src={E_staking} alt="" />
-            </div>
+                  <div className="contBox">
+                    <img className="mainImg" src={E_staking} alt="" />
+                    <button className="buyBtn" onClick={() => navigate(`detail/${index}`)}>
+                      Buy Now
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </article>
-
-          <article className="settingContainer">
-            <img className="title" src={E_title} alt="" />
-
-            <div className="contBox">
-              <div className="availbleBox">
-                <p className="key">Available Balance</p>
-                <p className="value">0.00 USDT</p>
-              </div>
-
-              <div className="priceBox">
-                <p>100</p>
-
-                <span className="unit">USDT</span>
-              </div>
-
-              <p className="explain">Unstake period: 3 months</p>
-
-              <button className="confirmBtn" onClick={() => navigate("popup")}>
-                Staking
-                {/* You don’t have enough USDT */}
-              </button>
-            </div>
-          </article>
-
-          {param.popup && (
-            <>
-              <StakingPopup off={setStakingPopup} />
-              <PopupBg blur off={setStakingPopup} />
-            </>
-          )}
-        </MstakingBox>
+          <Footer />
+        </MstakingDetailBox>
       </>
     );
   else
     return (
       <>
         <Header />
-        <PstakingBox>
-          <article className="imgContainer">
-            <div className="topBar">
-              <span className="tBox">
-                <img src={I_tIcon} alt="" />
-              </span>
+        <PstakingDetailBox>
+          <div className="innerBox">
+            <strong className="title">
+              Stake to participate in the auction!
+            </strong>
+            <ul className="ticketList">
+              {[1, 2, 3, 4].map((cont, index) => (
+                <li key={index}>
+                  <div className="topBar">
+                    <p className="key">LUCKY TICKET</p>
+                    <p className="value">#{`${index}`.padStart(5, "0")}</p>
+                  </div>
 
-              <span className="tokenTitle">LUCKY TICKET</span>
-            </div>
-
-            <img className="mainImg" src={E_staking} alt="" />
-          </article>
-
-          <article className="settingContainer">
-            <img className="title" src={E_title} alt="" />
-
-            <div className="contBox">
-              <div className="availbleBox">
-                <p className="key">Available Balance</p>
-                <p className="value">0.00 USDT</p>
-              </div>
-
-              <div className="priceBox">
-                <p>100</p>
-
-                <span className="unit">USDT</span>
-              </div>
-
-              <p className="explain">Unstake period: 3 months</p>
-
-              <button
-                className="confirmBtn"
-                onClick={() => setStakingPopup(true)}
-              >
-                Staking
-                {/* You don’t have enough USDT */}
-              </button>
-            </div>
-          </article>
-
-          {stakingPopup && (
-            <>
-              <StakingPopup off={setStakingPopup} />
-              <PopupBg blur off={setStakingPopup} />
-            </>
-          )}
-        </PstakingBox>
+                  <div className="contBox">
+                    <img className="mainImg" src={E_staking} alt="" />
+                    <button
+                      className="buyBtn"
+                      onClick={() => navigate(`detail/${index}`)}
+                    >
+                      Buy Now
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <Footer />
+        </PstakingDetailBox>
       </>
     );
 }
 
-const MstakingBox = styled.div`
-  padding: 56px 5.55vw 5.55vw 5.55vw;
+const MstakingDetailBox = styled.div`
+  padding: 75px 5.55vw 5.55vw 5.55vw;
   background: #000;
   background-image: url(${B_staking});
   background-repeat: no-repeat;
@@ -135,294 +92,152 @@ const MstakingBox = styled.div`
   background-size: cover;
   overflow-y: scroll;
 
-  .imgContainer {
+  .listArea {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    height: 88.9vw;
-    padding: 4.44vw;
-    background: #000;
-    box-shadow: 0px 0px 60px rgba(255, 255, 255, 0.4);
-    border-radius: 12px;
-
-    .topBar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-
-      .tBox {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 16.66vw;
-        height: 16.66vw;
-        background: #fff;
-        border-radius: 50%;
-        border: 1.38vw solid #333;
-
-        img {
-          width: 7.5vw;
-        }
-      }
-
-      .tokenTitle {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 44.44vw;
-        height: 11.11vw;
-        font-size: 4.44vw;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: #fff;
-        background: rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(60px);
-        border-radius: 30px;
-      }
-    }
-
-    .imgBox {
-      flex: 1;
-      width: 100%;
-      overflow: hidden;
-
-      .mainImg {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-      }
-    }
-  }
-
-  .settingContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 5.55vw;
-    margin: 12.22vw 0 0 0;
+    gap: 3.88vw;
+    padding: 0 0 16.66vw 0;
 
     .title {
-      height: 5.55vw;
-      padding: 0 3.33vw;
-      object-fit: cover;
+      font-size: 5.55vw;
+      font-weight: 600;
+      line-height: 8.33vw;
+      color: #fff;
+      text-align: center;
     }
 
-    .contBox {
-      .availbleBox {
+    .ticketList {
+      display: flex;
+      flex-direction: column;
+      gap: 5.55vw;
+
+      li {
         display: flex;
         flex-direction: column;
-        gap: 2.77vw;
-        padding: 0 3.33vw;
-        font-size: 5vw;
-        font-weight: 500;
-
-        .key {
-          color: #7a7a7a;
-        }
-
-        .value {
-          color: #fff;
-        }
-      }
-
-      .priceBox {
-        display: flex;
+        justify-content: space-between;
         align-items: center;
         width: 100%;
-        height: 16.66vw;
-        margin: 5.55vw 0 0 0;
-        padding: 2.77vw 2.77vw 2.77vw 6.66vw;
-        font-weight: 700;
-        background: #fff;
+        height: 112.5vw;
+        padding: 6.66vw 5.55vw;
+        background: #000;
+        box-shadow: 0px 0px 60px rgba(255, 255, 255, 0.4);
         border-radius: 3.33vw;
 
-        p {
-          flex: 1;
-          font-size: 6.66vw;
-          line-height: 6.66vw;
-        }
-
-        .unit {
+        .topBar {
           display: flex;
-          justify-content: center;
+          justify-content: space-between;
           align-items: center;
-          height: 100%;
-          padding: 0 4.44vw;
-          font-size: 6.66vw;
-          line-height: 6.66vw;
+          width: 100%;
+          height: 11.11vw;
+          padding: 0 6.66vw;
+          font-size: 4.44vw;
+          font-weight: 700;
+          text-transform: uppercase;
           color: #fff;
-          background: #000;
-          border-radius: 2.77vw;
+          background: rgba(255, 255, 255, 0.2);
+          backdrop-filter: blur(60px);
+          border-radius: 8.33vw;
         }
-      }
 
-      .explain {
-        margin: 5.55vw 0 0 0;
-        font-size: 5vw;
-        font-weight: 500;
-        color: #7a7a7a;
-      }
+        .contBox {
+          display: flex;
+          flex-direction: column;
+          gap: 5.83vw;
 
-      .confirmBtn {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        height: 13.88vw;
-        margin: 5.55vw 0 0 0;
-        font-size: 4.44vw;
-        font-weight: 500;
-        background: #fff;
-        border-radius: 12px;
+          .mainImg {
+            width: 100%;
+          }
+
+          .buyBtn {
+            height: 15.55vw;
+            font-size: 5vw;
+            font-weight: 700;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(60px);
+            border-radius: 8.33vw;
+          }
+        }
       }
     }
   }
 `;
 
-const PstakingBox = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 92px;
-  height: 100vh;
+const PstakingDetailBox = styled.div`
+  min-height: 100vh;
   background: #000;
   background-image: url(${B_staking});
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
 
-  .imgContainer {
+  & > .innerBox {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 34px;
-    width: 404px;
-    height: 538px;
-    padding: 24px;
-    background: #000;
-    box-shadow: 0px 0px 60px rgba(255, 255, 255, 0.4);
-    border-radius: 12px;
-
-    .topBar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-
-      .tBox {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 82px;
-        height: 82px;
-        background: #fff;
-        border-radius: 50%;
-        border: 7px solid #333;
-
-        img {
-          width: 38px;
-        }
-      }
-
-      .tokenTitle {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 206px;
-        height: 52px;
-        font-size: 22px;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: #fff;
-        background: rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(60px);
-        border-radius: 30px;
-      }
-    }
-
-    .mainImg {
-      width: 328px;
-    }
-  }
-
-  .settingContainer {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 30px;
-    width: 480px;
+    gap: 60px;
+    max-width: 1440px;
+    padding: 220px 0;
+    margin: 0 auto;
 
     .title {
-      height: 29px;
+      font-size: 34px;
+      font-weight: 600;
+      color: #fff;
     }
 
-    .contBox {
-      .availbleBox {
+    .ticketList {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+
+      li {
         display: flex;
         flex-direction: column;
-        gap: 10px;
-        font-size: 18px;
-        font-weight: 500;
-        line-height: 21px;
-
-        .key {
-          color: #7a7a7a;
-        }
-
-        .value {
-          color: #fff;
-        }
-      }
-
-      .priceBox {
-        display: flex;
+        justify-content: space-between;
         align-items: center;
-        width: 100%;
-        height: 70px;
-        margin: 30px 0 0 0;
-        padding: 10px 10px 10px 24px;
-        font-weight: 700;
-        background: #fff;
+        width: 330px;
+        height: 440px;
+        padding: 24px 20px;
+        background: #000;
+        box-shadow: 0px 0px 60px rgba(255, 255, 255, 0.4);
         border-radius: 12px;
 
-        p {
-          flex: 1;
-          font-size: 30px;
-          line-height: 30px;
-        }
-
-        .unit {
+        .topBar {
           display: flex;
-          justify-content: center;
+          justify-content: space-between;
           align-items: center;
-          height: 100%;
-          padding: 0 16px;
-          font-size: 28px;
-          line-height: 28px;
+          width: 100%;
+          height: 40px;
+          padding: 0 18px;
+          font-size: 16px;
+          font-weight: 700;
+          text-transform: uppercase;
           color: #fff;
-          background: #000;
-          border-radius: 10px;
+          background: rgba(255, 255, 255, 0.2);
+          backdrop-filter: blur(60px);
+          border-radius: 30px;
         }
-      }
 
-      .explain {
-        margin: 20px 0 0 0;
-        font-size: 18px;
-        font-weight: 500;
-        color: #7a7a7a;
-      }
+        .contBox {
+          display: flex;
+          flex-direction: column;
+          gap: 30px;
 
-      .confirmBtn {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        height: 60px;
-        margin: 48px 0 0 0;
-        font-size: 20px;
-        font-weight: 500;
-        background: #fff;
-        border-radius: 12px;
+          .mainImg {
+            width: 100%;
+          }
+
+          .buyBtn {
+            height: 56px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(60px);
+            border-radius: 30px;
+          }
+        }
       }
     }
   }

@@ -30,10 +30,10 @@ const D_vaultList = [
 
 const D_rewardHeader = [
   "Earned item",
-  "Earned Amount",
+  "Staking Amount",
   "APY",
   "Reward Distribution Cycle",
-  "",
+  "Earned",
 ];
 
 const D_rewardList = [
@@ -43,6 +43,7 @@ const D_rewardList = [
     amount: 3.36,
     apy: 30,
     cycle: "Year",
+    earned: 11,
   },
   {
     img: E_prof3,
@@ -50,6 +51,7 @@ const D_rewardList = [
     amount: 3.36,
     apy: 30,
     cycle: "Year",
+    earned: 11,
   },
 ];
 

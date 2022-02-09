@@ -88,7 +88,7 @@ export default function MyItems() {
 
             <div className="infoBox">
               <div className="titleBox">
-                <strong className="title">Ming #58</strong>
+                <strong className="title">Kingkong #58</strong>
               </div>
 
               <div className="ownedBox">
@@ -128,7 +128,9 @@ export default function MyItems() {
                 </li>
               </ul>
 
-              <button className="actionBtn">Unstake</button>
+              <button className="actionBtn" onClick={() => navigate("/resell")}>
+                Sell
+              </button>
 
               <p className="description">
                 The NFT purchased by participating in the subscription auction
@@ -156,7 +158,7 @@ export default function MyItems() {
 
             <div className="infoBox">
               <div className="titleBox">
-                <strong className="title">Ming #58</strong>
+                <strong className="title">Kingkong #58</strong>
               </div>
 
               <div className="ownedBox">
@@ -224,7 +226,7 @@ export default function MyItems() {
 
             <div className="infoBox">
               <div className="titleBox">
-                <strong className="title">Nero #112</strong>
+                <strong className="title">Series Kong #112</strong>
               </div>
 
               <div className="ownedBox">
@@ -348,7 +350,7 @@ export default function MyItems() {
 
             <div className="infoBox">
               <div className="titleBox">
-                <strong className="title">Ming #58</strong>
+                <strong className="title">Kingkong #58</strong>
               </div>
 
               <div className="ownedBox">
@@ -389,7 +391,9 @@ export default function MyItems() {
                 </ul>
               </div>
 
-              <button className="actionBtn">Unstake</button>
+              <button className="actionBtn" onClick={() => navigate("/resell")}>
+                Sell
+              </button>
 
               <p className="description">
                 The NFT purchased by participating in the subscription auction
@@ -417,7 +421,7 @@ export default function MyItems() {
 
             <div className="infoBox">
               <div className="titleBox">
-                <strong className="title">Ming #58</strong>
+                <strong className="title">Kingkong #58</strong>
               </div>
 
               <div className="ownedBox">
@@ -486,7 +490,7 @@ export default function MyItems() {
 
             <div className="infoBox">
               <div className="titleBox">
-                <strong className="title">Nero #112</strong>
+                <strong className="title">Series Kong #112</strong>
               </div>
 
               <div className="ownedBox">

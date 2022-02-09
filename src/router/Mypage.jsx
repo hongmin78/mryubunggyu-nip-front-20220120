@@ -15,6 +15,7 @@ import I_copy from "../img/icon/I_copy.svg";
 import I_3dot from "../img/icon/I_3dot.svg";
 import I_upload from "../img/icon/I_upload.svg";
 import I_clip from "../img/icon/I_clip.svg";
+import Staking from "../components/myprof/Staking";
 
 export default function Mypage() {
   const navigate = useNavigate();
@@ -114,7 +115,8 @@ export default function Mypage() {
 
             <div className="contBox">
               {category === 0 && <MyItems />}
-              {category === 1 && <Recommend />}
+              {category === 1 && <Staking />}
+              {category === 2 && <Recommend />}
             </div>
           </article>
         </MmypageBox>
@@ -194,7 +196,8 @@ export default function Mypage() {
 
             <div className="contBox">
               {category === 0 && <MyItems />}
-              {category === 1 && <Recommend />}
+              {category === 1 && <Staking />}
+              {category === 2 && <Recommend />}
             </div>
           </article>
         </PmypageBox>
@@ -615,4 +618,4 @@ const PmypageBox = styled.section`
   }
 `;
 
-const categoryList = ["My Items", "Recommend"];
+const categoryList = ["My Items", "Staking", "Recommend"];

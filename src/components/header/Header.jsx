@@ -61,7 +61,7 @@ export default function Header() {
             <nav>
               <button
                 style={{ color: isStaking && "#fff" }}
-                onClick={() => navigate(`/staking/detail/${0}`)}
+                onClick={() => navigate(`/staking`)}
               >
                 Lucky Ticket
               </button>

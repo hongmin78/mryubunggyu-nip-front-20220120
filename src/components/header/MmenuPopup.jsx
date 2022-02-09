@@ -52,7 +52,7 @@ export default function MmenuPopup({ off }) {
             </button>
             <button className="auctionBtn" onClick={() => navigate("/auction")}>
               <img src={I_openBox} alt="" />
-              <p>Auto Auction</p>
+              <p>Subscription Auction</p>
             </button>
             <button
               className="marketPlaceBtn"

@@ -66,7 +66,7 @@ export default function Penalty() {
               <img className="itemImg" src={E_marketItem1} alt="" />
 
               <div className="infoBox">
-                <p className="title">Nero #1</p>
+                <p className="title">Series Kong #1</p>
 
                 <ul className="detailList">
                   <li className="time">
@@ -129,7 +129,7 @@ export default function Penalty() {
                 <img className="itemImg" src={E_marketItem1} alt="" />
 
                 <div className="infoBox">
-                  <p className="title">Nero #1</p>
+                  <p className="title">Series Kong #1</p>
 
                   <ul className="detailList">
                     <li className="time">

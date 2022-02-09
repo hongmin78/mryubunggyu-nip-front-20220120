@@ -104,7 +104,7 @@ export default function AuctionDetail() {
                     )}
                   </div>
 
-                  <strong className="title">Ming #112</strong>
+                  <strong className="title">Kingkong #112</strong>
                 </div>
 
                 <div className="ownedBox">
@@ -206,6 +206,8 @@ export default function AuctionDetail() {
               </div>
             </div>
           </section>
+
+          <button className="bidBtn">Auction in progress..</button>
         </MauctionDetailBox>
       </>
     );
@@ -220,7 +222,7 @@ export default function AuctionDetail() {
             <article className="infoBox">
               <div className="itemInfoBox">
                 <div className="titleBox">
-                  <strong className="title">Ming #112</strong>
+                  <strong className="title">Kingkong #112</strong>
 
                   <div className="btnBox">
                     <div className="posBox">
@@ -277,6 +279,8 @@ export default function AuctionDetail() {
                     </ul>
                   </div>
                 </div>
+
+                <button className="bidBtn">Auction in progress..</button>
               </div>
 
               <div className="categoryBox">
@@ -685,6 +689,23 @@ const MauctionDetailBox = styled.div`
       }
     }
   }
+
+  .bidBtn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 60px;
+    font-size: 20px;
+    font-weight: 500;
+    color: #fff;
+    background: #000;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    z-index: 4;
+  }
 `;
 
 const PauctionDetailBox = styled.div`
@@ -733,10 +754,10 @@ const PauctionDetailBox = styled.div`
         .titleBox {
           display: flex;
           justify-content: space-between;
-          align-items: center;
-          font-size: 56px;
+          align-items: flex-end;
+          font-size: 40px;
           font-weight: 600;
-          line-height: 84px;
+          line-height: 60px;
 
           .title {
             font-family: "Poppins", sans-serif;
@@ -777,7 +798,7 @@ const PauctionDetailBox = styled.div`
                 height: 108px;
                 bottom: 0;
                 position: absolute;
-                
+
                 .copyBtn {
                   display: flex;
                   justify-content: center;
@@ -852,6 +873,16 @@ const PauctionDetailBox = styled.div`
               }
             }
           }
+        }
+
+        .bidBtn {
+          width: 100%;
+          height: 60px;
+          margin: 44px 0 0 0;
+          font-size: 20px;
+          font-weight: 500;
+          box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+          border-radius: 12px;
         }
       }
 

@@ -21,7 +21,7 @@ import E_issueProf from "../img/main/E_issueProf.png";
 import I_rtArw from "../img/icon/I_rtArw.svg";
 import I_ltArwWhite from "../img/icon/I_ltArwWhite.svg";
 import I_rtArwWhite from "../img/icon/I_rtArwWhite.svg";
-import I_tIcon from "../img/icon/I_tIcon.png";
+import I_upArw3 from "../img/icon/I_upArw3.svg";
 import E_staking from "../img/common/E_staking.png";
 import B_tip1 from "../img/main/B_tip1.png";
 import B_tip2 from "../img/main/B_tip2.png";
@@ -119,9 +119,16 @@ export default function Main() {
     else setFaqIndex(0);
   }
 
+  function onClickTopBtn() {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }
+
   useEffect(() => {
     setInterval(() => {
-      if (!issueRef.current.children[0]) return;
+      if (!issueRef.current) return;
 
       const contHeight = issueRef.current.children[0].offsetHeight;
       issueIndex++;
@@ -301,7 +308,7 @@ export default function Main() {
                     <div className="timeBox">4 mins ago</div>
                   </div>
                   <p className="cont">
-                    purchased <u>Ming #122</u> at 158 USDT
+                    purchased <u>Kingkong #122</u> at 158 USDT
                   </p>
                 </li>
               ))}
@@ -380,11 +387,8 @@ export default function Main() {
                   {ticketList.map((cont, index) => (
                     <li key={index} className="item">
                       <div className="topBar">
-                        <span className="tBox">
-                          <img src={I_tIcon} alt="" />
-                        </span>
-
-                        <span className="tokenTitle">LUCKY TICKET</span>
+                        <p className="key">LUCKY TICKET</p>
+                        <p className="value">#{`${index}`.padStart(5, "0")}</p>
                       </div>
 
                       <img src={E_staking} alt="" />
@@ -393,7 +397,7 @@ export default function Main() {
                         className="stakeBtn"
                         onClick={() => navigate("/staking")}
                       >
-                        Stake Now
+                        BUY Now
                       </button>
                     </li>
                   ))}
@@ -449,6 +453,10 @@ export default function Main() {
               </div>
             </article>
           </section>
+
+          <button className="topBtn" onClick={() => onClickTopBtn()}>
+            <img src={I_upArw3} alt="" />
+          </button>
         </MmainBox>
         <Footer />
       </>
@@ -504,7 +512,7 @@ export default function Main() {
                     <div className="timeBox">4 mins ago</div>
                   </div>
                   <p className="cont">
-                    purchased <u>Ming #122</u> at 158 USDT
+                    purchased <u>Kingkong #122</u> at 158 USDT
                   </p>
                 </li>
               ))}
@@ -583,11 +591,8 @@ export default function Main() {
                   {ticketList.map((cont, index) => (
                     <li key={index} className="item">
                       <div className="topBar">
-                        <span className="tBox">
-                          <img src={I_tIcon} alt="" />
-                        </span>
-
-                        <span className="tokenTitle">LUCKY TICKET</span>
+                        <p className="key">LUCKY TICKET</p>
+                        <p className="value">#{`${index}`.padStart(5, "0")}</p>
                       </div>
 
                       <img src={E_staking} alt="" />
@@ -596,7 +601,7 @@ export default function Main() {
                         className="stakeBtn"
                         onClick={() => navigate("/staking")}
                       >
-                        Stake Now
+                        BUY Now
                       </button>
                     </li>
                   ))}
@@ -652,6 +657,10 @@ export default function Main() {
               </div>
             </article>
           </section>
+
+          <button className="topBtn" onClick={() => onClickTopBtn()}>
+            <img src={I_upArw3} alt="" />
+          </button>
         </PmainBox>
         <Footer />
       </>
@@ -883,36 +892,15 @@ const MmainBox = styled.div`
             justify-content: space-between;
             align-items: center;
             width: 100%;
-
-            .tBox {
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              width: 16.66vw;
-              height: 16.66vw;
-              background: #fff;
-              border-radius: 50%;
-              border: 1.38vw solid #333;
-
-              img {
-                width: 7.5vw;
-              }
-            }
-
-            .tokenTitle {
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              width: 44.44vw;
-              height: 11.11vw;
-              font-size: 4.44vw;
-              font-weight: 700;
-              text-transform: uppercase;
-              color: #fff;
-              background: rgba(255, 255, 255, 0.2);
-              backdrop-filter: blur(60px);
-              border-radius: 8.33vw;
-            }
+            height: 11.11vw;
+            padding: 0 5vw;
+            font-size: 4.44vw;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(60px);
+            border-radius: 8.33vw;
           }
 
           .itemImg {
@@ -999,6 +987,21 @@ const MmainBox = styled.div`
         }
       }
     }
+  }
+
+  .topBtn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 12.22vw;
+    height: 12.22vw;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid #f6f6f6;
+    border-radius: 50%;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    right: 30px;
+    bottom: 20px;
+    position: fixed;
   }
 `;
 
@@ -1230,36 +1233,15 @@ const PmainBox = styled.div`
             justify-content: space-between;
             align-items: center;
             width: 100%;
-
-            .tBox {
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              width: 68px;
-              height: 68px;
-              background: #fff;
-              border-radius: 50%;
-              border: 6px solid #333;
-
-              img {
-                width: 32px;
-              }
-            }
-
-            .tokenTitle {
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              width: 148px;
-              height: 40px;
-              font-size: 16px;
-              font-weight: 700;
-              text-transform: uppercase;
-              color: #fff;
-              background: rgba(255, 255, 255, 0.2);
-              backdrop-filter: blur(60px);
-              border-radius: 30px;
-            }
+            height: 40px;
+            padding: 0 18px;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(60px);
+            border-radius: 30px;
           }
 
           .itemImg {
@@ -1342,6 +1324,21 @@ const PmainBox = styled.div`
         }
       }
     }
+  }
+
+  .topBtn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 54px;
+    height: 54px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid #f6f6f6;
+    border-radius: 50%;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    right: 30px;
+    bottom: 20px;
+    position: fixed;
   }
 `;
 

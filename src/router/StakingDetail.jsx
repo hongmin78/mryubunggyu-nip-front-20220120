@@ -10,208 +10,121 @@ import StakingPopup from "../components/StakingPopup";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import Header from "../components/header/Header";
-import {
-  D_rewardHeader,
-  D_rewardList,
-  D_vaultHeader,
-  D_vaultList,
-} from "../data/Dstaking";
-import Footer from "./Footer";
 
 export default function StakingDetail() {
   const navigate = useNavigate();
   const param = useParams();
 
   const isMobile = useSelector((state) => state.common.isMobile);
-  const isLogin = useSelector((state) => state.common.isLogin);
+
+  const [stakingPopup, setStakingPopup] = useState(false);
 
   if (isMobile)
     return (
       <>
         <Header />
-        <MstakingDetailBox>
-          <article className="listArea">
-            <div className="vaultBox listContainer">
-              <p className="title">Vaults</p>
+        <MstakingBox>
+          <article className="imgContainer">
+            <div className="topBar">
+              <span className="tBox">
+                <img src={I_tIcon} alt="" />
+              </span>
 
-              <ul className="list">
-                {D_vaultList.map((cont, index) => (
-                  <li key={index}>
-                    <div className="listHeader">
-                      <img src={cont.img} alt="" />
-                      <p>{cont.name}</p>
-                    </div>
-
-                    <ul className="data">
-                      <li>
-                        <p className="key">Staking Amount</p>
-                        <p className="value">{cont.amount}&nbsp;USDT</p>
-                      </li>
-                      <li>
-                        <p className="key">Start</p>
-                        <p className="value">{cont.start}</p>
-                      </li>
-                      <li>
-                        <p className="key">Ended</p>
-                        <p className="value">{cont.end}</p>
-                      </li>
-                    </ul>
-
-                    <div className="btnBox">
-                      <button className="unstakeBtn" onClick={() => {}}>
-                        Unstake
-                      </button>
-                      <button className="stakeBtn" onClick={() => {}}>
-                        Stake
-                      </button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+              <span className="tokenTitle">LUCKY TICKET</span>
             </div>
 
-            <div className="rewardBox listContainer">
-              <p className="title">Earned Rewards</p>
-
-              <ul className="list">
-                {D_rewardList.map((cont, index) => (
-                  <li key={index}>
-                    <div className="listHeader">
-                      <img src={cont.img} alt="" />
-                      <p>{cont.name}</p>
-                    </div>
-
-                    <ul className="data">
-                      <li>
-                        <p className="key">Staking Amount</p>
-                        <p className="value">{cont.amount}&nbsp;USDT</p>
-                      </li>
-                      <li>
-                        <p className="key">APY</p>
-                        <p className="value">{cont.apy}%</p>
-                      </li>
-                      <li>
-                        <p className="key">Reward Distribution Cycle</p>
-                        <p className="value">{cont.cycle}</p>
-                      </li>
-                    </ul>
-
-                    <div className="btnBox">
-                      <button className="claimBtn" onClick={() => {}}>
-                        Claim
-                      </button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+            <div className="imgBox">
+              <img className="mainImg" src={E_staking} alt="" />
             </div>
           </article>
-          <Footer />
-        </MstakingDetailBox>
+
+          <article className="settingContainer">
+            <img className="title" src={E_title} alt="" />
+
+            <div className="contBox">
+              <div className="availbleBox">
+                <p className="key">Available Balance</p>
+                <p className="value">0.00 USDT</p>
+              </div>
+
+              <div className="priceBox">
+                <p>100</p>
+
+                <span className="unit">USDT</span>
+              </div>
+
+              <p className="explain">Unstake period: 3 months</p>
+
+              <button className="confirmBtn" onClick={() => navigate("popup")}>
+                Staking
+                {/* You don’t have enough USDT */}
+              </button>
+            </div>
+          </article>
+
+          {param.popup && (
+            <>
+              <StakingPopup off={setStakingPopup} />
+              <PopupBg blur off={setStakingPopup} />
+            </>
+          )}
+        </MstakingBox>
       </>
     );
   else
     return (
       <>
         <Header />
-        <PstakingDetailBox>
-          <div className="innerBox">
-            <article className="titleBox">
-              <p className="title">
-                the longer you stake, the better the rewards!
-              </p>
+        <PstakingBox>
+          <article className="imgContainer">
+            <div className="topBar">
+              <p className="key">LUCKY TICKET</p>
+              <p className="value">#00001</p>
+            </div>
 
-              <p className="address">
-                Your address : {isLogin ? isLogin : "-"}
-              </p>
-            </article>
+            <img className="mainImg" src={E_staking} alt="" />
+          </article>
 
-            <article className="listArea">
-              <div className="vaultBox listContainer">
-                <p className="title">Vaults</p>
+          <article className="settingContainer">
+            <img className="title" src={E_title} alt="" />
 
-                <div className="listBox">
-                  <ul className="listHeader">
-                    {D_vaultHeader.map((cont, index) => (
-                      <li key={index}>{cont}</li>
-                    ))}
-                  </ul>
-
-                  <ul className="list">
-                    {D_vaultList.map((cont, index) => (
-                      <li key={index}>
-                        <span>
-                          <img src={cont.img} alt="" />
-                          <p>{cont.name}</p>
-                        </span>
-
-                        <span>
-                          <p>{cont.amount}&nbsp;USDT</p>
-                        </span>
-
-                        <span>{cont.start}</span>
-
-                        <span>{cont.end}</span>
-
-                        <span>
-                          <button className="unstakeBtn" onClick={() => {}}>
-                            Unstake
-                          </button>
-                          <button className="stakeBtn" onClick={() => {}}>
-                            Stake
-                          </button>
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+            <div className="contBox">
+              <div className="availbleBox">
+                <p className="key">Available Balance</p>
+                <p className="value">0.00 USDT</p>
               </div>
-              <div className="rewardBox listContainer">
-                <p className="title">Earned Rewards</p>
 
-                <div className="listBox">
-                  <ul className="listHeader">
-                    {D_rewardHeader.map((cont, index) => (
-                      <li key={index}>{cont}</li>
-                    ))}
-                  </ul>
+              <div className="priceBox">
+                <p>100</p>
 
-                  <ul className="list">
-                    {D_rewardList.map((cont, index) => (
-                      <li key={index}>
-                        <span>
-                          <img src={cont.img} alt="" />
-                          <p>{cont.name}</p>
-                        </span>
-
-                        <span>
-                          <p>{cont.amount}&nbsp;USDT</p>
-                        </span>
-
-                        <span>{cont.apy}%</span>
-
-                        <span>{cont.cycle}</span>
-
-                        <span>
-                          <button className="claimBtn" onClick={() => {}}>
-                            Claim
-                          </button>
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                <span className="unit">USDT</span>
               </div>
-            </article>
-          </div>
-          <Footer />
-        </PstakingDetailBox>
+
+              <p className="explain">Unstake period: 3 months</p>
+
+              <button
+                className="confirmBtn"
+                onClick={() => setStakingPopup(true)}
+              >
+                Staking
+                {/* You don’t have enough USDT */}
+              </button>
+            </div>
+          </article>
+
+          {stakingPopup && (
+            <>
+              <StakingPopup off={setStakingPopup} />
+              <PopupBg blur off={setStakingPopup} />
+            </>
+          )}
+        </PstakingBox>
       </>
     );
 }
 
-const MstakingDetailBox = styled.div`
-  padding: 75px 5.55vw 5.55vw 5.55vw;
+const MstakingBox = styled.div`
+  padding: 56px 5.55vw 5.55vw 5.55vw;
   background: #000;
   background-image: url(${B_staking});
   background-repeat: no-repeat;
@@ -219,231 +132,273 @@ const MstakingDetailBox = styled.div`
   background-size: cover;
   overflow-y: scroll;
 
-  .listArea {
+  .imgContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 88.9vw;
+    padding: 4.44vw;
+    background: #000;
+    box-shadow: 0px 0px 60px rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
+
+    .topBar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+
+      .tBox {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 16.66vw;
+        height: 16.66vw;
+        background: #fff;
+        border-radius: 50%;
+        border: 1.38vw solid #333;
+
+        img {
+          width: 7.5vw;
+        }
+      }
+
+      .tokenTitle {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 44.44vw;
+        height: 11.11vw;
+        font-size: 4.44vw;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #fff;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(60px);
+        border-radius: 30px;
+      }
+    }
+
+    .imgBox {
+      flex: 1;
+      width: 100%;
+      overflow: hidden;
+
+      .mainImg {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+    }
+  }
+
+  .settingContainer {
     display: flex;
     flex-direction: column;
     gap: 5.55vw;
-    padding: 0 0 16.66vw 0;
+    margin: 12.22vw 0 0 0;
 
-    .listContainer {
-      display: flex;
-      flex-direction: column;
-      gap: 6.66vw;
-      padding: 3.88vw 5.55vw;
-      color: #fff;
-      background: rgba(255, 255, 255, 0.2);
-      border: 2px solid #ffffff;
-      border-radius: 3.33vw;
+    .title {
+      height: 5.55vw;
+      padding: 0 3.33vw;
+      object-fit: cover;
+    }
 
-      .title {
-        font-size: 5.55vw;
-        font-weight: 600;
+    .contBox {
+      .availbleBox {
+        display: flex;
+        flex-direction: column;
+        gap: 2.77vw;
+        padding: 0 3.33vw;
+        font-size: 5vw;
+        font-weight: 500;
+
+        .key {
+          color: #7a7a7a;
+        }
+
+        .value {
+          color: #fff;
+        }
       }
 
-      .list {
-        & > li {
-          display: flex;
-          flex-direction: column;
-          gap: 6.66vw;
-          padding-bottom: 5.55vw;
+      .priceBox {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        height: 16.66vw;
+        margin: 5.55vw 0 0 0;
+        padding: 2.77vw 2.77vw 2.77vw 6.66vw;
+        font-weight: 700;
+        background: #fff;
+        border-radius: 3.33vw;
 
-          &:nth-of-type(n + 2) {
-            padding-top: 5.55vw;
-            border-top: 1px solid rgba(217, 217, 217, 0.2);
-          }
-
-          .listHeader {
-            display: flex;
-            align-items: center;
-            gap: 2.77vw;
-            font-size: 5vw;
-
-            img {
-              width: 13.88vw;
-              height: 13.88vw;
-              border-radius: 50%;
-              object-fit: cover;
-            }
-          }
-
-          .data {
-            display: flex;
-            flex-direction: column;
-            gap: 3.88vw;
-
-            li {
-              display: flex;
-              justify-content: space-between;
-              font-size: 3.88vw;
-            }
-          }
-
-          .btnBox {
-            display: flex;
-            gap: 3.3vw;
-
-            button {
-              flex: 1;
-              height: 13.88vw;
-              font-size: 5vw;
-              font-weight: 600;
-              border-radius: 3.33vw;
-
-              &.unstakeBtn {
-                color: #fff;
-                background: #004ce0;
-              }
-
-              &.stakeBtn,
-              &.claimBtn {
-                background: #fff;
-              }
-            }
-          }
+        p {
+          flex: 1;
+          font-size: 6.66vw;
+          line-height: 6.66vw;
         }
+
+        .unit {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100%;
+          padding: 0 4.44vw;
+          font-size: 6.66vw;
+          line-height: 6.66vw;
+          color: #fff;
+          background: #000;
+          border-radius: 2.77vw;
+        }
+      }
+
+      .explain {
+        margin: 5.55vw 0 0 0;
+        font-size: 5vw;
+        font-weight: 500;
+        color: #7a7a7a;
+      }
+
+      .confirmBtn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 13.88vw;
+        margin: 5.55vw 0 0 0;
+        font-size: 4.44vw;
+        font-weight: 500;
+        background: #fff;
+        border-radius: 12px;
       }
     }
   }
 `;
 
-const PstakingDetailBox = styled.div`
-  min-height: 100vh;
+const PstakingBox = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 92px;
+  height: 100vh;
   background: #000;
   background-image: url(${B_staking});
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
 
-  & > .innerBox {
+  .imgContainer {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 60px;
-    padding: 220px 0;
+    gap: 62px;
+    width: 404px;
+    height: 538px;
+    padding: 24px;
+    background: #000;
+    box-shadow: 0px 0px 60px rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
 
-    .titleBox {
+    .topBar {
       display: flex;
-      flex-direction: column;
+      justify-content: space-between;
       align-items: center;
-      gap: 20px;
+      width: 100%;
+      height: 52px;
+      padding: 0 24px;
+      font-size: 22px;
+      font-weight: 700;
+      text-transform: uppercase;
       color: #fff;
-
-      .title {
-        font-size: 44px;
-        font-weight: 600;
-      }
-
-      .address {
-        font-size: 18px;
-      }
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(60px);
+      border-radius: 30px;
     }
 
-    .listArea {
-      display: flex;
-      flex-direction: column;
-      gap: 44px;
-      width: 100%;
-      max-width: 1440px;
+    .mainImg {
+      width: 328px;
+    }
+  }
 
-      .listContainer {
+  .settingContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 30px;
+    width: 480px;
+
+    .title {
+      height: 29px;
+    }
+
+    .contBox {
+      .availbleBox {
         display: flex;
         flex-direction: column;
-        gap: 30px;
-        padding: 20px 40px 60px 40px;
-        color: #fff;
-        background: rgba(255, 255, 255, 0.2);
-        border: 2px solid #ffffff;
-        border-radius: 20px;
+        gap: 10px;
+        font-size: 18px;
+        font-weight: 500;
+        line-height: 21px;
 
-        &.rewardBox {
-          .listHeader li,
-          .list li span {
-            &:nth-of-type(3) {
-              justify-content: center;
-              padding: 0 90px 0 0;
-            }
-          }
+        .key {
+          color: #7a7a7a;
         }
 
-        .title {
-          font-size: 24px;
-          font-weight: 600;
+        .value {
+          color: #fff;
+        }
+      }
+
+      .priceBox {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        height: 70px;
+        margin: 30px 0 0 0;
+        padding: 10px 10px 10px 24px;
+        font-weight: 700;
+        background: #fff;
+        border-radius: 12px;
+
+        p {
+          flex: 1;
+          font-size: 30px;
+          line-height: 30px;
         }
 
-        .listBox {
-          .listHeader {
-            display: flex;
-            font-size: 18px;
-            font-weight: 600;
-          }
-
-          .list {
-            li {
-              display: flex;
-              align-items: center;
-              height: 104px;
-
-              &:nth-of-type(n + 2) {
-                border-top: 1px solid rgba(217, 217, 217, 0.2);
-              }
-            }
-          }
-
-          .listHeader li,
-          .list li span {
-            display: flex;
-            align-items: center;
-            font-size: 18px;
-
-            &:nth-of-type(1) {
-              width: 288px;
-              gap: 14px;
-
-              img {
-                width: 68px;
-                height: 68px;
-                border-radius: 50%;
-                object-fit: cover;
-              }
-            }
-
-            &:nth-of-type(2) {
-              width: 220px;
-            }
-
-            &:nth-of-type(3) {
-              width: 255px;
-            }
-
-            &:nth-of-type(4) {
-              width: 255px;
-            }
-
-            &:nth-of-type(5) {
-              flex: 1;
-              justify-content: flex-end;
-              gap: 24px;
-
-              button {
-                width: 162px;
-                height: 50px;
-                font-size: 18px;
-                font-weight: 600;
-                border-radius: 12px;
-
-                &.unstakeBtn {
-                  color: #fff;
-                  background: #004ce0;
-                }
-
-                &.stakeBtn,
-                &.claimBtn {
-                  background: #fff;
-                }
-              }
-            }
-          }
+        .unit {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100%;
+          padding: 0 16px;
+          font-size: 28px;
+          line-height: 28px;
+          color: #fff;
+          background: #000;
+          border-radius: 10px;
         }
+      }
+
+      .explain {
+        margin: 20px 0 0 0;
+        font-size: 18px;
+        font-weight: 500;
+        color: #7a7a7a;
+      }
+
+      .confirmBtn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 60px;
+        margin: 48px 0 0 0;
+        font-size: 20px;
+        font-weight: 500;
+        background: #fff;
+        border-radius: 12px;
       }
     }
   }

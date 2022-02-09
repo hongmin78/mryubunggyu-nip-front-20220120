@@ -16,21 +16,20 @@ export default function Footer() {
 
   if (isMobile)
     return (
-      <MfooterBox style={{ padding: isStaking && "unset" }}>
+      <MfooterBox
+        style={{
+          padding: isStaking && "unset",
+          background: isStaking && "unset",
+        }}
+      >
+        <article className="logoBox" onClick={() => setPdfPopup(true)}>
+          <img className="logoImg" src={I_logoWhite} alt="" />
+          <p className="logoText">NIP</p>
+        </article>
+
         <p className="copyright" style={{ color: isStaking && "#DBDEE2" }}>
           Copyright © 2022 METACHAIN .LTD. All rights reserved.
         </p>
-
-        <article className="logoBox" onClick={() => setPdfPopup(true)}>
-          <img
-            className="logoImg"
-            src={isStaking ? I_logoWhite : I_logoSky}
-            alt=""
-          />
-          <p className="logoText" style={{ color: isStaking && "#DBDEE2" }}>
-            NIP
-          </p>
-        </article>
 
         {pdfPopup && (
           <>
@@ -50,11 +49,7 @@ export default function Footer() {
             </p>
 
             <article className="logoBox" onClick={() => setPdfPopup(true)}>
-              <img
-                className="logoImg"
-                src={isStaking ? I_logoWhite : I_logoSky}
-                alt=""
-              />
+              <img className="logoImg" src={I_logoWhite} alt="" />
               <p className="logoText" style={{ color: isStaking && "#DBDEE2" }}>
                 NIP
               </p>
@@ -74,16 +69,18 @@ export default function Footer() {
 
 const MfooterBox = styled.footer`
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 10px;
-  padding: 0 20px 30px 20px;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 2px;
+  height: 112px;
+  padding: 0 20px 24px 20px;
+  background: #758faa;
 
   .copyright {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 500;
-    line-height: 10px;
-    color: #4f4f4f;
+    line-height: 18px;
+    color: #fff;
     letter-spacing: -0.04em;
   }
 
@@ -95,14 +92,14 @@ const MfooterBox = styled.footer`
     cursor: pointer;
 
     .logoImg {
-      height: 27px;
+      height: 44px;
     }
 
     .logoText {
-      font-size: 14px;
+      font-size: 22px;
       font-weight: 600;
-      line-height: 14px;
-      color: #839cb8;
+      line-height: 22px;
+      color: #fff;
     }
   }
 `;
@@ -112,8 +109,8 @@ const PfooterBox = styled.footer`
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: 108px;
-  background: #fff;
+  height: 180px;
+  background: #758faa;
 
   .innerBox {
     display: flex;
@@ -126,10 +123,10 @@ const PfooterBox = styled.footer`
     }
 
     .copyright {
-      font-size: 14px;
+      font-size: 18px;
       font-weight: 500;
-      line-height: 14px;
-      color: #4f4f4f;
+      line-height: 18px;
+      color: #fff;
     }
 
     .logoBox {
@@ -139,14 +136,14 @@ const PfooterBox = styled.footer`
       cursor: pointer;
 
       .logoImg {
-        height: 40px;
+        height: 102px;
       }
 
       .logoText {
-        font-size: 21px;
+        font-size: 54px;
         font-weight: 600;
-        line-height: 21px;
-        color: #839cb8;
+        line-height: 54px;
+        color: #fff;
       }
     }
   }

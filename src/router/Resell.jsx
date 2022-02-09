@@ -32,7 +32,7 @@ export default function Resell() {
 
           <article className="sellSec">
             <div className="topBar">
-              <p className="title">Nero #112</p>
+              <p className="title">Series Kong #112</p>
             </div>
 
             <ul className="sellBox">
@@ -339,7 +339,7 @@ export default function Resell() {
           <ul className="itemSec">
             <li className="itemBox">
               <img className="itemImg" src={E_item3} alt="" />
-              <p className="title">Nero #112</p>
+              <p className="title">Series Kong #112</p>
             </li>
 
             <li className="transactionBox">
