@@ -1,12 +1,7 @@
 import { Fragment, useEffect, useRef } from "react";
 import { useState } from "react";
 import styled from "styled-components";
-import {
-  autoAuctionList,
-  D_faqList,
-  D_issueList,
-  marketPlaceList,
-} from "../data/Dmain";
+import { D_faqList, D_issueList, marketPlaceList } from "../data/Dmain";
 import Footer from "./Footer";
 import AuctionItem from "../components/AuctionItem";
 import MarketItem from "../components/MarketItem";
@@ -26,13 +21,15 @@ import E_staking from "../img/common/E_staking.png";
 import B_tip1 from "../img/main/B_tip1.png";
 import B_tip2 from "../img/main/B_tip2.png";
 import B_tip3 from "../img/main/B_tip3.png";
+import axios from "axios";
 
 export default function Main() {
   const navigate = useNavigate();
 
   const headLineRef = useRef();
   const issueRef = useRef();
-  const auctionRef = useRef();
+  const firstAuctionRef = useRef();
+  const secondAuctionRef = useRef();
   const marketRef = useRef();
   const ticketRef = useRef();
   const faqRef = useRef();
@@ -42,14 +39,19 @@ export default function Main() {
   const isMobile = useSelector((state) => state.common.isMobile);
 
   const [headLineIndex, setHeadLineIndex] = useState(0);
-  const [auctionIndex, setAuctionIndex] = useState(0);
+  const [firstAuctionIndex, setFirstAuctionIndex] = useState(0);
+  const [secondAuctionIndex, setSecondAuctionIndex] = useState(0);
   const [marketIndex, setMarketIndex] = useState(0);
   const [ticketIndex, setTicketIndex] = useState(0);
   const [faqIndex, setFaqIndex] = useState(0);
 
+  const [auctionListFirst, setAuctionListFirst] = useState([]);
+  const [auctionListSecond, setAuctionListSecond] = useState([]);
+
   const [likeObj, setLikeObj] = useState({});
 
   function onClickHeadLinePreBtn() {
+    if (!headLineRef.current.children) return;
     const wrapWidth = headLineRef.current.offsetWidth;
     const contWidth = headLineRef.current.children[0].offsetWidth;
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
@@ -60,6 +62,7 @@ export default function Main() {
   }
 
   function onClickHeadLineNextBtn() {
+    if (!headLineRef.current.children) return;
     const wrapWidth = headLineRef.current.offsetWidth;
     const contWidth = headLineRef.current.children[0].offsetWidth;
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
@@ -69,27 +72,41 @@ export default function Main() {
     else setHeadLineIndex(0);
   }
 
-  function onClickAuctionNextBtn() {
-    const wrapWidth = auctionRef.current.offsetWidth;
-    const contWidth = auctionRef.current.children[0].offsetWidth;
+  function onClickFirstAuctionNextBtn() {
+    if (!firstAuctionRef.current.children) return;
+    const wrapWidth = firstAuctionRef.current.offsetWidth;
+    const contWidth = firstAuctionRef.current.children[0].offsetWidth;
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
-    const pageNum = Math.ceil(autoAuctionList.length / itemNumByPage);
+    const pageNum = Math.ceil(auctionListFirst.length / itemNumByPage);
 
-    if (auctionIndex < pageNum - 1) setAuctionIndex(auctionIndex + 1);
-    else setAuctionIndex(0);
+    if (firstAuctionIndex < pageNum - 1) setFirstAuctionIndex(firstAuctionIndex + 1);
+    else setFirstAuctionIndex(0);
+  }
+
+  function onClickSecondAuctionNextBtn() {
+    if (!secondAuctionRef.current.children) return;
+    const wrapWidth = secondAuctionRef.current.offsetWidth;
+    const contWidth = secondAuctionRef.current.children[0].offsetWidth;
+    const itemNumByPage = Math.floor(wrapWidth / contWidth);
+    const pageNum = Math.ceil(auctionListFirst.length / itemNumByPage);
+
+    if (secondAuctionIndex < pageNum - 1) setSecondAuctionIndex(firstAuctionIndex + 1);
+    else setSecondAuctionIndex(0);
   }
 
   function onClickMarketNextBtn() {
+    if (!marketRef.current.children) return;
     const wrapWidth = marketRef.current.offsetWidth;
     const contWidth = marketRef.current.children[0].offsetWidth;
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
-    const pageNum = Math.ceil(autoAuctionList.length / itemNumByPage);
+    const pageNum = Math.ceil(auctionListFirst.length / itemNumByPage);
 
     if (marketIndex < pageNum - 1) setMarketIndex(marketIndex + 1);
     else setMarketIndex(0);
   }
 
   function onClickTicketNextBtn() {
+    if (!ticketRef.current.children) return;
     const wrapWidth = ticketRef.current.offsetWidth;
     const contWidth = ticketRef.current.children[0].offsetWidth;
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
@@ -100,6 +117,7 @@ export default function Main() {
   }
 
   function onClickFaqPreBtn() {
+    if (!faqRef.current.children) return;
     const wrapWidth = faqRef.current.offsetWidth;
     const contWidth = faqRef.current.children[0].offsetWidth;
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
@@ -110,6 +128,7 @@ export default function Main() {
   }
 
   function onClickFaqNextBtn() {
+    if (!faqRef.current.children) return;
     const wrapWidth = faqRef.current.offsetWidth;
     const contWidth = faqRef.current.children[0].offsetWidth;
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
@@ -126,7 +145,19 @@ export default function Main() {
     });
   }
 
+  function getAuction() {
+    axios
+      .get("http://nips1.net:34805/auction/list", { params: { limit: 16 } })
+      .then((res) => {
+        console.log(res.data);
+        setAuctionListFirst(res.data.slice(0, 8));
+        setAuctionListSecond(res.data.slice(8));
+      });
+  }
+
   useEffect(() => {
+    getAuction();
+
     setInterval(() => {
       if (!issueRef.current) return;
 
@@ -151,6 +182,7 @@ export default function Main() {
   }, []);
 
   useEffect(() => {
+    if (!headLineRef.current) return;
     const wrapWidth = headLineRef.current.offsetWidth;
     const contWidth = headLineRef.current.children[0].offsetWidth;
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
@@ -172,26 +204,50 @@ export default function Main() {
   }, [headLineIndex]);
 
   useEffect(() => {
-    const wrapWidth = auctionRef.current.offsetWidth;
-    const contWidth = auctionRef.current.children[0].offsetWidth;
+    if (!firstAuctionRef.current.children[0]) return;
+    const wrapWidth = firstAuctionRef.current.offsetWidth;
+    const contWidth = firstAuctionRef.current.children[0].offsetWidth;
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
 
-    if (auctionRef.current?.scrollTo) {
-      if (auctionIndex === 0) {
-        auctionRef.current.scrollTo({
+    if (firstAuctionRef.current?.scrollTo) {
+      if (firstAuctionIndex === 0) {
+        firstAuctionRef.current.scrollTo({
           left: 0,
           behavior: "smooth",
         });
       } else {
-        auctionRef.current.scrollTo({
+        firstAuctionRef.current.scrollTo({
           left:
-            contWidth * itemNumByPage * auctionIndex +
-            auctionIndex * getStyle(auctionRef, "gap"),
+            contWidth * itemNumByPage * firstAuctionIndex +
+            firstAuctionIndex * getStyle(firstAuctionRef, "gap") * itemNumByPage,
           behavior: "smooth",
         });
       }
     }
-  }, [auctionIndex]);
+  }, [firstAuctionIndex]);
+
+  useEffect(() => {
+    if (!secondAuctionRef.current.children[0]) return;
+    const wrapWidth = secondAuctionRef.current.offsetWidth;
+    const contWidth = secondAuctionRef.current.children[0].offsetWidth;
+    const itemNumByPage = Math.floor(wrapWidth / contWidth);
+
+    if (secondAuctionRef.current?.scrollTo) {
+      if (secondAuctionIndex === 0) {
+        secondAuctionRef.current.scrollTo({
+          left: 0,
+          behavior: "smooth",
+        });
+      } else {
+        secondAuctionRef.current.scrollTo({
+          left:
+            contWidth * itemNumByPage * secondAuctionIndex +
+            secondAuctionIndex * getStyle(secondAuctionRef, "gap") * itemNumByPage,
+          behavior: "smooth",
+        });
+      }
+    }
+  }, [secondAuctionIndex]);
 
   useEffect(() => {
     const wrapWidth = marketRef.current.offsetWidth;
@@ -208,7 +264,7 @@ export default function Main() {
         marketRef.current.scrollTo({
           left:
             contWidth * itemNumByPage * marketIndex +
-            marketIndex * getStyle(marketRef, "gap"),
+            marketIndex * getStyle(marketRef, "gap") * itemNumByPage,
           behavior: "smooth",
         });
       }
@@ -321,8 +377,8 @@ export default function Main() {
 
               <div className="listBox">
                 <div className="posBox">
-                  <ul className="itemList" ref={auctionRef}>
-                    {autoAuctionList.map((cont, index) => (
+                  <ul className="itemList" ref={firstAuctionRef}>
+                    {auctionListFirst.map((cont, index) => (
                       <Fragment key={index}>
                         <AuctionItem
                           data={cont}
@@ -333,13 +389,13 @@ export default function Main() {
                       </Fragment>
                     ))}
                   </ul>
-                  <button className="nextBtn" onClick={onClickAuctionNextBtn}>
+                  <button className="nextBtn" onClick={onClickFirstAuctionNextBtn}>
                     <img src={I_rtArw} alt="" />
                   </button>
                 </div>
                 <div className="posBox">
                   <ul className="itemList">
-                    {autoAuctionList.map((cont, index) => (
+                    {auctionListSecond.map((cont, index) => (
                       <Fragment key={index}>
                         <AuctionItem
                           data={cont}
@@ -397,7 +453,7 @@ export default function Main() {
                         className="stakeBtn"
                         onClick={() => navigate("/staking")}
                       >
-                        BUY Now
+                        Buy Now
                       </button>
                     </li>
                   ))}
@@ -525,8 +581,8 @@ export default function Main() {
 
               <div className="listBox">
                 <div className="posBox">
-                  <ul className="itemList" ref={auctionRef}>
-                    {autoAuctionList.map((cont, index) => (
+                  <ul className="itemList" ref={firstAuctionRef}>
+                    {auctionListFirst.map((cont, index) => (
                       <Fragment key={index}>
                         <AuctionItem
                           data={cont}
@@ -537,13 +593,17 @@ export default function Main() {
                       </Fragment>
                     ))}
                   </ul>
-                  <button className="nextBtn" onClick={onClickAuctionNextBtn}>
+                  <button
+                    className="nextBtn"
+                    onClick={onClickFirstAuctionNextBtn}
+                  >
                     <img src={I_rtArw} alt="" />
                   </button>
                 </div>
+
                 <div className="posBox">
-                  <ul className="itemList">
-                    {autoAuctionList.map((cont, index) => (
+                  <ul className="itemList" ref={secondAuctionRef}>
+                    {auctionListSecond.map((cont, index) => (
                       <Fragment key={index}>
                         <AuctionItem
                           data={cont}
@@ -554,7 +614,10 @@ export default function Main() {
                       </Fragment>
                     ))}
                   </ul>
-                  <button className="nextBtn">
+                  <button
+                    className="nextBtn"
+                    onClick={onClickSecondAuctionNextBtn}
+                  >
                     <img src={I_rtArw} alt="" />
                   </button>
                 </div>
@@ -601,7 +664,7 @@ export default function Main() {
                         className="stakeBtn"
                         onClick={() => navigate("/staking")}
                       >
-                        BUY Now
+                        Buy Now
                       </button>
                     </li>
                   ))}

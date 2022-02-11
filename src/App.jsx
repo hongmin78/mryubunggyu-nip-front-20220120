@@ -2,11 +2,11 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { HashRouter, Route, Routes } from "react-router-dom";
 import styled from "styled-components";
-import SignUpPopup from "./components/SignUpPopup";
 import Auction from "./router/Auction";
 import AuctionDetail from "./router/AuctionDetail";
 import ConnectWallet from "./router/ConnectWallet";
 import EditProf from "./router/EditProf";
+import EmailAuth from "./router/EmailAuth";
 import Main from "./router/Main";
 import Market from "./router/Market";
 import MarketDetail from "./router/MarketDetail";
@@ -16,6 +16,7 @@ import Resell from "./router/Resell";
 import Staking from "./router/Staking";
 import StakingDetail from "./router/StakingDetail";
 import Term from "./router/Term";
+import Test from "./router/Test";
 import Winning from "./router/Winning";
 import GlobalStyle from "./util/GlobalStyle";
 import { setMobile } from "./util/store/commonSlice";
@@ -70,13 +71,17 @@ function App() {
 
           <Route path="/connectwallet" element={<ConnectWallet />} />
           <Route path="/connectwallet/:popup" element={<ConnectWallet />} />
+          <Route
+            path="/emailauth/:walletaddress/:authNum"
+            element={<EmailAuth />}
+          />
 
           <Route path="/staking" element={<Staking />} />
           <Route path="/staking/:popup" element={<Staking />} />
           <Route path="/staking/detail/:id" element={<StakingDetail />} />
 
           <Route path="/auction" element={<Auction />} />
-          <Route path="/auction/detail/:id" element={<AuctionDetail />} />
+          <Route path="/auction/detail/:dna" element={<AuctionDetail />} />
 
           <Route path="/market" element={<Market />} />
           <Route path="/market/detail/:id" element={<MarketDetail />} />
@@ -86,6 +91,7 @@ function App() {
           <Route path="/editprof" element={<EditProf />} />
 
           <Route path="/resell" element={<Resell />} />
+          <Route path="/test" element={<Test />} />
         </Routes>
       </HashRouter>
     </AppBox>

@@ -1,13 +1,20 @@
 import API from "./API";
 
-export const verifyEmail = async (email) => {
-  try {
-    const { data } = await API.post("/mail/verify", { email });
-    return data;
-  } catch (err) {
-    console.table(err);
-  }
-};
+export function getRequestEmail(email, walletAddress) {
+  API.post("/signup/email/request", { email, walletAddress })
+    .then((res) => {
+      return res;
+    })
+    .catch((err) => console.error(err));
+}
+
+export function authEmail(walletAddress, authNum) {
+  API.post("/signup/email/auth", { walletAddress, authNum })
+    .then((res) => {
+      return res;
+    })
+    .catch((err) => console.error(err));
+}
 
 export const login = async (email, password) => {
   const { data } = await API.post("/user/login", { email, password });

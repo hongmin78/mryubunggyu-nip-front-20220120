@@ -4,6 +4,7 @@ import I_heartO from "../img/icon/I_heartO.svg";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { autoAuctionList } from "../data/Dmain";
 
 export default function AuctionItem({ data, index, likeObj, setLikeObj }) {
   const navigate = useNavigate();
@@ -23,12 +24,12 @@ export default function AuctionItem({ data, index, likeObj, setLikeObj }) {
     return (
       <Mitem
         className="item"
-        onClick={() => navigate(`/auction/detail/${index}`)}
+        onClick={() => navigate(`/auction/detail/${data.dna}`)}
       >
         <div className="topBar">
           <div className="profBox">
-            <img src={data.profImg} alt="" />
-            <p className="address">{strDot(data.address, 5, 4)}</p>
+            <img src={autoAuctionList[index]?.profImg} alt="" />
+            <p className="address">{strDot(autoAuctionList[index]?.address, 5, 4)}</p>
           </div>
 
           {likeObj && (
@@ -43,22 +44,20 @@ export default function AuctionItem({ data, index, likeObj, setLikeObj }) {
                   color: likeObj[index] && "#ff5050",
                 }}
               >
-                {data.like}
+                0
               </p>
             </button>
           )}
         </div>
 
-        <img className="itemImg" src={data.item} alt="" />
+        <img className="itemImg" src={data?.image} alt="" />
 
         <div className="infoBox">
-          <p className="title">{data.title}</p>
+          <p className="title">Series Kong{data?.name}</p>
 
           <ul className="detailList">
             <li>Last sold for</li>
-            <li>
-              {data.price}&nbsp;{data.unit}
-            </li>
+            <li>100&nbsp;USDT</li>
           </ul>
         </div>
       </Mitem>
@@ -67,12 +66,14 @@ export default function AuctionItem({ data, index, likeObj, setLikeObj }) {
     return (
       <Pitem
         className="item"
-        onClick={() => navigate(`/auction/detail/${index}`)}
+        onClick={() => navigate(`/auction/detail/${data.dna}`)}
       >
         <div className="topBar">
           <div className="profBox">
-            <img src={data.profImg} alt="" />
-            <p className="address">{strDot(data.address, 5, 4)}</p>
+            <img src={autoAuctionList[index]?.profImg} alt="" />
+            <p className="address">
+              {strDot(autoAuctionList[index]?.address, 5, 4)}
+            </p>
           </div>
 
           {likeObj && (
@@ -87,21 +88,21 @@ export default function AuctionItem({ data, index, likeObj, setLikeObj }) {
                   color: likeObj[index] && "#ff5050",
                 }}
               >
-                {data.like}
+                {autoAuctionList[index]?.like}
               </p>
             </button>
           )}
         </div>
 
-        <img className="itemImg" src={data.item} alt="" />
+        <img className="itemImg" src={data?.image} alt="" />
 
         <div className="infoBox">
-          <p className="title">{data.title}</p>
+          <p className="title">Series Kong{data?.name}</p>
 
           <ul className="detailList">
             <li>Last sold for</li>
             <li>
-              {data.price}&nbsp;{data.unit}
+              100&nbsp;USDT
             </li>
           </ul>
         </div>

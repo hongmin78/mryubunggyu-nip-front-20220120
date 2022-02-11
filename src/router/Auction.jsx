@@ -1,14 +1,15 @@
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import I_search from "../img/icon/I_search.svg";
 import I_dnArw from "../img/icon/I_dnArw.svg";
 import AuctionItem from "../components/AuctionItem";
-import { D_auctionItemList, D_sortList } from "../data/Dauction";
+import { D_sortList } from "../data/Dauction";
 import Footer from "./Footer";
 import PopupBg from "../components/PopupBg";
 import SelectPopup from "../components/SelectPopup";
 import { useSelector } from "react-redux";
 import Header from "../components/header/Header";
+import axios from "axios";
 
 export default function Auction() {
   const searchBoxRef = useRef();
@@ -21,6 +22,19 @@ export default function Auction() {
   const [sortPopup, setSortPopup] = useState(false);
   const [likeObj, setLikeObj] = useState({});
   const [limit, setLimit] = useState(8);
+
+  const [auctionList, setAuctionList] = useState([]);
+
+  function getAuction() {
+    axios.get("http://nips1.net:34805/auction/list").then((res) => {
+      console.log(res.data);
+      setAuctionList(res.data);
+    });
+  }
+
+  useEffect(() => {
+    getAuction();
+  }, []);
 
   if (isMobile)
     return (
@@ -80,7 +94,7 @@ export default function Auction() {
             </section>
 
             <ul className="itemList">
-              {D_auctionItemList.map((cont, index) => {
+              {auctionList.map((cont, index) => {
                 if (index < limit)
                   return (
                     <Fragment key={index}>
@@ -163,7 +177,7 @@ export default function Auction() {
           </section>
 
           <ul className="itemList">
-            {D_auctionItemList.map((cont, index) => {
+            {auctionList.map((cont, index) => {
               if (index < limit)
                 return (
                   <Fragment key={index}>

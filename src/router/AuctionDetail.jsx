@@ -3,10 +3,9 @@ import I_clip from "../img/icon/I_clip.svg";
 import I_heart from "../img/icon/I_heart.svg";
 import I_heartO from "../img/icon/I_heartO.svg";
 import I_3dot from "../img/icon/I_3dot.svg";
-import E_detailItem from "../img/auction/E_detailItem.png";
 import I_rtArw from "../img/icon/I_rtArw.svg";
 import { Fragment, useEffect, useRef, useState } from "react";
-import { putCommaAtPrice } from "../util/Util";
+import { getStyle, putCommaAtPrice } from "../util/Util";
 import { D_category, D_transactionHistory } from "../data/DauctionDetail";
 import Offer from "../components/itemDetail/Offer";
 import { autoAuctionList } from "../data/Dmain";
@@ -16,8 +15,11 @@ import Properties from "../components/itemDetail/Properties";
 import { useSelector } from "react-redux";
 import Header from "../components/header/Header";
 import PopupBg from "../components/PopupBg";
+import axios from "axios";
+import { useParams } from "react-router-dom";
 
 export default function AuctionDetail() {
+  const params = useParams();
   const moreRef = useRef();
 
   const isMobile = useSelector((state) => state.common.isMobile);
@@ -26,8 +28,11 @@ export default function AuctionDetail() {
   const [category, setCategory] = useState(0);
   const [moreIndex, setMoreIndex] = useState(0);
   const [showCopyBtn, setShowCopyBtn] = useState(false);
+  const [itemData, setItemData] = useState({});
+  const [moreCollection, setMoreCollection] = useState([]);
 
   function onClickAuctionNextBtn() {
+    if (!moreRef.current.children[0]) return;
     const wrapWidth = moreRef.current.offsetWidth;
     const contWidth = moreRef.current.children[0].offsetWidth;
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
@@ -37,7 +42,29 @@ export default function AuctionDetail() {
     else setMoreIndex(0);
   }
 
+  function getAuction() {
+    axios
+      .get("http://nips1.net:34805/auction/list", { params: { limit: 8 } })
+      .then((res) => {
+        console.log(res.data);
+        setMoreCollection(res.data);
+      });
+  }
+
   useEffect(() => {
+    axios
+      .get(`http://nips1.net:34805/auction/item/${params.dna}`)
+      .then((res) => {
+        console.log(res.data[0]);
+        setItemData(res.data[0]);
+      });
+
+    getAuction();
+  }, []);
+
+  useEffect(() => {
+    if (!moreRef.current.children[0]) return;
+
     const wrapWidth = moreRef.current.offsetWidth;
     const contWidth = moreRef.current.children[0].offsetWidth;
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
@@ -50,11 +77,9 @@ export default function AuctionDetail() {
         });
       } else {
         moreRef.current.scrollTo({
-          left: isMobile
-            ? moreRef.current.scrollLeft +
-              moreRef.current.children[moreIndex].getBoundingClientRect().left -
-              20
-            : contWidth * itemNumByPage * moreIndex + itemNumByPage * 40,
+          left:
+            contWidth * itemNumByPage * moreIndex +
+            moreIndex * getStyle(moreRef, "gap") * itemNumByPage,
           behavior: "smooth",
         });
       }
@@ -68,7 +93,9 @@ export default function AuctionDetail() {
 
         <MauctionDetailBox>
           <section className="itemInfoContainer">
-            <img className="itemImg" src={E_detailItem} alt="" />
+            <span className="itemImgBox">
+              <img className="itemImg" src={itemData?.image} alt="" />
+            </span>
 
             <article className="infoBox">
               <div className="itemInfoBox">
@@ -151,7 +178,7 @@ export default function AuctionDetail() {
 
                 <div className="contBox">
                   {category === 0 && <Offer />}
-                  {category === 1 && <Details />}
+                  {category === 1 && <Details itemData={itemData.attributes} />}
                   {category === 2 && <Properties />}
                 </div>
               </div>
@@ -194,7 +221,7 @@ export default function AuctionDetail() {
             <div className="listBox">
               <div className="posBox">
                 <ul className="itemList" ref={moreRef}>
-                  {autoAuctionList.map((cont, index) => (
+                  {moreCollection.map((cont, index) => (
                     <Fragment key={index}>
                       <AuctionItem data={cont} index={index} />
                     </Fragment>
@@ -217,12 +244,16 @@ export default function AuctionDetail() {
         <Header />
         <PauctionDetailBox>
           <section className="itemInfoContainer">
-            <img className="itemImg" src={E_detailItem} alt="" />
+            <span className="itemImgBox">
+              <img className="itemImg" src={itemData?.image} alt="" />
+            </span>
 
             <article className="infoBox">
               <div className="itemInfoBox">
                 <div className="titleBox">
-                  <strong className="title">Kingkong #112</strong>
+                  <strong className="title">
+                    Series Kong {itemData?.name}
+                  </strong>
 
                   <div className="btnBox">
                     <div className="posBox">
@@ -301,7 +332,7 @@ export default function AuctionDetail() {
 
                 <div className="contBox">
                   {category === 0 && <Offer />}
-                  {category === 1 && <Details />}
+                  {category === 1 && <Details itemData={itemData.attributes} />}
                   {category === 2 && <Properties />}
                 </div>
               </div>
@@ -344,7 +375,7 @@ export default function AuctionDetail() {
             <div className="listBox">
               <div className="posBox">
                 <ul className="itemList" ref={moreRef}>
-                  {autoAuctionList.map((cont, index) => (
+                  {moreCollection.map((cont, index) => (
                     <Fragment key={index}>
                       <AuctionItem data={cont} index={index} />
                     </Fragment>
@@ -373,6 +404,7 @@ const MauctionDetailBox = styled.div`
       width: 100%;
       height: 100vw;
       object-fit: contain;
+      border-radius: 5.55vw;
     }
 
     & > .infoBox {
@@ -731,7 +763,10 @@ const PauctionDetailBox = styled.div`
     justify-content: space-between;
     gap: 40px;
 
-    .itemImg {
+    .itemImgBox {
+      display: flex;
+      justify-content: center;
+      align-items: center;
       width: 760px;
       height: 760px;
       object-fit: contain;
@@ -739,6 +774,12 @@ const PauctionDetailBox = styled.div`
       @media screen and (max-width: 1440px) {
         min-width: 500px;
         height: 500px;
+        border-radius: 20px;
+      }
+
+      .itemImg {
+        height: 100%;
+        border-radius: 20px;
       }
     }
 

@@ -7,7 +7,7 @@ import I_chkWhite from "../img/icon/I_chkWhite.svg";
 import { setLogin } from "../util/store/commonSlice";
 import { chkValidEmail } from "../util/Util";
 
-import { signup, verifyEmail } from "../api/auth";
+import { signup, getRequestEmail } from "../api/Signup";
 
 export default function SignUpPopup({ walletAddress }) {
   const navigate = useNavigate();
@@ -25,14 +25,15 @@ export default function SignUpPopup({ walletAddress }) {
   const [agreeList, setAgreeList] = useState(new Array(2).fill(false));
 
   const clickRegistrationBtn = async () => {
-    const { access } = await verifyEmail(email);
-    if (access) {
-      setIsAuthEmail(true);
-      console.log("success");
-    } else {
-      // setIsAuthEmail(true);
-      console.table("fail");
-    }
+    await getRequestEmail(email, walletAddress);
+    // const { access } = await getRequestEmail(email, walletAddress);
+    // if (access) {
+    //   setIsAuthEmail(true);
+    //   console.log("success");
+    // } else {
+    //   // setIsAuthEmail(true);
+    //   console.table("fail");
+    // }
   };
 
   useEffect(() => {
@@ -42,8 +43,9 @@ export default function SignUpPopup({ walletAddress }) {
   const disableConfirm =
     !(email && pw && pwConfrim && agreeList[0] && agreeList[1]) ||
     emailAlarm ||
-    pwAlarm ||
-    !isAuthEmail;
+    pwAlarm;
+  // pwAlarm ||
+  // !isAuthEmail;
 
   function onClickAgreeList(index) {
     let dataList = agreeList;
