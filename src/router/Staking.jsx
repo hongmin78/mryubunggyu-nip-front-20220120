@@ -4,9 +4,9 @@ import E_staking from "../img/common/E_staking.png";
 
 import { useSelector } from "react-redux";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
-import Header from "../components/header/Header";
 import { D_vaultList } from "../data/Dstaking";
 import Footer from "./Footer";
+import Header from "../components/header/Header";
 
 export default function Staking() {
   const navigate = useNavigate();

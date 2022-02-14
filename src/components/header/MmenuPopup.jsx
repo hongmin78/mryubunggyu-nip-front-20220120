@@ -179,6 +179,12 @@ const MmenuPopupBox = styled.section`
           img {
             width: 26px;
           }
+
+          &:nth-of-type(-n + 2) {
+            img {
+              width: 28px;
+            }
+          }
         }
       }
     }

@@ -71,13 +71,14 @@ const MfooterBox = styled.footer`
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  align-items: flex-end;
   gap: 2px;
   height: 112px;
   padding: 0 20px 24px 20px;
   background: #758faa;
 
   .copyright {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 500;
     line-height: 18px;
     color: #fff;
@@ -92,13 +93,13 @@ const MfooterBox = styled.footer`
     cursor: pointer;
 
     .logoImg {
-      height: 44px;
+      height: 48px;
     }
 
     .logoText {
-      font-size: 22px;
+      font-size: 25px;
       font-weight: 600;
-      line-height: 22px;
+      line-height: 25px;
       color: #fff;
     }
   }

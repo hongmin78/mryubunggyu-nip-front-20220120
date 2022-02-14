@@ -6,10 +6,15 @@ import PopupBg from "../components/PopupBg";
 import SignUpPopup from "../components/SignUpPopup";
 import { useSelector } from "react-redux";
 import Header from "../components/header/Header";
+import { login } from "../api/Signup";
+import { setLogin } from "../util/store/commonSlice";
+import { useDispatch } from "react-redux";
+import SetErrorBar from "../util/SetErrorBar";
 
 export default function ConnectWallet() {
   const navigate = useNavigate();
   const param = useParams();
+  const dispatch = useDispatch();
 
   const isMobile = useSelector((state) => state.common.isMobile);
 
@@ -20,11 +25,22 @@ export default function ConnectWallet() {
     let { ethereum } = window;
     if (!ethereum) return;
 
-    ethereum.request({ method: "eth_requestAccounts" }).then((res) => {
+    ethereum.request({ method: "eth_requestAccounts" }).then(async (res) => {
       let address = res[0];
       setWalletAddress(address);
-      if (isMobile) navigate("signup");
-      else setSignUpPopup(true);
+
+      
+      try{
+        const resp = await login(address);
+        console.log(resp.walletAddress);
+        dispatch(setLogin(resp.walletAddress));
+        localStorage.setItem("walletAddress", resp.walletAddress);
+        SetErrorBar(resp.message);
+        navigate("/");
+      } catch {
+        if (isMobile) navigate("signup");
+        else setSignUpPopup(true);
+      }
 
       // navigate(-1);
       // dispatch(setLogin(address));

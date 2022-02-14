@@ -1,3 +1,4 @@
+import { useLayoutEffect } from "react";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { HashRouter, Route, Routes } from "react-router-dom";
@@ -19,7 +20,7 @@ import Term from "./router/Term";
 import Test from "./router/Test";
 import Winning from "./router/Winning";
 import GlobalStyle from "./util/GlobalStyle";
-import { setMobile } from "./util/store/commonSlice";
+import { setLogin, setMobile } from "./util/store/commonSlice";
 
 function App() {
   const dispatch = useDispatch();
@@ -28,6 +29,13 @@ function App() {
     if (window.innerWidth > 1024) dispatch(setMobile(false));
     else dispatch(setMobile(true));
   }
+
+  useLayoutEffect(async () => {
+    const walletAddress = localStorage.getItem("walletAddress");
+
+    console.log("walletAddress", walletAddress);
+    if (walletAddress) dispatch(setLogin(walletAddress));
+  });
 
   useEffect(() => {
     if (window.innerWidth > 1024) dispatch(setMobile(false));
@@ -71,10 +79,7 @@ function App() {
 
           <Route path="/connectwallet" element={<ConnectWallet />} />
           <Route path="/connectwallet/:popup" element={<ConnectWallet />} />
-          <Route
-            path="/emailauth/:walletaddress/:authNum"
-            element={<EmailAuth />}
-          />
+          <Route path="/emailauth/:email/:authNum" element={<EmailAuth />} />
 
           <Route path="/staking" element={<Staking />} />
           <Route path="/staking/:popup" element={<Staking />} />

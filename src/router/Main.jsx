@@ -79,7 +79,8 @@ export default function Main() {
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
     const pageNum = Math.ceil(auctionListFirst.length / itemNumByPage);
 
-    if (firstAuctionIndex < pageNum - 1) setFirstAuctionIndex(firstAuctionIndex + 1);
+    if (firstAuctionIndex < pageNum - 1)
+      setFirstAuctionIndex(firstAuctionIndex + 1);
     else setFirstAuctionIndex(0);
   }
 
@@ -90,7 +91,8 @@ export default function Main() {
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
     const pageNum = Math.ceil(auctionListFirst.length / itemNumByPage);
 
-    if (secondAuctionIndex < pageNum - 1) setSecondAuctionIndex(firstAuctionIndex + 1);
+    if (secondAuctionIndex < pageNum - 1)
+      setSecondAuctionIndex(firstAuctionIndex + 1);
     else setSecondAuctionIndex(0);
   }
 
@@ -204,7 +206,8 @@ export default function Main() {
   }, [headLineIndex]);
 
   useEffect(() => {
-    if (!firstAuctionRef.current.children[0]) return;
+    if (!firstAuctionRef.current || !firstAuctionRef.current.children[0])
+      return;
     const wrapWidth = firstAuctionRef.current.offsetWidth;
     const contWidth = firstAuctionRef.current.children[0].offsetWidth;
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
@@ -219,7 +222,9 @@ export default function Main() {
         firstAuctionRef.current.scrollTo({
           left:
             contWidth * itemNumByPage * firstAuctionIndex +
-            firstAuctionIndex * getStyle(firstAuctionRef, "gap") * itemNumByPage,
+            firstAuctionIndex *
+              getStyle(firstAuctionRef, "gap") *
+              itemNumByPage,
           behavior: "smooth",
         });
       }
@@ -227,7 +232,8 @@ export default function Main() {
   }, [firstAuctionIndex]);
 
   useEffect(() => {
-    if (!secondAuctionRef.current.children[0]) return;
+    if (!secondAuctionRef.current || !secondAuctionRef.current.children[0])
+      return;
     const wrapWidth = secondAuctionRef.current.offsetWidth;
     const contWidth = secondAuctionRef.current.children[0].offsetWidth;
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
@@ -242,7 +248,9 @@ export default function Main() {
         secondAuctionRef.current.scrollTo({
           left:
             contWidth * itemNumByPage * secondAuctionIndex +
-            secondAuctionIndex * getStyle(secondAuctionRef, "gap") * itemNumByPage,
+            secondAuctionIndex *
+              getStyle(secondAuctionRef, "gap") *
+              itemNumByPage,
           behavior: "smooth",
         });
       }
@@ -389,7 +397,10 @@ export default function Main() {
                       </Fragment>
                     ))}
                   </ul>
-                  <button className="nextBtn" onClick={onClickFirstAuctionNextBtn}>
+                  <button
+                    className="nextBtn"
+                    onClick={onClickFirstAuctionNextBtn}
+                  >
                     <img src={I_rtArw} alt="" />
                   </button>
                 </div>
@@ -731,7 +742,7 @@ export default function Main() {
 }
 
 const MmainBox = styled.div`
-  padding: 55px 0 20vw 0;
+  padding: 72px 0 20vw 0;
 
   .headLineContainer {
     display: flex;

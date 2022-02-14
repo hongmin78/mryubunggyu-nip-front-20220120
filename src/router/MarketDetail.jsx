@@ -384,7 +384,7 @@ export default function MarketDetail() {
 }
 
 const MmarketDetailBox = styled.div`
-  padding: 55px 0 0 0;
+  padding: 72px 0 80px 0;
 
   * {
     font-family: "Roboto", sans-serif;
@@ -706,7 +706,7 @@ const MmarketDetailBox = styled.div`
           box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
           position: absolute;
           z-index: 2;
-          right: -7px;
+          right: 6px;
         }
       }
     }

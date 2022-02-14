@@ -8,6 +8,7 @@ import { setLogin } from "../util/store/commonSlice";
 import { chkValidEmail } from "../util/Util";
 
 import { signup, getRequestEmail } from "../api/Signup";
+import SetErrorBar from "../util/SetErrorBar";
 
 export default function SignUpPopup({ walletAddress }) {
   const navigate = useNavigate();
@@ -17,24 +18,15 @@ export default function SignUpPopup({ walletAddress }) {
 
   const [email, setEmail] = useState("");
   const [emailAlarm, setEmailAlarm] = useState("");
-  const [isAuthEmail, setIsAuthEmail] = useState(false);
   const [pw, setPw] = useState("");
   const [pwConfrim, setPwConfirm] = useState("");
   const [pwAlarm, setPwAlarm] = useState("");
-  const [referal, setReferal] = useState("");
+  const [referral, setReferal] = useState("");
   const [agreeList, setAgreeList] = useState(new Array(2).fill(false));
 
-  const clickRegistrationBtn = async () => {
-    await getRequestEmail(email, walletAddress);
-    // const { access } = await getRequestEmail(email, walletAddress);
-    // if (access) {
-    //   setIsAuthEmail(true);
-    //   console.log("success");
-    // } else {
-    //   // setIsAuthEmail(true);
-    //   console.table("fail");
-    // }
-  };
+  function clickRegistrationBtn() {
+    getRequestEmail(email, walletAddress);
+  }
 
   useEffect(() => {
     console.log(walletAddress);
@@ -44,8 +36,6 @@ export default function SignUpPopup({ walletAddress }) {
     !(email && pw && pwConfrim && agreeList[0] && agreeList[1]) ||
     emailAlarm ||
     pwAlarm;
-  // pwAlarm ||
-  // !isAuthEmail;
 
   function onClickAgreeList(index) {
     let dataList = agreeList;
@@ -56,19 +46,13 @@ export default function SignUpPopup({ walletAddress }) {
   }
 
   async function onClickSignUpBtn() {
-    const { access } = await signup(
-      walletAddress,
-      email,
-      pw,
-      referal,
-      agreeList[0],
-      agreeList[1]
-    );
-    if (access) {
+    const res = await signup(walletAddress, email, pw, referral);
+    console.log(res);
+    if (res) {
       dispatch(setLogin(walletAddress));
+      localStorage.setItem("walletAddress", walletAddress);
+      SetErrorBar(res.message);
       navigate("/staking");
-    } else {
-      alert("fail signup");
     }
   }
 
@@ -155,11 +139,11 @@ export default function SignUpPopup({ walletAddress }) {
           </li>
 
           <li>
-            <p className="contTitle">Referals</p>
+            <p className="contTitle">Referrals</p>
             <div className="inputContainer">
               <div className="inputBox">
                 <input
-                  value={referal}
+                  value={referral}
                   onChange={(e) => setReferal(e.target.value)}
                   placeholder="Friend Recommendation"
                 />
@@ -271,11 +255,11 @@ export default function SignUpPopup({ walletAddress }) {
           </li>
 
           <li>
-            <p className="contTitle">Referals</p>
+            <p className="contTitle">Referrals</p>
             <div className="inputContainer">
               <div className="inputBox">
                 <input
-                  value={referal}
+                  value={referral}
                   onChange={(e) => setReferal(e.target.value)}
                   placeholder="Friend Recommendation"
                 />

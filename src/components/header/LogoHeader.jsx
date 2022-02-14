@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import I_x from "../../img/icon/I_x.svg";
-import I_logoBlue from "../../img/icon/I_logoBlue.png";
+import I_headerLogo from "../../img/icon/I_headerLogo.png";
 
 export default function LogoHeader() {
   const navigate = useNavigate();
@@ -22,8 +22,7 @@ export default function LogoHeader() {
       <PheaderBox>
         <section className="innerBox">
           <button className="logoBox" onClick={() => navigate("/")}>
-            <img className="logoImg" src={I_logoBlue} alt="" />
-            <p className="logoText">NIP</p>
+            <img className="logoImg" src={I_headerLogo} alt="" />
           </button>
         </section>
       </PheaderBox>
@@ -70,18 +69,8 @@ const PheaderBox = styled.header`
     }
 
     .logoBox {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-
       .logoImg {
-        height: 57px;
-      }
-
-      .logoText {
-        font-size: 34px;
-        font-weight: 600;
-        color: #063a71;
+        height: 90px;
       }
     }
   }

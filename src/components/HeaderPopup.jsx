@@ -15,6 +15,8 @@ export default function HeaderPopup() {
 
   function onClickLogout() {
     dispatch(setLogin());
+    localStorage.removeItem("walletAddress");
+    navigate("/");
   }
 
   return (

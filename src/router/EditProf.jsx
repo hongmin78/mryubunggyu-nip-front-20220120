@@ -264,7 +264,7 @@ export default function EditProf() {
 }
 
 const MeditProfBox = styled.section`
-  padding: 55px 0 0 0;
+  padding: 72px 0 0 0;
 
   .setList {
     display: flex;

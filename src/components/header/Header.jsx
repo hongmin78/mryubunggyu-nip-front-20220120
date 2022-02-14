@@ -3,9 +3,10 @@ import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import HeaderPopup from "../../components/HeaderPopup";
-import I_logo from "../../img/icon/I_logo.svg";
-import I_logoText from "../../img/icon/I_logoText.svg";
-import I_logoTextWhite from "../../img/icon/I_logoTextWhite.svg";
+import I_headerLogo from "../../img/icon/I_headerLogo.png";
+import I_headerLogoM from "../../img/icon/I_headerLogoM.png";
+import I_headerLogoWhite from "../../img/icon/I_headerLogoWhite.png";
+
 import I_3line from "../../img/icon/I_3line.svg";
 import I_3lineWhite from "../../img/icon/I_3lineWhite.svg";
 import { strDot } from "../../util/Util";
@@ -28,12 +29,7 @@ export default function Header() {
       <>
         <MheaderBox style={{ background: isStaking && "unset" }}>
           <button className="logoBox" onClick={() => navigate("/")}>
-            <img className="logoImg" src={I_logo} alt="" />
-            <img
-              className="logoText"
-              src={isStaking ? I_logoTextWhite : I_logoText}
-              alt=""
-            />
+            <img className="logoImg" src={I_headerLogoM} alt="" />
           </button>
 
           <button className="menuBtn" onClick={() => setMenuPopup(true)}>
@@ -49,10 +45,9 @@ export default function Header() {
       <PheaderBox style={{ background: isStaking && "unset" }}>
         <section className="innerBox">
           <button className="logoBox" onClick={() => navigate("/")}>
-            <img className="logoImg" src={I_logo} alt="" />
             <img
-              className="logoText"
-              src={isStaking ? I_logoTextWhite : I_logoText}
+              className="logoImg"
+              src={isStaking ? I_headerLogoWhite : I_headerLogo}
               alt=""
             />
           </button>
@@ -123,7 +118,7 @@ const MheaderBox = styled.header`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 56px;
+  height: 72px;
   padding: 0 20px;
   background: #fff;
   top: 0;
@@ -133,16 +128,8 @@ const MheaderBox = styled.header`
   z-index: 4;
 
   .logoBox {
-    display: flex;
-    align-items: flex-end;
-    gap: 6px;
-
     .logoImg {
-      height: 27px;
-    }
-
-    .logoText {
-      height: 12px;
+      height: 56px;
     }
   }
 `;
@@ -169,16 +156,8 @@ const PheaderBox = styled.header`
     }
 
     .logoBox {
-      display: flex;
-      align-items: flex-end;
-      gap: 6px;
-
       .logoImg {
-        height: 57px;
-      }
-
-      .logoText {
-        height: 24px;
+        height: 90px;
       }
     }
 
