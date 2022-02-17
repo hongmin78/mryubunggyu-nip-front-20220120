@@ -61,7 +61,7 @@ export default function Staking() {
                 <li key={index}>
                   <div className="topBar">
                     <p className="key">LUCKY TICKET</p>
-                    <p className="value">#{`${index}`.padStart(5, "0")}</p>
+                    <p className="value">#{`${ index}`.padStart(5, "0")}</p>
                   </div>
 
                   <div className="contBox">

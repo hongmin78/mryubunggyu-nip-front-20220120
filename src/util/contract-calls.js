@@ -1,7 +1,7 @@
 
 import {web3} from '../configs/configweb3'
-import {abierc20} from '../contracts/abi/erc20'
-
+import { abi as abierc20 } from '../contracts/abi-erc20'
+import { abi as abistake } from '../contracts/abi-staker'
 // import { abi_putons ale } from '../contracts/abi/abi_puton sale'
 import {LOGGER} from './common'
 import sha256 from 'js-sha256'
@@ -9,8 +9,9 @@ import sha256 from 'js-sha256'
 // import { DebugMode } from '../configs/configs'
 const jcontracts={}
 const MAP_STR_ABI = {
-		ERC20 : abierc20
-	, ADMIN : abi_admin
+	ERC20 : abierc20
+	, STAKE : abistake
+//	, ADMIN : abi_admin
 }
 const getabistr_forfunction = jargs=>{let { contractaddress , abikind ,  methodname , aargs }=jargs;
 	let contract; contractaddress=contractaddress.toLowerCase()
@@ -58,7 +59,7 @@ const query_with_arg = jargs=> {  // {contractaddress , methodname , aargs }=jar
 		}).catch(err=>{resolve(null)})
 	})
 }
-const query_admin_fee =jargs=>{	let {contractaddress , actiontype }=jargs; let contract; contractaddress=contractaddress.toLowerCase()
+/** const query_admin_fee =jargs=>{	let {contractaddress , actiontype }=jargs; let contract; contractaddress=contractaddress.toLowerCase()
 	if(jcontracts[contractaddress ]){ contract=jcontracts[contractaddress] }
 	else {        contract=new web3.eth.Contract( abi_admin , contractaddress);    jcontracts[contractaddress ]=contract }
 	return new Promise((resolve,reject)=>{
@@ -67,7 +68,7 @@ const query_admin_fee =jargs=>{	let {contractaddress , actiontype }=jargs; let c
 			resolve(resp)
 		}).catch(err=>{resolve(null)})
 	})
-}
+} */
 const query_eth_balance=useraddress=>{
 	return new Promise((resolve,reject)=>{
 		web3.eth.getBalance( useraddress ).then(resp=>{
@@ -79,7 +80,7 @@ export {
 	getabistr_forfunction
 	, query_noarg
 	, query_with_arg
-	, query_admin_fee
+//	, query_admin_fee
 
 	, query_eth_balance
 }

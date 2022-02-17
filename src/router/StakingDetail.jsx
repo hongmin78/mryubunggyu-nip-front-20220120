@@ -3,22 +3,48 @@ import B_staking from "../img/staking/B_staking.png";
 import I_tIcon from "../img/icon/I_tIcon.png";
 import E_staking from "../img/common/E_staking.png";
 import E_title from "../img/staking/E_title.svg";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PopupBg from "../components/PopupBg";
 import StakingPopup from "../components/StakingPopup";
-
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import Header from "../components/header/Header";
+import { addresses } from '../configs/addresses'
+import axios from "axios";
+import { API } from '../configs/api'
+import { LOGGER } from '../util/common'
+import { query_with_arg, getabistr_forfunction } from "../util/contract-calls";
+import { getmyaddress } from '../util/common'
+import { messages } from '../configs/messages'
 
 export default function StakingDetail() {
-  const navigate = useNavigate();
-  const param = useParams();
-
+  const navigate = useNavigate()
+  const param = useParams()
   const isMobile = useSelector((state) => state.common.isMobile);
-
-  const [stakingPopup, setStakingPopup] = useState(false);
-
+  const [ stakingPopup , setStakingPopup ] = useState(false);
+	let [ currentserialnumber , setcurrentserialnumber]=useState()
+	let myaddress = getmyaddress()
+	useEffect(_=>{ // return
+//		alert(myaddress)
+		LOGGER( '' , myaddress )
+		if ( myaddress ){}
+		else {LOGGER(messages.MSG_PLEASE_CONNECT_WALLET ); return }
+		LOGGER(API.API_MAX + `/tickets/serialnumber`)
+//		return
+/** 		false && axios.get ( API.API_MAX + `/tickets/serialnumber`).then(resp=>{ LOGGER('' , resp.data )
+			let { status , payload } =resp.data
+			if ( status == 'OK' ){
+//				setcurrentserialnumber ( payload.max ? payload.max : 0 )
+			}
+		})*/
+		/*query_with_arg ( {contractaddress : addresses.contract_USDT
+			, abikind : 'ERC20'
+			, methodname : 'balanceOf'
+			, aargs : [ myaddress ] 
+		} ) 		.then(resp=>{					LOGGER( 'R6H63xkTcs' , resp )
+		}) */
+		
+	} , [] )
   if (isMobile)
     return (
       <>

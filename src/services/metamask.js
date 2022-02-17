@@ -1,4 +1,4 @@
-import NodeWalletConnect from "@walletconnect/node";
+// import NodeWalletConnect from "@walletconnect/node";
 
 const LOGGER = console.log;
 let { ethereum } = window;

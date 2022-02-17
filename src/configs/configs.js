@@ -1,0 +1,6 @@
+
+const MIN_STAKE_AMOUNT = 100
+
+export { 
+	MIN_STAKE_AMOUNT
+}

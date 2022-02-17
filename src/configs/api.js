@@ -1,8 +1,8 @@
 
-const URL='http://nips1.net'
+const URL='http://nips1.net:34815'
 
 const API={
-//	API_
+	API_MAX : URL + `/queries/max` // /:tablename/:fieldname
 }
 
 export { 

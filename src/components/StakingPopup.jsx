@@ -7,13 +7,42 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import PopupBg from "./PopupBg";
 import { useNavigate } from "react-router-dom";
+import axios from 'axios'
+import { getabistr_forfunction } from '../util/contract-calls'
+import { addresses } from "../configs/addresses";
+import {MIN_STAKE_AMOUNT} from '../configs/configs'
+import { LOGGER } from "../util/common";
+import { getweirep } from '../util/eth'
+import { requesttransaction } from '../services/metamask'
 
 export default function StakingPopup({ off }) {
   const navigate = useNavigate();
-  
   const isMobile = useSelector((state) => state.common.isMobile);
+	const [termChk, setTermChk] = useState(false);
+	let [ myaddress  , setmyaddress] = useState()
+	const onclick_buy=_=>{
+		if (myaddress){}
+		else {return }
+		let abistr = getabistr_forfunction({
+			contractaddress : addresses.contract_stake
+			, abikind : 'STAKE'
+			, methodname : 'stake'
+			, aargs : [ addresses.contract_USDT
+				, getweirep( MIN_STAKE_AMOUNT )
+				, myaddress
+			]
+		})
+		LOGGER( '' , abistr )
+		requesttransaction ({
+			from : myaddress
+			, to : addresses.contract_stake
+			, data : abistr
+//			, value : ''
+		}).then(resp=>{ LOGGER( '' , resp )
+			let txhash = resp 
 
-  const [termChk, setTermChk] = useState(false);
+		}) 
+	}
 
   if (isMobile)
     return (
@@ -85,7 +114,10 @@ export default function StakingPopup({ off }) {
                 </span>
               </div>
 
-              <button className="confirmBtn" onClick={() => navigate(-1)}>
+              <button className="confirmBtn" onClick={() => {
+								onclick_buy()	
+								navigate(-1)								
+							}}>
                 Confirm
               </button>
             </div>
