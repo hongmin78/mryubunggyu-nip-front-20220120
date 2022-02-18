@@ -3,7 +3,7 @@ import I_x from "../img/icon/I_x.svg";
 import I_tIcon from "../img/icon/I_tIcon.png";
 import I_chkWhite from "../img/icon/I_chkWhite.svg";
 import { putCommaAtPrice } from "../util/Util";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import PopupBg from "./PopupBg";
 import { useNavigate } from "react-router-dom";
@@ -11,36 +11,65 @@ import axios from 'axios'
 import { getabistr_forfunction } from '../util/contract-calls'
 import { addresses } from "../configs/addresses";
 import {MIN_STAKE_AMOUNT} from '../configs/configs'
-import { LOGGER } from "../util/common";
+import { LOGGER, getmyaddress } from "../util/common";
 import { getweirep } from '../util/eth'
 import { requesttransaction } from '../services/metamask'
+import SetErrorBar from "../util/SetErrorBar";
+import { messages } from "../configs/messages";
+import { API } from '../configs/api'
 
 export default function StakingPopup({ off }) {
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
-	const [termChk, setTermChk] = useState(false);
-	let [ myaddress  , setmyaddress] = useState()
-	const onclick_buy=_=>{
-		if (myaddress){}
-		else {return }
-		let abistr = getabistr_forfunction({
+	const [ termChk , setTermChk] = useState(false);
+	let [ myaddress , setmyaddress ] = useState(getmyaddress() )
+
+	useEffect(_=>{
+		const fetchdata=async _=>{
+			axios.get( API.API_TICKERS ).then(resp=>{ LOGGER('MDmEMQ5xde' , resp.data )
+				let { status , payload}=resp
+			})
+		}	
+		fetchdata()
+	} , [] )
+	const onclick_buy=async _=>{LOGGER( 'YFVGAF0sBJ'  )
+		let myaddress = getmyaddress()
+		LOGGER( 'eYJAgMYkR5' , myaddress )
+		
+/** 		if (myaddress){}
+		else { 
+			SetErrorBar( messages.MSG_PLEASE_ CONNECT_WALLET )
+			return 
+		} */
+		let abistr = getabistr_forfunction( {
 			contractaddress : addresses.contract_stake
 			, abikind : 'STAKE'
 			, methodname : 'stake'
-			, aargs : [ addresses.contract_USDT
-				, getweirep( MIN_STAKE_AMOUNT )
+			, aargs : [
+					addresses.contract_USDT
+				, getweirep( '' + MIN_STAKE_AMOUNT )
 				, myaddress
 			]
 		})
 		LOGGER( '' , abistr )
-		requesttransaction ({
-			from : myaddress
-			, to : addresses.contract_stake
-			, data : abistr
-//			, value : ''
-		}).then(resp=>{ LOGGER( '' , resp )
-			let txhash = resp 
-		}) 
+//		return
+		const callreqtx=async _=>{
+			let resp = await requesttransaction ( {
+				from : myaddress
+				, to : addresses.contract_stake
+				, data : abistr
+	//			, value : ''
+			})
+			axios.post ( API.API_TXS , { txhash : resp 
+				, username : myaddress
+				, typestr : 'STAKE'
+				, auxdata : ''
+			} ).then(resp=>{ LOGGER( '' , resp )
+				SetErrorBar ( messages.MSG_TX_REQUEST_SENT )
+			} )
+		}
+		callreqtx()
+//		.then(resp=>{ LOGGER( '' , resp )		}) 
 	}
 
   if (isMobile)
@@ -114,8 +143,8 @@ export default function StakingPopup({ off }) {
               </div>
 
               <button className="confirmBtn" onClick={() => {
-								onclick_buy()	
-								navigate(-1)								
+								onclick_buy()
+								false && navigate(-1)
 							}}>
                 Confirm
               </button>
@@ -194,8 +223,9 @@ export default function StakingPopup({ off }) {
               </span>
             </div>
 
-						<button className="confirmBtn" onClick={() => { off()
+						<button className="confirmBtn" onClick={() => { 
 							onclick_buy()
+							false && off()
 						} } >
               Confirm
             </button>

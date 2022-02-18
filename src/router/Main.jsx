@@ -33,21 +33,16 @@ export default function Main() {
   const marketRef = useRef();
   const ticketRef = useRef();
   const faqRef = useRef();
-
   let issueIndex = 0;
-
   const isMobile = useSelector((state) => state.common.isMobile);
-
   const [headLineIndex, setHeadLineIndex] = useState(0);
   const [firstAuctionIndex, setFirstAuctionIndex] = useState(0);
   const [secondAuctionIndex, setSecondAuctionIndex] = useState(0);
   const [marketIndex, setMarketIndex] = useState(0);
   const [ticketIndex, setTicketIndex] = useState(0);
   const [faqIndex, setFaqIndex] = useState(0);
-
   const [auctionListFirst, setAuctionListFirst] = useState([]);
   const [auctionListSecond, setAuctionListSecond] = useState([]);
-
   const [likeObj, setLikeObj] = useState({});
 
   function onClickHeadLinePreBtn() {
@@ -149,7 +144,7 @@ export default function Main() {
 
   function getAuction() {
     axios
-      .get("http://nips1.net:34805/auction/list", { params: { limit: 16 } })
+      .get("http://nips1.net:34705/auction/list", { params: { limit: 16 } })
       .then((res) => {
         console.log(res.data);
         setAuctionListFirst(res.data.slice(0, 8));
@@ -159,13 +154,10 @@ export default function Main() {
 
   useEffect(() => {
     getAuction();
-
     setInterval(() => {
       if (!issueRef.current) return;
-
       const contHeight = issueRef.current.children[0].offsetHeight;
-      issueIndex++;
-
+      issueIndex++
       if (issueRef.current?.scrollTo) {
         if (issueIndex < D_issueList.length) {
           issueRef.current.scrollTo({
@@ -180,8 +172,8 @@ export default function Main() {
           });
         }
       }
-    }, 5000);
-  }, []);
+    }, 5000 )
+  }, [] )
 
   useEffect(() => {
     if (!headLineRef.current) return;
@@ -229,8 +221,7 @@ export default function Main() {
         });
       }
     }
-  }, [firstAuctionIndex]);
-
+  }, [ firstAuctionIndex ]);
   useEffect(() => {
     if (!secondAuctionRef.current || !secondAuctionRef.current.children[0])
       return;

@@ -2,7 +2,10 @@
 const URL='http://nips1.net:34815'
 
 const API={
-	API_MAX : URL + `/queries/max` // /:tablename/:fieldname
+	API_MAX	: URL + `/queries/max` // /:tablename/:fieldname
+	, API_TXS	: URL + '/transactions' // /:txhash
+	, API_TICKERS : URL + '/tickers'
+	
 }
 
 export { 

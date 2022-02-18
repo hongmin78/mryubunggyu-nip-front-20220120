@@ -44,7 +44,7 @@ export default function AuctionDetail() {
 
   function getAuction() {
     axios
-      .get("http://nips1.net:34805/auction/list", { params: { limit: 8 } })
+      .get("http://nips1.net:34705/auction/list", { params: { limit: 8 } })
       .then((res) => {
         console.log(res.data);
         setMoreCollection(res.data);
@@ -53,7 +53,7 @@ export default function AuctionDetail() {
 
   useEffect(() => {
     axios
-      .get(`http://nips1.net:34805/auction/item/${params.dna}`)
+      .get(`http://nips1.net:34705/auction/item/${params.dna}`)
       .then((res) => {
         console.log(res.data[0]);
         setItemData(res.data[0]);

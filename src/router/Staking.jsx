@@ -1,20 +1,23 @@
 import styled from "styled-components";
 import B_staking from "../img/staking/B_staking.png";
 import E_staking from "../img/common/E_staking.png";
-
 import { useSelector } from "react-redux";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { D_vaultList } from "../data/Dstaking";
 import Footer from "./Footer";
 import Header from "../components/header/Header";
+import { useEffect } from "react";
+import axios from "axios";
+import { API } from '../configs/api'
 
 export default function Staking() {
   const navigate = useNavigate();
+  const isMobile = useSelector((state) => state.common.isMobile )
+	useEffect ( _=>{
+		
 
-  const isMobile = useSelector((state) => state.common.isMobile);
-
-
-  if (isMobile)
+	} , [] )
+  if ( isMobile )
     return (
       <>
         <Header />

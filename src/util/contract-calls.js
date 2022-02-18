@@ -13,12 +13,16 @@ const MAP_STR_ABI = {
 	, STAKE : abistake
 //	, ADMIN : abi_admin
 }
-const getabistr_forfunction = jargs=>{let { contractaddress , abikind ,  methodname , aargs }=jargs;
+const getabistr_forfunction = jargs=>{let { contractaddress 
+		, abikind 
+		,  methodname 
+		, aargs 
+	}=jargs;
 	let contract; contractaddress=contractaddress.toLowerCase()
 	let sig = sha256 (contractaddress + methodname )
   if( jcontracts[sig ] ){
 		contract = jcontracts[ sig ] }
-	else {        
+	else {
 		contract=new web3.eth.Contract( MAP_STR_ABI[abikind] , contractaddress)
 		jcontracts[ sig ] = contract 
 	}
@@ -31,7 +35,7 @@ const query_noarg = jargs=>{
 	let sig = sha256 (contractaddress + methodname )
 	if( jcontracts[ sig ]){ 
 		contract = jcontracts[ sig ] }
-	else {        
+	else {
 		contract = new web3.eth.Contract( MAP_STR_ABI[abikind] , contractaddress);    
 		jcontracts[ sig ] = contract 
 	}
@@ -81,7 +85,6 @@ export {
 	, query_noarg
 	, query_with_arg
 //	, query_admin_fee
-
 	, query_eth_balance
 }
 /** const approve=async jargs=>{let {contractaddress , spenderaddress,amount }=jargs; let contract; contractaddress=contractaddress.toLowerCase()

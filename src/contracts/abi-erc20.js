@@ -1,5 +1,5 @@
 
-const abierc20 = [
+const abi = [
   {
     name: 'approve',
     type: 'function',
@@ -91,6 +91,6 @@ const abierc20 = [
 	  "type":"function"
 	}
 ];	*/
-module.exports={
-	abierc20
+export {
+	abi
 }

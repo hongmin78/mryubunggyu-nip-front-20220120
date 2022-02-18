@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
@@ -11,19 +11,23 @@ import I_3line from "../../img/icon/I_3line.svg";
 import I_3lineWhite from "../../img/icon/I_3lineWhite.svg";
 import { strDot } from "../../util/Util";
 import MmenuPopup from "./MmenuPopup";
+import { query_with_arg } from "../../util/contract-calls";
 
 export default function Header() {
   const navigate = useNavigate();
   const pathname = useLocation().pathname;
   let isStaking = pathname.indexOf("/staking") !== -1;
-
   const isMobile = useSelector((state) => state.common.isMobile);
-  const isLogin = useSelector((state) => state.common.isLogin);
-
+	const isLogin = useSelector((state) => state.common.isLogin);
+	let address = useSelector ( state => state.common.address )
+	
   const [headerPopup, setHeaderPopup] = useState(false);
-
   const [menuPopup, setMenuPopup] = useState(false);
-
+	useEffect(_=>{
+		if( isLogin ){}
+		else { return }
+//		query_with_arg()
+	} , [ isLogin ] )
   if (isMobile) {
     return (
       <>
@@ -94,7 +98,7 @@ export default function Header() {
                     background: isStaking && "#f6f6f6",
                   }}
                 >
-                  {strDot(isLogin, 4, 4)}
+                  {strDot(isLogin, 8, 0)}
                 </span>
 
                 {headerPopup && <HeaderPopup />}
@@ -102,9 +106,11 @@ export default function Header() {
             ) : (
               <button
                 className="connectBtn"
-                onClick={() => navigate("/connectwallet")}
+								onClick={() => {	navigate("/connectwallet")
+
+								} }
               >
-                Connect Wallet
+                { address ? address : 'Connect Wallet' }
               </button>
             )}
           </article>

@@ -8,8 +8,7 @@ export function getRequestEmail(email, walletAddress) {
     })
     .catch((err) => SetErrorBar(err.response.data));
 }
-
-export function authEmail(email, authNum) {
+export function authEmail (email, authNum) {
   API.post("/signup/email/auth", { email, authNum })
     .then((res) => {
       return res;
@@ -28,7 +27,7 @@ export const signup = async (walletAddress, email, password, referral) => {
     email,
     password,
     referral,
-  });
+  } )
   try {
     const { data } = await API.post("/signup", {
       walletAddress,

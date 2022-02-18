@@ -20,19 +20,34 @@ import Term from "./router/Term";
 import Test from "./router/Test";
 import Winning from "./router/Winning";
 import GlobalStyle from "./util/GlobalStyle";
-import { setLogin, setMobile } from "./util/store/commonSlice";
+import { setLogin, setMobile , setaddress } from "./util/store/commonSlice";
+import { messages } from "./configs/messages";
+import SetErrorBar from './util/SetErrorBar'
+import { LOGGER } from "./util/common";
+import { strDot } from "./util/Util";
 
 function App() {
-  const dispatch = useDispatch();
-
+  const dispatch = useDispatch()
   function handleResize() {
     if (window.innerWidth > 1024) dispatch(setMobile(false));
     else dispatch(setMobile(true));
   }
 
+	useEffect( _=> {
+		let { ethereum }=window
+		if ( ethereum){}
+		else {return }
+		ethereum.on('accountsChanged', resp=>{ LOGGER(resp )
+			SetErrorBar( messages.MSG_ACCOUNTS_CHANGED )
+			dispatch( setaddress( resp[ 0 ] ) )
+		})
+		ethereum.on('networkChanged', function (networkId) { LOGGER( networkId )
+			// Time to reload your interface with the new networkId
+		})
+		dispatch( setaddress( strDot(ethereum.selectedAddress , 8 , 0 )  ) ) 
+	} , [ window.ethereum ] )
   useLayoutEffect(async () => {
     const walletAddress = localStorage.getItem("walletAddress");
-
     console.log("walletAddress", walletAddress);
     if (walletAddress) dispatch(setLogin(walletAddress));
   });

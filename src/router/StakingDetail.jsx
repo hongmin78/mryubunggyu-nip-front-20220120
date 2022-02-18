@@ -16,7 +16,8 @@ import { LOGGER } from '../util/common'
 import { query_with_arg, getabistr_forfunction } from "../util/contract-calls";
 import { getmyaddress } from '../util/common'
 import { messages } from '../configs/messages'
-
+import SetErrorBar from "../util/SetErrorBar";
+// import { useSelector } from "react-redux";
 export default function StakingDetail() {
   const navigate = useNavigate()
   const param = useParams()
@@ -24,12 +25,35 @@ export default function StakingDetail() {
   const [ stakingPopup , setStakingPopup ] = useState(false);
 	let [ currentserialnumber , setcurrentserialnumber]=useState()
 	let myaddress = getmyaddress()
-	useEffect(_=>{ // return
-//		alert(myaddress)
+  let isLogin = useSelector((state) => state.common.isLogin )
+	const onclickstakingbutton = async _=>{
+		let myaddress = getmyaddress()
+		const querybalance= _=>{
+			return query_with_arg( {
+				contractaddress : addresses.contract_USDT
+				, abikind : 'ERC20'
+				, methodname : 'balanceOf'
+				, aargs : [ myaddress ] 
+			})
+		}
+		if ( isLogin ){
+			let resp = await querybalance( )
+			LOGGER( 'h8UpKsxO1Y' , resp )
+		}
+		else {
+		//	SetErrorBar( messages.MSG_PLEASE_CONNECT_WALLET )
+			//return 
+		}
+		setStakingPopup(true)
+	}
+	useEffect ( _=> {
+		LOGGER( 'vF16Vg7wEA' , isLogin )
+	} , [ isLogin ] )
+	useEffect ( _=>{ return //		alert(myaddress)
 		LOGGER( '' , myaddress )
 		if ( myaddress ){}
 		else {LOGGER(messages.MSG_PLEASE_CONNECT_WALLET ); return }
-		LOGGER(API.API_MAX + `/tickets/serialnumber`)
+//		LOGGER(API.API_MAX + `/tickets/serialnumber`)
 //		return
 /** 		false && axios.get ( API.API_MAX + `/tickets/serialnumber`).then(resp=>{ LOGGER('' , resp.data )
 			let { status , payload } =resp.data
@@ -42,8 +66,7 @@ export default function StakingDetail() {
 			, methodname : 'balanceOf'
 			, aargs : [ myaddress ] 
 		} ) 		.then(resp=>{					LOGGER( 'R6H63xkTcs' , resp )
-		}) */
-		
+		}) */		
 	} , [] )
   if (isMobile)
     return (
@@ -81,7 +104,10 @@ export default function StakingDetail() {
 
               <p className="explain">Unstake period: 3 months</p>
 
-              <button className="confirmBtn" onClick={() => navigate("popup")}>
+							<button className="confirmBtn" onClick={() => { 
+								onclickstakingbutton()
+								false && navigate("popup")
+							} }>
                 Staking
                 {/* You don’t have enough USDT */}
               </button>
@@ -130,7 +156,9 @@ export default function StakingDetail() {
 
               <button
                 className="confirmBtn"
-                onClick={() => setStakingPopup(true)}
+								onClick={() =>{ 
+									onclickstakingbutton()
+								}}
               >
                 Staking
                 {/* You don’t have enough USDT */}

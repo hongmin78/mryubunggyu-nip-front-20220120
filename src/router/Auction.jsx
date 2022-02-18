@@ -26,11 +26,14 @@ export default function Auction() {
   const [auctionList, setAuctionList] = useState([]);
 
   function getAuction() {
-    axios.get("http://nips1.net:34805/auction/list").then((res) => {
-      console.log(res.data);
+		const fetchdata=_=>{
+   	 axios.get("http://nips1.net:34705/auction/list").then((res) => {
+    	console.log(res.data);
       setAuctionList(res.data);
-    });
-  }
+    	});
+		}
+		fetchdata()
+	}
 
   useEffect(() => {
     getAuction();

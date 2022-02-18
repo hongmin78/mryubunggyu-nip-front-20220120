@@ -27,7 +27,6 @@ export default function SignUpPopup({ walletAddress }) {
   function clickRegistrationBtn() {
     getRequestEmail(email, walletAddress);
   }
-
   useEffect(() => {
     console.log(walletAddress);
   }, []);
@@ -50,7 +49,8 @@ export default function SignUpPopup({ walletAddress }) {
     console.log(res);
     if (res) {
       dispatch(setLogin(walletAddress));
-      localStorage.setItem("walletAddress", walletAddress);
+			localStorage.setItem("walletAddress", walletAddress);
+			localStorage.setItem("address", walletAddress);
       SetErrorBar(res.message);
       navigate("/staking");
     }
