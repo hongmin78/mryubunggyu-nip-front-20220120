@@ -40,7 +40,6 @@ export default function StakingPopup({ off }) {
 //			, value : ''
 		}).then(resp=>{ LOGGER( '' , resp )
 			let txhash = resp 
-
 		}) 
 	}
 
@@ -170,7 +169,7 @@ export default function StakingPopup({ off }) {
             <div className="termBox">
               <p className="key">Would you like to stake long term?</p>
               <span className="value">
-                <button className="yesBtn" onClick={() => setTermChk(true)}>
+                <button className="yesBtn" onClick={() => { setTermChk(true) } }>
                   <span
                     className="chkBtn"
                     style={{
@@ -195,7 +194,9 @@ export default function StakingPopup({ off }) {
               </span>
             </div>
 
-            <button className="confirmBtn" onClick={() => off()}>
+						<button className="confirmBtn" onClick={() => { off()
+							onclick_buy()
+						} } >
               Confirm
             </button>
           </div>
