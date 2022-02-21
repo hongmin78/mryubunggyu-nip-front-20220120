@@ -20,9 +20,20 @@ export default function Header() {
   const isMobile = useSelector((state) => state.common.isMobile);
 	const isLogin = useSelector((state) => state.common.isLogin);
 	let address = useSelector ( state => state.common.address )
-	
   const [headerPopup, setHeaderPopup] = useState(false);
-  const [menuPopup, setMenuPopup] = useState(false);
+	const [menuPopup, setMenuPopup] = useState(false)
+	
+/**  	useEffect(_=>{
+		const spinner = document.querySelector("#Spinner");
+    spinner.animate(
+      [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
+      {
+        duration: 1000,
+        iterations: Infinity,
+      }
+    )
+	} , [] ) */
+
 	useEffect(_=>{
 		if( isLogin ){}
 		else { return }

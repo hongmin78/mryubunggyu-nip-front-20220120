@@ -6,16 +6,34 @@ import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { D_vaultList } from "../data/Dstaking";
 import Footer from "./Footer";
 import Header from "../components/header/Header";
-import { useEffect } from "react";
+import { useEffect , useState } from "react";
 import axios from "axios";
 import { API } from '../configs/api'
+import { getmyaddress, LOGGER } from "../util/common";
+import SetErrorBar from "../util/SetErrorBar";
+import { messages } from "../configs/messages";
 
 export default function Staking() {
   const navigate = useNavigate();
-  const isMobile = useSelector((state) => state.common.isMobile )
-	useEffect ( _=>{
-		
-
+	const isMobile = useSelector((state) => state.common.isMobile )
+	let [ isstaked , setisstaked ] = useState (false )
+	useEffect ( _=>{		
+		const fetchdata=async _=>{
+			let myaddress=getmyaddress()
+			LOGGER( '' , myaddress )
+			let resp = await axios.get( API.API_USERINFO + `/${myaddress}`)
+			LOGGER( 'rBojncz0CD' , resp.data )
+			let { status , respdata }=resp.data
+			if ( status =='OK' ){
+				setisstaked ( respdata.isstaked ? true : false )
+				if ( respdata.isstaked ){
+					SetErrorBar( messages.MSG_YOU_ALREADY_HAVE_STAKED )
+				}
+			}
+		}
+		setTimeout(_=>{
+			fetchdata( )
+		} , 4000 )		
 	} , [] )
   if ( isMobile )
     return (
@@ -71,7 +89,11 @@ export default function Staking() {
                     <img className="mainImg" src={E_staking} alt="" />
                     <button
                       className="buyBtn"
-                      onClick={() => navigate(`detail/${index}`)}
+											onClick={() =>{
+												if (isstaked){SetErrorBar( messages.MSG_YOU_ALREADY_HAVE_STAKED) ; return }
+												navigate(`detail/${index}`)
+											}}
+											disabled = {false }
                     >
                       Buy Now
                     </button>

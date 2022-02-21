@@ -8,34 +8,80 @@ import { useSelector } from "react-redux";
 import PopupBg from "./PopupBg";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios'
-import { getabistr_forfunction } from '../util/contract-calls'
+import { getabistr_forfunction, query_with_arg } from '../util/contract-calls'
 import { addresses } from "../configs/addresses";
 import {MIN_STAKE_AMOUNT} from '../configs/configs'
 import { LOGGER, getmyaddress } from "../util/common";
-import { getweirep } from '../util/eth'
+import { getweirep , getethrep } from '../util/eth'
 import { requesttransaction } from '../services/metamask'
 import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
 import { API } from '../configs/api'
-
+import awaitTransactionMined from "await-transaction-mined";
+import { web3 } from '../configs/configweb3'
+import { TX_POLL_OPTIONS } from '../configs/configs'
+import I_spinner from '../img/icon/I_spinner.svg'
 export default function StakingPopup({ off }) {
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
 	const [ termChk , setTermChk] = useState(false);
 	let [ myaddress , setmyaddress ] = useState(getmyaddress() )
-
+	let [ isallowanceok , setisallowanceok] = useState( false )
 	useEffect(_=>{
 		const fetchdata=async _=>{
 			axios.get( API.API_TICKERS ).then(resp=>{ LOGGER('MDmEMQ5xde' , resp.data )
 				let { status , payload}=resp
+
 			})
-		}	
+			let myaddress = getmyaddress()
+			query_with_arg ({contractaddress : addresses.contract_USDT
+				, abikind : 'ERC20'
+				, methodname : 'allowance'
+				, aargs : [ myaddress 
+					, addresses.contract_stake
+				] 
+			} ).then(resp=>{
+				let allowanceineth =  getethrep( resp )
+				LOGGER( '' , resp , allowanceineth )
+				if ( allowanceineth > 0){ setisallowanceok ( false )}
+				else {}
+			})
+		}
 		fetchdata()
 	} , [] )
+	const onclick_approve=async _=>{ LOGGER( '' )
+		let myaddress = getmyaddress()
+		let abistr = getabistr_forfunction ({
+			contractaddress : addresses.contract_USDT
+			, abikind : 'ERC20'
+			, methodname : 'approve'
+			, aargs : [
+				addresses.contract_stake
+				, getweirep('' +10**10 )
+			]
+		})
+		LOGGER('' , abistr )
+		requesttransaction({
+			from : myaddress
+			, to : addresses.contract_USDT
+			, data : abistr
+		}).then(resp=>{
+			if ( resp ){}
+			else { SetErrorBar( messages.MSG_USER_DENIED_TX ) ; return }
+			let txhash=resp
+			SetErrorBar( messages.MSG_TX_REQUEST_SENT )
+			awaitTransactionMined
+			.awaitTx( web3 , txhash, TX_POLL_OPTIONS )
+			.then((minedtxreceipt) => {
+				LOGGER("", minedtxreceipt);
+				SetErrorBar( messages.MSG_TX_FINALIZED )
+//					Setisloader(false);
+			})
+		})
+	}
 	const onclick_buy=async _=>{LOGGER( 'YFVGAF0sBJ'  )
 		let myaddress = getmyaddress()
 		LOGGER( 'eYJAgMYkR5' , myaddress )
-		
 /** 		if (myaddress){}
 		else { 
 			SetErrorBar( messages.MSG_PLEASE_ CONNECT_WALLET )
@@ -52,6 +98,7 @@ export default function StakingPopup({ off }) {
 			]
 		})
 		LOGGER( '' , abistr )
+		return
 //		return
 		const callreqtx=async _=>{
 			let resp = await requesttransaction ( {
@@ -92,7 +139,7 @@ export default function StakingPopup({ off }) {
                 </span>
 
                 <ul className="priceList">
-                  <li className="price">10 USDT</li>
+                  <li className="price">100 USDT</li>
                   <li className="exchange">${putCommaAtPrice(2115222)}</li>
                 </ul>
               </div>
@@ -142,12 +189,30 @@ export default function StakingPopup({ off }) {
                 </span>
               </div>
 
+<div style={{ visibility:'hidden' }}>
               <button className="confirmBtn" onClick={() => {
+								onclick_approve()
+								false && navigate(-1)
+							}}  >
+                Approve
+              </button>
+</div>
+
+<div>              <button className="confirmBtn" onClick={() => {
 								onclick_buy()
 								false && navigate(-1)
 							}}>
                 Confirm
+								<img
+          id="Spinner"
+          className="spinner"
+          src={I_spinner}
+          alt=""
+          style={{ display:  "block" }}
+        />
+
               </button>
+</div>							
             </div>
           </article>
         </MstakingPopupBox>
@@ -173,7 +238,7 @@ export default function StakingPopup({ off }) {
               </span>
 
               <ul className="priceList">
-                <li className="price">10 USDT</li>
+                <li className="price">100 USDT</li>
                 <li className="exchange">${putCommaAtPrice(2115222)}</li>
               </ul>
             </div>
@@ -222,6 +287,12 @@ export default function StakingPopup({ off }) {
                 </button>
               </span>
             </div>
+
+              <button className="confirmBtn" onClick={() => {
+								onclick_approve()								
+							}}>
+                Approve
+              </button>
 
 						<button className="confirmBtn" onClick={() => { 
 							onclick_buy()

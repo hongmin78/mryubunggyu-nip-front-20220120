@@ -15,9 +15,9 @@ const MAP_STR_ABI = {
 }
 const getabistr_forfunction = jargs=>{let { contractaddress 
 		, abikind 
-		,  methodname 
+		, methodname 
 		, aargs 
-	}=jargs;
+	}=jargs
 	let contract; contractaddress=contractaddress.toLowerCase()
 	let sig = sha256 (contractaddress + methodname )
   if( jcontracts[sig ] ){
