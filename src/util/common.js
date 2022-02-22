@@ -6,7 +6,26 @@ const LOGGER = console.log;
 const KEYS = Object.keys;
 const ISFINITE = Number.isFinite;
 const STRINGER = JSON.stringify;
-const PARSER = JSON.parse;
+const PARSER = JSON.parse
+
+const getobjtype=object=>{
+  var stringConstructor = "test".constructor;
+  var arrayConstructor = [].constructor;
+  var objectConstructor = ({}).constructor;
+  if (object === null) {
+      return "null";
+  }
+  if (object === undefined) {      return "undefined";
+  }
+  if (object.constructor === stringConstructor) {      return "String";
+  }
+  if (object.constructor === arrayConstructor) {      return "Array";
+  }
+  if (object.constructor === objectConstructor) {      return "Object";
+  }
+  return null ;
+}
+
 const getqueriesspeckey = (key) => {
   let location = window.location.href;
   let atkns = location.split(/\?/);
@@ -182,6 +201,7 @@ const show_in_exp_form = (number) => {
 };
 const POST_ON_CONFIRM_OR_RECEIPT = 1;
 export {
+	getobjtype ,
   LOGGER,
   ISFINITE,
   STRINGER,

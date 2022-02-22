@@ -8,6 +8,20 @@ const abi =[
 			, { type : 'address' , name : '_to' }  // 		 
 		]
 		, outputs : [ ]
+		, type: 'function'
+		,    payable: true 
+		,    constant: true,
+	}
+	, { name : '_balances'
+		, inputs :[
+			{ type: 'address' , name : '_address' }
+		]
+		, outputs : [ 
+			{ type: 'uint256' , name: 'balances_'}
+		]
+		, type: 'function'
+		, payable: true 
+		, constant: true,
 	}
 ]
 export {

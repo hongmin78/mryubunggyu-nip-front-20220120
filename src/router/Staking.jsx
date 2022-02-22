@@ -17,7 +17,7 @@ export default function Staking() {
   const navigate = useNavigate();
 	const isMobile = useSelector((state) => state.common.isMobile )
 	let [ isstaked , setisstaked ] = useState (false )
-	useEffect ( _=>{		
+	useEffect ( _=>{
 		const fetchdata=async _=>{
 			let myaddress=getmyaddress()
 			LOGGER( '' , myaddress )

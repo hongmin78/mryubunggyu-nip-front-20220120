@@ -11,7 +11,9 @@ import axios from 'axios'
 import { getabistr_forfunction, query_with_arg } from '../util/contract-calls'
 import { addresses } from "../configs/addresses";
 import {MIN_STAKE_AMOUNT} from '../configs/configs'
-import { LOGGER, getmyaddress } from "../util/common";
+import { LOGGER, getmyaddress
+	, getobjtype
+} from "../util/common";
 import { getweirep , getethrep } from '../util/eth'
 import { requesttransaction } from '../services/metamask'
 import SetErrorBar from "../util/SetErrorBar";
@@ -21,19 +23,34 @@ import awaitTransactionMined from "await-transaction-mined";
 import { web3 } from '../configs/configweb3'
 import { TX_POLL_OPTIONS } from '../configs/configs'
 import I_spinner from '../img/icon/I_spinner.svg'
+import { strDot } from '../util/Util'
 export default function StakingPopup({ off }) {
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
 	const [ termChk , setTermChk] = useState(false);
 	let [ myaddress , setmyaddress ] = useState(getmyaddress() )
+	let [ mybalance , setmybalance]= useState()
 	let [ isallowanceok , setisallowanceok] = useState( false )
+	let [ allowanceamount , setallowanceamount ] = useState()
+	let [ stakedbalance , setstakedbalance ] = useState()
 	useEffect(_=>{
 		const fetchdata=async _=>{
 			axios.get( API.API_TICKERS ).then(resp=>{ LOGGER('MDmEMQ5xde' , resp.data )
-				let { status , payload}=resp
+				let { status , payload }=resp
 
 			})
 			let myaddress = getmyaddress()
+			LOGGER( '' , addresses.contract_stake , myaddress )
+			let resp_balances = await query_with_arg ({
+					contractaddress : addresses.contract_stake
+				, abikind : 'STAKE'
+				, methodname : '_balances'
+				, aargs : [ myaddress
+				]
+			})
+			LOGGER( 'uQJ2POHvP8' , resp_balances )
+			setstakedbalance ( resp_balances )
+			
 			query_with_arg ({contractaddress : addresses.contract_USDT
 				, abikind : 'ERC20'
 				, methodname : 'allowance'
@@ -43,8 +60,18 @@ export default function StakingPopup({ off }) {
 			} ).then(resp=>{
 				let allowanceineth =  getethrep( resp )
 				LOGGER( '' , resp , allowanceineth )
-				if ( allowanceineth > 0){ setisallowanceok ( false )}
+				setallowanceamount ( allowanceineth )
+				if ( allowanceineth > 0){ setisallowanceok ( false )				
+				}
 				else {}
+			})
+			query_with_arg ({contractaddress : addresses.contract_USDT
+				, abikind : 'ERC20'
+				, methodname : 'balanceOf'
+				, aargs : [ myaddress ]
+			}).then(resp=>{
+				LOGGER( '' , resp , )
+				setmybalance( getethrep(resp ) )
 			})
 		}
 		fetchdata()
@@ -79,7 +106,7 @@ export default function StakingPopup({ off }) {
 			})
 		})
 	}
-	const onclick_buy=async _=>{LOGGER( 'YFVGAF0sBJ'  )
+	const onclick_buy=async _=>{LOGGER( 'YFVGAF0sBJ' )
 		let myaddress = getmyaddress()
 		LOGGER( 'eYJAgMYkR5' , myaddress )
 /** 		if (myaddress){}
@@ -98,7 +125,7 @@ export default function StakingPopup({ off }) {
 			]
 		})
 		LOGGER( '' , abistr )
-		return
+//		return
 //		return
 		const callreqtx=async _=>{
 			let resp = await requesttransaction ( {
@@ -107,7 +134,17 @@ export default function StakingPopup({ off }) {
 				, data : abistr
 	//			, value : ''
 			})
-			axios.post ( API.API_TXS , { txhash : resp 
+			let resptype = getobjtype ( resp )
+			let txhash
+			switch ( resptype ){
+				case 'String' :
+					txhash = resp 
+				break 
+				case 'Object' :
+					txhash = resp.txHash
+				break
+			}			
+			axios.post ( API.API_TXS + `/${txhash}` , { txhash
 				, username : myaddress
 				, typestr : 'STAKE'
 				, auxdata : ''
@@ -157,6 +194,20 @@ export default function StakingPopup({ off }) {
                   <p className="key">Total Staked</p>
                   <p className="value">10 USDT</p>
                 </li>
+								<li>
+	                <p className="key">your address</p>
+  	              <p className="value">{ strDot(myaddress , 6 , 0 ) }</p>
+    	          </li>
+								<li>
+									<p className="key">Your USDT balance</p>
+                  <p className="value">{mybalance} USDT</p>
+								</li>
+								<li>
+									<p className="key">Allowance</p>
+                  <p className="value">{allowanceamount} USDT</p>
+								</li>
+
+
               </ul>
             </div>
 
@@ -256,6 +307,19 @@ export default function StakingPopup({ off }) {
                 <p className="key">Total Staked</p>
                 <p className="value">10 USDT</p>
               </li>
+              <li>
+                <p className="key">your address</p>
+                <p className="value">{strDot(myaddress , 8, 0 ) } </p>
+              </li>
+							<li>
+									<p className="key">Your USDT balance</p>
+                  <p className="value">{mybalance} USDT</p>
+							</li>
+							<li>
+									<p className="key">Allowance</p>
+                  <p className="value">{allowanceamount} USDT</p>
+								</li>
+
             </ul>
           </div>
 
