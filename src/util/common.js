@@ -12,8 +12,7 @@ const getobjtype=object=>{
   var stringConstructor = "test".constructor;
   var arrayConstructor = [].constructor;
   var objectConstructor = ({}).constructor;
-  if (object === null) {
-      return "null";
+  if (object === null) {      return "null";
   }
   if (object === undefined) {      return "undefined";
   }
@@ -25,7 +24,6 @@ const getobjtype=object=>{
   }
   return null ;
 }
-
 const getqueriesspeckey = (key) => {
   let location = window.location.href;
   let atkns = location.split(/\?/);

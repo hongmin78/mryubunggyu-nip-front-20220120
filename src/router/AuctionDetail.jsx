@@ -17,20 +17,28 @@ import Header from "../components/header/Header";
 import PopupBg from "../components/PopupBg";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import { LOGGER } from "../util/common";
+import { API } from "../configs/api";
 
 export default function AuctionDetail() {
   const params = useParams();
   const moreRef = useRef();
-
   const isMobile = useSelector((state) => state.common.isMobile);
-
   const [toggleLike, setToggleLike] = useState(false);
   const [category, setCategory] = useState(0);
   const [moreIndex, setMoreIndex] = useState(0);
   const [showCopyBtn, setShowCopyBtn] = useState(false);
-  const [itemData, setItemData] = useState({});
+  const [itemData, setItemData ] = useState({});
   const [moreCollection, setMoreCollection] = useState([]);
 
+	const onclickfavorite=_=>{
+		axios.post (API.API_TOGGLE_FAVORITE ).then(resp=>{
+			LOGGER( 'xMYQNYFa9d' , resp.data )
+			
+		})
+		setToggleLike(!toggleLike)
+		LOGGER('8FCYJgzDZX')
+	} 
   function onClickAuctionNextBtn() {
     if (!moreRef.current.children[0]) return;
     const wrapWidth = moreRef.current.offsetWidth;
@@ -104,7 +112,8 @@ export default function AuctionDetail() {
                     <div className="btnBox">
                       <button
                         className="likeBtn hoverBtn"
-                        onClick={() => setToggleLike(!toggleLike)}
+												onClick={() => { onclickfavorite ()
+												} }
                       >
                         <img src={toggleLike ? I_heartO : I_heart} alt="" />
                       </button>
@@ -259,7 +268,8 @@ export default function AuctionDetail() {
                     <div className="posBox">
                       <button
                         className="likeBtn hoverBtn"
-                        onClick={() => setToggleLike(!toggleLike)}
+												onClick={() => { onclickfavorite()
+												} }
                       >
                         <img src={toggleLike ? I_heartO : I_heart} alt="" />
                       </button>

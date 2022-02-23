@@ -1,6 +1,5 @@
 import SetErrorBar from "../util/SetErrorBar";
 import API from "./API";
-
 export function getRequestEmail(email, walletAddress) {
   API.post("/signup/email/request", { email, walletAddress })
     .then((res) => {
@@ -15,7 +14,6 @@ export function authEmail (email, authNum) {
     })
     .catch((err) => console.error(err));
 }
-
 export const login = async (walletAddress) => {
   const { data } = await API.post("/signup/login", { walletAddress });
   return data;

@@ -18,7 +18,7 @@ export default function ConnectWallet() {
 
   const isMobile = useSelector((state) => state.common.isMobile);
 
-  const [signUpPopup, setSignUpPopup] = useState(false);
+  const [signUpPopup, setSignUpPopup ] = useState(false);
   const [walletAddress, setWalletAddress] = useState("");
 
   async function requestconnect() {
@@ -28,8 +28,6 @@ export default function ConnectWallet() {
     ethereum.request({ method: "eth_requestAccounts" }).then(async (res) => {
       let address = res[0];
       setWalletAddress(address);
-
-      
       try{
         const resp = await login(address);
         console.log(resp.walletAddress);
@@ -41,7 +39,6 @@ export default function ConnectWallet() {
         if (isMobile) navigate("signup");
         else setSignUpPopup(true);
       }
-
       // navigate(-1);
       // dispatch(setLogin(address));
     });

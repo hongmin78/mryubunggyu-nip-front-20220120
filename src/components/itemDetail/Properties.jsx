@@ -3,6 +3,7 @@ import I_etherScan from "../../img/icon/I_etherScan.png";
 import I_cube from "../../img/icon/I_cube.svg";
 import I_eye from "../../img/icon/I_eye.svg";
 import { useSelector } from "react-redux";
+import { URL_METADATA_BASE } from '../../configs/configs'
 
 export default function Properties() {
   const isMobile = useSelector((state) => state.common.isMobile);
@@ -17,7 +18,9 @@ export default function Properties() {
           </button>
         </li>
         <li>
-          <button className="" onClick={() => {}}>
+          <button className="" onClick={() => {
+						window.open ( URL_METADATA_BASE + '' )
+					}}>
             <img src={I_cube} alt="" />
             <p>View metadata</p>
           </button>
@@ -40,7 +43,9 @@ export default function Properties() {
           </button>
         </li>
         <li>
-          <button className="" onClick={() => {}}>
+          <button className="" onClick={() => {
+						window.open ( URL_METADATA_BASE + '' )
+					}}>
             <img src={I_cube} alt="" />
             <p>View metadata</p>
           </button>

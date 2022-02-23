@@ -6,30 +6,34 @@ import I_x from "../img/icon/I_x.svg";
 import I_chkWhite from "../img/icon/I_chkWhite.svg";
 import { setLogin } from "../util/store/commonSlice";
 import { chkValidEmail } from "../util/Util";
-
 import { signup, getRequestEmail } from "../api/Signup";
 import SetErrorBar from "../util/SetErrorBar";
+import { messages } from "../configs/messages";
+import { generaterandomstr_charset } from "../util/common";
 
 export default function SignUpPopup({ walletAddress }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
   const isMobile = useSelector((state) => state.common.isMobile);
-
   const [email, setEmail] = useState("");
   const [emailAlarm, setEmailAlarm] = useState("");
   const [pw, setPw] = useState("");
   const [pwConfrim, setPwConfirm] = useState("");
   const [pwAlarm, setPwAlarm] = useState("");
   const [referral, setReferal] = useState("");
-  const [agreeList, setAgreeList] = useState(new Array(2).fill(false));
+  const [agreeList, setAgreeList ] = useState(new Array(2).fill(false));
 
   function clickRegistrationBtn() {
     getRequestEmail(email, walletAddress);
   }
   useEffect(() => {
-    console.log(walletAddress);
-  }, []);
+		console.log(walletAddress);
+		let pwrandom = generaterandomstr_charset(6 , 'base58')
+		setPw(pwrandom)
+		setPwConfirm ( pwrandom )
+		setReferal('CaBusHK4GQ')
+		setEmail ('leejh16@gmail.com')
+  }, [] )
 
   const disableConfirm =
     !(email && pw && pwConfrim && agreeList[0] && agreeList[1]) ||
@@ -38,19 +42,20 @@ export default function SignUpPopup({ walletAddress }) {
 
   function onClickAgreeList(index) {
     let dataList = agreeList;
-
     dataList[index] = !dataList[index];
-
     setAgreeList([...dataList]);
   }
 
   async function onClickSignUpBtn() {
+
+		if(chkValidEmail( email) ){}
+		else {SetErrorBar( messages.MSG_EMAIL_INVALID ); return }
     const res = await signup(walletAddress, email, pw, referral);
     console.log(res);
     if (res) {
       dispatch(setLogin(walletAddress));
-			localStorage.setItem("walletAddress", walletAddress);
-			localStorage.setItem("address", walletAddress);
+			localStorage.setItem( "walletAddress" , walletAddress);
+			localStorage.setItem( "address" , walletAddress);
       SetErrorBar(res.message);
       navigate("/staking");
     }
@@ -112,8 +117,8 @@ export default function SignUpPopup({ walletAddress }) {
             <p className="contTitle">Password</p>
             <div className="inputContainer">
               <div className="inputBox">
-                <input
-                  type="password"
+                <input 
+                  type=""
                   value={pw}
                   onChange={(e) => setPw(e.target.value)}
                   placeholder="Password"
@@ -145,7 +150,7 @@ export default function SignUpPopup({ walletAddress }) {
                 <input
                   value={referral}
                   onChange={(e) => setReferal(e.target.value)}
-                  placeholder="Friend Recommendation"
+									placeholder="Friend Recommendation"									
                 />
               </div>
             </div>
@@ -156,7 +161,8 @@ export default function SignUpPopup({ walletAddress }) {
           <li>
             <button
               className={agreeList[0] ? "chkBtn on" : "chkBtn"}
-              onClick={() => onClickAgreeList(0)}
+							onClick={() => onClickAgreeList(0)}
+							style={{transform:'scale(3,3)'}}
             >
               <img src={I_chkWhite} alt="" />
             </button>
@@ -299,7 +305,9 @@ export default function SignUpPopup({ walletAddress }) {
         </ul>
 
         <ul className="btnBox">
-          <button className="cancelBtn" onClick={() => navigate("/")}>
+          <button className="cancelBtn" onClick={() => {
+						navigate("/")}						
+					}>
             Cancel
           </button>
           <button

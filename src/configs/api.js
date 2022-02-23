@@ -6,6 +6,7 @@ const API={
 	, API_TXS	: URL + '/transactions' // /:txhash
 	, API_TICKERS : URL + '/tickers'
 	, API_USERINFO : URL + '/users/info'
+	, API_TOGGLE_FAVORITE : URL + '/favorites/toggle'
 }
 
 export { 

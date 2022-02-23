@@ -12,6 +12,9 @@ import I_3lineWhite from "../../img/icon/I_3lineWhite.svg";
 import { strDot } from "../../util/Util";
 import MmenuPopup from "./MmenuPopup";
 import { query_with_arg } from "../../util/contract-calls";
+import { LOGGER, getmyaddress } from "../../util/common";
+import { addresses } from '../../configs/addresses'
+import { getethrep } from "../../util/eth";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -22,7 +25,7 @@ export default function Header() {
 	let address = useSelector ( state => state.common.address )
   const [headerPopup, setHeaderPopup] = useState(false);
 	const [menuPopup, setMenuPopup] = useState(false)
-	
+	let [ mybalance , setmybalance ] = useState()
 /**  	useEffect(_=>{
 		const spinner = document.querySelector("#Spinner");
     spinner.animate(
@@ -37,7 +40,23 @@ export default function Header() {
 	useEffect(_=>{
 		if( isLogin ){}
 		else { return }
-//		query_with_arg()
+		const fetchdata = _=>{
+			let myaddress = getmyaddress()
+			if ( myaddress){}
+			else { return }
+			query_with_arg ({contractaddress : addresses.contract_USDT
+				, abikind : 'ERC20'
+				, methodname : 'balanceOf'
+				, aargs : [ myaddress 
+				] 
+			} ).then(resp=>{LOGGER( 'Ce4mDMhjbS' , resp )
+				setmybalance( getethrep ( resp ) )
+				
+			})
+		}
+		setTimeout(_=>{ 
+			fetchdata()
+		} , 3000		)
 	} , [ isLogin ] )
   if (isMobile) {
     return (
@@ -99,7 +118,7 @@ export default function Header() {
                 onClick={() => setHeaderPopup(!headerPopup)}
               >
                 <span className="balanceBox">
-                  <p className="price">0.0523456</p>
+                  <p className="price">{ mybalance }</p>
                   <p className="unit">USDT</p>
                 </span>
 
