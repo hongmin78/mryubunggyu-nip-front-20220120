@@ -26,38 +26,37 @@ export default function Header() {
   const [headerPopup, setHeaderPopup] = useState(false);
 	const [menuPopup, setMenuPopup] = useState(false)
 	let [ mybalance , setmybalance ] = useState()
+	let [ myaddress , setmyaddress ] = useState()
 /**  	useEffect(_=>{
 		const spinner = document.querySelector("#Spinner");
     spinner.animate(
       [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
-      {
-        duration: 1000,
+      {        duration: 1000,
         iterations: Infinity,
       }
     )
 	} , [] ) */
-
 	useEffect(_=>{
-		if( isLogin ){}
+		if( address ){} // isLogin
 		else { return }
 		const fetchdata = _=>{
-			let myaddress = getmyaddress()
+			let myaddress = getmyaddress() ; LOGGER( 'MXZfykw8Mw' , myaddress )
+			setmyaddress( myaddress )
 			if ( myaddress){}
 			else { return }
 			query_with_arg ({contractaddress : addresses.contract_USDT
 				, abikind : 'ERC20'
 				, methodname : 'balanceOf'
 				, aargs : [ myaddress 
-				] 
-			} ).then(resp=>{LOGGER( 'Ce4mDMhjbS' , resp )
+			] } ).then(resp=>{LOGGER( 'Ce4mDMhjbS' , resp )
 				setmybalance( getethrep ( resp ) )
 				
 			})
 		}
 		setTimeout(_=>{ 
 			fetchdata()
-		} , 3000		)
-	} , [ isLogin ] )
+		} , 3000 )
+	} , [ isLogin , address ] )
   if (isMobile) {
     return (
       <>
@@ -140,7 +139,7 @@ export default function Header() {
 
 								} }
               >
-                { address ? address : 'Connect Wallet' }
+                { myaddress ? myaddress : 'Connect Wallet' }
               </button>
             )}
           </article>

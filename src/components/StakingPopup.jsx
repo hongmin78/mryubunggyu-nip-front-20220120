@@ -8,9 +8,9 @@ import { useSelector } from "react-redux";
 import PopupBg from "./PopupBg";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios'
-import { getabistr_forfunction, query_with_arg } from '../util/contract-calls'
+import { getabistr_forfunction, query_with_arg, query_noarg } from '../util/contract-calls'
 import { addresses } from "../configs/addresses";
-import {MIN_STAKE_AMOUNT} from '../configs/configs'
+import { MIN_STAKE_AMOUNT } from '../configs/configs'
 import { LOGGER, getmyaddress
 	, getobjtype
 } from "../util/common";
@@ -24,6 +24,7 @@ import { web3 } from '../configs/configweb3'
 import { TX_POLL_OPTIONS } from '../configs/configs'
 import I_spinner from '../img/icon/I_spinner.svg'
 import { strDot } from '../util/Util'
+
 export default function StakingPopup({ off }) {
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
@@ -33,11 +34,15 @@ export default function StakingPopup({ off }) {
 	let [ isallowanceok , setisallowanceok] = useState( false )
 	let [ allowanceamount , setallowanceamount ] = useState()
 	let [ stakedbalance , setstakedbalance ] = useState()
+	let [ tvl , settvl] = useState()
+	let [ tickerusdt, settickerusdt ] = useState ()
 	useEffect(_=>{
 		const fetchdata=async _=>{
 			axios.get( API.API_TICKERS ).then(resp=>{ LOGGER('MDmEMQ5xde' , resp.data )
-				let { status , payload }=resp
-
+				let { status , payload , list }=resp
+//				let { USDT } = payload.list
+	//			LOGGER( 'mlB7HasjBh' , USDT )
+		//		settickerusdt ( USDT )
 			})
 			let myaddress = getmyaddress()
 			LOGGER( '' , addresses.contract_stake , myaddress )
@@ -49,8 +54,7 @@ export default function StakingPopup({ off }) {
 				]
 			})
 			LOGGER( 'uQJ2POHvP8' , resp_balances )
-			setstakedbalance ( resp_balances )
-			
+			setstakedbalance ( resp_balances )			
 			query_with_arg ({contractaddress : addresses.contract_USDT
 				, abikind : 'ERC20'
 				, methodname : 'allowance'
@@ -72,6 +76,13 @@ export default function StakingPopup({ off }) {
 			}).then(resp=>{
 				LOGGER( '' , resp , )
 				setmybalance( getethrep(resp ) )
+			})
+			query_noarg ({ contractaddress : addresses.contract_stake
+				, abikind : 'STAKE'
+				, methodname : '_tvl'
+			}).then(resp=>{
+				LOGGER( '' , resp )
+				settvl ( getethrep ( resp ) )				
 			})
 		}
 		fetchdata()
@@ -128,29 +139,35 @@ export default function StakingPopup({ off }) {
 //		return
 //		return
 		const callreqtx=async _=>{
-			let resp = await requesttransaction ( {
-				from : myaddress
-				, to : addresses.contract_stake
-				, data : abistr
-	//			, value : ''
-			})
-			let resptype = getobjtype ( resp )
-			let txhash
-			switch ( resptype ){
-				case 'String' :
-					txhash = resp 
-				break 
-				case 'Object' :
-					txhash = resp.txHash
-				break
-			}			
-			axios.post ( API.API_TXS + `/${txhash}` , { txhash
-				, username : myaddress
-				, typestr : 'STAKE'
-				, auxdata : ''
-			} ).then(resp=>{ LOGGER( '' , resp )
-				SetErrorBar ( messages.MSG_TX_REQUEST_SENT )
-			} )
+			let resp 
+			try {resp = await requesttransaction ( {
+					from : myaddress
+					, to : addresses.contract_stake
+					, data : abistr
+		//			, value : ''
+				})
+				if ( resp){}
+				else { SetErrorBar( messages.MSG_USER_DENIED_TX ) ; return }
+				let resptype = getobjtype ( resp )
+				let txhash
+				switch ( resptype ){
+					case 'String' :
+						txhash = resp 
+					break 
+					case 'Object' :
+						txhash = resp.txHash
+					break
+				}
+				axios.post ( API.API_TXS + `/${txhash}` , { txhash
+					, username : myaddress
+					, typestr : 'STAKE'
+					, auxdata : ''
+				} ).then(resp=>{ LOGGER( '' , resp )
+					SetErrorBar ( messages.MSG_TX_REQUEST_SENT )
+				} )
+			} catch (err){				LOGGER()
+				SetErrorBar( messages.MSG_USER_DENIED_TX )
+			}
 		}
 		callreqtx()
 //		.then(resp=>{ LOGGER( '' , resp )		}) 
@@ -176,8 +193,11 @@ export default function StakingPopup({ off }) {
                 </span>
 
                 <ul className="priceList">
-                  <li className="price">100 USDT</li>
-                  <li className="exchange">${putCommaAtPrice(2115222)}</li>
+									<li className="price">{ MIN_STAKE_AMOUNT } USDT</li>
+                  <li className="exchange">${
+										MIN_STAKE_AMOUNT && tickerusdt ? 
+										putCommaAtPrice ( +MIN_STAKE_AMOUNT * +tickerusdt ) : null
+									 }</li>
                 </ul>
               </div>
 
@@ -192,7 +212,7 @@ export default function StakingPopup({ off }) {
                 </li>
                 <li>
                   <p className="key">Total Staked</p>
-                  <p className="value">10 USDT</p>
+                  <p className="value">{ tvl } USDT</p>
                 </li>
 								<li>
 	                <p className="key">your address</p>
@@ -289,8 +309,11 @@ export default function StakingPopup({ off }) {
               </span>
 
               <ul className="priceList">
-                <li className="price">100 USDT</li>
-                <li className="exchange">${putCommaAtPrice(2115222)}</li>
+                <li className="price">{ MIN_STAKE_AMOUNT } USDT</li>
+                <li className="exchange">${ 
+									MIN_STAKE_AMOUNT && tickerusdt ? 
+									putCommaAtPrice ( +MIN_STAKE_AMOUNT * +tickerusdt ) : null
+								}</li>
               </ul>
             </div>
 
@@ -305,7 +328,7 @@ export default function StakingPopup({ off }) {
               </li>
               <li>
                 <p className="key">Total Staked</p>
-                <p className="value">10 USDT</p>
+                <p className="value">{ tvl } USDT</p>
               </li>
               <li>
                 <p className="key">your address</p>

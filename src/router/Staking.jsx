@@ -16,7 +16,7 @@ import { messages } from "../configs/messages";
 export default function Staking() {
   const navigate = useNavigate();
 	const isMobile = useSelector((state) => state.common.isMobile )
-	let [ isstaked , setisstaked ] = useState (false )
+	let [ isstaked , setisstaked ] = useState ( false )
 	useEffect ( _=>{
 		const fetchdata=async _=>{
 			let myaddress=getmyaddress()

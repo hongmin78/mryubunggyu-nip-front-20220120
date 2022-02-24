@@ -10,31 +10,44 @@ import { login } from "../api/Signup";
 import { setLogin } from "../util/store/commonSlice";
 import { useDispatch } from "react-redux";
 import SetErrorBar from "../util/SetErrorBar";
+import axios from "axios";
+import { API } from "../configs/api";
+import { messages } from "../configs/messages";
+import { TIME_PAGE_TRANSITION_DEF } from '../configs/configs'
 
 export default function ConnectWallet() {
   const navigate = useNavigate();
   const param = useParams();
   const dispatch = useDispatch();
-
   const isMobile = useSelector((state) => state.common.isMobile);
-
   const [signUpPopup, setSignUpPopup ] = useState(false);
   const [walletAddress, setWalletAddress] = useState("");
 
   async function requestconnect() {
     let { ethereum } = window;
-    if (!ethereum) return;
-
+		if ( ethereum ) {}
+		else { return }
     ethereum.request({ method: "eth_requestAccounts" }).then(async (res) => {
+			if (res && res[0]){} else {SetErrorBar ( messages.MSG_PLEASE_CONNECT_WALLET ); return }
       let address = res[0];
-      setWalletAddress(address);
+      setWalletAddress( address )
       try{
-        const resp = await login(address);
-        console.log(resp.walletAddress);
-        dispatch(setLogin(resp.walletAddress));
-        localStorage.setItem("walletAddress", resp.walletAddress);
-        SetErrorBar(resp.message);
-        navigate("/");
+				const resp = await axios.post ( API.API_LOGIN , {address 
+					, cryptotype : 'ETH' 
+				} ) // login( address )
+				console.log ( '' , resp.data ) // walletAddress
+				let { status }=resp.data 
+				if ( status == 'OK'){
+					dispatch(setLogin( address )); // resp.walletAddress
+//					localStorage.setItem("walletAddress", resp.walletAddress);
+					SetErrorBar( messages.MSG_DONE_LOGIN  ) // resp.message
+					setTimeout ( _=>{
+						navigate("/")
+					} , TIME_PAGE_TRANSITION_DEF )
+				} else {				
+					if (isMobile){navigate('/signup') } // navigate("signup");
+					else {	setSignUpPopup(true) } 
+				}
       } catch {
         if (isMobile) navigate("signup");
         else setSignUpPopup(true);

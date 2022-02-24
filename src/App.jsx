@@ -1,5 +1,5 @@
 import { useLayoutEffect } from "react";
-import { useEffect } from "react";
+import { useEffect , useState } from "react";
 import { useDispatch } from "react-redux";
 import { HashRouter, Route, Routes } from "react-router-dom";
 import styled from "styled-components";
@@ -27,30 +27,43 @@ import { LOGGER } from "./util/common";
 import { strDot } from "./util/Util";
 
 function App() {
-  const dispatch = useDispatch()
+	const dispatch = useDispatch()
+//	let [ address , setaddress ] = useState()
   function handleResize() {
     if (window.innerWidth > 1024) dispatch(setMobile(false));
     else dispatch(setMobile(true));
   }
-
 	useEffect( _=> {
 		let { ethereum }=window
 		if ( ethereum){}
 		else {return }
-		ethereum.on('accountsChanged', resp=>{ LOGGER(resp )
+		ethereum.on( 'accountsChanged' , resp=>{ LOGGER( 'GsnRPWi8Zg@accountsChanged' , resp )
 			SetErrorBar( messages.MSG_ACCOUNTS_CHANGED )
-			dispatch( setaddress( resp[ 0 ] ) )
+			if( resp[ 0 ] ){
+				let address = resp[0]
+				dispatch( setaddress( address ) )
+				dispatch( setLogin ( address ) )
+				setaddress ( address )
+			} else {
+				dispatch( setaddress( null ) )
+				dispatch( setLogin ( null ) )
+				setaddress ( null )
+			}			
 		})
 		ethereum.on('networkChanged', function (networkId) { LOGGER( networkId )
 			// Time to reload your interface with the new networkId
 		})
-		dispatch( setaddress( strDot(ethereum.selectedAddress , 8 , 0 )  ) ) 
+		ethereum.on('chainChanged',  chainId => {
+			LOGGER('@chainChanged' , chainId )
+		} )
+//		dispatch( setaddress(  ) )  // strDot(ethereum.selectedAddress , 8 , 0 ) )
 	} , [ window.ethereum ] )
   useLayoutEffect(async () => {
-    const walletAddress = localStorage.getItem("walletAddress");
-    console.log("walletAddress", walletAddress);
-    if (walletAddress) dispatch(setLogin(walletAddress));
-  });
+//    const walletAddress = localStorage.getItem("walletAddress");
+	//	console.log("walletAddress", walletAddress);
+		setLogin(null)
+//    if (walletAddress) dispatch(setLogin(walletAddress));
+  })
 
   useEffect(() => {
     if (window.innerWidth > 1024) dispatch(setMobile(false));
@@ -94,6 +107,7 @@ function App() {
 
           <Route path="/connectwallet" element={<ConnectWallet />} />
           <Route path="/connectwallet/:popup" element={<ConnectWallet />} />
+					<Route path="/emailauth/:email/:authNum/:walletaddress" element={<EmailAuth />} />
           <Route path="/emailauth/:email/:authNum" element={<EmailAuth />} />
 
           <Route path="/staking" element={<Staking />} />

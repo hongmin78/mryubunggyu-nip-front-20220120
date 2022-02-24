@@ -20,9 +20,30 @@ const abi =[
 			{ type: 'uint256' , name: 'balances_'}
 		]
 		, type: 'function'
-		, payable: true 
+		, payable: false
 		, constant: true,
 	}
+	, { name : '_tvl'
+		, inputs :[
+		]
+		, outputs : [ 
+			{ type: 'uint256' , name: 'tvl_'}
+		]
+		, type: 'function'
+		, payable: false 
+		, constant: true,
+	}
+	, { name : '_tvl_nft'
+		, inputs :[
+		]
+		, outputs : [ 
+			{ type: 'uint256' , name: 'tvl_'}
+		]
+		, type: 'function'
+		, payable: false 
+		, constant: true,
+	}
+
 ]
 export {
 	abi

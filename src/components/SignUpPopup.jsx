@@ -9,7 +9,10 @@ import { chkValidEmail } from "../util/Util";
 import { signup, getRequestEmail } from "../api/Signup";
 import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
-import { generaterandomstr_charset } from "../util/common";
+import { generaterandomstr_charset, LOGGER, getmyaddress } from "../util/common";
+import axios from 'axios'
+import { API } from '../configs/api'
+import { TIME_PAGE_TRANSITION_DEF } from "../configs/configs";
 
 export default function SignUpPopup({ walletAddress }) {
   const navigate = useNavigate();
@@ -24,7 +27,23 @@ export default function SignUpPopup({ walletAddress }) {
   const [agreeList, setAgreeList ] = useState(new Array(2).fill(false));
 
   function clickRegistrationBtn() {
-    getRequestEmail(email, walletAddress);
+		let myaddress=getmyaddress()
+		axios.post( API.API_EMAIL_REQUEST , { email, walletAddress : myaddress })
+		.then( resp => { //					SetErrorBar(res.data);
+			LOGGER ( '' , resp.data )
+			let { status }=resp.data
+			if ( status == 'OK') {
+				SetErrorBar ( messages.MSG_EMAIL_SENT )
+			} else {
+				SetErrorBar ( messages.MSG_SERVER_ERR )
+			}
+		})
+		.catch((err) =>{ 
+			LOGGER( '' , err )
+			SetErrorBar( messages.MSG_SERVER_ERR ) ; 
+			return 
+		} )
+//    getRequestEmail( email, walletAddress );
   }
   useEffect(() => {
 		console.log(walletAddress);
@@ -47,10 +66,26 @@ export default function SignUpPopup({ walletAddress }) {
   }
 
   async function onClickSignUpBtn() {
-
 		if(chkValidEmail( email) ){}
 		else {SetErrorBar( messages.MSG_EMAIL_INVALID ); return }
-    const res = await signup(walletAddress, email, pw, referral);
+		axios.post( API.API_SIGNUP , {
+			walletAddress 
+			, email
+			, password : pw  
+			, referral 
+		} ).then(resp=>{			LOGGER ( 'VrPcFLisLA' , resp.data )
+			let { status }=resp.data
+			if ( status == 'OK'){
+				SetErrorBar( messages.MSG_DONE_REGISTERING )
+				setTimeout(() => {
+					navigate("/staking");
+				}, TIME_PAGE_TRANSITION_DEF );
+			} else { 
+				SetErrorBar( messages.MSG_SERVER_ERR )
+				return
+			}
+		})
+/** 		const res = await signup(walletAddress, email, pw, referral);
     console.log(res);
     if (res) {
       dispatch(setLogin(walletAddress));
@@ -58,7 +93,7 @@ export default function SignUpPopup({ walletAddress }) {
 			localStorage.setItem( "address" , walletAddress);
       SetErrorBar(res.message);
       navigate("/staking");
-    }
+    }*/
   }
 
   useEffect(() => {
