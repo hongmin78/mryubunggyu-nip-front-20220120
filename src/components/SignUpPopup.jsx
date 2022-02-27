@@ -25,15 +25,17 @@ export default function SignUpPopup({ walletAddress }) {
   const [pwAlarm, setPwAlarm] = useState("");
   const [referral, setReferal] = useState("");
   const [agreeList, setAgreeList ] = useState(new Array(2).fill(false));
-
+	let [ isemailrequested , setisemailrequested] = useState( false )
+	let [ myaddress , setmyaddress] = useState( getmyaddress() )
   function clickRegistrationBtn() {
-		let myaddress=getmyaddress()
+		let myaddress = getmyaddress()
 		axios.post( API.API_EMAIL_REQUEST , { email, walletAddress : myaddress })
-		.then( resp => { //					SetErrorBar(res.data);
+		.then( resp => { // SetErrorBar(res.data);
 			LOGGER ( '' , resp.data )
 			let { status }=resp.data
 			if ( status == 'OK') {
 				SetErrorBar ( messages.MSG_EMAIL_SENT )
+				setisemailrequested( true )
 			} else {
 				SetErrorBar ( messages.MSG_SERVER_ERR )
 			}
@@ -55,7 +57,9 @@ export default function SignUpPopup({ walletAddress }) {
   }, [] )
 
   const disableConfirm =
-    !(email && pw && pwConfrim && agreeList[0] && agreeList[1]) ||
+		!(email && pw && pwConfrim && agreeList[0] && agreeList[1]
+				&& isemailrequested
+			) ||
     emailAlarm ||
     pwAlarm;
 
@@ -68,6 +72,14 @@ export default function SignUpPopup({ walletAddress }) {
   async function onClickSignUpBtn() {
 		if(chkValidEmail( email) ){}
 		else {SetErrorBar( messages.MSG_EMAIL_INVALID ); return }
+		if ( isemailrequested ){}
+		else {SetErrorBar( messages.MSG_PLEASE_REQUEST_EMAIL_VERIFY_CODE ) ; return }
+		let respreferer = await axios.get( API.API_QUERY_REFERER + `/users/myreferercode/${referral}`)
+		LOGGER('' , respreferer.data )
+		let { status , respdata} = respreferer.data
+		if ( status == 'OK' && respdata && respdata?.myreferercode ) {
+		}
+		else { SetErrorBar( messages.MSG_REFERER_CODE_INVALID ) ; return }
 		axios.post( API.API_SIGNUP , {
 			walletAddress 
 			, email
@@ -128,6 +140,18 @@ export default function SignUpPopup({ walletAddress }) {
         </article>
 
         <ul className="inputList">
+          <li>
+            <p className="contTitle">Address</p>
+            <div className="inputContainer">
+              <div className="inputBox">
+                <input style={{color:'#bbb'}}
+                  type=""
+                  value={ myaddress }
+									disabled
+									/>
+              </div>
+            </div>
+          </li>
           <li>
             <p className="contTitle">Email</p>
             <div className="inputContainer">
@@ -244,6 +268,19 @@ export default function SignUpPopup({ walletAddress }) {
 
         <ul className="inputList">
           <li>
+            <p className="contTitle">Address</p>
+            <div className="inputContainer">
+              <div className="inputBox">
+                <input style={{color:'#bbb'}}
+                  type=""
+                  value={ myaddress }
+									disabled
+									/>
+              </div>
+            </div>
+          </li>
+
+          <li>
             <p className="contTitle">Email</p>
             <div className="inputContainer">
               <div className="inputBox">
@@ -255,7 +292,7 @@ export default function SignUpPopup({ walletAddress }) {
 
                 <button
                   className="registrationBtn"
-                  onClick={clickRegistrationBtn}
+                  onClick={clickRegistrationBtn }
                 >
                   Registration
                 </button>

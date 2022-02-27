@@ -11,10 +11,12 @@ let TX_POLL_OPTIONS={
 const URL_BASE=`http://nips1.net`
 const URL_METADATA_BASE=`http://nips1.net/assets/json` // /2.json
 const TIME_PAGE_TRANSITION_DEF = 3000
+const DECIMALS_DISP_DEF = 4 
 export { 
 	MIN_STAKE_AMOUNT
 	, TX_POLL_OPTIONS
 	, URL_BASE
 	, URL_METADATA_BASE
 	, TIME_PAGE_TRANSITION_DEF
+	, DECIMALS_DISP_DEF
 }

@@ -25,6 +25,8 @@ import { messages } from "./configs/messages";
 import SetErrorBar from './util/SetErrorBar'
 import { LOGGER } from "./util/common";
 import { strDot } from "./util/Util";
+import axios from "axios";
+import { API } from "./configs/api";
 
 function App() {
 	const dispatch = useDispatch()
@@ -34,9 +36,28 @@ function App() {
     else dispatch(setMobile(true));
   }
 	useEffect( _=> {
+		const queryuseraddress=address =>{
+			axios.get (API.API_QUERY_USERADDRESS + `/users/username/${address}`).then(resp=>{
+				LOGGER( 'QlzCkJ0KYu' , resp.data ) 
+				let { status , respdata }=resp.data
+				if ( status =='OK' ){
+					if ( respdata?.id ) {
+						dispatch( setaddress( address ) )
+						dispatch( setLogin ( address ) )
+						setaddress ( address )		
+					}
+				}	else { LOGGER( 'user not found')
+				}			
+			})
+		}
 		let { ethereum }=window
 		if ( ethereum){}
 		else {return }
+		let { selectedAddress : address } = ethereum
+		if ( address) {
+			queryuseraddress( address )
+		}
+		else {}
 		ethereum.on( 'accountsChanged' , resp=>{ LOGGER( 'GsnRPWi8Zg@accountsChanged' , resp )
 			SetErrorBar( messages.MSG_ACCOUNTS_CHANGED )
 			if( resp[ 0 ] ){

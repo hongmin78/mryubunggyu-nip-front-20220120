@@ -12,9 +12,18 @@ const jnetkind={mainnet:'mainnet',testnet:'ropsten'}
 const jnettype={mainnet:'mainnet',testnet:'testnet'}
 const jinfuraurl={mainnet:infuraurlmain,testnet:infuraurlropsten}
 const infuraurl=jinfuraurl[NETCLASS]  //
-const netkind=jnetkind[NETCLASS],nettype=jnettype[NETCLASS] // 'testnet' //  'ropsten'
+const netkind=jnetkind[NETCLASS]
+const nettype='ETH-TESTNET' //  jnettype[NETCLASS] // 'testnet' //  'ropsten'
+const NETTYPE='ETH-TESTNET'
+const BASE_CURRENCY='ETH'
+const STAKE_CURRENCY='USDT'
 // const infuraurl=infuraurlmain // infuraurlropsten // 
 let web3 = new Web3(new Web3.providers.HttpProvider(infuraurl))
 
-module.exports={ web3 ,netkind,nettype } // ,createaccount,aapikeys,getapikey
+module.exports={ web3 ,netkind 
+	, nettype
+	, NETTYPE
+ , BASE_CURRENCY
+ , STAKE_CURRENCY
+} // ,createaccount,aapikeys,getapikey
 

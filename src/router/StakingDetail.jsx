@@ -17,6 +17,7 @@ import { query_with_arg, getabistr_forfunction } from "../util/contract-calls";
 import { getmyaddress } from '../util/common'
 import { messages } from '../configs/messages'
 import SetErrorBar from "../util/SetErrorBar";
+import { TIME_PAGE_TRANSITION_DEF } from "../configs/configs";
 // import { useSelector } from "react-redux";
 export default function StakingDetail() {
   const navigate = useNavigate()
@@ -41,18 +42,22 @@ export default function StakingDetail() {
 			LOGGER( 'h8UpKsxO1Y' , resp )
 		}
 		else {
-		//	SetErrorBar( messages.MSG_PLEASE_CONNECT_WALLET )
-			//return 
+			SetErrorBar( messages.MSG_PLEASE_CONNECT_WALLET )
+			setTimeout(_=>{
+				navigate ( "/connectwallet" )
+			} , TIME_PAGE_TRANSITION_DEF )
+			return 
 		}
 		setStakingPopup(true)
 	}
 	useEffect ( _=> {
 		LOGGER( 'vF16Vg7wEA' , isLogin )
 	} , [ isLogin ] )
-	useEffect ( _=>{ return //		alert(myaddress)
+	useEffect ( _=>{  return //		alert(myaddress)
 		LOGGER( '' , myaddress )
 		if ( myaddress ){}
-		else {LOGGER(messages.MSG_PLEASE_CONNECT_WALLET ); return }
+		else {			
+			LOGGER(messages.MSG_PLEASE_CONNECT_WALLET ); return }
 //		LOGGER(API.API_MAX + `/tickets/serialnumber`)
 //		return
 /** 		false && axios.get ( API.API_MAX + `/tickets/serialnumber`).then(resp=>{ LOGGER('' , resp.data )

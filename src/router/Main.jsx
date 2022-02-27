@@ -5,6 +5,7 @@ import { D_faqList, D_issueList, marketPlaceList } from "../data/Dmain";
 import Footer from "./Footer";
 import AuctionItem from "../components/AuctionItem";
 import MarketItem from "../components/MarketItem";
+import MarketItem0227 from "../components/MarketItem0227";
 import Header from "../components/header/Header";
 import { useSelector } from "react-redux";
 import { getStyle } from "../util/Util";
@@ -22,6 +23,8 @@ import B_tip1 from "../img/main/B_tip1.png";
 import B_tip2 from "../img/main/B_tip2.png";
 import B_tip3 from "../img/main/B_tip3.png";
 import axios from "axios";
+import { API } from "../configs/api";
+import { LOGGER } from "../util/common";
 
 export default function Main() {
   const navigate = useNavigate();
@@ -31,7 +34,8 @@ export default function Main() {
   const firstAuctionRef = useRef();
   const secondAuctionRef = useRef();
   const marketRef = useRef();
-  const ticketRef = useRef();
+	const ticketRef = useRef();
+	let premiumref = useRef()
   const faqRef = useRef();
   let issueIndex = 0;
   const isMobile = useSelector((state) => state.common.isMobile);
@@ -44,7 +48,7 @@ export default function Main() {
   const [auctionListFirst, setAuctionListFirst] = useState([]);
   const [auctionListSecond, setAuctionListSecond] = useState([]);
   const [likeObj, setLikeObj] = useState({});
-
+	let [ premiumitemlist , setpremiumitemlist]= useState ( [] )
   function onClickHeadLinePreBtn() {
     if (!headLineRef.current.children) return;
     const wrapWidth = headLineRef.current.offsetWidth;
@@ -85,7 +89,6 @@ export default function Main() {
     const contWidth = secondAuctionRef.current.children[0].offsetWidth;
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
     const pageNum = Math.ceil(auctionListFirst.length / itemNumByPage);
-
     if (secondAuctionIndex < pageNum - 1)
       setSecondAuctionIndex(firstAuctionIndex + 1);
     else setSecondAuctionIndex(0);
@@ -97,10 +100,12 @@ export default function Main() {
     const contWidth = marketRef.current.children[0].offsetWidth;
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
     const pageNum = Math.ceil(auctionListFirst.length / itemNumByPage);
-
     if (marketIndex < pageNum - 1) setMarketIndex(marketIndex + 1);
     else setMarketIndex(0);
   }
+	function onClickPremiumNextBtn (){
+		return
+	}
 
   function onClickTicketNextBtn() {
     if (!ticketRef.current.children) return;
@@ -141,19 +146,24 @@ export default function Main() {
       behavior: "smooth",
     });
   }
-
-  function getAuction() {
+  function fetchitems() {
     axios
       .get("http://nips1.net:34705/auction/list", { params: { limit: 16 } })
       .then((res) => {
         console.log(res.data);
         setAuctionListFirst(res.data.slice(0, 8));
         setAuctionListSecond(res.data.slice(8));
-      });
+			});
+		axios.get( API.API_PREMIUMITEMS + `/items/group_/kingkong/0/16/id/DESC` ).then(resp=>{ LOGGER('De0Mlt93PT' , resp.data )
+			let { status , list }=resp.data 
+			if ( status =='OK'){
+				setpremiumitemlist ( list ) 
+			}			
+		})
   }
 
   useEffect(() => {
-    getAuction();
+    fetchitems();
     setInterval(() => {
       if (!issueRef.current) return;
       const contHeight = issueRef.current.children[0].offsetHeight;
@@ -249,6 +259,8 @@ export default function Main() {
   }, [secondAuctionIndex]);
 
   useEffect(() => {
+		if ( marketRef && marketRef.current && marketRef.current.children[0]){}
+		else {return }
     const wrapWidth = marketRef.current.offsetWidth;
     const contWidth = marketRef.current.children[0].offsetWidth;
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
@@ -417,7 +429,6 @@ export default function Main() {
 
             <article className="marketplaceBox itemListBox">
               <strong className="title">MarketPlace</strong>
-
               <div className="posBox">
                 <ul className="itemList" ref={marketRef}>
                   {marketPlaceList.map((cont, index) => (
@@ -432,6 +443,27 @@ export default function Main() {
                   ))}
                 </ul>
                 <button className="nextBtn" onClick={onClickMarketNextBtn}>
+                  <img src={I_rtArw} alt="" />
+                </button>
+              </div>
+            </article>
+
+            <article className="marketplaceBox itemListBox">
+              <strong className="title">Kingkong</strong>
+              <div className="posBox">
+                <ul className="itemList" ref={premiumref}>
+                  {premiumitemlist.map((cont, index) => (
+                    <Fragment key={index}>
+                      <MarketItem0227
+                        data={cont}
+                        index={index}
+                        likeObj={likeObj}
+                        setLikeObj={setLikeObj}
+                      />
+                    </Fragment>
+                  ))}
+                </ul>
+                <button className="nextBtn" onClick={onClickPremiumNextBtn}>
                   <img src={I_rtArw} alt="" />
                 </button>
               </div>
@@ -628,9 +660,8 @@ export default function Main() {
 
             <article className="marketplaceBox itemListBox">
               <strong className="title">MarketPlace</strong>
-
               <div className="posBox">
-                <ul className="itemList" ref={marketRef}>
+                <ul className="itemList" ref={premiumref}>
                   {marketPlaceList.map((cont, index) => (
                     <Fragment key={index}>
                       <MarketItem
@@ -643,6 +674,27 @@ export default function Main() {
                   ))}
                 </ul>
                 <button className="nextBtn" onClick={onClickMarketNextBtn}>
+                  <img src={I_rtArw} alt="" />
+                </button>
+              </div>
+            </article>
+
+            <article className="marketplaceBox itemListBox">
+              <strong className="title">Kingkong</strong>
+              <div className="posBox">
+                <ul className="itemList" ref={marketRef}>
+                  {premiumitemlist.map((cont, index) => (
+                    <Fragment key={index}>
+                      <MarketItem0227
+                        data={cont}
+                        index={index}
+                        likeObj={likeObj}
+                        setLikeObj={setLikeObj}
+                      />
+                    </Fragment>
+                  ))}
+                </ul>
+                <button className="nextBtn" onClick={onClickPremiumNextBtn}>
                   <img src={I_rtArw} alt="" />
                 </button>
               </div>

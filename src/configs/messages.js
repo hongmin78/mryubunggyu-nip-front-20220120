@@ -11,6 +11,9 @@ const messages={
 	, MSG_SERVER_ERR : 'Server Error'
 	, MSG_EMAIL_SENT : 'Email sent'
 	, MSG_DONE_REGISTERING : '가입되었습니다'
+	, MSG_PLEASE_REQUEST_EMAIL_VERIFY_CODE : '이메일 인증을 요청하세요'
+	, MSG_REFERER_CODE_INVALID : '존재하지 아니하는 추천인코드입니다'
+	, MSG_BALANCE_NOT_ENOUGH : '잔액이 불충분합니다'
 }
 export {
 	messages

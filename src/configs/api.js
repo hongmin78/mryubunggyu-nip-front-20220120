@@ -11,6 +11,9 @@ const API={
 
 	, API_EMAIL_REQUEST : URL + '/signup/email/request'
 	, API_SIGNUP : URL + '/signup/signup'
+	, API_QUERY_REFERER : URL + '/queries/singlerow' // /:tablename/:fieldname/:fieldval
+	, API_QUERY_USERADDRESS : URL + '/queries/singlerow' 
+	, API_PREMIUMITEMS : URL + '/queries/rows'
 }
 
 export { 

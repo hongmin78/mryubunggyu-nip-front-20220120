@@ -49,8 +49,11 @@ export default function Header() {
 				, methodname : 'balanceOf'
 				, aargs : [ myaddress 
 			] } ).then(resp=>{LOGGER( 'Ce4mDMhjbS' , resp )
-				setmybalance( getethrep ( resp ) )
-				
+				setmybalance( getethrep ( resp ) )				
+			})
+			
+			window.ethereum.on('networkChanged', function (networkId) { LOGGER( '' ,  networkId )
+				// Time to reload your interface with the new networkId
 			})
 		}
 		setTimeout(_=>{ 
@@ -107,6 +110,7 @@ export default function Header() {
               </button>
             </nav>
 
+<button className='menuBtn'><span className='balanceBox'>Switch network</span></button>
             {isLogin ? (
               <button
                 className="menuBtn"
@@ -139,7 +143,7 @@ export default function Header() {
 
 								} }
               >
-                { myaddress ? myaddress : 'Connect Wallet' }
+                { myaddress ? strDot(myaddress , 8 , 0 )  : 'Connect Wallet' }
               </button>
             )}
           </article>

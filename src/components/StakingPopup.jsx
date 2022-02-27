@@ -3,14 +3,16 @@ import I_x from "../img/icon/I_x.svg";
 import I_tIcon from "../img/icon/I_tIcon.png";
 import I_chkWhite from "../img/icon/I_chkWhite.svg";
 import { putCommaAtPrice } from "../util/Util";
-import { useState, useEffect } from "react";
+import { useState, useEffect , useRef } from "react";
 import { useSelector } from "react-redux";
 import PopupBg from "./PopupBg";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios'
-import { getabistr_forfunction, query_with_arg, query_noarg } from '../util/contract-calls'
+import { getabistr_forfunction, query_with_arg, query_noarg
+	, query_eth_balance
+} from '../util/contract-calls'
 import { addresses } from "../configs/addresses";
-import { MIN_STAKE_AMOUNT } from '../configs/configs'
+import { MIN_STAKE_AMOUNT, DECIMALS_DISP_DEF } from '../configs/configs'
 import { LOGGER, getmyaddress
 	, getobjtype
 } from "../util/common";
@@ -20,11 +22,12 @@ import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
 import { API } from '../configs/api'
 import awaitTransactionMined from "await-transaction-mined";
-import { web3 } from '../configs/configweb3'
+import { web3 , BASE_CURRENCY , STAKE_CURRENCY
+	, NETTYPE
+} from '../configs/configweb3'
 import { TX_POLL_OPTIONS } from '../configs/configs'
 import I_spinner from '../img/icon/I_spinner.svg'
 import { strDot } from '../util/Util'
-
 export default function StakingPopup({ off }) {
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
@@ -34,10 +37,19 @@ export default function StakingPopup({ off }) {
 	let [ isallowanceok , setisallowanceok] = useState( false )
 	let [ allowanceamount , setallowanceamount ] = useState()
 	let [ stakedbalance , setstakedbalance ] = useState()
-	let [ tvl , settvl] = useState()
+	let [ tvl , settvl ] = useState()
 	let [ tickerusdt, settickerusdt ] = useState ()
-	useEffect(_=>{
-		const fetchdata=async _=>{
+	let [ myethbalance , setmyethbalance ] = useState()
+	let spinnerHref = useRef();
+	useEffect(_=>{		
+/**     const spinner = document.querySelector("#Spinner");
+    spinner.animate(
+      [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
+      {        duration: 1000,
+        iterations: Infinity,
+      }
+    );*/
+		const fetchdata=async _=>{			
 			axios.get( API.API_TICKERS ).then(resp=>{ LOGGER('MDmEMQ5xde' , resp.data )
 				let { status , payload , list }=resp
 //				let { USDT } = payload.list
@@ -54,7 +66,7 @@ export default function StakingPopup({ off }) {
 				]
 			})
 			LOGGER( 'uQJ2POHvP8' , resp_balances )
-			setstakedbalance ( resp_balances )			
+			setstakedbalance ( getethrep( resp_balances) )			
 			query_with_arg ({contractaddress : addresses.contract_USDT
 				, abikind : 'ERC20'
 				, methodname : 'allowance'
@@ -63,8 +75,9 @@ export default function StakingPopup({ off }) {
 				] 
 			} ).then(resp=>{
 				let allowanceineth =  getethrep( resp )
-				LOGGER( '' , resp , allowanceineth )
+				LOGGER( '8LYRxjNp8k' , resp , allowanceineth )
 				setallowanceamount ( allowanceineth )
+//				setallowanceamount ( 100 )
 				if ( allowanceineth > 0){ setisallowanceok ( false )				
 				}
 				else {}
@@ -83,6 +96,17 @@ export default function StakingPopup({ off }) {
 			}).then(resp=>{
 				LOGGER( '' , resp )
 				settvl ( getethrep ( resp ) )				
+			})
+			false && query_with_arg ({contractaddress : addresses.contract_stake
+				, abikind : 'STAKE'
+				, methodname : '_tvl_nft'
+			}).then(resp=>{
+				LOGGER( '' , resp )
+//				settvlnft ( resp )
+			})
+			query_eth_balance( myaddress ).then(resp=>{
+				LOGGER( 'rmgUxgo5ye' , resp )
+				setmyethbalance ( (+getethrep ( resp )).toFixed( DECIMALS_DISP_DEF ) )
 			})
 		}
 		fetchdata()
@@ -108,11 +132,34 @@ export default function StakingPopup({ off }) {
 			else { SetErrorBar( messages.MSG_USER_DENIED_TX ) ; return }
 			let txhash=resp
 			SetErrorBar( messages.MSG_TX_REQUEST_SENT )
+			axios.post ( API.API_TXS + `/${txhash}` , { txhash
+					, username : myaddress
+					, typestr : 'APPROVE'
+					, auxdata : {erc20: addresses.contract_USDT , target: addresses.contract_stake }
+					, nettype : NETTYPE
+			} ).then(resp=>{ LOGGER( '' , resp )
+					SetErrorBar ( messages.MSG_TX_REQUEST_SENT )
+			} )
+
 			awaitTransactionMined
 			.awaitTx( web3 , txhash, TX_POLL_OPTIONS )
 			.then((minedtxreceipt) => {
 				LOGGER("", minedtxreceipt);
 				SetErrorBar( messages.MSG_TX_FINALIZED )
+
+				query_with_arg ({contractaddress : addresses.contract_USDT
+					, abikind : 'ERC20'
+					, methodname : 'allowance'
+					, aargs : [ myaddress 
+						, addresses.contract_stake
+					] 
+				} ).then(resp=>{
+					let allowanceineth =  getethrep( resp )
+					LOGGER( 'gCwXF6Jjkh' , resp , allowanceineth )
+					setallowanceamount ( allowanceineth )	//				setallowanceamount ( 100 )
+					if ( allowanceineth > 0){ setisallowanceok ( false )									}
+					else {}
+				})
 //					Setisloader(false);
 			})
 		})
@@ -120,6 +167,8 @@ export default function StakingPopup({ off }) {
 	const onclick_buy=async _=>{LOGGER( 'YFVGAF0sBJ' )
 		let myaddress = getmyaddress()
 		LOGGER( 'eYJAgMYkR5' , myaddress )
+		if ( mybalance >= MIN_STAKE_AMOUNT ){}
+		else { SetErrorBar( messages.MSG_BALANCE_NOT_ENOUGH ); return }
 /** 		if (myaddress){}
 		else { 
 			SetErrorBar( messages.MSG_PLEASE_ CONNECT_WALLET )
@@ -136,7 +185,6 @@ export default function StakingPopup({ off }) {
 			]
 		})
 		LOGGER( '' , abistr )
-//		return
 //		return
 		const callreqtx=async _=>{
 			let resp 
@@ -161,10 +209,30 @@ export default function StakingPopup({ off }) {
 				axios.post ( API.API_TXS + `/${txhash}` , { txhash
 					, username : myaddress
 					, typestr : 'STAKE'
-					, auxdata : ''
+					, auxdata : {amount: MIN_STAKE_AMOUNT 
+						, currency : STAKE_CURRENCY
+						, currencyaddress : addresses.contract_USDT
+					}
+					, nettype : NETTYPE
 				} ).then(resp=>{ LOGGER( '' , resp )
 					SetErrorBar ( messages.MSG_TX_REQUEST_SENT )
 				} )
+			/***** */
+				awaitTransactionMined
+				.awaitTx( web3 , txhash, TX_POLL_OPTIONS )
+				.then(async (minedtxreceipt) => {
+					LOGGER("", minedtxreceipt);
+					SetErrorBar( messages.MSG_TX_FINALIZED )
+					let resp_balances = await query_with_arg ({
+						contractaddress : addresses.contract_stake
+						, abikind : 'STAKE'
+						, methodname : '_balances'
+						, aargs : [ myaddress
+						]
+					})
+					LOGGER( 'uQJ2POHvP8' , resp_balances )
+					setstakedbalance ( getethrep( resp_balances) )			
+				})
 			} catch (err){				LOGGER()
 				SetErrorBar( messages.MSG_USER_DENIED_TX )
 			}
@@ -214,6 +282,11 @@ export default function StakingPopup({ off }) {
                   <p className="key">Total Staked</p>
                   <p className="value">{ tvl } USDT</p>
                 </li>
+                <li>
+                  <p className="key">Your Stake</p>
+                  <p className="value">{ stakedbalance } USDT</p>
+                </li>
+
 								<li>
 	                <p className="key">your address</p>
   	              <p className="value">{ strDot(myaddress , 6 , 0 ) }</p>
@@ -224,9 +297,12 @@ export default function StakingPopup({ off }) {
 								</li>
 								<li>
 									<p className="key">Allowance</p>
-                  <p className="value">{allowanceamount} USDT</p>
+                  <p className="value">{ allowanceamount } USDT</p>
 								</li>
-
+								<li>
+									<p className="key">{ BASE_CURRENCY } balance</p>
+                  <p className="value">{ myethbalance} { BASE_CURRENCY }</p>
+								</li>
 
               </ul>
             </div>
@@ -260,28 +336,31 @@ export default function StakingPopup({ off }) {
                 </span>
               </div>
 
-<div style={{ visibility:'hidden' }}>
               <button className="confirmBtn" onClick={() => {
 								onclick_approve()
 								false && navigate(-1)
-							}}  >
-                Approve
+								}}
+								style={ + allowanceamount > 0 ? { visibility:'hidden' } : {display:'block'} }								
+							>
+                Approve!
+								<img            ref={spinnerHref}
+            className="Spinner"
+            src={ I_spinner }
+            alt=""
+						style={{ display: true ? "block" : "none"
+							,width: '18px'
+							,position: 'absolute'
+							,margin: '0 0 0 64px'			
+						}}
+          			/>
+
               </button>
-</div>
 
 <div>              <button className="confirmBtn" onClick={() => {
 								onclick_buy()
 								false && navigate(-1)
 							}}>
                 Confirm
-								<img
-          id="Spinner"
-          className="spinner"
-          src={I_spinner}
-          alt=""
-          style={{ display:  "block" }}
-        />
-
               </button>
 </div>							
             </div>
@@ -331,6 +410,11 @@ export default function StakingPopup({ off }) {
                 <p className="value">{ tvl } USDT</p>
               </li>
               <li>
+                <p className="key">Your Stake</p>
+                <p className="value">{ stakedbalance } USDT</p>
+              </li>
+
+              <li>
                 <p className="key">your address</p>
                 <p className="value">{strDot(myaddress , 8, 0 ) } </p>
               </li>
@@ -340,7 +424,11 @@ export default function StakingPopup({ off }) {
 							</li>
 							<li>
 									<p className="key">Allowance</p>
-                  <p className="value">{allowanceamount} USDT</p>
+                  <p className="value">{ allowanceamount } USDT</p>
+							</li>
+							<li>
+									<p className="key">{ BASE_CURRENCY } balance</p>
+                  <p className="value">{ myethbalance} { BASE_CURRENCY }</p>
 								</li>
 
             </ul>
@@ -375,9 +463,10 @@ export default function StakingPopup({ off }) {
               </span>
             </div>
 
-              <button className="confirmBtn" onClick={() => {
-								onclick_approve()								
-							}}>
+							<button className="confirmBtn" 
+								onClick={() => { onclick_approve() }}
+								style={ + allowanceamount > 0 ? { visibility:'hidden' } : {display:'inline'} }
+								>
                 Approve
               </button>
 
