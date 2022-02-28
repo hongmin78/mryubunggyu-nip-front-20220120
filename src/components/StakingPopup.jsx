@@ -3,243 +3,273 @@ import I_x from "../img/icon/I_x.svg";
 import I_tIcon from "../img/icon/I_tIcon.png";
 import I_chkWhite from "../img/icon/I_chkWhite.svg";
 import { putCommaAtPrice } from "../util/Util";
-import { useState, useEffect , useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import PopupBg from "./PopupBg";
 import { useNavigate } from "react-router-dom";
-import axios from 'axios'
-import { getabistr_forfunction, query_with_arg, query_noarg
-	, query_eth_balance
-} from '../util/contract-calls'
+import axios from "axios";
+import {
+  getabistr_forfunction,
+  query_with_arg,
+  query_noarg,
+  query_eth_balance,
+} from "../util/contract-calls";
 import { addresses } from "../configs/addresses";
-import { MIN_STAKE_AMOUNT, DECIMALS_DISP_DEF } from '../configs/configs'
-import { LOGGER, getmyaddress
-	, getobjtype
-} from "../util/common";
-import { getweirep , getethrep } from '../util/eth'
-import { requesttransaction } from '../services/metamask'
+import { MIN_STAKE_AMOUNT, DECIMALS_DISP_DEF } from "../configs/configs";
+import { LOGGER, getmyaddress, getobjtype } from "../util/common";
+import { getweirep, getethrep } from "../util/eth";
+import { requesttransaction } from "../services/metamask";
 import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
-import { API } from '../configs/api'
+import { API } from "../configs/api";
 import awaitTransactionMined from "await-transaction-mined";
-import { web3 , BASE_CURRENCY , STAKE_CURRENCY
-	, NETTYPE
-} from '../configs/configweb3'
-import { TX_POLL_OPTIONS } from '../configs/configs'
-import I_spinner from '../img/icon/I_spinner.svg'
-import { strDot } from '../util/Util'
+import {
+  web3,
+  BASE_CURRENCY,
+  STAKE_CURRENCY,
+  NETTYPE,
+} from "../configs/configweb3";
+import { TX_POLL_OPTIONS } from "../configs/configs";
+import I_spinner from "../img/icon/I_spinner.svg";
+import { strDot } from "../util/Util";
 export default function StakingPopup({ off }) {
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
-	const [ termChk , setTermChk] = useState(false);
-	let [ myaddress , setmyaddress ] = useState(getmyaddress() )
-	let [ mybalance , setmybalance]= useState()
-	let [ isallowanceok , setisallowanceok] = useState( false )
-	let [ allowanceamount , setallowanceamount ] = useState()
-	let [ stakedbalance , setstakedbalance ] = useState()
-	let [ tvl , settvl ] = useState()
-	let [ tickerusdt, settickerusdt ] = useState ()
-	let [ myethbalance , setmyethbalance ] = useState()
-	let spinnerHref = useRef();
-	useEffect(_=>{		
-/**     const spinner = document.querySelector("#Spinner");
+  const [termChk, setTermChk] = useState(false);
+  let [myaddress, setmyaddress] = useState(getmyaddress());
+  let [mybalance, setmybalance] = useState();
+  let [isallowanceok, setisallowanceok] = useState(false);
+  let [allowanceamount, setallowanceamount] = useState();
+  let [stakedbalance, setstakedbalance] = useState();
+  let [tvl, settvl] = useState();
+  let [tickerusdt, settickerusdt] = useState();
+  let [myethbalance, setmyethbalance] = useState();
+  let spinnerHref = useRef();
+  useEffect((_) => {
+    /**     const spinner = document.querySelector("#Spinner");
     spinner.animate(
       [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
       {        duration: 1000,
         iterations: Infinity,
       }
     );*/
-		const fetchdata=async _=>{			
-			axios.get( API.API_TICKERS ).then(resp=>{ LOGGER('MDmEMQ5xde' , resp.data )
-				let { status , payload , list }=resp
-//				let { USDT } = payload.list
-	//			LOGGER( 'mlB7HasjBh' , USDT )
-		//		settickerusdt ( USDT )
-			})
-			let myaddress = getmyaddress()
-			LOGGER( '' , addresses.contract_stake , myaddress )
-			let resp_balances = await query_with_arg ({
-					contractaddress : addresses.contract_stake
-				, abikind : 'STAKE'
-				, methodname : '_balances'
-				, aargs : [ myaddress
-				]
-			})
-			LOGGER( 'uQJ2POHvP8' , resp_balances )
-			setstakedbalance ( getethrep( resp_balances) )			
-			query_with_arg ({contractaddress : addresses.contract_USDT
-				, abikind : 'ERC20'
-				, methodname : 'allowance'
-				, aargs : [ myaddress 
-					, addresses.contract_stake
-				] 
-			} ).then(resp=>{
-				let allowanceineth =  getethrep( resp )
-				LOGGER( '8LYRxjNp8k' , resp , allowanceineth )
-				setallowanceamount ( allowanceineth )
-//				setallowanceamount ( 100 )
-				if ( allowanceineth > 0){ setisallowanceok ( false )				
-				}
-				else {}
-			})
-			query_with_arg ({contractaddress : addresses.contract_USDT
-				, abikind : 'ERC20'
-				, methodname : 'balanceOf'
-				, aargs : [ myaddress ]
-			}).then(resp=>{
-				LOGGER( '' , resp , )
-				setmybalance( getethrep(resp ) )
-			})
-			query_noarg ({ contractaddress : addresses.contract_stake
-				, abikind : 'STAKE'
-				, methodname : '_tvl'
-			}).then(resp=>{
-				LOGGER( '' , resp )
-				settvl ( getethrep ( resp ) )				
-			})
-			false && query_with_arg ({contractaddress : addresses.contract_stake
-				, abikind : 'STAKE'
-				, methodname : '_tvl_nft'
-			}).then(resp=>{
-				LOGGER( '' , resp )
-//				settvlnft ( resp )
-			})
-			query_eth_balance( myaddress ).then(resp=>{
-				LOGGER( 'rmgUxgo5ye' , resp )
-				setmyethbalance ( (+getethrep ( resp )).toFixed( DECIMALS_DISP_DEF ) )
-			})
-		}
-		fetchdata()
-	} , [] )
-	const onclick_approve=async _=>{ LOGGER( '' )
-		let myaddress = getmyaddress()
-		let abistr = getabistr_forfunction ({
-			contractaddress : addresses.contract_USDT
-			, abikind : 'ERC20'
-			, methodname : 'approve'
-			, aargs : [
-				addresses.contract_stake
-				, getweirep('' +10**10 )
-			]
-		})
-		LOGGER('' , abistr )
-		requesttransaction({
-			from : myaddress
-			, to : addresses.contract_USDT
-			, data : abistr
-		}).then(resp=>{
-			if ( resp ){}
-			else { SetErrorBar( messages.MSG_USER_DENIED_TX ) ; return }
-			let txhash=resp
-			SetErrorBar( messages.MSG_TX_REQUEST_SENT )
-			axios.post ( API.API_TXS + `/${txhash}` , { txhash
-					, username : myaddress
-					, typestr : 'APPROVE'
-					, auxdata : {erc20: addresses.contract_USDT , target: addresses.contract_stake }
-					, nettype : NETTYPE
-			} ).then(resp=>{ LOGGER( '' , resp )
-					SetErrorBar ( messages.MSG_TX_REQUEST_SENT )
-			} )
+    const fetchdata = async (_) => {
+      axios.get(API.API_TICKERS).then((resp) => {
+        LOGGER("MDmEMQ5xde", resp.data);
+        let { status, payload, list } = resp;
+        //				let { USDT } = payload.list
+        //			LOGGER( 'mlB7HasjBh' , USDT )
+        //		settickerusdt ( USDT )
+      });
+      let myaddress = getmyaddress();
+      LOGGER("", addresses.contract_stake, myaddress);
+      let resp_balances = await query_with_arg({
+        contractaddress: addresses.contract_stake,
+        abikind: "STAKE",
+        methodname: "_balances",
+        aargs: [myaddress],
+      });
+      LOGGER("uQJ2POHvP8", resp_balances);
+      setstakedbalance(getethrep(resp_balances));
+      query_with_arg({
+        contractaddress: addresses.contract_USDT,
+        abikind: "ERC20",
+        methodname: "allowance",
+        aargs: [myaddress, addresses.contract_stake],
+      }).then((resp) => {
+        let allowanceineth = getethrep(resp);
+        LOGGER("8LYRxjNp8k", resp, allowanceineth);
+        setallowanceamount(allowanceineth);
+        //				setallowanceamount ( 100 )
+        if (allowanceineth > 0) {
+          setisallowanceok(false);
+        } else {
+        }
+      });
+      query_with_arg({
+        contractaddress: addresses.contract_USDT,
+        abikind: "ERC20",
+        methodname: "balanceOf",
+        aargs: [myaddress],
+      }).then((resp) => {
+        LOGGER("", resp);
+        setmybalance(getethrep(resp));
+      });
+      query_noarg({
+        contractaddress: addresses.contract_stake,
+        abikind: "STAKE",
+        methodname: "_tvl",
+      }).then((resp) => {
+        LOGGER("", resp);
+        settvl(getethrep(resp));
+      });
+      false &&
+        query_with_arg({
+          contractaddress: addresses.contract_stake,
+          abikind: "STAKE",
+          methodname: "_tvl_nft",
+        }).then((resp) => {
+          LOGGER("", resp);
+          //				settvlnft ( resp )
+        });
+      query_eth_balance(myaddress).then((resp) => {
+        LOGGER("rmgUxgo5ye", resp);
+        setmyethbalance((+getethrep(resp)).toFixed(DECIMALS_DISP_DEF));
+      });
+    };
+    fetchdata();
+  }, []);
+  const onclick_approve = async (_) => {
+    LOGGER("");
+    let myaddress = getmyaddress();
+    let abistr = getabistr_forfunction({
+      contractaddress: addresses.contract_USDT,
+      abikind: "ERC20",
+      methodname: "approve",
+      aargs: [addresses.contract_stake, getweirep("" + 10 ** 10)],
+    });
+    LOGGER("", abistr);
+    requesttransaction({
+      from: myaddress,
+      to: addresses.contract_USDT,
+      data: abistr,
+    }).then((resp) => {
+      if (resp) {
+      } else {
+        SetErrorBar(messages.MSG_USER_DENIED_TX);
+        return;
+      }
+      let txhash = resp;
+      SetErrorBar(messages.MSG_TX_REQUEST_SENT);
+      axios
+        .post(API.API_TXS + `/${txhash}`, {
+          txhash,
+          username: myaddress,
+          typestr: "APPROVE",
+          auxdata: {
+            erc20: addresses.contract_USDT,
+            target: addresses.contract_stake,
+          },
+          nettype: NETTYPE,
+        })
+        .then((resp) => {
+          LOGGER("", resp);
+          SetErrorBar(messages.MSG_TX_REQUEST_SENT);
+        });
 
-			awaitTransactionMined
-			.awaitTx( web3 , txhash, TX_POLL_OPTIONS )
-			.then((minedtxreceipt) => {
-				LOGGER("", minedtxreceipt);
-				SetErrorBar( messages.MSG_TX_FINALIZED )
+      awaitTransactionMined
+        .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+        .then((minedtxreceipt) => {
+          LOGGER("", minedtxreceipt);
+          SetErrorBar(messages.MSG_TX_FINALIZED);
 
-				query_with_arg ({contractaddress : addresses.contract_USDT
-					, abikind : 'ERC20'
-					, methodname : 'allowance'
-					, aargs : [ myaddress 
-						, addresses.contract_stake
-					] 
-				} ).then(resp=>{
-					let allowanceineth =  getethrep( resp )
-					LOGGER( 'gCwXF6Jjkh' , resp , allowanceineth )
-					setallowanceamount ( allowanceineth )	//				setallowanceamount ( 100 )
-					if ( allowanceineth > 0){ setisallowanceok ( false )									}
-					else {}
-				})
-//					Setisloader(false);
-			})
-		})
-	}
-	const onclick_buy=async _=>{LOGGER( 'YFVGAF0sBJ' )
-		let myaddress = getmyaddress()
-		LOGGER( 'eYJAgMYkR5' , myaddress )
-		if ( mybalance >= MIN_STAKE_AMOUNT ){}
-		else { SetErrorBar( messages.MSG_BALANCE_NOT_ENOUGH ); return }
-/** 		if (myaddress){}
+          query_with_arg({
+            contractaddress: addresses.contract_USDT,
+            abikind: "ERC20",
+            methodname: "allowance",
+            aargs: [myaddress, addresses.contract_stake],
+          }).then((resp) => {
+            let allowanceineth = getethrep(resp);
+            LOGGER("gCwXF6Jjkh", resp, allowanceineth);
+            setallowanceamount(allowanceineth); //				setallowanceamount ( 100 )
+            if (allowanceineth > 0) {
+              setisallowanceok(false);
+            } else {
+            }
+          });
+          //					Setisloader(false);
+        });
+    });
+  };
+  const onclick_buy = async (_) => {
+    LOGGER("YFVGAF0sBJ");
+    let myaddress = getmyaddress();
+    LOGGER("eYJAgMYkR5", myaddress);
+    if (mybalance >= MIN_STAKE_AMOUNT) {
+    } else {
+      SetErrorBar(messages.MSG_BALANCE_NOT_ENOUGH);
+      return;
+    }
+    /** 		if (myaddress){}
 		else { 
 			SetErrorBar( messages.MSG_PLEASE_ CONNECT_WALLET )
 			return 
 		} */
-		let abistr = getabistr_forfunction( {
-			contractaddress : addresses.contract_stake
-			, abikind : 'STAKE'
-			, methodname : 'stake'
-			, aargs : [
-					addresses.contract_USDT
-				, getweirep( '' + MIN_STAKE_AMOUNT )
-				, myaddress
-			]
-		})
-		LOGGER( '' , abistr )
-//		return
-		const callreqtx=async _=>{
-			let resp 
-			try {resp = await requesttransaction ( {
-					from : myaddress
-					, to : addresses.contract_stake
-					, data : abistr
-		//			, value : ''
-				})
-				if ( resp){}
-				else { SetErrorBar( messages.MSG_USER_DENIED_TX ) ; return }
-				let resptype = getobjtype ( resp )
-				let txhash
-				switch ( resptype ){
-					case 'String' :
-						txhash = resp 
-					break 
-					case 'Object' :
-						txhash = resp.txHash
-					break
-				}
-				axios.post ( API.API_TXS + `/${txhash}` , { txhash
-					, username : myaddress
-					, typestr : 'STAKE'
-					, auxdata : {amount: MIN_STAKE_AMOUNT 
-						, currency : STAKE_CURRENCY
-						, currencyaddress : addresses.contract_USDT
-					}
-					, nettype : NETTYPE
-				} ).then(resp=>{ LOGGER( '' , resp )
-					SetErrorBar ( messages.MSG_TX_REQUEST_SENT )
-				} )
-			/***** */
-				awaitTransactionMined
-				.awaitTx( web3 , txhash, TX_POLL_OPTIONS )
-				.then(async (minedtxreceipt) => {
-					LOGGER("", minedtxreceipt);
-					SetErrorBar( messages.MSG_TX_FINALIZED )
-					let resp_balances = await query_with_arg ({
-						contractaddress : addresses.contract_stake
-						, abikind : 'STAKE'
-						, methodname : '_balances'
-						, aargs : [ myaddress
-						]
-					})
-					LOGGER( 'uQJ2POHvP8' , resp_balances )
-					setstakedbalance ( getethrep( resp_balances) )			
-				})
-			} catch (err){				LOGGER()
-				SetErrorBar( messages.MSG_USER_DENIED_TX )
-			}
-		}
-		callreqtx()
-//		.then(resp=>{ LOGGER( '' , resp )		}) 
-	}
+    let abistr = getabistr_forfunction({
+      contractaddress: addresses.contract_stake,
+      abikind: "STAKE",
+      methodname: "stake",
+      aargs: [
+        addresses.contract_USDT,
+        getweirep("" + MIN_STAKE_AMOUNT),
+        myaddress,
+      ],
+    });
+    LOGGER("", abistr);
+    //		return
+    const callreqtx = async (_) => {
+      let resp;
+      try {
+        resp = await requesttransaction({
+          from: myaddress,
+          to: addresses.contract_stake,
+          data: abistr,
+          //			, value : ''
+        });
+        if (resp) {
+        } else {
+          SetErrorBar(messages.MSG_USER_DENIED_TX);
+          return;
+        }
+        let resptype = getobjtype(resp);
+        let txhash;
+        switch (resptype) {
+          case "String":
+            txhash = resp;
+            break;
+          case "Object":
+            txhash = resp.txHash;
+            break;
+        }
+        axios
+          .post(API.API_TXS + `/${txhash}`, {
+            txhash,
+            username: myaddress,
+            typestr: "STAKE",
+            auxdata: {
+              amount: MIN_STAKE_AMOUNT,
+              currency: STAKE_CURRENCY,
+              currencyaddress: addresses.contract_USDT,
+            },
+            nettype: NETTYPE,
+          })
+          .then((resp) => {
+            LOGGER("", resp);
+            SetErrorBar(messages.MSG_TX_REQUEST_SENT);
+          });
+        /***** */
+        awaitTransactionMined
+          .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+          .then(async (minedtxreceipt) => {
+            LOGGER("", minedtxreceipt);
+            SetErrorBar(messages.MSG_TX_FINALIZED);
+            let resp_balances = await query_with_arg({
+              contractaddress: addresses.contract_stake,
+              abikind: "STAKE",
+              methodname: "_balances",
+              aargs: [myaddress],
+            });
+            LOGGER("uQJ2POHvP8", resp_balances);
+            setstakedbalance(getethrep(resp_balances));
+          });
+      } catch (err) {
+        LOGGER();
+        SetErrorBar(messages.MSG_USER_DENIED_TX);
+      }
+    };
+    callreqtx();
+    //		.then(resp=>{ LOGGER( '' , resp )		})
+  };
 
   if (isMobile)
     return (
@@ -261,11 +291,13 @@ export default function StakingPopup({ off }) {
                 </span>
 
                 <ul className="priceList">
-									<li className="price">{ MIN_STAKE_AMOUNT } USDT</li>
-                  <li className="exchange">${
-										MIN_STAKE_AMOUNT && tickerusdt ? 
-										putCommaAtPrice ( +MIN_STAKE_AMOUNT * +tickerusdt ) : null
-									 }</li>
+                  <li className="price">{MIN_STAKE_AMOUNT} USDT</li>
+                  <li className="exchange">
+                    $
+                    {MIN_STAKE_AMOUNT && tickerusdt
+                      ? putCommaAtPrice(+MIN_STAKE_AMOUNT * +tickerusdt)
+                      : null}
+                  </li>
                 </ul>
               </div>
 
@@ -280,30 +312,31 @@ export default function StakingPopup({ off }) {
                 </li>
                 <li>
                   <p className="key">Total Staked</p>
-                  <p className="value">{ tvl } USDT</p>
+                  <p className="value">{tvl} USDT</p>
                 </li>
                 <li>
                   <p className="key">Your Stake</p>
-                  <p className="value">{ stakedbalance } USDT</p>
+                  <p className="value">{stakedbalance} USDT</p>
                 </li>
 
-								<li>
-	                <p className="key">your address</p>
-  	              <p className="value">{ strDot(myaddress , 6 , 0 ) }</p>
-    	          </li>
-								<li>
-									<p className="key">Your USDT balance</p>
+                <li>
+                  <p className="key">your address</p>
+                  <p className="value">{strDot(myaddress, 6, 0)}</p>
+                </li>
+                <li>
+                  <p className="key">Your USDT balance</p>
                   <p className="value">{mybalance} USDT</p>
-								</li>
-								<li>
-									<p className="key">Allowance</p>
-                  <p className="value">{ allowanceamount } USDT</p>
-								</li>
-								<li>
-									<p className="key">{ BASE_CURRENCY } balance</p>
-                  <p className="value">{ myethbalance} { BASE_CURRENCY }</p>
-								</li>
-
+                </li>
+                <li>
+                  <p className="key">Allowance</p>
+                  <p className="value">{allowanceamount} USDT</p>
+                </li>
+                <li>
+                  <p className="key">{BASE_CURRENCY} balance</p>
+                  <p className="value">
+                    {myethbalance} {BASE_CURRENCY}
+                  </p>
+                </li>
               </ul>
             </div>
 
@@ -336,33 +369,45 @@ export default function StakingPopup({ off }) {
                 </span>
               </div>
 
-              <button className="confirmBtn" onClick={() => {
-								onclick_approve()
-								false && navigate(-1)
-								}}
-								style={ + allowanceamount > 0 ? { visibility:'hidden' } : {display:'block'} }								
-							>
+              <button
+                className="confirmBtn"
+                onClick={() => {
+                  onclick_approve();
+                  false && navigate(-1);
+                }}
+                style={
+                  +allowanceamount > 0
+                    ? { visibility: "hidden" }
+                    : { display: "block" }
+                }
+              >
                 Approve!
-								<img            ref={spinnerHref}
-            className="Spinner"
-            src={ I_spinner }
-            alt=""
-						style={{ display: true ? "block" : "none"
-							,width: '18px'
-							,position: 'absolute'
-							,margin: '0 0 0 64px'			
-						}}
-          			/>
-
+                <img
+                  ref={spinnerHref}
+                  className="Spinner"
+                  src={I_spinner}
+                  alt=""
+                  style={{
+                    display: true ? "block" : "none",
+                    width: "18px",
+                    position: "absolute",
+                    margin: "0 0 0 64px",
+                  }}
+                />
               </button>
 
-<div>              <button className="confirmBtn" onClick={() => {
-								onclick_buy()
-								false && navigate(-1)
-							}}>
-                Confirm
-              </button>
-</div>							
+              <div>
+                {" "}
+                <button
+                  className="confirmBtn"
+                  onClick={() => {
+                    onclick_buy();
+                    false && navigate(-1);
+                  }}
+                >
+                  Confirm
+                </button>
+              </div>
             </div>
           </article>
         </MstakingPopupBox>
@@ -388,11 +433,13 @@ export default function StakingPopup({ off }) {
               </span>
 
               <ul className="priceList">
-                <li className="price">{ MIN_STAKE_AMOUNT } USDT</li>
-                <li className="exchange">${ 
-									MIN_STAKE_AMOUNT && tickerusdt ? 
-									putCommaAtPrice ( +MIN_STAKE_AMOUNT * +tickerusdt ) : null
-								}</li>
+                <li className="price">{MIN_STAKE_AMOUNT} USDT</li>
+                <li className="exchange">
+                  $
+                  {MIN_STAKE_AMOUNT && tickerusdt
+                    ? putCommaAtPrice(+MIN_STAKE_AMOUNT * +tickerusdt)
+                    : null}
+                </li>
               </ul>
             </div>
 
@@ -407,30 +454,31 @@ export default function StakingPopup({ off }) {
               </li>
               <li>
                 <p className="key">Total Staked</p>
-                <p className="value">{ tvl } USDT</p>
+                <p className="value">{tvl} USDT</p>
               </li>
               <li>
                 <p className="key">Your Stake</p>
-                <p className="value">{ stakedbalance } USDT</p>
+                <p className="value">{stakedbalance} USDT</p>
               </li>
 
               <li>
                 <p className="key">your address</p>
-                <p className="value">{strDot(myaddress , 8, 0 ) } </p>
+                <p className="value">{strDot(myaddress, 8, 0)} </p>
               </li>
-							<li>
-									<p className="key">Your USDT balance</p>
-                  <p className="value">{mybalance} USDT</p>
-							</li>
-							<li>
-									<p className="key">Allowance</p>
-                  <p className="value">{ allowanceamount } USDT</p>
-							</li>
-							<li>
-									<p className="key">{ BASE_CURRENCY } balance</p>
-                  <p className="value">{ myethbalance} { BASE_CURRENCY }</p>
-								</li>
-
+              <li>
+                <p className="key">Your USDT balance</p>
+                <p className="value">{mybalance} USDT</p>
+              </li>
+              <li>
+                <p className="key">Allowance</p>
+                <p className="value">{allowanceamount} USDT</p>
+              </li>
+              <li>
+                <p className="key">{BASE_CURRENCY} balance</p>
+                <p className="value">
+                  {myethbalance} {BASE_CURRENCY}
+                </p>
+              </li>
             </ul>
           </div>
 
@@ -438,7 +486,12 @@ export default function StakingPopup({ off }) {
             <div className="termBox">
               <p className="key">Would you like to stake long term?</p>
               <span className="value">
-                <button className="yesBtn" onClick={() => { setTermChk(true) } }>
+                <button
+                  className="yesBtn"
+                  onClick={() => {
+                    setTermChk(true);
+                  }}
+                >
                   <span
                     className="chkBtn"
                     style={{
@@ -463,18 +516,40 @@ export default function StakingPopup({ off }) {
               </span>
             </div>
 
-							<button className="confirmBtn" 
-								onClick={() => { onclick_approve() }}
-								style={ + allowanceamount > 0 ? { visibility:'hidden' } : {display:'inline'} }
-								>
-                Approve
-              </button>
+            <button
+              className="confirmBtn"
+              onClick={() => {
+                onclick_approve();
+              }}
+              style={
+                +allowanceamount > 0
+                  ? { visibility: "hidden" }
+                  : { display: "inline" }
+              }
+            >
+              Approve
+            </button>
 
-						<button className="confirmBtn" onClick={() => { 
-							onclick_buy()
-							false && off()
-						} } >
+            <button
+              className="confirmBtn"
+              onClick={() => {
+                onclick_buy();
+                false && off();
+              }}
+            >
               Confirm
+              <img
+                ref={spinnerHref}
+                className="Spinner"
+                src={I_spinner}
+                alt=""
+                style={{
+                  display: true ? "block" : "none",
+                  width: "18px",
+                  right: "160px",
+                  position: "absolute",
+                }}
+              />
             </button>
           </div>
         </article>
@@ -785,12 +860,16 @@ const PstakingPopupBox = styled.section`
       }
 
       .confirmBtn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         height: 60px;
         font-size: 20px;
         font-weight: 500;
         color: #fff;
         background: #000;
         border-radius: 12px;
+        position: relative;
       }
     }
   }

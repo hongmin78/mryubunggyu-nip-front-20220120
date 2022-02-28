@@ -8,7 +8,12 @@ import MarketItem from "../components/MarketItem";
 import MarketItem0227 from "../components/MarketItem0227";
 import Header from "../components/header/Header";
 import { useSelector } from "react-redux";
-import { getStyle } from "../util/Util";
+import {
+  getStyle,
+  onClickNextBtn,
+  onClickPreBtn,
+  swiperListener,
+} from "../util/Util";
 import FaqItem from "../components/FaqCont";
 import { useNavigate } from "react-router-dom";
 
@@ -34,111 +39,24 @@ export default function Main() {
   const firstAuctionRef = useRef();
   const secondAuctionRef = useRef();
   const marketRef = useRef();
-	const ticketRef = useRef();
-	let premiumref = useRef()
+  const ticketRef = useRef();
+  let premiumref = useRef();
   const faqRef = useRef();
   let issueIndex = 0;
+
   const isMobile = useSelector((state) => state.common.isMobile);
+
   const [headLineIndex, setHeadLineIndex] = useState(0);
   const [firstAuctionIndex, setFirstAuctionIndex] = useState(0);
   const [secondAuctionIndex, setSecondAuctionIndex] = useState(0);
   const [marketIndex, setMarketIndex] = useState(0);
+  const [premiumIndex, setPremiumIndex] = useState(0);
   const [ticketIndex, setTicketIndex] = useState(0);
   const [faqIndex, setFaqIndex] = useState(0);
   const [auctionListFirst, setAuctionListFirst] = useState([]);
   const [auctionListSecond, setAuctionListSecond] = useState([]);
   const [likeObj, setLikeObj] = useState({});
-	let [ premiumitemlist , setpremiumitemlist]= useState ( [] )
-  function onClickHeadLinePreBtn() {
-    if (!headLineRef.current.children) return;
-    const wrapWidth = headLineRef.current.offsetWidth;
-    const contWidth = headLineRef.current.children[0].offsetWidth;
-    const itemNumByPage = Math.floor(wrapWidth / contWidth);
-    const pageNum = Math.ceil(headLineList.length / itemNumByPage);
-
-    if (headLineIndex > 0) setHeadLineIndex(headLineIndex - 1);
-    else setHeadLineIndex(pageNum - 1);
-  }
-
-  function onClickHeadLineNextBtn() {
-    if (!headLineRef.current.children) return;
-    const wrapWidth = headLineRef.current.offsetWidth;
-    const contWidth = headLineRef.current.children[0].offsetWidth;
-    const itemNumByPage = Math.floor(wrapWidth / contWidth);
-    const pageNum = Math.ceil(headLineList.length / itemNumByPage);
-
-    if (headLineIndex < pageNum - 1) setHeadLineIndex(headLineIndex + 1);
-    else setHeadLineIndex(0);
-  }
-
-  function onClickFirstAuctionNextBtn() {
-    if (!firstAuctionRef.current.children) return;
-    const wrapWidth = firstAuctionRef.current.offsetWidth;
-    const contWidth = firstAuctionRef.current.children[0].offsetWidth;
-    const itemNumByPage = Math.floor(wrapWidth / contWidth);
-    const pageNum = Math.ceil(auctionListFirst.length / itemNumByPage);
-
-    if (firstAuctionIndex < pageNum - 1)
-      setFirstAuctionIndex(firstAuctionIndex + 1);
-    else setFirstAuctionIndex(0);
-  }
-
-  function onClickSecondAuctionNextBtn() {
-    if (!secondAuctionRef.current.children) return;
-    const wrapWidth = secondAuctionRef.current.offsetWidth;
-    const contWidth = secondAuctionRef.current.children[0].offsetWidth;
-    const itemNumByPage = Math.floor(wrapWidth / contWidth);
-    const pageNum = Math.ceil(auctionListFirst.length / itemNumByPage);
-    if (secondAuctionIndex < pageNum - 1)
-      setSecondAuctionIndex(firstAuctionIndex + 1);
-    else setSecondAuctionIndex(0);
-  }
-
-  function onClickMarketNextBtn() {
-    if (!marketRef.current.children) return;
-    const wrapWidth = marketRef.current.offsetWidth;
-    const contWidth = marketRef.current.children[0].offsetWidth;
-    const itemNumByPage = Math.floor(wrapWidth / contWidth);
-    const pageNum = Math.ceil(auctionListFirst.length / itemNumByPage);
-    if (marketIndex < pageNum - 1) setMarketIndex(marketIndex + 1);
-    else setMarketIndex(0);
-  }
-	function onClickPremiumNextBtn (){
-		return
-	}
-
-  function onClickTicketNextBtn() {
-    if (!ticketRef.current.children) return;
-    const wrapWidth = ticketRef.current.offsetWidth;
-    const contWidth = ticketRef.current.children[0].offsetWidth;
-    const itemNumByPage = Math.floor(wrapWidth / contWidth);
-    const pageNum = Math.ceil(ticketList.length / itemNumByPage);
-
-    if (ticketIndex < pageNum - 1) setTicketIndex(ticketIndex + 1);
-    else setTicketIndex(0);
-  }
-
-  function onClickFaqPreBtn() {
-    if (!faqRef.current.children) return;
-    const wrapWidth = faqRef.current.offsetWidth;
-    const contWidth = faqRef.current.children[0].offsetWidth;
-    const itemNumByPage = Math.floor(wrapWidth / contWidth);
-    const pageNum = Math.ceil(D_faqList.length / itemNumByPage);
-
-    if (faqIndex > 0) setFaqIndex(faqIndex - 1);
-    else setFaqIndex(pageNum - 1);
-  }
-
-  function onClickFaqNextBtn() {
-    if (!faqRef.current.children) return;
-    const wrapWidth = faqRef.current.offsetWidth;
-    const contWidth = faqRef.current.children[0].offsetWidth;
-    const itemNumByPage = Math.floor(wrapWidth / contWidth);
-    const pageNum = Math.ceil(D_faqList.length / itemNumByPage);
-
-    if (faqIndex < pageNum - 1) setFaqIndex(faqIndex + 1);
-    else setFaqIndex(0);
-  }
+  let [premiumitemlist, setpremiumitemlist] = useState([]);
 
   function onClickTopBtn() {
     window.scrollTo({
@@ -146,6 +64,7 @@ export default function Main() {
       behavior: "smooth",
     });
   }
+
   function fetchitems() {
     axios
       .get("http://nips1.net:34705/auction/list", { params: { limit: 16 } })
@@ -153,13 +72,16 @@ export default function Main() {
         console.log(res.data);
         setAuctionListFirst(res.data.slice(0, 8));
         setAuctionListSecond(res.data.slice(8));
-			});
-		axios.get( API.API_PREMIUMITEMS + `/items/group_/kingkong/0/16/id/DESC` ).then(resp=>{ LOGGER('De0Mlt93PT' , resp.data )
-			let { status , list }=resp.data 
-			if ( status =='OK'){
-				setpremiumitemlist ( list ) 
-			}			
-		})
+      });
+    axios
+      .get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/16/id/DESC`)
+      .then((resp) => {
+        LOGGER("De0Mlt93PT", resp.data);
+        let { status, list } = resp.data;
+        if (status == "OK") {
+          setpremiumitemlist(list);
+        }
+      });
   }
 
   useEffect(() => {
@@ -167,7 +89,7 @@ export default function Main() {
     setInterval(() => {
       if (!issueRef.current) return;
       const contHeight = issueRef.current.children[0].offsetHeight;
-      issueIndex++
+      issueIndex++;
       if (issueRef.current?.scrollTo) {
         if (issueIndex < D_issueList.length) {
           issueRef.current.scrollTo({
@@ -182,25 +104,24 @@ export default function Main() {
           });
         }
       }
-    }, 5000 )
-  }, [] )
+    }, 5000);
+  }, []);
 
   useEffect(() => {
     if (!headLineRef.current) return;
     const wrapWidth = headLineRef.current.offsetWidth;
     const contWidth = headLineRef.current.children[0].offsetWidth;
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
-    const pageNum = Math.ceil(headLineList.length / itemNumByPage);
 
     if (headLineRef.current?.scrollTo) {
-      if (headLineIndex < pageNum) {
+      if (headLineIndex === 0) {
         headLineRef.current.scrollTo({
-          left: contWidth * itemNumByPage * headLineIndex,
+          left: 0,
           behavior: "smooth",
         });
       } else {
         headLineRef.current.scrollTo({
-          left: 0,
+          left: contWidth * itemNumByPage * headLineIndex,
           behavior: "smooth",
         });
       }
@@ -208,122 +129,27 @@ export default function Main() {
   }, [headLineIndex]);
 
   useEffect(() => {
-    if (!firstAuctionRef.current || !firstAuctionRef.current.children[0])
-      return;
-    const wrapWidth = firstAuctionRef.current.offsetWidth;
-    const contWidth = firstAuctionRef.current.children[0].offsetWidth;
-    const itemNumByPage = Math.floor(wrapWidth / contWidth);
+    swiperListener(firstAuctionRef, firstAuctionIndex);
+  }, [firstAuctionIndex]);
 
-    if (firstAuctionRef.current?.scrollTo) {
-      if (firstAuctionIndex === 0) {
-        firstAuctionRef.current.scrollTo({
-          left: 0,
-          behavior: "smooth",
-        });
-      } else {
-        firstAuctionRef.current.scrollTo({
-          left:
-            contWidth * itemNumByPage * firstAuctionIndex +
-            firstAuctionIndex *
-              getStyle(firstAuctionRef, "gap") *
-              itemNumByPage,
-          behavior: "smooth",
-        });
-      }
-    }
-  }, [ firstAuctionIndex ]);
   useEffect(() => {
-    if (!secondAuctionRef.current || !secondAuctionRef.current.children[0])
-      return;
-    const wrapWidth = secondAuctionRef.current.offsetWidth;
-    const contWidth = secondAuctionRef.current.children[0].offsetWidth;
-    const itemNumByPage = Math.floor(wrapWidth / contWidth);
-
-    if (secondAuctionRef.current?.scrollTo) {
-      if (secondAuctionIndex === 0) {
-        secondAuctionRef.current.scrollTo({
-          left: 0,
-          behavior: "smooth",
-        });
-      } else {
-        secondAuctionRef.current.scrollTo({
-          left:
-            contWidth * itemNumByPage * secondAuctionIndex +
-            secondAuctionIndex *
-              getStyle(secondAuctionRef, "gap") *
-              itemNumByPage,
-          behavior: "smooth",
-        });
-      }
-    }
+    swiperListener(secondAuctionRef, secondAuctionIndex);
   }, [secondAuctionIndex]);
 
   useEffect(() => {
-		if ( marketRef && marketRef.current && marketRef.current.children[0]){}
-		else {return }
-    const wrapWidth = marketRef.current.offsetWidth;
-    const contWidth = marketRef.current.children[0].offsetWidth;
-    const itemNumByPage = Math.floor(wrapWidth / contWidth);
-
-    if (marketRef.current?.scrollTo) {
-      if (marketIndex === 0) {
-        marketRef.current.scrollTo({
-          left: 0,
-          behavior: "smooth",
-        });
-      } else {
-        marketRef.current.scrollTo({
-          left:
-            contWidth * itemNumByPage * marketIndex +
-            marketIndex * getStyle(marketRef, "gap") * itemNumByPage,
-          behavior: "smooth",
-        });
-      }
-    }
+    swiperListener(marketRef, marketIndex);
   }, [marketIndex]);
 
   useEffect(() => {
-    const wrapWidth = ticketRef.current.offsetWidth;
-    const contWidth = ticketRef.current.children[0].offsetWidth;
-    const itemNumByPage = Math.floor(wrapWidth / contWidth);
+    swiperListener(premiumref, premiumIndex);
+  }, [premiumIndex]);
 
-    if (ticketRef.current?.scrollTo) {
-      if (ticketIndex === 0) {
-        ticketRef.current.scrollTo({
-          left: 0,
-          behavior: "smooth",
-        });
-      } else {
-        ticketRef.current.scrollTo({
-          left:
-            contWidth * itemNumByPage * ticketIndex +
-            ticketIndex * getStyle(ticketRef, "gap"),
-          behavior: "smooth",
-        });
-      }
-    }
+  useEffect(() => {
+    swiperListener(ticketRef, ticketIndex);
   }, [ticketIndex]);
 
   useEffect(() => {
-    const wrapWidth = faqRef.current.offsetWidth;
-    const contWidth = faqRef.current.children[0].offsetWidth;
-    const itemNumByPage = Math.floor(wrapWidth / contWidth);
-
-    if (faqRef.current?.scrollTo) {
-      if (faqIndex === 0) {
-        faqRef.current.scrollTo({
-          left: 0,
-          behavior: "smooth",
-        });
-      } else {
-        faqRef.current.scrollTo({
-          left:
-            contWidth * itemNumByPage * faqIndex +
-            faqIndex * getStyle(faqRef, "gap"),
-          behavior: "smooth",
-        });
-      }
-    }
+    swiperListener(faqRef, faqIndex);
   }, [faqIndex]);
 
   if (isMobile)
@@ -352,12 +178,29 @@ export default function Main() {
                 </li>
               ))}
             </ul>
-            <button className="preBtn indexBtn" onClick={onClickHeadLinePreBtn}>
+            <button
+              className="preBtn indexBtn"
+              onClick={() =>
+                onClickPreBtn(
+                  headLineRef,
+                  headLineList,
+                  headLineIndex,
+                  setHeadLineIndex
+                )
+              }
+            >
               <img src={I_ltArwWhite} alt="" />
             </button>
             <button
               className="nextBtn indexBtn"
-              onClick={onClickHeadLineNextBtn}
+              onClick={() =>
+                onClickNextBtn(
+                  headLineRef,
+                  headLineList,
+                  headLineIndex,
+                  setHeadLineIndex
+                )
+              }
             >
               <img src={I_rtArwWhite} alt="" />
             </button>
@@ -402,7 +245,14 @@ export default function Main() {
                   </ul>
                   <button
                     className="nextBtn"
-                    onClick={onClickFirstAuctionNextBtn}
+                    onClick={() =>
+                      onClickNextBtn(
+                        firstAuctionRef,
+                        auctionListFirst,
+                        firstAuctionIndex,
+                        setFirstAuctionIndex
+                      )
+                    }
                   >
                     <img src={I_rtArw} alt="" />
                   </button>
@@ -442,7 +292,17 @@ export default function Main() {
                     </Fragment>
                   ))}
                 </ul>
-                <button className="nextBtn" onClick={onClickMarketNextBtn}>
+                <button
+                  className="nextBtn"
+                  onClick={() =>
+                    onClickNextBtn(
+                      marketRef,
+                      auctionListFirst,
+                      marketIndex,
+                      setMarketIndex
+                    )
+                  }
+                >
                   <img src={I_rtArw} alt="" />
                 </button>
               </div>
@@ -463,7 +323,17 @@ export default function Main() {
                     </Fragment>
                   ))}
                 </ul>
-                <button className="nextBtn" onClick={onClickPremiumNextBtn}>
+                <button
+                  className="nextBtn"
+                  onClick={() =>
+                    onClickNextBtn(
+                      premiumref,
+                      premiumitemlist,
+                      premiumIndex,
+                      setPremiumIndex
+                    )
+                  }
+                >
                   <img src={I_rtArw} alt="" />
                 </button>
               </div>
@@ -492,7 +362,17 @@ export default function Main() {
                     </li>
                   ))}
                 </ul>
-                <button className="nextBtn" onClick={onClickTicketNextBtn}>
+                <button
+                  className="nextBtn"
+                  onClick={() =>
+                    onClickNextBtn(
+                      ticketRef,
+                      ticketList,
+                      ticketIndex,
+                      setTicketIndex
+                    )
+                  }
+                >
                   <img src={I_rtArw} alt="" />
                 </button>
               </div>
@@ -533,10 +413,20 @@ export default function Main() {
                   ))}
                 </ul>
                 <div className="pageBtnBox">
-                  <button className="preBtn" onClick={onClickFaqPreBtn}>
+                  <button
+                    className="preBtn"
+                    onClick={() =>
+                      onClickPreBtn(faqRef, D_faqList, faqIndex, setFaqIndex)
+                    }
+                  >
                     <img src={I_ltArwWhite} alt="" />
                   </button>
-                  <button className="nextBtn" onClick={onClickFaqNextBtn}>
+                  <button
+                    className="nextBtn"
+                    onClick={() =>
+                      onClickNextBtn(faqRef, D_faqList, faqIndex, setFaqIndex)
+                    }
+                  >
                     <img src={I_rtArwWhite} alt="" />
                   </button>
                 </div>
@@ -579,12 +469,29 @@ export default function Main() {
                 </li>
               ))}
             </ul>
-            <button className="preBtn indexBtn" onClick={onClickHeadLinePreBtn}>
+            <button
+              className="preBtn indexBtn"
+              onClick={() =>
+                onClickPreBtn(
+                  headLineRef,
+                  headLineList,
+                  headLineIndex,
+                  setHeadLineIndex
+                )
+              }
+            >
               <img src={I_ltArwWhite} alt="" />
             </button>
             <button
               className="nextBtn indexBtn"
-              onClick={onClickHeadLineNextBtn}
+              onClick={() =>
+                onClickNextBtn(
+                  headLineRef,
+                  headLineList,
+                  headLineIndex,
+                  setHeadLineIndex
+                )
+              }
             >
               <img src={I_rtArwWhite} alt="" />
             </button>
@@ -629,7 +536,14 @@ export default function Main() {
                   </ul>
                   <button
                     className="nextBtn"
-                    onClick={onClickFirstAuctionNextBtn}
+                    onClick={() =>
+                      onClickNextBtn(
+                        firstAuctionRef,
+                        auctionListFirst,
+                        firstAuctionIndex,
+                        setFirstAuctionIndex
+                      )
+                    }
                   >
                     <img src={I_rtArw} alt="" />
                   </button>
@@ -650,7 +564,14 @@ export default function Main() {
                   </ul>
                   <button
                     className="nextBtn"
-                    onClick={onClickSecondAuctionNextBtn}
+                    onClick={() =>
+                      onClickNextBtn(
+                        secondAuctionRef,
+                        auctionListSecond,
+                        secondAuctionIndex,
+                        setSecondAuctionIndex
+                      )
+                    }
                   >
                     <img src={I_rtArw} alt="" />
                   </button>
@@ -661,7 +582,7 @@ export default function Main() {
             <article className="marketplaceBox itemListBox">
               <strong className="title">MarketPlace</strong>
               <div className="posBox">
-                <ul className="itemList" ref={premiumref}>
+                <ul className="itemList" ref={marketRef}>
                   {marketPlaceList.map((cont, index) => (
                     <Fragment key={index}>
                       <MarketItem
@@ -673,7 +594,17 @@ export default function Main() {
                     </Fragment>
                   ))}
                 </ul>
-                <button className="nextBtn" onClick={onClickMarketNextBtn}>
+                <button
+                  className="nextBtn"
+                  onClick={() =>
+                    onClickNextBtn(
+                      marketRef,
+                      auctionListFirst,
+                      marketIndex,
+                      setMarketIndex
+                    )
+                  }
+                >
                   <img src={I_rtArw} alt="" />
                 </button>
               </div>
@@ -682,7 +613,7 @@ export default function Main() {
             <article className="marketplaceBox itemListBox">
               <strong className="title">Kingkong</strong>
               <div className="posBox">
-                <ul className="itemList" ref={marketRef}>
+                <ul className="itemList" ref={premiumref}>
                   {premiumitemlist.map((cont, index) => (
                     <Fragment key={index}>
                       <MarketItem0227
@@ -694,7 +625,17 @@ export default function Main() {
                     </Fragment>
                   ))}
                 </ul>
-                <button className="nextBtn" onClick={onClickPremiumNextBtn}>
+                <button
+                  className="nextBtn"
+                  onClick={() =>
+                    onClickNextBtn(
+                      premiumref,
+                      premiumitemlist,
+                      premiumIndex,
+                      setPremiumIndex
+                    )
+                  }
+                >
                   <img src={I_rtArw} alt="" />
                 </button>
               </div>
@@ -723,7 +664,17 @@ export default function Main() {
                     </li>
                   ))}
                 </ul>
-                <button className="nextBtn" onClick={onClickTicketNextBtn}>
+                <button
+                  className="nextBtn"
+                  onClick={() =>
+                    onClickNextBtn(
+                      ticketRef,
+                      ticketList,
+                      ticketIndex,
+                      setTicketIndex
+                    )
+                  }
+                >
                   <img src={I_rtArw} alt="" />
                 </button>
               </div>
@@ -764,10 +715,20 @@ export default function Main() {
                   ))}
                 </ul>
                 <div className="pageBtnBox">
-                  <button className="preBtn" onClick={onClickFaqPreBtn}>
+                  <button
+                    className="preBtn"
+                    onClick={() =>
+                      onClickPreBtn(faqRef, D_faqList, faqIndex, setFaqIndex)
+                    }
+                  >
                     <img src={I_ltArwWhite} alt="" />
                   </button>
-                  <button className="nextBtn" onClick={onClickFaqNextBtn}>
+                  <button
+                    className="nextBtn"
+                    onClick={() =>
+                      onClickNextBtn(faqRef, D_faqList, faqIndex, setFaqIndex)
+                    }
+                  >
                     <img src={I_rtArwWhite} alt="" />
                   </button>
                 </div>

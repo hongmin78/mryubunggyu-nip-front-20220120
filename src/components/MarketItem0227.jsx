@@ -4,7 +4,7 @@ import I_heartO from "../img/icon/I_heartO.svg";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import moment from 'moment'
+import moment from "moment";
 
 export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
   const navigate = useNavigate();
@@ -25,8 +25,8 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
       >
         <div className="topBar">
           <div className="profBox">
-            <img src={ data.url } alt="" />
-            <p className="address">{strDot('0x123456789012345', 5, 4)}</p>
+            <img src={data.url} alt="" />
+            <p className="address">{strDot("0x123456789012345", 5, 4)}</p>
           </div>
 
           {likeObj && (
@@ -47,10 +47,10 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
           )}
         </div>
 
-        <img className="itemImg" src={data.url } alt="" />
+        <img className="itemImg" src={data.url} alt="" />
 
         <div className="infoBox">
-          <p className="title">{data.titlename }</p>
+          <p className="title">{data.titlename}</p>
 
           <ul className="detailList">
             <li>
@@ -62,7 +62,7 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
                 {data.price}&nbsp;{data.unit}
               </p>
 
-              <p>{ moment( data.createdat).fromNow() }</p>
+              <p>{moment(data.createdat).fromNow()}</p>
             </li>
           </ul>
         </div>
@@ -76,8 +76,8 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
       >
         <div className="topBar">
           <div className="profBox">
-            <img src={data.url } alt="" />
-            <p className="address">{strDot('0x123456789012345', 5, 4)}</p>
+            <img src={data.url} alt="" />
+            <p className="address">{strDot("0x123456789012345", 5, 4)}</p>
           </div>
 
           {likeObj && (
@@ -98,10 +98,10 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
           )}
         </div>
 
-        <img className="itemImg" src={ data.url } alt="" />
+        <img className="itemImg" src={data.url} alt="" />
 
         <div className="infoBox">
-          <p className="title">{data.titlename }</p>
+          <p className="title">{data.titlename}</p>
 
           <ul className="detailList">
             <li>
@@ -113,7 +113,7 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
                 {data.price}&nbsp;{data.unit}
               </p>
 
-              <p>{ moment(data.createdat).fromNow() }</p>
+              <p>{moment(data.createdat).fromNow()}</p>
             </li>
           </ul>
         </div>
@@ -231,6 +231,13 @@ const Pitem = styled.li`
       display: flex;
       align-items: center;
       gap: 10px;
+
+      img {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
     }
 
     .likeBtn {
