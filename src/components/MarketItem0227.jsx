@@ -8,7 +8,6 @@ import moment from 'moment'
 
 export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
   const navigate = useNavigate();
-
   const isMobile = useSelector((state) => state.common.isMobile);
 
   function onClickItemLike(e, index) {
@@ -26,7 +25,7 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
       >
         <div className="topBar">
           <div className="profBox">
-            <img src={data.url } alt="" />
+            <img src={ data.url } alt="" />
             <p className="address">{strDot('0x123456789012345', 5, 4)}</p>
           </div>
 
@@ -99,7 +98,7 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
           )}
         </div>
 
-        <img className="itemImg" src={data.url } alt="" />
+        <img className="itemImg" src={ data.url } alt="" />
 
         <div className="infoBox">
           <p className="title">{data.titlename }</p>
