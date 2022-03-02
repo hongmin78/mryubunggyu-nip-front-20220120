@@ -136,11 +136,11 @@ function App() {
           <Route path="/staking/detail/:id" element={<StakingDetail />} />
 
           <Route path="/auction" element={<Auction />} />
-          <Route path="/auction/detail/:dna" element={<AuctionDetail />} />
+          <Route path="/auction/detail/:itemid" element={<AuctionDetail />} />
 
           <Route path="/market" element={<Market />} />
-          <Route path="/market/detail/:id" element={<MarketDetail />} />
-          <Route path="/market/detail/:id/:popup" element={<MarketDetail />} />
+          <Route path="/market/detail/:itemid" element={<MarketDetail />} />
+          <Route path="/market/detail/:itemid/:popup" element={<MarketDetail />} />
 
           <Route path="/mypage" element={<Mypage />} />
           <Route path="/editprof" element={<EditProf />} />

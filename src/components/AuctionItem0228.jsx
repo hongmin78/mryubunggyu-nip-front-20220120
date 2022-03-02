@@ -4,12 +4,11 @@ import I_heartO from "../img/icon/I_heartO.svg";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import moment from "moment";
+import { autoAuctionList } from "../data/Dmain";
 
-export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
+export default function AuctionItem0228 ({ data, index, likeObj, setLikeObj }) {
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
-
   function onClickItemLike(e, index) {
     e.stopPropagation();
     let dataObj = likeObj;
@@ -20,13 +19,14 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
   if (isMobile)
     return (
       <Mitem
-        className="item"
-        onClick={() => navigate(`/market/detail/${data?.itemid }`)}
+				className="item"
+				onClick={() => navigate(`/auction/detail/${data.itemid }`)}
+        // onClick={() => navigate(`/auction/detail/${data.dna}`)}
       >
         <div className="topBar">
           <div className="profBox">
-            <img src={data.url} alt="" />
-            <p className="address">{strDot("0x123456789012345", 5, 4)}</p>
+            <img src={autoAuctionList[index]?.profImg} alt="" />
+            <p className="address">{strDot(autoAuctionList[index]?.address, 5, 4)}</p>
           </div>
 
           {likeObj && (
@@ -41,29 +41,20 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
                   color: likeObj[index] && "#ff5050",
                 }}
               >
-                {data.like}
+                0
               </p>
             </button>
           )}
         </div>
 
-        <img className="itemImg" src={data.url} alt="" />
+        <img className="itemImg" src={data?.url } alt="" />
 
         <div className="infoBox">
-          <p className="title">{data.titlename}</p>
+          <p className="title">Series Kong{data?.titlename }</p>
 
           <ul className="detailList">
-            <li>
-              <p>Current bid</p>
-              <p>Ending in</p>
-            </li>
-            <li style={{ color: "#fff" }}>
-              <p>
-                {data.price}&nbsp;{data.unit}
-              </p>
-
-              <p>{moment(data.createdat).fromNow()}</p>
-            </li>
+            <li>Last sold for</li>
+            <li>100&nbsp;USDT</li>
           </ul>
         </div>
       </Mitem>
@@ -72,12 +63,15 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
     return (
       <Pitem
         className="item"
-        onClick={() => navigate(`/market/detail/${data?.itemid }`)}
+//				onClick={() => navigate(`/auction/detail/${data.dna}`)}
+				onClick={() => navigate(`/auction/detail/${data.itemid }`)}
       >
         <div className="topBar">
           <div className="profBox">
-            <img src={data.url} alt="" />
-            <p className="address">{strDot("0x123456789012345", 5, 4)}</p>
+            <img src={autoAuctionList[index]?.profImg} alt="" />
+            <p className="address">
+              {strDot(autoAuctionList[index]?.address, 5, 4)}
+            </p>
           </div>
 
           {likeObj && (
@@ -92,28 +86,21 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
                   color: likeObj[index] && "#ff5050",
                 }}
               >
-                {data.like}
+                {autoAuctionList[index]?.like}
               </p>
             </button>
           )}
         </div>
 
-        <img className="itemImg" src={data.url} alt="" />
+        <img className="itemImg" src={data?.url } alt="" />
 
         <div className="infoBox">
-          <p className="title">{data.titlename}</p>
+          <p className="title">Series Kong{data?.titlename }</p>
 
           <ul className="detailList">
+            <li>Last sold for</li>
             <li>
-              <p>Current bid</p>
-              <p>Ending in</p>
-            </li>
-            <li style={{ color: "#fff" }}>
-              <p>
-                {data.price}&nbsp;{data.unit}
-              </p>
-
-              <p>{moment(data.createdat).fromNow()}</p>
+              100&nbsp;USDT
             </li>
           </ul>
         </div>
@@ -199,12 +186,7 @@ const Mitem = styled.li`
       font-size: 3.88vw;
       font-weight: 500;
       color: #7a7a7a;
-      background: #000;
-
-      li {
-        display: flex;
-        justify-content: space-between;
-      }
+      border-top: 1px solid #f6f6f6;
     }
   }
 `;
@@ -231,13 +213,6 @@ const Pitem = styled.li`
       display: flex;
       align-items: center;
       gap: 10px;
-
-      img {
-        width: 34px;
-        height: 34px;
-        border-radius: 50%;
-        object-fit: cover;
-      }
     }
 
     .likeBtn {
@@ -286,12 +261,7 @@ const Pitem = styled.li`
       font-weight: 500;
       line-height: 19px;
       color: #7a7a7a;
-      background: #000;
-
-      li {
-        display: flex;
-        justify-content: space-between;
-      }
+      border-top: 1px solid #f6f6f6;
     }
   }
 `;

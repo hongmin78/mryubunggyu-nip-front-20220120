@@ -62,11 +62,11 @@ export default function Test() {
   }
 
   function get() {
-    axios.get("http://nips1.net:34805/auction").then((res) => console.log(res));
+    axios.get("http://3.35.11 7.87:34805/auction").then((res) => console.log(res));
   }
   function post() {
     axios
-      .post("http://nips1.net:34805/auction", itemData)
+      .post("http://3.35.11 7.87:34805/auction", itemData)
       .then((res) => console.log(res));
   }
 

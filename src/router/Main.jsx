@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { D_faqList, D_issueList, marketPlaceList } from "../data/Dmain";
 import Footer from "./Footer";
 import AuctionItem from "../components/AuctionItem";
+import AuctionItem0228 from "../components/AuctionItem0228";
 import MarketItem from "../components/MarketItem";
 import MarketItem0227 from "../components/MarketItem0227";
 import Header from "../components/header/Header";
@@ -33,7 +34,6 @@ import { LOGGER } from "../util/common";
 
 export default function Main() {
   const navigate = useNavigate();
-
   const headLineRef = useRef();
   const issueRef = useRef();
   const firstAuctionRef = useRef();
@@ -43,9 +43,7 @@ export default function Main() {
   let premiumref = useRef();
   const faqRef = useRef();
   let issueIndex = 0;
-
   const isMobile = useSelector((state) => state.common.isMobile);
-
   const [headLineIndex, setHeadLineIndex] = useState(0);
   const [firstAuctionIndex, setFirstAuctionIndex] = useState(0);
   const [secondAuctionIndex, setSecondAuctionIndex] = useState(0);
@@ -67,14 +65,17 @@ export default function Main() {
 
   function fetchitems() {
     axios
-      .get("http://nips1.net:34705/auction/list", { params: { limit: 16 } })
-      .then((res) => {
-        console.log(res.data);
-        setAuctionListFirst(res.data.slice(0, 8));
-        setAuctionListSecond(res.data.slice(8));
+//      .get(  "http://3.35.117.87:34705/auction/list", { params: { limit: 16 } })
+			.get( API.API_COMMONITEMS + `/items/group_/kong/0/128/id/DESC` )
+      .then((res) => { // console.log(res.data);
+				let { status , list }=res.data
+				if ( status == 'OK'){
+					setAuctionListFirst( list.slice(0, 64 ) )
+					setAuctionListSecond(list.slice( 64 ) )
+				}
       });
     axios
-      .get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/16/id/DESC`)
+      .get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC`)
       .then((resp) => {
         LOGGER("De0Mlt93PT", resp.data);
         let { status, list } = resp.data;
@@ -234,7 +235,7 @@ export default function Main() {
                   <ul className="itemList" ref={firstAuctionRef}>
                     {auctionListFirst.map((cont, index) => (
                       <Fragment key={index}>
-                        <AuctionItem
+                        <AuctionItem0228
                           data={cont}
                           index={index}
                           likeObj={likeObj}
@@ -261,7 +262,7 @@ export default function Main() {
                   <ul className="itemList">
                     {auctionListSecond.map((cont, index) => (
                       <Fragment key={index}>
-                        <AuctionItem
+                        <AuctionItem0228
                           data={cont}
                           index={index}
                           likeObj={likeObj}
@@ -277,7 +278,7 @@ export default function Main() {
               </div>
             </article>
 
-            <article className="marketplaceBox itemListBox">
+            <article className="marketplaceBox itemListBox" style={{display:'none'}} >
               <strong className="title">MarketPlace</strong>
               <div className="posBox">
                 <ul className="itemList" ref={marketRef}>
@@ -309,7 +310,7 @@ export default function Main() {
             </article>
 
             <article className="marketplaceBox itemListBox">
-              <strong className="title">Kingkong</strong>
+              <strong className="title">Marketplace</strong>
               <div className="posBox">
                 <ul className="itemList" ref={premiumref}>
                   {premiumitemlist.map((cont, index) => (
@@ -525,7 +526,7 @@ export default function Main() {
                   <ul className="itemList" ref={firstAuctionRef}>
                     {auctionListFirst.map((cont, index) => (
                       <Fragment key={index}>
-                        <AuctionItem
+                        <AuctionItem0228
                           data={cont}
                           index={index}
                           likeObj={likeObj}
@@ -553,7 +554,7 @@ export default function Main() {
                   <ul className="itemList" ref={secondAuctionRef}>
                     {auctionListSecond.map((cont, index) => (
                       <Fragment key={index}>
-                        <AuctionItem
+                        <AuctionItem0228
                           data={cont}
                           index={index}
                           likeObj={likeObj}
@@ -579,7 +580,7 @@ export default function Main() {
               </div>
             </article>
 
-            <article className="marketplaceBox itemListBox">
+            <article className="marketplaceBox itemListBox"  style={{display:'none'}} >
               <strong className="title">MarketPlace</strong>
               <div className="posBox">
                 <ul className="itemList" ref={marketRef}>
@@ -611,7 +612,7 @@ export default function Main() {
             </article>
 
             <article className="marketplaceBox itemListBox">
-              <strong className="title">Kingkong</strong>
+              <strong className="title">Marketplace</strong>
               <div className="posBox">
                 <ul className="itemList" ref={premiumref}>
                   {premiumitemlist.map((cont, index) => (

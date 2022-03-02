@@ -43,16 +43,18 @@ export default function StakingPopup({ off }) {
   let [stakedbalance, setstakedbalance] = useState();
   let [tvl, settvl] = useState();
   let [tickerusdt, settickerusdt] = useState();
-  let [myethbalance, setmyethbalance] = useState();
-  let spinnerHref = useRef();
+	let [myethbalance, setmyethbalance] = useState();
+	let spinnerHref = useRef()
+	let [ isloader_00 , setisloader_00 ] = useState( false )
+	let [ isloader_01 , setisloader_01 ] = useState( false )
   useEffect((_) => {
-    /**     const spinner = document.querySelector("#Spinner");
+    const spinner =spinnerHref.current // document.querySelector("Spinner");
     spinner.animate(
       [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
       {        duration: 1000,
         iterations: Infinity,
       }
-    );*/
+    )
     const fetchdata = async (_) => {
       axios.get(API.API_TICKERS).then((resp) => {
         LOGGER("MDmEMQ5xde", resp.data);
@@ -128,12 +130,14 @@ export default function StakingPopup({ off }) {
       methodname: "approve",
       aargs: [addresses.contract_stake, getweirep("" + 10 ** 10)],
     });
-    LOGGER("", abistr);
+		LOGGER("", abistr);
+		setisloader_00 ( true )
     requesttransaction({
       from: myaddress,
       to: addresses.contract_USDT,
       data: abistr,
     }).then((resp) => {
+			setisloader_00 ( false )
       if (resp) {
       } else {
         SetErrorBar(messages.MSG_USER_DENIED_TX);
@@ -205,17 +209,18 @@ export default function StakingPopup({ off }) {
         myaddress,
       ],
     });
-    LOGGER("", abistr);
-    //		return
+		LOGGER("", abistr)     //		return		
     const callreqtx = async (_) => {
       let resp;
       try {
+				setisloader_01 ( true )
         resp = await requesttransaction({
           from: myaddress,
           to: addresses.contract_stake,
           data: abistr,
           //			, value : ''
-        });
+				});
+				setisloader_01 ( false )
         if (resp) {
         } else {
           SetErrorBar(messages.MSG_USER_DENIED_TX);
@@ -262,7 +267,7 @@ export default function StakingPopup({ off }) {
             LOGGER("uQJ2POHvP8", resp_balances);
             setstakedbalance(getethrep(resp_balances));
           });
-      } catch (err) {
+      } catch (err) { setisloader_01 ( false )
         LOGGER();
         SetErrorBar(messages.MSG_USER_DENIED_TX);
       }
@@ -384,11 +389,11 @@ export default function StakingPopup({ off }) {
                 Approve!
                 <img
                   ref={spinnerHref}
-                  className="Spinner"
+                  
                   src={I_spinner}
                   alt=""
                   style={{
-                    display: true ? "block" : "none",
+                    display: isloader_00 ? "block" : "none",
                     width: "18px",
                     position: "absolute",
                     margin: "0 0 0 64px",
@@ -540,11 +545,11 @@ export default function StakingPopup({ off }) {
               Confirm
               <img
                 ref={spinnerHref}
-                className="Spinner"
+                
                 src={I_spinner}
                 alt=""
                 style={{
-                  display: true ? "block" : "none",
+                  display: isloader_01 ? "block" : "none",
                   width: "18px",
                   right: "160px",
                   position: "absolute",

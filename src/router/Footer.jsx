@@ -28,6 +28,10 @@ export default function Footer() {
         </article>
 
         <p className="copyright" style={{ color: isStaking && "#DBDEE2" }}>
+          abc@gmail.com
+        </p>
+
+        <p className="copyright" style={{ color: isStaking && "#DBDEE2" }}>
           Copyright © 2022 METACHAIN .LTD. All rights reserved.
         </p>
 
@@ -44,6 +48,17 @@ export default function Footer() {
       <>
         <PfooterBox style={{ background: isStaking && "unset" }}>
           <div className="innerBox">
+					<p className="copyright" style={{ color: isStaking && "#DBDEE2" }}>              
+							Customer Support
+							<br/>
+<br/>
+cs_jp@nftinfinity.world
+							<br/>
+							<br/>
+							cs_ph@nftinfinity.world
+
+            </p>
+
             <p className="copyright" style={{ color: isStaking && "#DBDEE2" }}>
               Copyright © 2022 METACHAIN .LTD. All rights reserved.
             </p>

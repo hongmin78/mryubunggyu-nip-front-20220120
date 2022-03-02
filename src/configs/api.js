@@ -1,5 +1,7 @@
 
-const URL='http://nips1.net:34815'
+// const URL='http://nip s1.net:348 15'
+// const URL='http://3.35. 117.87:34 815'
+const URL='https://nftinfinity.world:34825'
 
 const API={
 		API_MAX	: URL + `/queries/max` // /:tablename/:fieldname
@@ -14,6 +16,8 @@ const API={
 	, API_QUERY_REFERER : URL + '/queries/singlerow' // /:tablename/:fieldname/:fieldval
 	, API_QUERY_USERADDRESS : URL + '/queries/singlerow' 
 	, API_PREMIUMITEMS : URL + '/queries/rows'
+	, API_COMMONITEMS  : URL + '/queries/rows'
+	, API_ITEMDETAIL : URL + '/items/item' // /:itemid
 }
 
 export { 

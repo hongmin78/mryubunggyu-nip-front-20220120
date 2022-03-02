@@ -8,15 +8,11 @@ import { autoAuctionList } from "../data/Dmain";
 
 export default function AuctionItem({ data, index, likeObj, setLikeObj }) {
   const navigate = useNavigate();
-
   const isMobile = useSelector((state) => state.common.isMobile);
-
   function onClickItemLike(e, index) {
     e.stopPropagation();
-
     let dataObj = likeObj;
     dataObj[index] = !dataObj[index];
-
     setLikeObj({ ...dataObj });
   }
 

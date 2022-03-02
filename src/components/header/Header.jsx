@@ -51,7 +51,7 @@ export default function Header() {
 			] } ).then(resp=>{LOGGER( 'Ce4mDMhjbS' , resp )
 				setmybalance( getethrep ( resp ) )				
 			})
-			
+
 			window.ethereum.on('networkChanged', function (networkId) { LOGGER( '' ,  networkId )
 				// Time to reload your interface with the new networkId
 			})
@@ -110,7 +110,8 @@ export default function Header() {
               </button>
             </nav>
 
-<button className='menuBtn'><span className='balanceBox'>Switch network</span></button>
+{/**  <button className='menuBtn' >
+		<span className='balanceBox'>Switch network</span></button>*/}
             {isLogin ? (
               <button
                 className="menuBtn"

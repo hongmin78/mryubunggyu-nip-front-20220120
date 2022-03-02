@@ -1,93 +1,48 @@
 import styled from "styled-components";
-import I_clip from "../img/icon/I_clip.svg";
 import I_heart from "../img/icon/I_heart.svg";
 import I_heartO from "../img/icon/I_heartO.svg";
 import I_3dot from "../img/icon/I_3dot.svg";
+import I_clip from "../img/icon/I_clip.svg";
+import E_detailItem from "../img/market/E_detailItem.png";
 import I_rtArw from "../img/icon/I_rtArw.svg";
 import { Fragment, useEffect, useRef, useState } from "react";
-import { getStyle, putCommaAtPrice } from "../util/Util";
+import { putCommaAtPrice } from "../util/Util";
 import { D_category, D_transactionHistory } from "../data/DauctionDetail";
 import Offer from "../components/itemDetail/Offer";
-import { autoAuctionList } from "../data/Dmain";
-// import AuctionItem from "../components/AuctionItem";
-import AuctionItem0228 from "../components/AuctionItem0228";
+import { marketPlaceList } from "../data/Dmain";
 import Details from "../components/itemDetail/Details";
 import Properties from "../components/itemDetail/Properties";
-import { useSelector } from "react-redux";
-import Header from "../components/header/Header";
+import MarketItem from "../components/MarketItem";
+import BidPopup from "../components/BidPopup";
 import PopupBg from "../components/PopupBg";
-import axios from "axios";
-import { useParams } from "react-router-dom";
-import { LOGGER } from "../util/common";
-import { API } from "../configs/api";
+import { useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import Header from "../components/header/Header";
 
-export default function AuctionDetail() {
-  const params = useParams();
+export default function MarketDetail() {
+  const navigate = useNavigate();
+  const param = useParams();
   const moreRef = useRef();
+
   const isMobile = useSelector((state) => state.common.isMobile);
+
   const [toggleLike, setToggleLike] = useState(false);
   const [category, setCategory] = useState(0);
   const [moreIndex, setMoreIndex] = useState(0);
+  const [bidPopup, setBidPopup] = useState(false);
   const [showCopyBtn, setShowCopyBtn] = useState(false);
-  const [itemData, setItemData ] = useState({});
-  const [moreCollection, setMoreCollection] = useState([]);
 
-	const onclickfavorite=_=>{
-		axios.post (API.API_TOGGLE_FAVORITE ).then(resp=>{
-			LOGGER( 'xMYQNYFa9d' , resp.data )
-		})
-		setToggleLike(!toggleLike)
-		LOGGER('8FCYJgzDZX')
-	} 
   function onClickAuctionNextBtn() {
-    if (!moreRef.current.children[0]) return;
     const wrapWidth = moreRef.current.offsetWidth;
     const contWidth = moreRef.current.children[0].offsetWidth;
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
-    const pageNum = Math.ceil(autoAuctionList.length / itemNumByPage);
+    const pageNum = Math.ceil(marketPlaceList.length / itemNumByPage);
 
     if (moreIndex < pageNum - 1) setMoreIndex(moreIndex + 1);
     else setMoreIndex(0);
   }
 
-	const getitem=_=>{
-		axios.get( API.API_ITEMDETAIL + `/${params.itemid }`).then ( resp => { LOGGER ('7FzS4oxYPN' , resp.data )
-		let { status , respdata}=resp.data
-		if (status == 'OK'){
-			setItemData( respdata )
-		}
-	})
-	}
-  function getAuction() {
-		axios //      .get("http://3.35.1 17.87:34705/auction/list", { params: { limit: 8 } })
-			.get(API.API_COMMONITEMS + `/items/group_/kong/0/128/id/DESC` )
-      .then( resp => {	LOGGER( '' , resp.data )
-				let { status ,list }=resp.data
-				if ( status =='OK'){
-					setMoreCollection( list )
-				}
-//        console.log(res.data);
-  //      setMoreCollection(res.data);
-      });
-  }
-
-	useEffect (_=>{
-		getitem()
-		getAuction()
-	} , [] )
-/**   useEffect(() => {
-    axios
-      .ge t(`http://3.35.117.87:34705/auction/item/${params.dna}`)
-      .then((res) => {
-        console.log(res.data[0]);
-        setItemD ata(res.data[0]);
-      });
-    getAuction();
-  }, []); */
-
   useEffect(() => {
-    if (!moreRef.current.children[0]) return;
-
     const wrapWidth = moreRef.current.offsetWidth;
     const contWidth = moreRef.current.children[0].offsetWidth;
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
@@ -100,9 +55,11 @@ export default function AuctionDetail() {
         });
       } else {
         moreRef.current.scrollTo({
-          left:
-            contWidth * itemNumByPage * moreIndex +
-            moreIndex * getStyle(moreRef, "gap") * itemNumByPage,
+          left: isMobile
+            ? moreRef.current.scrollLeft +
+              moreRef.current.children[moreIndex].getBoundingClientRect().left -
+              20
+            : contWidth * itemNumByPage * moreIndex + itemNumByPage * 40,
           behavior: "smooth",
         });
       }
@@ -113,12 +70,9 @@ export default function AuctionDetail() {
     return (
       <>
         <Header />
-
-        <MauctionDetailBox>
+        <MmarketDetailBox>
           <section className="itemInfoContainer">
-            <span className="itemImgBox">
-              <img className="itemImg" src={itemData?.url } alt="" />
-            </span>
+            <img className="itemImg" src={E_detailItem} alt="" />
 
             <article className="infoBox">
               <div className="itemInfoBox">
@@ -127,8 +81,7 @@ export default function AuctionDetail() {
                     <div className="btnBox">
                       <button
                         className="likeBtn hoverBtn"
-												onClick={() => { onclickfavorite ()
-												} }
+                        onClick={() => setToggleLike(!toggleLike)}
                       >
                         <img src={toggleLike ? I_heartO : I_heart} alt="" />
                       </button>
@@ -145,7 +98,7 @@ export default function AuctionDetail() {
                       <>
                         <button
                           className="copyBtn displayBtn"
-                          onClick={() => {}}
+                          onClick={() => setShowCopyBtn(false)}
                         >
                           <img src={I_clip} alt="" />
                           Copy Link
@@ -155,7 +108,7 @@ export default function AuctionDetail() {
                     )}
                   </div>
 
-                  <strong className="title">Kingkong #112</strong>
+                  <strong className="title">Series Kong #9</strong>
                 </div>
 
                 <div className="ownedBox">
@@ -202,7 +155,7 @@ export default function AuctionDetail() {
 
                 <div className="contBox">
                   {category === 0 && <Offer />}
-                  {category === 1 && <Details itemData={itemData?.attributes} />}
+                  {category === 1 && <Details />}
                   {category === 2 && <Properties />}
                 </div>
               </div>
@@ -245,9 +198,9 @@ export default function AuctionDetail() {
             <div className="listBox">
               <div className="posBox">
                 <ul className="itemList" ref={moreRef}>
-                  {moreCollection.map((cont, index) => (
+                  {marketPlaceList.map((cont, index) => (
                     <Fragment key={index}>
-                      <AuctionItem0228 data={cont} index={index} />
+                      <MarketItem data={cont} index={index} />
                     </Fragment>
                   ))}
                 </ul>
@@ -258,33 +211,37 @@ export default function AuctionDetail() {
             </div>
           </section>
 
-          <button className="bidBtn">Auction in progress..</button>
-        </MauctionDetailBox>
+          {param.popup && (
+            <>
+              <BidPopup off={setBidPopup} />
+              <PopupBg blur off={setBidPopup} />
+            </>
+          )}
+
+          <button className="bidBtn" onClick={() => navigate("bid")}>
+            Place bid
+          </button>
+        </MmarketDetailBox>
       </>
     );
   else
     return (
       <>
         <Header />
-        <PauctionDetailBox>
+        <PmarketDetailBox>
           <section className="itemInfoContainer">
-            <span className="itemImgBox">
-              <img className="itemImg" src={itemData?.url } alt="" />
-            </span>
+            <img className="itemImg" src={E_detailItem} alt="" />
 
             <article className="infoBox">
               <div className="itemInfoBox">
                 <div className="titleBox">
-                  <strong className="title">
-                    Series Kong {itemData?.titlename }
-                  </strong>
+                  <strong className="title">Series Kong #9</strong>
 
                   <div className="btnBox">
                     <div className="posBox">
                       <button
                         className="likeBtn hoverBtn"
-												onClick={() => { onclickfavorite()
-												} }
+                        onClick={() => setToggleLike(!toggleLike)}
                       >
                         <img src={toggleLike ? I_heartO : I_heart} alt="" />
                       </button>
@@ -324,7 +281,7 @@ export default function AuctionDetail() {
 
                   <div className="value">
                     <strong className="price">
-                      {putCommaAtPrice(100)} USDT
+                      {putCommaAtPrice(588)} USDT
                     </strong>
 
                     <ul className="timeList">
@@ -336,7 +293,9 @@ export default function AuctionDetail() {
                   </div>
                 </div>
 
-                <button className="bidBtn">Auction in progress..</button>
+                <button className="bidBtn" onClick={() => setBidPopup(true)}>
+                  Place bid
+                </button>
               </div>
 
               <div className="categoryBox">
@@ -357,7 +316,7 @@ export default function AuctionDetail() {
 
                 <div className="contBox">
                   {category === 0 && <Offer />}
-                  {category === 1 && <Details itemData={itemData?.attributes} />}
+                  {category === 1 && <Details />}
                   {category === 2 && <Properties />}
                 </div>
               </div>
@@ -400,9 +359,9 @@ export default function AuctionDetail() {
             <div className="listBox">
               <div className="posBox">
                 <ul className="itemList" ref={moreRef}>
-                  {moreCollection.map((cont, index) => (
+                  {marketPlaceList.map((cont, index) => (
                     <Fragment key={index}>
-                      <AuctionItem0228 data={cont} index={index} />
+                      <MarketItem data={cont} index={index} />
                     </Fragment>
                   ))}
                 </ul>
@@ -412,12 +371,19 @@ export default function AuctionDetail() {
               </div>
             </div>
           </section>
-        </PauctionDetailBox>
+
+          {bidPopup && (
+            <>
+              <BidPopup off={setBidPopup} />
+              <PopupBg blur off={setBidPopup} />
+            </>
+          )}
+        </PmarketDetailBox>
       </>
     );
 }
 
-const MauctionDetailBox = styled.div`
+const MmarketDetailBox = styled.div`
   padding: 72px 0 80px 0;
 
   * {
@@ -429,10 +395,9 @@ const MauctionDetailBox = styled.div`
       width: 100%;
       height: 100vw;
       object-fit: contain;
-      border-radius: 5.55vw;
     }
 
-    & > .infoBox {
+    .infoBox {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -765,9 +730,9 @@ const MauctionDetailBox = styled.div`
   }
 `;
 
-const PauctionDetailBox = styled.div`
+const PmarketDetailBox = styled.div`
   max-width: 1480px;
-  padding: 180px 0 220px 0;
+  padding: 220px 0;
   margin: 0 auto;
 
   & > * {
@@ -781,6 +746,21 @@ const PauctionDetailBox = styled.div`
   & > .topBar {
     display: flex;
     justify-content: flex-end;
+
+    .copyBtn {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      width: 152px;
+      height: 44px;
+      font-size: 18px;
+      font-weight: 500;
+      line-height: 18px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
   }
 
   .itemInfoContainer {
@@ -788,10 +768,7 @@ const PauctionDetailBox = styled.div`
     justify-content: space-between;
     gap: 40px;
 
-    .itemImgBox {
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    .itemImg {
       width: 760px;
       height: 760px;
       object-fit: contain;
@@ -799,31 +776,24 @@ const PauctionDetailBox = styled.div`
       @media screen and (max-width: 1440px) {
         min-width: 500px;
         height: 500px;
-        border-radius: 20px;
-      }
-
-      .itemImg {
-        height: 100%;
-        border-radius: 20px;
       }
     }
 
-    & > .infoBox {
+    .infoBox {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       max-width: 608px;
-      min-width: 445px;
       width: 100%;
 
       .itemInfoBox {
         .titleBox {
           display: flex;
           justify-content: space-between;
-          align-items: flex-end;
+          align-items: center;
           font-size: 40px;
           font-weight: 600;
-          line-height: 60px;
+          line-height: 84px;
 
           .title {
             font-family: "Poppins", sans-serif;
@@ -942,12 +912,18 @@ const PauctionDetailBox = styled.div`
         }
 
         .bidBtn {
+          display: flex;
+          justify-content: center;
+          align-items: center;
           width: 100%;
           height: 60px;
-          margin: 44px 0 0 0;
+          margin: 60px 0 0 0;
           font-size: 20px;
           font-weight: 500;
-          box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+          line-height: 20px;
+          color: #fff;
+          font-family: "Poppins", sans-serif;
+          background: #000;
           border-radius: 12px;
         }
       }
@@ -1077,7 +1053,6 @@ const PauctionDetailBox = styled.div`
     margin: 120px 0 0 0;
 
     .title {
-      padding: 0 20px;
       font-size: 30px;
     }
 

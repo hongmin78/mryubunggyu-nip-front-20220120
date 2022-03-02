@@ -8,8 +8,10 @@ let TX_POLL_OPTIONS={
 	interval : TXREQSTATUS_POLL_INTERVAL
 	, blocksToWait : TXREQSTATUS_BLOCKCOUNT
 }
-const URL_BASE=`http://nips1.net`
-const URL_METADATA_BASE=`http://nips1.net/assets/json` // /2.json
+// const URL_BASE=`http://3.35.1 17.87`
+const URL_BASE=`https://nftinfinity.world`
+// const URL_METADATA_BASE=`http://3.35.11 7.87/assets/json` // /2.json
+const URL_METADATA_BASE=`https://nftinfinity.world/assets/json` // /2.json
 const TIME_PAGE_TRANSITION_DEF = 3000
 const DECIMALS_DISP_DEF = 4 
 export { 

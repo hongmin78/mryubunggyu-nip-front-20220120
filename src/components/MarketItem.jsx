@@ -22,7 +22,7 @@ export default function MarketItem({ data, index, likeObj, setLikeObj }) {
     return (
       <Mitem
         className="item"
-        onClick={() => navigate(`/market/detail/${index}`)}
+        onClick={() => navigate(`/market/detail/${data?.itemid }`)}
       >
         <div className="topBar">
           <div className="profBox">
@@ -73,7 +73,7 @@ export default function MarketItem({ data, index, likeObj, setLikeObj }) {
     return (
       <Pitem
         className="item"
-        onClick={() => navigate(`/market/detail/${index}`)}
+        onClick={() => navigate(`/market/detail/${data?.itemid }`)}
       >
         <div className="topBar">
           <div className="profBox">

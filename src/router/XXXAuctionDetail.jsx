@@ -9,8 +9,7 @@ import { getStyle, putCommaAtPrice } from "../util/Util";
 import { D_category, D_transactionHistory } from "../data/DauctionDetail";
 import Offer from "../components/itemDetail/Offer";
 import { autoAuctionList } from "../data/Dmain";
-// import AuctionItem from "../components/AuctionItem";
-import AuctionItem0228 from "../components/AuctionItem0228";
+import AuctionItem from "../components/AuctionItem";
 import Details from "../components/itemDetail/Details";
 import Properties from "../components/itemDetail/Properties";
 import { useSelector } from "react-redux";
@@ -35,6 +34,7 @@ export default function AuctionDetail() {
 	const onclickfavorite=_=>{
 		axios.post (API.API_TOGGLE_FAVORITE ).then(resp=>{
 			LOGGER( 'xMYQNYFa9d' , resp.data )
+
 		})
 		setToggleLike(!toggleLike)
 		LOGGER('8FCYJgzDZX')
@@ -50,40 +50,25 @@ export default function AuctionDetail() {
     else setMoreIndex(0);
   }
 
-	const getitem=_=>{
-		axios.get( API.API_ITEMDETAIL + `/${params.itemid }`).then ( resp => { LOGGER ('7FzS4oxYPN' , resp.data )
-		let { status , respdata}=resp.data
-		if (status == 'OK'){
-			setItemData( respdata )
-		}
-	})
-	}
   function getAuction() {
 		axios //      .get("http://3.35.1 17.87:34705/auction/list", { params: { limit: 8 } })
-			.get(API.API_COMMONITEMS + `/items/group_/kong/0/128/id/DESC` )
-      .then( resp => {	LOGGER( '' , resp.data )
-				let { status ,list }=resp.data
-				if ( status =='OK'){
-					setMoreCollection( list )
-				}
-//        console.log(res.data);
-  //      setMoreCollection(res.data);
+			.get(API.API_COMMONITEMS  )
+      .then((res) => {
+        console.log(res.data);
+        setMoreCollection(res.data);
       });
   }
 
-	useEffect (_=>{
-		getitem()
-		getAuction()
-	} , [] )
-/**   useEffect(() => {
+  useEffect(() => {
     axios
-      .ge t(`http://3.35.117.87:34705/auction/item/${params.dna}`)
+      .get(`http://3.35.117.87:34705/auction/item/${params.dna}`)
       .then((res) => {
         console.log(res.data[0]);
-        setItemD ata(res.data[0]);
+        setItemData(res.data[0]);
       });
+
     getAuction();
-  }, []); */
+  }, []);
 
   useEffect(() => {
     if (!moreRef.current.children[0]) return;
@@ -117,7 +102,7 @@ export default function AuctionDetail() {
         <MauctionDetailBox>
           <section className="itemInfoContainer">
             <span className="itemImgBox">
-              <img className="itemImg" src={itemData?.url } alt="" />
+              <img className="itemImg" src={itemData?.image} alt="" />
             </span>
 
             <article className="infoBox">
@@ -202,7 +187,7 @@ export default function AuctionDetail() {
 
                 <div className="contBox">
                   {category === 0 && <Offer />}
-                  {category === 1 && <Details itemData={itemData?.attributes} />}
+                  {category === 1 && <Details itemData={itemData.attributes} />}
                   {category === 2 && <Properties />}
                 </div>
               </div>
@@ -247,7 +232,7 @@ export default function AuctionDetail() {
                 <ul className="itemList" ref={moreRef}>
                   {moreCollection.map((cont, index) => (
                     <Fragment key={index}>
-                      <AuctionItem0228 data={cont} index={index} />
+                      <AuctionItem data={cont} index={index} />
                     </Fragment>
                   ))}
                 </ul>
@@ -269,14 +254,14 @@ export default function AuctionDetail() {
         <PauctionDetailBox>
           <section className="itemInfoContainer">
             <span className="itemImgBox">
-              <img className="itemImg" src={itemData?.url } alt="" />
+              <img className="itemImg" src={itemData?.image} alt="" />
             </span>
 
             <article className="infoBox">
               <div className="itemInfoBox">
                 <div className="titleBox">
                   <strong className="title">
-                    Series Kong {itemData?.titlename }
+                    Series Kong {itemData?.name}
                   </strong>
 
                   <div className="btnBox">
@@ -357,7 +342,7 @@ export default function AuctionDetail() {
 
                 <div className="contBox">
                   {category === 0 && <Offer />}
-                  {category === 1 && <Details itemData={itemData?.attributes} />}
+                  {category === 1 && <Details itemData={itemData.attributes} />}
                   {category === 2 && <Properties />}
                 </div>
               </div>
@@ -402,7 +387,7 @@ export default function AuctionDetail() {
                 <ul className="itemList" ref={moreRef}>
                   {moreCollection.map((cont, index) => (
                     <Fragment key={index}>
-                      <AuctionItem0228 data={cont} index={index} />
+                      <AuctionItem data={cont} index={index} />
                     </Fragment>
                   ))}
                 </ul>

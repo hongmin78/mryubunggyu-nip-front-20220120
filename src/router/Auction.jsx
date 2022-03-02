@@ -10,6 +10,7 @@ import SelectPopup from "../components/SelectPopup";
 import { useSelector } from "react-redux";
 import Header from "../components/header/Header";
 import axios from "axios";
+import { API} from '../configs/api'
 
 export default function Auction() {
   const searchBoxRef = useRef();
@@ -27,9 +28,14 @@ export default function Auction() {
 
   function getAuction() {
 		const fetchdata=_=>{
-   	 axios.get("http://nips1.net:34705/auction/list").then((res) => {
-    	console.log(res.data);
-      setAuctionList(res.data);
+//   	 axios.get("http://3.3 5.117.87:34705/auction/list").then((res) => {
+			axios.get(API.API_COMMONITEMS + `/items/group_/kong/0/32/id/DESC` ).then(resp=>{				
+			console.log(resp.data);
+			let { status , list }=resp.data 
+			if ( status =='OK' ) {
+				setAuctionList( list )
+			}
+      
     	});
 		}
 		fetchdata()

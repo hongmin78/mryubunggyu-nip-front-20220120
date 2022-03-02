@@ -18,26 +18,26 @@ import PopupBg from "../components/PopupBg";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import Header from "../components/header/Header";
+import axios from "axios";
+import { API } from '../configs/api' // import API from "../api/API";
+import { LOGGER } from "../util/common";
 
 export default function MarketDetail() {
   const navigate = useNavigate();
-  const param = useParams();
+  const params = useParams();
   const moreRef = useRef();
-
   const isMobile = useSelector((state) => state.common.isMobile);
-
   const [toggleLike, setToggleLike] = useState(false);
   const [category, setCategory] = useState(0);
   const [moreIndex, setMoreIndex] = useState(0);
   const [bidPopup, setBidPopup] = useState(false);
   const [showCopyBtn, setShowCopyBtn] = useState(false);
-
+	let [ itemdata , setitemdata ] =useState ()
   function onClickAuctionNextBtn() {
     const wrapWidth = moreRef.current.offsetWidth;
     const contWidth = moreRef.current.children[0].offsetWidth;
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
     const pageNum = Math.ceil(marketPlaceList.length / itemNumByPage);
-
     if (moreIndex < pageNum - 1) setMoreIndex(moreIndex + 1);
     else setMoreIndex(0);
   }
@@ -66,13 +66,24 @@ export default function MarketDetail() {
     }
   }, [moreIndex]);
 
+	const getitem=_=>{
+		axios.get( API.API_ITEMDETAIL + `/${params.itemid }`).then(resp=>{ LOGGER( 'BYLjMqzlfl' , resp.data )
+			let { status , respdata }=resp.data
+			if ( status == 'OK'){
+				setitemdata( respdata )
+			}
+		})
+	}
+	useEffect(_=>{
+		getitem()
+	} , [] )
   if (isMobile)
     return (
       <>
         <Header />
         <MmarketDetailBox>
           <section className="itemInfoContainer">
-            <img className="itemImg" src={E_detailItem} alt="" />
+            <img className="itemImg" src={itemdata?.url } alt="" /> 
 
             <article className="infoBox">
               <div className="itemInfoBox">
@@ -108,7 +119,7 @@ export default function MarketDetail() {
                     )}
                   </div>
 
-                  <strong className="title">Series Kong #9</strong>
+                  <strong className="title">Series Kong {itemdata?.titlename} </strong>
                 </div>
 
                 <div className="ownedBox">
@@ -211,7 +222,7 @@ export default function MarketDetail() {
             </div>
           </section>
 
-          {param.popup && (
+          {params.popup && (
             <>
               <BidPopup off={setBidPopup} />
               <PopupBg blur off={setBidPopup} />
@@ -230,12 +241,12 @@ export default function MarketDetail() {
         <Header />
         <PmarketDetailBox>
           <section className="itemInfoContainer">
-            <img className="itemImg" src={E_detailItem} alt="" />
+            <img className="itemImg" src={ itemdata?.url } alt="" />
 
             <article className="infoBox">
               <div className="itemInfoBox">
                 <div className="titleBox">
-                  <strong className="title">Series Kong #9</strong>
+                  <strong className="title">Series Kong { itemdata?.titlename }</strong>
 
                   <div className="btnBox">
                     <div className="posBox">
