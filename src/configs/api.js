@@ -18,6 +18,7 @@ const API={
 	, API_PREMIUMITEMS : URL + '/queries/rows'
 	, API_COMMONITEMS  : URL + '/queries/rows'
 	, API_ITEMDETAIL : URL + '/items/item' // /:itemid
+	,
 }
 
 export { 

@@ -21,8 +21,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import Header from "../components/header/Header";
 import axios from "axios";
 import { API } from '../configs/api' // import API from "../api/API";
-import { LOGGER } from "../util/common";
+import { LOGGER, getmyaddress } from "../util/common";
 import { ITEM_PRICE_DEF } from '../configs/configs'
+import SetErrorBar from "../util/SetErrorBar";
+import { messages } from "../configs/messages";
 export default function MarketDetail() {
   const navigate = useNavigate();
   const params = useParams();
@@ -35,6 +37,23 @@ export default function MarketDetail() {
   const [showCopyBtn, setShowCopyBtn] = useState(false);
 	let [ itemdata , setitemdata ] =useState ()
 	let [ marketPlaceList , setmarketPlaceList] =useState( [] )
+	const onclicklike=_=>{
+		let myaddress = getmyaddress()
+		if (myaddress){} else {SetErrorBar( messages.MSG_PLEASE_CONNECT_WALLET ) ; return }
+		axios.post ( API.API_TOGGLE_FAVORITE + `/${itemdata?.itemid}` , {username : myaddress } ).then(			resp=>{ LOGGER( '' , resp.data )
+			let { status , respdata }=resp.data
+			if ( status =='OK'){
+				setToggleLike ( respdata? true : false )
+				switch(+respdata ){
+					case 1 : SetErrorBar ( messages.MSG_DONE_LIKE )
+					break
+					default : SetErrorBar ( messages.MSG_DONE_UNLIKE)
+					break
+				}
+			}
+		}	)
+		setToggleLike(!toggleLike)
+	} 
   function onClickAuctionNextBtn() {
     const wrapWidth = moreRef.current.offsetWidth;
     const contWidth = moreRef.current.children[0].offsetWidth;
@@ -105,7 +124,9 @@ export default function MarketDetail() {
                     <div className="btnBox">
                       <button
                         className="likeBtn hoverBtn"
-                        onClick={() => setToggleLike(!toggleLike)}
+												onClick={() => { 
+													onclicklike()													
+												} }
                       >
                         <img src={toggleLike ? I_heartO : I_heart} alt="" />
                       </button>
@@ -265,7 +286,9 @@ export default function MarketDetail() {
                     <div className="posBox">
                       <button
                         className="likeBtn hoverBtn"
-                        onClick={() => setToggleLike(!toggleLike)}
+												onClick={() => {
+													onclicklike()
+												} }
                       >
                         <img src={toggleLike ? I_heartO : I_heart} alt="" />
                       </button>

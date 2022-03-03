@@ -8,6 +8,15 @@ const ISFINITE = Number.isFinite;
 const STRINGER = JSON.stringify;
 const PARSER = JSON.parse
 
+const conv_jdata_arrkeyvalue=jdata=>{
+	if (jdata){}
+	else {return [] } 
+	if (KEYS( jdata).length ){}
+	else {return [] }
+	return KEYS( jdata ).map ( elem =>{ 
+		return {key : elem , value : jdata[elem ]}
+	})
+}
 const getobjtype=object=>{
   var stringConstructor = "test".constructor;
   var arrayConstructor = [].constructor;
@@ -198,7 +207,18 @@ const show_in_exp_form = (number) => {
   return (+number).toExponential();
 };
 const POST_ON_CONFIRM_OR_RECEIPT = 1;
+function onclickcopy ( copyText ) {
+	const textArea = document.createElement("textarea");
+	document.body.appendChild(textArea);
+//	const copyText = `${url}/${document.location.hash}`;
+	textArea.value = copyText;
+	textArea.select();
+	document.execCommand("copy");
+	document.body.removeChild(textArea);
+//	SetErrorBar("Link Copied!");
+}
 export {
+	conv_jdata_arrkeyvalue ,
 	getobjtype ,
   LOGGER,
   ISFINITE,
@@ -219,5 +239,6 @@ export {
   getqueriesspeckey,
   get_lasttoken_url,
   show_in_exp_form,
-  POST_ON_CONFIRM_OR_RECEIPT,
+	POST_ON_CONFIRM_OR_RECEIPT,
+	onclickcopy
 };

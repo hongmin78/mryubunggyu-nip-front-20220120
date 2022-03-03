@@ -12,14 +12,20 @@ import { autoAuctionList } from "../data/Dmain";
 // import AuctionItem from "../components/AuctionItem";
 import AuctionItem0228 from "../components/AuctionItem0228";
 import Details from "../components/itemDetail/Details";
+import Details0303 from "../components/itemDetail/Details0303";
+
 import Properties from "../components/itemDetail/Properties";
 import { useSelector } from "react-redux";
 import Header from "../components/header/Header";
 import PopupBg from "../components/PopupBg";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import { LOGGER } from "../util/common";
+import { LOGGER , getmyaddress, onclickcopy, PARSER
+	, conv_jdata_arrkeyvalue
+} from "../util/common";
 import { API } from "../configs/api";
+import SetErrorBar from '../util/SetErrorBar'
+import { messages } from '../configs/messages'
 
 export default function AuctionDetail() {
   const params = useParams();
@@ -29,8 +35,26 @@ export default function AuctionDetail() {
   const [category, setCategory] = useState(0);
   const [moreIndex, setMoreIndex] = useState(0);
   const [showCopyBtn, setShowCopyBtn] = useState(false);
-  const [itemData, setItemData ] = useState({});
+  const [itemdata, setitemdata ] = useState({});
   const [moreCollection, setMoreCollection] = useState([]);
+	let [ attributes , setattributes ] = useState ( [] )
+	const onclicklike=_=>{
+		let myaddress = getmyaddress()
+		if (myaddress){} else {SetErrorBar( messages.MSG_PLEASE_CONNECT_WALLET ) ; return }
+		axios.post ( API.API_TOGGLE_FAVORITE + `/${itemdata?.itemid}` , {username : myaddress } ).then(			resp=>{ LOGGER( '' , resp.data )
+			let { status , respdata }=resp.data
+			if ( status =='OK'){
+				setToggleLike ( respdata? true : false )
+				switch(+respdata ){
+					case 1 : SetErrorBar ( messages.MSG_DONE_LIKE )
+					break
+					default : SetErrorBar ( messages.MSG_DONE_UNLIKE)
+					break
+				}
+			}
+		}	)
+		setToggleLike(!toggleLike)
+	}
 
 	const onclickfavorite=_=>{
 		axios.post (API.API_TOGGLE_FAVORITE ).then(resp=>{
@@ -45,16 +69,20 @@ export default function AuctionDetail() {
     const contWidth = moreRef.current.children[0].offsetWidth;
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
     const pageNum = Math.ceil(autoAuctionList.length / itemNumByPage);
-
     if (moreIndex < pageNum - 1) setMoreIndex(moreIndex + 1);
     else setMoreIndex(0);
   }
-
 	const getitem=_=>{
 		axios.get( API.API_ITEMDETAIL + `/${params.itemid }`).then ( resp => { LOGGER ('7FzS4oxYPN' , resp.data )
 		let { status , respdata}=resp.data
 		if (status == 'OK'){
-			setItemData( respdata )
+			setitemdata( respdata )
+			let { metadata}=respdata
+			if ( metadata ) {
+				let jmetadata= PARSER( metadata )
+				LOGGER ( 'oXhffF8eTM' , conv_jdata_arrkeyvalue ( jmetadata ) )
+				setattributes ( conv_jdata_arrkeyvalue ( jmetadata ) )
+			}
 		}
 	})
 	}
@@ -87,14 +115,12 @@ export default function AuctionDetail() {
 
   useEffect(() => {
     if (!moreRef.current.children[0]) return;
-
     const wrapWidth = moreRef.current.offsetWidth;
     const contWidth = moreRef.current.children[0].offsetWidth;
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
-
     if (moreRef.current?.scrollTo) {
       if (moreIndex === 0) {
-        moreRef.current.scrollTo({
+        moreRef.current.scrollTo( {
           left: 0,
           behavior: "smooth",
         });
@@ -117,7 +143,7 @@ export default function AuctionDetail() {
         <MauctionDetailBox>
           <section className="itemInfoContainer">
             <span className="itemImgBox">
-              <img className="itemImg" src={itemData?.url } alt="" />
+              <img className="itemImg" src={itemdata?.url } alt="" />
             </span>
 
             <article className="infoBox">
@@ -127,7 +153,7 @@ export default function AuctionDetail() {
                     <div className="btnBox">
                       <button
                         className="likeBtn hoverBtn"
-												onClick={() => { onclickfavorite ()
+												onClick={() => { onclicklike () // onclick favorite ()
 												} }
                       >
                         <img src={toggleLike ? I_heartO : I_heart} alt="" />
@@ -145,7 +171,11 @@ export default function AuctionDetail() {
                       <>
                         <button
                           className="copyBtn displayBtn"
-                          onClick={() => {}}
+                          onClick={() => {
+														onclickcopy ( window.location.href )
+														SetErrorBar(messages.MSG_COPIED )
+														setShowCopyBtn(false)														
+													}}
                         >
                           <img src={I_clip} alt="" />
                           Copy Link
@@ -202,8 +232,8 @@ export default function AuctionDetail() {
 
                 <div className="contBox">
                   {category === 0 && <Offer />}
-                  {category === 1 && <Details itemData={itemData?.attributes} />}
-                  {category === 2 && <Properties />}
+                  {category === 1 && <Details0303 attributes={ attributes } />}
+                  {category === 2 && <Properties itemdata={ itemdata } />}
                 </div>
               </div>
             </article>
@@ -269,21 +299,21 @@ export default function AuctionDetail() {
         <PauctionDetailBox>
           <section className="itemInfoContainer">
             <span className="itemImgBox">
-              <img className="itemImg" src={itemData?.url } alt="" />
+              <img className="itemImg" src={itemdata?.url } alt="" />
             </span>
 
             <article className="infoBox">
               <div className="itemInfoBox">
                 <div className="titleBox">
                   <strong className="title">
-                    Series Kong {itemData?.titlename }
+                    Series Kong {itemdata?.titlename }
                   </strong>
 
                   <div className="btnBox">
                     <div className="posBox">
                       <button
                         className="likeBtn hoverBtn"
-												onClick={() => { onclickfavorite()
+												onClick={() => { onclicklike () // onclickfavorite()
 												} }
                       >
                         <img src={toggleLike ? I_heartO : I_heart} alt="" />
@@ -301,7 +331,11 @@ export default function AuctionDetail() {
                       <div className="hoverBox">
                         <button
                           className="copyBtn displayBtn"
-                          onClick={() => setShowCopyBtn(false)}
+													onClick={() =>{ 
+														onclickcopy ( window.location.href )
+														SetErrorBar(messages.MSG_COPIED )
+														setShowCopyBtn(false)														
+													}}
                         >
                           <img src={I_clip} alt="" />
                           Copy Link
@@ -357,8 +391,8 @@ export default function AuctionDetail() {
 
                 <div className="contBox">
                   {category === 0 && <Offer />}
-                  {category === 1 && <Details itemData={itemData?.attributes} />}
-                  {category === 2 && <Properties />}
+                  {category === 1 && <Details0303 attributes={ attributes } />}
+                  {category === 2 && <Properties itemdata={ itemdata } />}
                 </div>
               </div>
             </article>

@@ -5,7 +5,7 @@ import I_eye from "../../img/icon/I_eye.svg";
 import { useSelector } from "react-redux";
 import { URL_METADATA_BASE } from '../../configs/configs'
 
-export default function Properties() {
+export default function Properties( { itemdata } ) {
   const isMobile = useSelector((state) => state.common.isMobile);
 
   if (isMobile)
@@ -19,7 +19,8 @@ export default function Properties() {
         </li>
         <li>
           <button className="" onClick={() => {
-						window.open ( URL_METADATA_BASE + '' )
+//						window.open ( URL_METADATA_BASE + '' )
+						window.open ( itemdata?.metadataurl )
 					}}>
             <img src={I_cube} alt="" />
             <p>View metadata</p>
