@@ -88,7 +88,7 @@ export default function MyItems() {
 
             <div className="infoBox">
               <div className="titleBox">
-                <strong className="title">Kingkong #58</strong>
+                <strong className="title">Lucky Ticket #38</strong>
               </div>
 
               <div className="ownedBox">
@@ -158,7 +158,7 @@ export default function MyItems() {
 
             <div className="infoBox">
               <div className="titleBox">
-                <strong className="title">Kingkong #58</strong>
+                <strong className="title">Lucky Ticket #38</strong>
               </div>
 
               <div className="ownedBox">
@@ -350,7 +350,7 @@ export default function MyItems() {
 
             <div className="infoBox">
               <div className="titleBox">
-                <strong className="title">Kingkong #58</strong>
+                <strong className="title">Lucky Ticket #38</strong>
               </div>
 
               <div className="ownedBox">
@@ -421,7 +421,7 @@ export default function MyItems() {
 
             <div className="infoBox">
               <div className="titleBox">
-                <strong className="title">Kingkong #58</strong>
+                <strong className="title">Lucky Ticket #38</strong>
               </div>
 
               <div className="ownedBox">

@@ -1,27 +1,42 @@
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useRef, useState, useEffect } from "react";
 import styled from "styled-components";
 import I_search from "../img/icon/I_search.svg";
 import I_dnArw from "../img/icon/I_dnArw.svg";
 import Footer from "./Footer";
 import PopupBg from "../components/PopupBg";
 import MarketItem from "../components/MarketItem";
+import MarketItem0227 from '../components/MarketItem0227'
+
 import { D_marketItemList, D_sortList } from "../data/Dmarket";
 import SelectPopup from "../components/SelectPopup";
 import { useSelector } from "react-redux";
 import Header from "../components/header/Header";
+import { API } from '../configs/api'
+import { LOGGER } from "../util/common";
+import axios from 'axios'
 
 export default function Market() {
   const searchBoxRef = useRef();
   const sortBtnRef = useRef();
-
   const isMobile = useSelector((state) => state.common.isMobile);
-
   const [search, setSearch] = useState("");
   const [sortOpt, setSortOpt] = useState(D_sortList[1]);
   const [sortPopup, setSortPopup] = useState(false);
   const [likeObj, setLikeObj] = useState({});
   const [limit, setLimit] = useState(8);
-
+	let [ D_marketItemList , setD_marketItemList ] = useState( [] )
+	const fetchdata=()=>{
+		axios.get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC`).then(resp=>{
+			LOGGER('' , resp.data )
+			let { status , list } = resp.data
+			if ( status == 'OK' ) {
+				setD_marketItemList ( list )
+			}
+		})
+	}
+	useEffect(()=>{
+		fetchdata()
+	}, [] )
   if (isMobile)
     return (
       <>
@@ -80,11 +95,11 @@ export default function Market() {
             </section>
 
             <ul className="itemList">
-              {D_marketItemList.map((cont, index) => {
+              {D_marketItemList.map( (cont, index) => {
                 if (index < limit)
                   return (
                     <Fragment key={index}>
-                      <MarketItem
+                      <MarketItem0227
                         data={cont}
                         index={index}
                         likeObj={likeObj}
@@ -165,7 +180,7 @@ export default function Market() {
               if (index < limit)
                 return (
                   <Fragment key={index}>
-                    <MarketItem
+                    <MarketItem0227
                       data={cont}
                       index={index}
                       likeObj={likeObj}

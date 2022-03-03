@@ -94,7 +94,6 @@ export default function StakingDetail() {
 
           <article className="settingContainer">
             <img className="title" src={E_title} alt="" />
-
             <div className="contBox">
               <div className="availbleBox">
                 <p className="key">Available Balance</p>
@@ -116,6 +115,9 @@ export default function StakingDetail() {
                 Staking
                 {/* You don’t have enough USDT */}
               </button>
+							<span style={{color:'#fff'}}><br/>You can participate in Subscription Auction by staking the LUCKY TICKET
+							</span>
+
             </div>
           </article>
 
@@ -168,6 +170,8 @@ export default function StakingDetail() {
                 Staking
                 {/* You don’t have enough USDT */}
               </button>
+							<span style={{color:'#fff'}}><br/>You can participate in Subscription Auction by staking the LUCKY TICKET
+							</span>
             </div>
           </article>
 

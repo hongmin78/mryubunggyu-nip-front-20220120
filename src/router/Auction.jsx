@@ -3,6 +3,7 @@ import styled from "styled-components";
 import I_search from "../img/icon/I_search.svg";
 import I_dnArw from "../img/icon/I_dnArw.svg";
 import AuctionItem from "../components/AuctionItem";
+import AuctionItem0228 from "../components/AuctionItem0228";
 import { D_sortList } from "../data/Dauction";
 import Footer from "./Footer";
 import PopupBg from "../components/PopupBg";
@@ -15,35 +16,26 @@ import { API} from '../configs/api'
 export default function Auction() {
   const searchBoxRef = useRef();
   const sortBtnRef = useRef();
-
   const isMobile = useSelector((state) => state.common.isMobile);
-
   const [search, setSearch] = useState("");
   const [sortOpt, setSortOpt] = useState(D_sortList[1]);
   const [sortPopup, setSortPopup] = useState(false);
   const [likeObj, setLikeObj] = useState({});
   const [limit, setLimit] = useState(8);
-
   const [auctionList, setAuctionList] = useState([]);
 
-  function getAuction() {
-		const fetchdata=_=>{
-//   	 axios.get("http://3.3 5.117.87:34705/auction/list").then((res) => {
-			axios.get(API.API_COMMONITEMS + `/items/group_/kong/0/32/id/DESC` ).then(resp=>{				
-			console.log(resp.data);
+	const fetchdata=_=>{		//   	 axios.get("http://3.3 5.117.87:34705/auction/list").then((res) => {
+		axios.get(API.API_COMMONITEMS + `/items/group_/kong/0/32/id/DESC` ).then(resp=>{						console.log(resp.data);
 			let { status , list }=resp.data 
 			if ( status =='OK' ) {
 				setAuctionList( list )
 			}
-      
-    	});
-		}
-		fetchdata()
+		});
 	}
-
-  useEffect(() => {
-    getAuction();
-  }, []);
+//  function getAuction() {		fetchdata()	}
+  useEffect(() => { 		// getAuction();
+		fetchdata()
+  }, [] )
 
   if (isMobile)
     return (
@@ -107,7 +99,7 @@ export default function Auction() {
                 if (index < limit)
                   return (
                     <Fragment key={index}>
-                      <AuctionItem
+                      <AuctionItem0228
                         data={cont}
                         index={index}
                         likeObj={likeObj}
@@ -190,7 +182,7 @@ export default function Auction() {
               if (index < limit)
                 return (
                   <Fragment key={index}>
-                    <AuctionItem
+                    <AuctionItem0228
                       data={cont}
                       index={index}
                       likeObj={likeObj}

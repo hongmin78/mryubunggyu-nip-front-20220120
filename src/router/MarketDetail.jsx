@@ -13,6 +13,7 @@ import { marketPlaceList } from "../data/Dmain";
 import Details from "../components/itemDetail/Details";
 import Properties from "../components/itemDetail/Properties";
 import MarketItem from "../components/MarketItem";
+import MarketItem0227 from "../components/MarketItem0227";
 import BidPopup from "../components/BidPopup";
 import PopupBg from "../components/PopupBg";
 import { useSelector } from "react-redux";
@@ -21,7 +22,7 @@ import Header from "../components/header/Header";
 import axios from "axios";
 import { API } from '../configs/api' // import API from "../api/API";
 import { LOGGER } from "../util/common";
-
+import { ITEM_PRICE_DEF } from '../configs/configs'
 export default function MarketDetail() {
   const navigate = useNavigate();
   const params = useParams();
@@ -33,6 +34,7 @@ export default function MarketDetail() {
   const [bidPopup, setBidPopup] = useState(false);
   const [showCopyBtn, setShowCopyBtn] = useState(false);
 	let [ itemdata , setitemdata ] =useState ()
+	let [ marketPlaceList , setmarketPlaceList] =useState( [] )
   function onClickAuctionNextBtn() {
     const wrapWidth = moreRef.current.offsetWidth;
     const contWidth = moreRef.current.children[0].offsetWidth;
@@ -43,6 +45,8 @@ export default function MarketDetail() {
   }
 
   useEffect(() => {
+		if (moreRef && moreRef?.current?.children[0]?.offsetWidth ){}
+		else {return }
     const wrapWidth = moreRef.current.offsetWidth;
     const contWidth = moreRef.current.children[0].offsetWidth;
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
@@ -65,7 +69,6 @@ export default function MarketDetail() {
       }
     }
   }, [moreIndex]);
-
 	const getitem=_=>{
 		axios.get( API.API_ITEMDETAIL + `/${params.itemid }`).then(resp=>{ LOGGER( 'BYLjMqzlfl' , resp.data )
 			let { status , respdata }=resp.data
@@ -74,8 +77,18 @@ export default function MarketDetail() {
 			}
 		})
 	}
+	const getotheritems = _=>{
+		axios.get( API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC`)
+		.then(resp =>{ LOGGER( '' , resp.data )
+			let { status , list }=resp.data
+			if ( status == 'OK'){
+				setmarketPlaceList( list )
+			}
+		})
+	}
 	useEffect(_=>{
 		getitem()
+		getotheritems()
 	} , [] )
   if (isMobile)
     return (
@@ -131,7 +144,7 @@ export default function MarketDetail() {
                   <div className="price">
                     <p className="key">Current price</p>
                     <strong className="value">
-                      {putCommaAtPrice(100)} USDT
+                      { itemdata?.group_=='kong'? '100':ITEM_PRICE_DEF } USDT
                     </strong>
                   </div>
 
@@ -211,7 +224,7 @@ export default function MarketDetail() {
                 <ul className="itemList" ref={moreRef}>
                   {marketPlaceList.map((cont, index) => (
                     <Fragment key={index}>
-                      <MarketItem data={cont} index={index} />
+                      <MarketItem0227 data={cont} index={index} />
                     </Fragment>
                   ))}
                 </ul>
@@ -291,8 +304,8 @@ export default function MarketDetail() {
                   </div>
 
                   <div className="value">
-                    <strong className="price">
-                      {putCommaAtPrice(588)} USDT
+                    <strong className="price">                      
+											{ itemdata?.group_=='kong'? '100':ITEM_PRICE_DEF } USDT
                     </strong>
 
                     <ul className="timeList">
@@ -372,7 +385,7 @@ export default function MarketDetail() {
                 <ul className="itemList" ref={moreRef}>
                   {marketPlaceList.map((cont, index) => (
                     <Fragment key={index}>
-                      <MarketItem data={cont} index={index} />
+                      <MarketItem0227 data={cont} index={index} />
                     </Fragment>
                   ))}
                 </ul>

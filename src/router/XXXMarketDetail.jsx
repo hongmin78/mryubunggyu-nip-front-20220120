@@ -281,7 +281,7 @@ export default function MarketDetail() {
 
                   <div className="value">
                     <strong className="price">
-                      {putCommaAtPrice(588)} USDT
+                      {putCommaAtPrice(372)} USDT
                     </strong>
 
                     <ul className="timeList">
