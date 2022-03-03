@@ -4,6 +4,7 @@ import I_heartO from "../img/icon/I_heartO.svg";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import moment from "moment";
 
 export default function MarketItem({ data, index, likeObj, setLikeObj }) {
   const navigate = useNavigate();
@@ -22,12 +23,12 @@ export default function MarketItem({ data, index, likeObj, setLikeObj }) {
     return (
       <Mitem
         className="item"
-        onClick={() => navigate(`/market/detail/${data?.itemid }`)}
+        onClick={() => navigate(`/market/detail/${data?.itemid}`)}
       >
         <div className="topBar">
           <div className="profBox">
-            <img src={data.profImg} alt="" />
-            <p className="address">{strDot(data.address, 5, 4)}</p>
+            <img src={data?.url} alt="" />
+            <p className="address">{strDot("0x5c7MMMMd8d7", 5, 4)}</p>
           </div>
 
           {likeObj && (
@@ -48,10 +49,10 @@ export default function MarketItem({ data, index, likeObj, setLikeObj }) {
           )}
         </div>
 
-        <img className="itemImg" src={data.item} alt="" />
+        <img className="itemImg" src={data.url} alt="" />
 
         <div className="infoBox">
-          <p className="title">{data.title}</p>
+          <p className="title">{data.titlename}</p>
 
           <ul className="detailList">
             <li>
@@ -63,7 +64,7 @@ export default function MarketItem({ data, index, likeObj, setLikeObj }) {
                 {data.price}&nbsp;{data.unit}
               </p>
 
-              <p>{data.time}</p>
+              <p>{moment(data.createdat).fromNow()}</p>
             </li>
           </ul>
         </div>
@@ -73,12 +74,12 @@ export default function MarketItem({ data, index, likeObj, setLikeObj }) {
     return (
       <Pitem
         className="item"
-        onClick={() => navigate(`/market/detail/${data?.itemid }`)}
+        onClick={() => navigate(`/market/detail/${data?.itemid}`)}
       >
         <div className="topBar">
           <div className="profBox">
-            <img src={data.profImg} alt="" />
-            <p className="address">{strDot(data.address, 5, 4)}</p>
+            <img src={data.url} alt="" />
+            <p className="address">{strDot("0x5c7MMMMd8d7", 5, 4)}</p>
           </div>
 
           {likeObj && (
@@ -99,10 +100,10 @@ export default function MarketItem({ data, index, likeObj, setLikeObj }) {
           )}
         </div>
 
-        <img className="itemImg" src={data.item} alt="" />
+        <img className="itemImg" src={data.url} alt="" />
 
         <div className="infoBox">
-          <p className="title">{data.title}</p>
+          <p className="title">{data.titlename}</p>
 
           <ul className="detailList">
             <li>
@@ -114,7 +115,7 @@ export default function MarketItem({ data, index, likeObj, setLikeObj }) {
                 {data.price}&nbsp;{data.unit}
               </p>
 
-              <p>{data.time}</p>
+              <p>{moment(data.createdat).fromNow()}</p>
             </li>
           </ul>
         </div>

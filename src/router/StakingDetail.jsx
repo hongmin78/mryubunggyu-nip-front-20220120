@@ -9,70 +9,75 @@ import StakingPopup from "../components/StakingPopup";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import Header from "../components/header/Header";
-import { addresses } from '../configs/addresses'
+import { addresses } from "../configs/addresses";
 import axios from "axios";
-import { API } from '../configs/api'
-import { LOGGER } from '../util/common'
+import { API } from "../configs/api";
+import { LOGGER } from "../util/common";
 import { query_with_arg, getabistr_forfunction } from "../util/contract-calls";
-import { getmyaddress } from '../util/common'
-import { messages } from '../configs/messages'
+import { getmyaddress } from "../util/common";
+import { messages } from "../configs/messages";
 import SetErrorBar from "../util/SetErrorBar";
 import { TIME_PAGE_TRANSITION_DEF } from "../configs/configs";
 // import { useSelector } from "react-redux";
 export default function StakingDetail() {
-  const navigate = useNavigate()
-  const param = useParams()
+  const navigate = useNavigate();
+  const param = useParams();
   const isMobile = useSelector((state) => state.common.isMobile);
-  const [ stakingPopup , setStakingPopup ] = useState(false);
-	let [ currentserialnumber , setcurrentserialnumber]=useState()
-	let myaddress = getmyaddress()
-  let isLogin = useSelector((state) => state.common.isLogin )
-	const onclickstakingbutton = async _=>{
-		let myaddress = getmyaddress()
-		const querybalance= _=>{
-			return query_with_arg( {
-				contractaddress : addresses.contract_USDT
-				, abikind : 'ERC20'
-				, methodname : 'balanceOf'
-				, aargs : [ myaddress ] 
-			})
-		}
-		if ( isLogin ){
-			let resp = await querybalance( )
-			LOGGER( 'h8UpKsxO1Y' , resp )
-		}
-		else {
-			SetErrorBar( messages.MSG_PLEASE_CONNECT_WALLET )
-			setTimeout(_=>{
-				navigate ( "/connectwallet" )
-			} , TIME_PAGE_TRANSITION_DEF )
-			return 
-		}
-		setStakingPopup(true)
-	}
-	useEffect ( _=> {
-		LOGGER( 'vF16Vg7wEA' , isLogin )
-	} , [ isLogin ] )
-	useEffect ( _=>{  return //		alert(myaddress)
-		LOGGER( '' , myaddress )
-		if ( myaddress ){}
-		else {			
-			LOGGER(messages.MSG_PLEASE_CONNECT_WALLET ); return }
-//		LOGGER(API.API_MAX + `/tickets/serialnumber`)
-//		return
-/** 		false && axios.get ( API.API_MAX + `/tickets/serialnumber`).then(resp=>{ LOGGER('' , resp.data )
+  const [stakingPopup, setStakingPopup] = useState(false);
+  let [currentserialnumber, setcurrentserialnumber] = useState();
+  let myaddress = getmyaddress();
+  let isLogin = useSelector((state) => state.common.isLogin);
+  const onclickstakingbutton = async (_) => {
+    let myaddress = getmyaddress();
+    const querybalance = (_) => {
+      return query_with_arg({
+        contractaddress: addresses.contract_USDT,
+        abikind: "ERC20",
+        methodname: "balanceOf",
+        aargs: [myaddress],
+      });
+    };
+    if (isLogin) {
+      let resp = await querybalance();
+      LOGGER("h8UpKsxO1Y", resp);
+    } else {
+      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+      setTimeout((_) => {
+        navigate("/connectwallet");
+      }, TIME_PAGE_TRANSITION_DEF);
+      return;
+    }
+    setStakingPopup(true);
+  };
+  useEffect(
+    (_) => {
+      LOGGER("vF16Vg7wEA", isLogin);
+    },
+    [isLogin]
+  );
+  useEffect((_) => {
+    return; //		alert(myaddress)
+    LOGGER("", myaddress);
+    if (myaddress) {
+    } else {
+      LOGGER(messages.MSG_PLEASE_CONNECT_WALLET);
+      return;
+    }
+    //		LOGGER(API.API_MAX + `/tickets/serialnumber`)
+    //		return
+    /** 		false && axios.get ( API.API_MAX + `/tickets/serialnumber`).then(resp=>{ LOGGER('' , resp.data )
 			let { status , payload } =resp.data
 			if ( status == 'OK' ){
 //				setcurrentserialnumber ( payload.max ? payload.max : 0 )
 			}
 		})*/
-		/*query_with_arg ( {contractaddress : addresses.contract_USDT
+    /*query_with_arg ( {contractaddress : addresses.contract_USDT
 			, abikind : 'ERC20'
 			, methodname : 'balanceOf'
 			, aargs : [ myaddress ] 
 		} ) 		.then(resp=>{					LOGGER( 'R6H63xkTcs' , resp )
-		}) */		
-	} , [] )
+		}) */
+  }, []);
   if (isMobile)
     return (
       <>
@@ -93,7 +98,7 @@ export default function StakingDetail() {
           </article>
 
           <article className="settingContainer">
-            <img className="title" src={E_title} alt="" />
+            <strong className="title">STAKE LUCKY TICKET</strong>
             <div className="contBox">
               <div className="availbleBox">
                 <p className="key">Available Balance</p>
@@ -108,16 +113,21 @@ export default function StakingDetail() {
 
               <p className="explain">Unstake period: 3 months</p>
 
-							<button className="confirmBtn" onClick={() => { 
-								onclickstakingbutton()
-								false && navigate("popup")
-							} }>
+              <button
+                className="confirmBtn"
+                onClick={() => {
+                  onclickstakingbutton();
+                  false && navigate("popup");
+                }}
+              >
                 Staking
                 {/* You don’t have enough USDT */}
               </button>
-							<span style={{color:'#fff'}}><br/>You can participate in Subscription Auction by staking the LUCKY TICKET
-							</span>
-
+              <span style={{ color: "#fff" }}>
+                <br />
+                You can participate in Subscription Auction by staking the LUCKY
+                TICKET
+              </span>
             </div>
           </article>
 
@@ -145,7 +155,7 @@ export default function StakingDetail() {
           </article>
 
           <article className="settingContainer">
-            <img className="title" src={E_title} alt="" />
+            <strong className="title">STAKE LUCKY TICKET</strong>
 
             <div className="contBox">
               <div className="availbleBox">
@@ -163,15 +173,18 @@ export default function StakingDetail() {
 
               <button
                 className="confirmBtn"
-								onClick={() =>{ 
-									onclickstakingbutton()
-								}}
+                onClick={() => {
+                  onclickstakingbutton();
+                }}
               >
                 Staking
                 {/* You don’t have enough USDT */}
               </button>
-							<span style={{color:'#fff'}}><br/>You can participate in Subscription Auction by staking the LUCKY TICKET
-							</span>
+              <span style={{ color: "#fff" }}>
+                <br />
+                You can participate in Subscription Auction by staking the LUCKY
+                TICKET
+              </span>
             </div>
           </article>
 
@@ -262,9 +275,9 @@ const MstakingBox = styled.div`
     margin: 12.22vw 0 0 0;
 
     .title {
-      height: 5.55vw;
-      padding: 0 3.33vw;
-      object-fit: cover;
+      color: #fff;
+      font-size: 5.55vw;
+      line-height: 5.55vw;
     }
 
     .contBox {
@@ -392,7 +405,9 @@ const PstakingBox = styled.div`
     width: 480px;
 
     .title {
-      height: 29px;
+      color: #fff;
+      font-size: 30px;
+      line-height: 30px;
     }
 
     .contBox {
