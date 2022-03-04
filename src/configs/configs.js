@@ -1,6 +1,6 @@
 
 // const MIN_STAKE_AMOUNT = 33 // 100
-const MIN_STAKE_AMOUNT = 
+const MIN_STAKE_AMOUNT = 100
 
 /********* await-tx-mined */
 const TXREQSTATUS_POLL_INTERVAL = 3000

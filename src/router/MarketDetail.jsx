@@ -84,7 +84,7 @@ export default function MarketDetail() {
               20
             : contWidth * itemNumByPage * moreIndex + itemNumByPage * 40,
           behavior: "smooth",
-        });
+       });
       }
     }
   }, [moreIndex]);
