@@ -169,7 +169,7 @@ export default function MyItems() {
               <div className="saleBox">
                 <div className="price">
                   <p className="key">Current price</p>
-                  <strong className="value">{putCommaAtPrice(100)} USDT</strong>
+                  <strong className="value">{putCommaAtPrice(686)} USDT</strong>
                 </div>
 
                 <div className="time">
@@ -436,7 +436,7 @@ export default function MyItems() {
                 </div>
 
                 <div className="value">
-                  <strong className="price">{putCommaAtPrice(100)} USDT</strong>
+                  <strong className="price">{putCommaAtPrice(686)} USDT</strong>
 
                   <ul className="timeList">
                     <li>00</li>

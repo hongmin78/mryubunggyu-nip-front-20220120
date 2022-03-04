@@ -153,7 +153,7 @@ export default function MarketDetail() {
                     )}
                   </div>
 
-                  <strong className="title">Series Kong {itemdata?.titlename} </strong>
+                  <strong className="title">King Kong {itemdata?.titlename} </strong>
                 </div>
 
                 <div className="ownedBox">
@@ -280,7 +280,7 @@ export default function MarketDetail() {
             <article className="infoBox">
               <div className="itemInfoBox">
                 <div className="titleBox">
-                  <strong className="title">Series Kong { itemdata?.titlename }</strong>
+                  <strong className="title">King Kong { itemdata?.titlename }</strong>
 
                   <div className="btnBox">
                     <div className="posBox">
