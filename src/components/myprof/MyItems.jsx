@@ -88,7 +88,7 @@ export default function MyItems() {
 
             <div className="infoBox">
               <div className="titleBox">
-                <strong className="title">Lucky Ticket #38</strong>
+                <strong className="title">Lucky Ticket #00001</strong>
               </div>
 
               <div className="ownedBox">
@@ -158,7 +158,7 @@ export default function MyItems() {
 
             <div className="infoBox">
               <div className="titleBox">
-                <strong className="title">Lucky Ticket #38</strong>
+                <strong className="title">Series Kong #010000</strong>
               </div>
 
               <div className="ownedBox">
@@ -169,7 +169,7 @@ export default function MyItems() {
               <div className="saleBox">
                 <div className="price">
                   <p className="key">Current price</p>
-                  <strong className="value">{putCommaAtPrice(686)} USDT</strong>
+                  <strong className="value">{putCommaAtPrice(372)} USDT</strong>
                 </div>
 
                 <div className="time">
@@ -186,7 +186,7 @@ export default function MyItems() {
               <ul className="priceBox">
                 <li>
                   <p className="key">Current price</p>
-                  <p className="value">586 USDT</p>
+                  <p className="value">372 USDT</p>
                 </li>
                 <li>
                   <p className="key">Transaction price</p>
@@ -226,7 +226,7 @@ export default function MyItems() {
 
             <div className="infoBox">
               <div className="titleBox">
-                <strong className="title">Series Kong #112</strong>
+                <strong className="title">King Kong #010000</strong>
               </div>
 
               <div className="ownedBox">
@@ -350,7 +350,7 @@ export default function MyItems() {
 
             <div className="infoBox">
               <div className="titleBox">
-                <strong className="title">Lucky Ticket #38</strong>
+                <strong className="title">Lucky Ticket #00001</strong>
               </div>
 
               <div className="ownedBox">
@@ -421,7 +421,7 @@ export default function MyItems() {
 
             <div className="infoBox">
               <div className="titleBox">
-                <strong className="title">Lucky Ticket #38</strong>
+                <strong className="title">Series Kong #010000</strong>
               </div>
 
               <div className="ownedBox">
@@ -436,7 +436,7 @@ export default function MyItems() {
                 </div>
 
                 <div className="value">
-                  <strong className="price">{putCommaAtPrice(686)} USDT</strong>
+                  <strong className="price">{putCommaAtPrice(372)} USDT</strong>
 
                   <ul className="timeList">
                     <li>00</li>
@@ -490,7 +490,7 @@ export default function MyItems() {
 
             <div className="infoBox">
               <div className="titleBox">
-                <strong className="title">Series Kong #112</strong>
+                <strong className="title">King Kong #010000</strong>
               </div>
 
               <div className="ownedBox">

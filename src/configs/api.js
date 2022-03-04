@@ -7,10 +7,9 @@ const API={
 		API_MAX	: URL + `/queries/max` // /:tablename/:fieldname
 	, API_TXS	: URL + '/transactions' // /:txhash
 	, API_TICKERS : URL + '/tickers'
-	, API_USERINFO : URL + '/users/info'
+	, API_USERINFO : `${URL}/users/info`
 	, API_TOGGLE_FAVORITE : URL + '/favorites/toggle'
 	, API_LOGIN : URL + '/users/login'
-
 	, API_EMAIL_REQUEST : URL + '/signup/email/request'
 	, API_SIGNUP : URL + '/signup/signup'
 	, API_QUERY_REFERER : URL + '/queries/singlerow' // /:tablename/:fieldname/:fieldval
@@ -18,7 +17,7 @@ const API={
 	, API_PREMIUMITEMS : URL + '/queries/rows'
 	, API_COMMONITEMS  : URL + '/queries/rows'
 	, API_ITEMDETAIL : URL + '/items/item' // /:itemid
-	,
+	, API_EMAIL_VERIFY: `${URL}/signup/email/auth`
 }
 
 export { 

@@ -197,7 +197,7 @@ export default function AuctionDetail() {
                   <div className="price">
                     <p className="key">Current price</p>
                     <strong className="value">
-                      {putCommaAtPrice(100)} USDT
+                      {putCommaAtPrice(372)} USDT
                     </strong>
                   </div>
 
@@ -358,7 +358,7 @@ export default function AuctionDetail() {
 
                   <div className="value">
                     <strong className="price">
-                      {putCommaAtPrice(100)} USDT
+                      {putCommaAtPrice(372)} USDT
                     </strong>
 
                     <ul className="timeList">

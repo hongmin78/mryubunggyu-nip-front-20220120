@@ -16,7 +16,7 @@ import { messages } from "../configs/messages";
 export default function Staking() {
   const navigate = useNavigate();
 	const isMobile = useSelector((state) => state.common.isMobile )
-	let [ isstaked , setisstaked ] = useState ( false )
+	let [ isstaked , setisstaked ] = useState ()
 	useEffect ( _=>{
 		const fetchdata=async _=>{
 			let myaddress=getmyaddress()
@@ -28,13 +28,25 @@ export default function Staking() {
 				setisstaked ( respdata.isstaked ? true : false )
 				if ( respdata.isstaked ){
 					SetErrorBar( messages.MSG_YOU_ALREADY_HAVE_STAKED )
-				}
+				}else{
+          SetErrorBar( "FYI: YOU NEED TO STAKE " )
+        }
 			}
 		}
 		setTimeout(_=>{
 			fetchdata( )
 		} , 4000 )		
 	} , [] )
+  const checkIf=(a)=>{
+    if (isstaked == null ||isstaked == undefined || isstaked == ''){
+      SetErrorBar("HOLD ON")
+      return;
+    }
+    if(!isstaked){
+      navigate(`detail/${a}`)
+    }
+
+  }
   if ( isMobile )
     return (
       <>
@@ -56,9 +68,11 @@ export default function Staking() {
 
                   <div className="contBox">
                     <img className="mainImg" src={E_staking} alt="" />
-                    <button className="buyBtn" onClick={() => navigate(`detail/${index}`)}>
+                    {isstaked?(<button className="buyBtn">
+                      Staked
+                    </button>):(<button className="buyBtn" onClick={e => checkIf(index)}>
                       Buy Now
-                    </button>
+                    </button>)}
                   </div>
                 </li>
               ))}
@@ -87,16 +101,11 @@ export default function Staking() {
 
                   <div className="contBox">
                     <img className="mainImg" src={E_staking} alt="" />
-                    <button
-                      className="buyBtn"
-											onClick={() =>{
-												if (isstaked){SetErrorBar( messages.MSG_YOU_ALREADY_HAVE_STAKED) ; return }
-												navigate(`detail/${index}`)
-											}}
-											disabled = {false }
-                    >
+                    {isstaked?(<button className="buyBtn" disabled>
+                      Staked
+                    </button>):(<button className="buyBtn" onClick={e => checkIf(index)}>
                       Buy Now
-                    </button>
+                    </button>)}
                   </div>
                 </li>
               ))}

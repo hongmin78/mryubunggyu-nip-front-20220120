@@ -30,8 +30,9 @@ export default function StakingDetail() {
   const onclickstakingbutton = async (_) => {
     let myaddress = getmyaddress();
     const querybalance = (_) => {
+      console.log(addresses.ETH_TESTNET.contract_USDT,[myaddress],)
       return query_with_arg({
-        contractaddress: addresses.contract_USDT,
+        contractaddress: addresses.ETH_TESTNET.contract_USDT,
         abikind: "ERC20",
         methodname: "balanceOf",
         aargs: [myaddress],

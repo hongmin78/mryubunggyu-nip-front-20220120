@@ -48,6 +48,7 @@ const query_noarg = jargs=>{
 }
 const query_with_arg = jargs=> {  // {contractaddress , methodname , aargs }=jargs
 	let {contractaddress , abikind , methodname , aargs }=jargs
+	console.log(contractaddress)
 	let contract; contractaddress=contractaddress.toLowerCase()
 	let sig = sha256 (contractaddress + methodname )
 	if( jcontracts[ sig ]){ 

@@ -7,6 +7,7 @@ import { messages } from "../configs/messages";
 import { LOGGER } from "../util/common";
 import SetErrorBar from "../util/SetErrorBar";
 import { TIME_PAGE_TRANSITION_DEF } from "../configs/configs";
+import { API } from "../configs/api";
 
 export default function EmailAuth() {
   const navigate = useNavigate();
@@ -14,14 +15,17 @@ export default function EmailAuth() {
   const { email, authNum , walletaddress } = useParams();
 
   useEffect(async () => {
+	  console.log(email, authNum, walletaddress)
 		const postemailauth=_=>{
-			axios.post("/signup/email/auth", { email, authNum , walletaddress })
+			axios.post(API.API_EMAIL_VERIFY, { email, authNum , walletaddress })
 			.then( resp => {	LOGGER('' , resp.data )
 				let { status }=resp.data 
 				if ( status == 'OK'){
 					SetErrorBar (messages.MSG_EMAIL_VERIFIED)
+					localStorage.setItem("MAIL_CHECK", true);
+					
 					setTimeout(() => {
-						navigate("/")					
+						window.close()				
 					}, TIME_PAGE_TRANSITION_DEF )
 				}
 				else {} 
@@ -33,7 +37,7 @@ export default function EmailAuth() {
   return <EmailAuthBox></EmailAuthBox>;
 }
 
-const EmailAuthBox = styled.section`<div></div>`;
+const EmailAuthBox = styled.section``;
 /**  await authEmail(email, authNum);
 	setTimeout(_=>{
 		navigate("/")

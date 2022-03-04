@@ -1,4 +1,3 @@
-
 import { net } from './net'
 
 const addresses ={
@@ -9,7 +8,10 @@ const addresses ={
 	 , contract_admin : '0x005b38d678753f211abae8dbb38c45a9d159ecee' // 0xd24ff65996e94d79d3cd8a22e8f95c42fbec0e0f'
 	 , 
 	} , 'BSC_MAINNET' : {
-		
+			contract_USDT :		'0x55d398326f99059fF775485246999027B3197955' // owner : 0x83f714ad20e34748516e8367faf143abde6c3783
+		, contract_stake :	'0x53caf649502a39c1a6d360d77e12676425f74860'
+		, contract_admin :	'0x59e84ece084a0e2cabc1e344320b71d8be117ea9'
+		, 
 	}
 }
 export {

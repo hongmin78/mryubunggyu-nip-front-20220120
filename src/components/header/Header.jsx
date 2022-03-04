@@ -44,7 +44,8 @@ export default function Header() {
 			setmyaddress( myaddress )
 			if ( myaddress){}
 			else { return }
-			query_with_arg ({contractaddress : addresses.contract_USDT
+      console.log(addresses.ETH_TESTNET.contract_USDT, [myaddress])
+			query_with_arg ({contractaddress : addresses.ETH_TESTNET.contract_USDT
 				, abikind : 'ERC20'
 				, methodname : 'balanceOf'
 				, aargs : [ myaddress 

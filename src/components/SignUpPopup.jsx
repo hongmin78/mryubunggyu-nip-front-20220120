@@ -14,7 +14,10 @@ import axios from 'axios'
 import { API } from '../configs/api'
 import { TIME_PAGE_TRANSITION_DEF } from "../configs/configs";
 
+
 export default function SignUpPopup({ walletAddress }) {
+  
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isMobile = useSelector((state) => state.common.isMobile);
@@ -25,9 +28,14 @@ export default function SignUpPopup({ walletAddress }) {
   const [pwAlarm, setPwAlarm] = useState("");
   const [referral, setReferal] = useState("");
   const [agreeList, setAgreeList ] = useState(new Array(2).fill(false));
+  const [pending, setPending] =useState(false)
+  const [ mailcheck, setMailcheck] =useState(false)
 	let [ isemailrequested , setisemailrequested] = useState( false )
 	let [ myaddress , setmyaddress] = useState( getmyaddress() )
+  localStorage.setItem("mailcheck", false);
   function clickRegistrationBtn() {
+    setPending(true)
+    localStorage.setItem("MAIL_CHECK", false);
 		let myaddress = getmyaddress()
 		axios.post( API.API_EMAIL_REQUEST , { email, walletAddress : myaddress })
 		.then( resp => { // SetErrorBar(res.data);
@@ -47,13 +55,18 @@ export default function SignUpPopup({ walletAddress }) {
 		} )
 //    getRequestEmail( email, walletAddress );
   }
+  
+  window.addEventListener('storage', function(event) {
+    setMailcheck(localStorage.getItem("MAIL_CHECK"))
+  }, false);
+
   useEffect(() => {
 		console.log(walletAddress);
 		let pwrandom = generaterandomstr_charset(6 , 'base58')
-		setPw(pwrandom)
-		setPwConfirm ( pwrandom )
-		setReferal('CaBusHK4GQ')
-		setEmail ('leejh16@gmail.com')
+		setPw('')
+		setPwConfirm ('')
+		setReferal('')
+		setEmail ('')
   }, [] )
 
   const disableConfirm =
@@ -68,6 +81,12 @@ export default function SignUpPopup({ walletAddress }) {
     dataList[index] = !dataList[index];
     setAgreeList([...dataList]);
   }
+
+  useEffect(()=>{
+    if(!pending)return;
+    console.log('checking')
+
+  })
 
   async function onClickSignUpBtn() {
 		if(chkValidEmail( email) ){}
@@ -97,6 +116,7 @@ export default function SignUpPopup({ walletAddress }) {
 				return
 			}
 		})
+    
 /** 		const res = await signup(walletAddress, email, pw, referral);
     console.log(res);
     if (res) {
@@ -234,7 +254,7 @@ export default function SignUpPopup({ walletAddress }) {
 
           <li>
             <button
-              className="chkBtn"
+              //className="chkBtn"
               className={agreeList[1] ? "chkBtn on" : "chkBtn"}
               onClick={() => onClickAgreeList(1)}
             >
@@ -288,14 +308,15 @@ export default function SignUpPopup({ walletAddress }) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Please enter your email address"
+                  disabled={mailcheck}
                 />
 
-                <button
+                {pending?(<button>{mailcheck?"VERIFIED":"PENDING"}</button>):(<button
                   className="registrationBtn"
                   onClick={clickRegistrationBtn }
                 >
                   Registration
-                </button>
+                </button>)}
               </div>
 
               {emailAlarm && <p className="alarm">{emailAlarm}</p>}
@@ -363,7 +384,7 @@ export default function SignUpPopup({ walletAddress }) {
 
           <li>
             <button
-              className="chkBtn"
+              //className="chkBtn"
               className={agreeList[1] ? "chkBtn on" : "chkBtn"}
               onClick={() => onClickAgreeList(1)}
             >
