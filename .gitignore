@@ -10,6 +10,7 @@
 
 # production
 /build
+/backup20220304
 
 # misc
 .DS_Store
