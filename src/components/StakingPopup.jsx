@@ -15,7 +15,7 @@ import {
   query_eth_balance,
 } from "../util/contract-calls";
 import { addresses } from "../configs/addresses";
-import { MIN_STAKE_AMOUNT, DECIMALS_DISP_DEF } from "../configs/configs";
+import {  DECIMALS_DISP_DEF } from "../configs/configs"; // MIN_STAKE_AMOUNT,
 import { LOGGER, getmyaddress, getobjtype } from "../util/common";
 import { getweirep, getethrep } from "../util/eth";
 import { requesttransaction } from "../services/metamask";
@@ -42,12 +42,14 @@ export default function StakingPopup({ off }) {
   let [allowanceamount, setallowanceamount] = useState();
   let [stakedbalance, setstakedbalance] = useState();
   let [tvl, settvl] = useState();
-  let [tickerusdt, settickerusdt] = useState();
+  let [tickerusdt, settickerusdt] = useState(1);
 	let [myethbalance, setmyethbalance] = useState();
   let [done, setDone]=useState(false)
 	let spinnerHref = useRef()
+	let spinnerHref_approve = useRef ()
 	let [ isloader_00 , setisloader_00 ] = useState( false )
 	let [ isloader_01 , setisloader_01 ] = useState( false )
+	let [ MIN_STAKE_AMOUNT, setMIN_STAKE_AMOUNT ] = useState( '100' )
   useEffect((_) => {
     const spinner =spinnerHref.current // document.querySelector("Spinner");
     spinner.animate(
@@ -55,7 +57,14 @@ export default function StakingPopup({ off }) {
       {        duration: 1000,
         iterations: Infinity,
       }
-    )
+		)
+    const spinner_approve =spinnerHref_approve.current // document.querySelector("Spinner");
+    spinner_approve.animate(
+      [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
+      {        duration: 1000,
+        iterations: Infinity,
+      }
+		)		
     const fetchdata = async (_) => {
       axios.get(API.API_TICKERS).then((resp) => {
         LOGGER("MDmEMQ5xde", resp.data);
@@ -65,9 +74,9 @@ export default function StakingPopup({ off }) {
         //		settickerusdt ( USDT )
       });
       let myaddress = getmyaddress();
-      LOGGER("", addresses.ETH_TESTNET.contract_stake, myaddress);
+      LOGGER("", addresses.contract_stake, myaddress); // .ETH_TESTNET
       let resp_balances = await query_with_arg({
-        contractaddress: addresses.ETH_TESTNET.contract_stake,
+        contractaddress: addresses.contract_stake, // ETH_TESTNET.
         abikind: "STAKE",
         methodname: "_balances",
         aargs: [myaddress],
@@ -75,10 +84,10 @@ export default function StakingPopup({ off }) {
       LOGGER("uQJ2POHvP8", resp_balances);
       setstakedbalance(getethrep(resp_balances));
       query_with_arg({
-        contractaddress: addresses.ETH_TESTNET.contract_USDT,
+        contractaddress: addresses.contract_USDT, // ETH_TESTNET.
         abikind: "ERC20",
         methodname: "allowance",
-        aargs: [myaddress, addresses.ETH_TESTNET.contract_stake],
+        aargs: [myaddress, addresses.contract_stake], // ETH_TESTNET.
       }).then((resp) => {
         let allowanceineth = getethrep(resp);
         LOGGER("8LYRxjNp8k", resp, allowanceineth);
@@ -90,25 +99,36 @@ export default function StakingPopup({ off }) {
         }
       });
       query_with_arg({
-        contractaddress: addresses.ETH_TESTNET.contract_USDT,
+        contractaddress: addresses.contract_USDT, // ETH_TESTNET.
         abikind: "ERC20",
         methodname: "balanceOf",
         aargs: [myaddress],
       }).then((resp) => {
         LOGGER("", resp);
-        setmybalance(getethrep(resp));
+        setmybalance(getethrep(resp , 4 ));
       });
       query_noarg({
-        contractaddress: addresses.ETH_TESTNET.contract_stake,
+        contractaddress: addresses.contract_stake, // ETH_TESTNET.
         abikind: "STAKE",
         methodname: "_tvl",
       }).then((resp) => {
         LOGGER("", resp);
         settvl(getethrep(resp));
-      });
+			});
+			
+			query_with_arg ({
+				contractaddress : addresses.contract_admin
+				, abikind : 'ADMIN'
+				, methodname : '_stakeplans'
+				, aargs : [ addresses.contract_USDT ]
+			}).then(resp => {
+				LOGGER( 'HSudcIgxuB' , resp )
+				if (resp){} else {return }
+				setMIN_STAKE_AMOUNT ( getethrep ( resp[4]))
+			})
       false &&
         query_with_arg({
-          contractaddress: addresses.ETH_TESTNET.contract_stake,
+          contractaddress: addresses.contract_stake, // .ETH_TESTNET
           abikind: "STAKE",
           methodname: "_tvl_nft",
         }).then((resp) => {
@@ -126,16 +146,16 @@ export default function StakingPopup({ off }) {
     LOGGER("");
     let myaddress = getmyaddress();
     let abistr = getabistr_forfunction({
-      contractaddress: addresses.ETH_TESTNET.contract_USDT,
+      contractaddress: addresses.contract_USDT, // ETH_TESTNET.
       abikind: "ERC20",
       methodname: "approve",
-      aargs: [addresses.ETH_TESTNET.contract_stake, getweirep("" + 10 ** 10)],
+      aargs: [addresses.contract_stake, getweirep("" + 10 ** 10)], // .ETH_TESTNET
     });
 		LOGGER("", abistr);
 		setisloader_00 ( true )
     requesttransaction({
       from: myaddress,
-      to: addresses.ETH_TESTNET.contract_USDT,
+      to: addresses.contract_USDT, // ETH_TESTNET.
       data: abistr,
     }).then((resp) => {
 			setisloader_00 ( false )
@@ -152,8 +172,8 @@ export default function StakingPopup({ off }) {
           username: myaddress,
           typestr: "APPROVE",
           auxdata: {
-            erc20: addresses.ETH_TESTNET.contract_USDT,
-            target: addresses.ETH_TESTNET.contract_stake,
+            erc20: addresses.contract_USDT, // .ETH_TESTNET
+            target: addresses.contract_stake, // .ETH_TESTNET
           },
           nettype: NETTYPE,
         })
@@ -169,10 +189,10 @@ export default function StakingPopup({ off }) {
           SetErrorBar(messages.MSG_TX_FINALIZED);
 
           query_with_arg({
-            contractaddress: addresses.ETH_TESTNET.contract_USDT,
+            contractaddress: addresses.contract_USDT, // .ETH_TESTNET
             abikind: "ERC20",
             methodname: "allowance",
-            aargs: [myaddress, addresses.ETH_TESTNET.contract_stake],
+            aargs: [myaddress, addresses.contract_stake], // ETH_TESTNET.
           }).then((resp) => {
             let allowanceineth = getethrep(resp);
             LOGGER("gCwXF6Jjkh", resp, allowanceineth);
@@ -193,7 +213,8 @@ export default function StakingPopup({ off }) {
     LOGGER("eYJAgMYkR5", myaddress);
     if (mybalance >= MIN_STAKE_AMOUNT) {
     } else {
-      SetErrorBar(messages.MSG_BALANCE_NOT_ENOUGH);
+			SetErrorBar(messages.MSG_BALANCE_NOT_ENOUGH);
+			setDone( false )
       return;
     }
     /** 		if (myaddress){}
@@ -202,11 +223,11 @@ export default function StakingPopup({ off }) {
 			return 
 		} */
     let abistr = getabistr_forfunction({
-      contractaddress: addresses.ETH_TESTNET.contract_stake,
+      contractaddress: addresses.contract_stake, // .ETH_TESTNET
       abikind: "STAKE",
       methodname: "stake",
       aargs: [
-        addresses.ETH_TESTNET.contract_USDT,
+        addresses.contract_USDT, // .ETH_TESTNET
         getweirep("" + MIN_STAKE_AMOUNT),
         myaddress,
       ],
@@ -218,7 +239,7 @@ export default function StakingPopup({ off }) {
 				setisloader_01 ( true )
         resp = await requesttransaction({
           from: myaddress,
-          to: addresses.ETH_TESTNET.contract_stake,
+          to: addresses.contract_stake, // .ETH_TESTNET
           data: abistr,
           //			, value : ''
 				});
@@ -246,7 +267,7 @@ export default function StakingPopup({ off }) {
             auxdata: {
               amount: MIN_STAKE_AMOUNT,
               currency: STAKE_CURRENCY,
-              currencyaddress: addresses.ETH_TESTNET.contract_USDT,
+              currencyaddress: addresses.contract_USDT, // ETH_TESTNET.
             },
             nettype: NETTYPE,
           })
@@ -303,7 +324,7 @@ export default function StakingPopup({ off }) {
                   <li className="price">{MIN_STAKE_AMOUNT} USDT</li>
                   <li className="exchange">
                     $
-                    {MIN_STAKE_AMOUNT && tickerusdt
+                    {+MIN_STAKE_AMOUNT && tickerusdt
                       ? putCommaAtPrice(+MIN_STAKE_AMOUNT * +tickerusdt)
                       : null}
                   </li>
@@ -445,7 +466,7 @@ export default function StakingPopup({ off }) {
                 <li className="price">{MIN_STAKE_AMOUNT} USDT</li>
                 <li className="exchange">
                   $
-                  {MIN_STAKE_AMOUNT && tickerusdt
+                  {+MIN_STAKE_AMOUNT && tickerusdt
                     ? putCommaAtPrice(+MIN_STAKE_AMOUNT * +tickerusdt)
                     : null}
                 </li>
@@ -535,8 +556,18 @@ export default function StakingPopup({ off }) {
                   ? { visibility: "hidden" }
                   : { display: "inline" }
               }
-            >
-              Approve
+            > Approve
+						<img
+                ref={spinnerHref_approve}
+                src={I_spinner}
+                alt=""
+                style={{                  display: isloader_00 ? "block" : "none",
+                  width: "18px",
+                  right: "160px",
+                  position: "absolute",
+                }}
+              />
+
             </button>
 
             <button
@@ -549,8 +580,7 @@ export default function StakingPopup({ off }) {
             >
               {done?"Pending":"Confirm"}
               <img
-                ref={spinnerHref}
-                
+                ref={spinnerHref}                
                 src={I_spinner}
                 alt=""
                 style={{

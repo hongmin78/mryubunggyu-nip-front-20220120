@@ -35,9 +35,12 @@ export default function Staking() {
 		}
 		setTimeout(_=>{
 			fetchdata( )
-		} , 4000 )		
+		} , 4000 )
 	} , [] )
-  const checkIf=(a)=>{
+	const checkIf=a=>{
+		navigate (`detail/${a}`)
+	}
+/**   const checkIf=(a)=>{		
     if (isstaked == null ||isstaked == undefined || isstaked == ''){
       SetErrorBar("HOLD ON")
       return;
@@ -45,8 +48,7 @@ export default function Staking() {
     if(!isstaked){
       navigate(`detail/${a}`)
     }
-
-  }
+  }*/
   if ( isMobile )
     return (
       <>

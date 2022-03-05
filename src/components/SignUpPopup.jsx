@@ -14,10 +14,7 @@ import axios from 'axios'
 import { API } from '../configs/api'
 import { TIME_PAGE_TRANSITION_DEF } from "../configs/configs";
 
-
-export default function SignUpPopup({ walletAddress }) {
-  
-
+export default function SignUpPopup({ walletAddress }) {  
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isMobile = useSelector((state) => state.common.isMobile);
@@ -43,6 +40,7 @@ export default function SignUpPopup({ walletAddress }) {
 			let { status }=resp.data
 			if ( status == 'OK') {
 				SetErrorBar ( messages.MSG_EMAIL_SENT )
+//				setPending( false )
 				setisemailrequested( true )
 			} else {
 				SetErrorBar ( messages.MSG_SERVER_ERR )
@@ -93,6 +91,8 @@ export default function SignUpPopup({ walletAddress }) {
 		else {SetErrorBar( messages.MSG_EMAIL_INVALID ); return }
 		if ( isemailrequested ){}
 		else {SetErrorBar( messages.MSG_PLEASE_REQUEST_EMAIL_VERIFY_CODE ) ; return }
+		if(referral){}
+		else { SetErrorBar( messages.MSG_PLEASE_INPUT + ' referer code' ); return }
 		let respreferer = await axios.get( API.API_QUERY_REFERER + `/users/myreferercode/${referral}`)
 		LOGGER('' , respreferer.data )
 		let { status , respdata} = respreferer.data

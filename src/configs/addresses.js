@@ -1,6 +1,6 @@
 import { net } from './net'
 
-const addresses ={
+const jaddresses ={
 	'ETH_TESTNET' : {
 		 	contract_USDT : '0x34da0872bb4b215345f6e47ed6514d8c4cd5f8e0'
 //	 , contract_stake : '0xa30fec0c860659639247b66ebbe3b2ccc9145e4c' // ver0223 // 0x87ac1e8378cdb6ad11e85ea9565b385b03970279'
@@ -14,6 +14,7 @@ const addresses ={
 		, 
 	}
 }
+let addresses= jaddresses [ net ]
 export {
 	addresses 
 }

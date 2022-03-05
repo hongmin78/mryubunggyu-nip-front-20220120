@@ -17,6 +17,7 @@ const messages={
 	, MSG_DONE_LIKE : 'I like it'
 	, MSG_DONE_UNLIKE : 'I do not care'
 	, MSG_COPIED : 'Copied'
+	, MSG_PLEASE_INPUT : 'Please input '
 }
 export {
 	messages
