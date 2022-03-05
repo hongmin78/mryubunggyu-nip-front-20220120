@@ -3,12 +3,11 @@ import Header from "../components/header/Header";
 import Footer from "./Footer";
 import { strDot } from "../util/Util";
 import { useSelector } from "react-redux";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MyItems from "../components/myprof/MyItems";
 import Recommend from "../components/myprof/Recommend";
 import PopupBg from "../components/PopupBg";
 import { useNavigate } from "react-router-dom";
-
 import B_mypage from "../img/mypage/B_mypage.png";
 import E_prof from "../img/mypage/E_prof.png";
 import I_copy from "../img/icon/I_copy.svg";
@@ -16,17 +15,36 @@ import I_3dot from "../img/icon/I_3dot.svg";
 import I_upload from "../img/icon/I_upload.svg";
 import I_clip from "../img/icon/I_clip.svg";
 import Staking from "../components/myprof/Staking";
+import { getmyaddress, LOGGER } from "../util/common";
+import moment from 'moment'
+import axios from "axios";
+import { API } from "../configs/api";
+import { addresses } from '../configs/addresses'
+import { TIME_FETCH_MYADDRESS_DEF } from '../configs/configs'
 
 export default function Mypage() {
   const navigate = useNavigate();
-
   const isLogin = useSelector((state) => state.common.isLogin);
   const isMobile = useSelector((state) => state.common.isMobile);
-
   const [category, setCategory] = useState(0);
   const [showEditBtn, setShowEditBtn] = useState(false);
   const [showCopyBtn, setShowCopyBtn] = useState(false);
-
+	let [ userinfo , setuserinfo ] = useState()
+	const fetchdata=async _=>{
+		let myaddress = getmyaddress()
+		axios.get(API.API_USERINFO + `/${myaddress}`).then(resp=>{ LOGGER( '' , resp.data )
+			let { status , respdata} =resp.data
+			if ( status =='OK' ){
+				setuserinfo( respdata )
+			}
+		})
+	}
+		useEffect(_=>{
+			setTimeout(_=>{
+				fetchdata()
+			} , TIME_FETCH_MYADDRESS_DEF )
+		} , [] )
+	
   if (isMobile)
     return (
       <>
@@ -88,7 +106,7 @@ export default function Mypage() {
               </div>
 
               <span className="adressContainer">
-                <span className="name">#36185</span>
+                <span className="name">@{ userinfo?.nickname }</span>
                 <span className="addressBox">
                   <p>{strDot(isLogin, 4, 4)}</p>
                   <img src={I_copy} alt="" />
@@ -137,7 +155,7 @@ export default function Mypage() {
                 </span>
 
                 <span className="adressContainer">
-                  <span className="name">#36185</span>
+                  <span className="name">@{ userinfo?.nickname }</span>
                   <span className="addressBox">
                     <p>{strDot(isLogin, 4, 4)}</p>
                     <img src={I_copy} alt="" />

@@ -29,6 +29,7 @@ export default function SignUpPopup({ walletAddress }) {
   const [ mailcheck, setMailcheck] =useState(false)
 	let [ isemailrequested , setisemailrequested] = useState( false )
 	let [ myaddress , setmyaddress] = useState( getmyaddress() )
+	let [ nickname , setnickname] = useState('')
   localStorage.setItem("mailcheck", false);
   function clickRegistrationBtn() {
     setPending(true)
@@ -104,6 +105,7 @@ export default function SignUpPopup({ walletAddress }) {
 			, email
 			, password : pw  
 			, referral 
+			, nickname
 		} ).then(resp=>{			LOGGER ( 'VrPcFLisLA' , resp.data )
 			let { status }=resp.data
 			if ( status == 'OK'){
@@ -219,6 +221,20 @@ export default function SignUpPopup({ walletAddress }) {
               </div>
 
               {pwAlarm && <p className="alarm">{pwAlarm}</p>}
+            </div>
+          </li>
+
+          <li>
+            <p className="contTitle">Nickname</p>
+            <div className="inputContainer">
+              <div className="inputBox">
+                <input
+                  type="text"
+                  value={nickname}
+                  onChange={(e) => setnickname(e.target.value)}
+                  placeholder="Nickname"
+                />
+              </div>              
             </div>
           </li>
 
@@ -350,6 +366,20 @@ export default function SignUpPopup({ walletAddress }) {
               </div>
 
               {pwAlarm && <p className="alarm">{pwAlarm}</p>}
+            </div>
+          </li>
+
+          <li>
+            <p className="contTitle">Nickname</p>
+            <div className="inputContainer">
+              <div className="inputBox">
+                <input
+                  type="text"
+                  value={nickname}
+                  onChange={(e) => setnickname(e.target.value)}
+                  placeholder="Nickname"
+                />
+              </div>              
             </div>
           </li>
 

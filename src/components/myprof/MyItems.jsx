@@ -5,25 +5,93 @@ import I_dnArw from "../../img/icon/I_dnArw.svg";
 import E_item2 from "../../img/mypage/E_item2.png";
 import E_staking from "../../img/common/E_staking.png";
 import E_item3 from "../../img/mypage/E_item3.png";
-
-import { putCommaAtPrice } from "../../util/Util";
-import { useRef, useState } from "react";
+import { putCommaAtPrice, strDot } from "../../util/Util";
+import { useRef, useEffect , useState } from "react";
 import PopupBg from "../../components/PopupBg";
 import { D_sortList } from "../../data/DmyPage";
 import { useNavigate } from "react-router-dom";
 import SelectPopup from "../SelectPopup";
 import { useSelector } from "react-redux";
+import axios from "axios";
+import { API } from "../../configs/api";
+import { query_with_arg } from "../../util/contract-calls";
+import { addresses } from '../../configs/addresses'
+import { TIME_FETCH_MYADDRESS_DEF } from '../../configs/configs'
+import { getmyaddress, LOGGER } from "../../util/common";
+import moment from 'moment'
 
+const MAP_NETTYPE_SCAN ={
+		'ETH_TESTNET' : 'https://etherscan.io'
+	, 'BSC_MAINNET' : 'https://bscscan.com'
+}
 export default function MyItems() {
   const navigate = useNavigate();
   const sortBtnRef = useRef();
-
   const isMobile = useSelector((state) => state.common.isMobile);
-
   const [filter, setFilter] = useState(0);
   const [sortOpt, setSortOpt] = useState(D_sortList[1]);
   const [sortPopup, setSortPopup] = useState(false);
+	const [ isstaked , setisstaked ] = useState( true )
+	let [ mytokenid , setmytokenid] = useState( 0)
+	let [ stakedata , setstakedata] = useState({})
+	let [ myaddress , setmyaddress] = useState()
+	let [ txhash , settxhash] = useState()
+	let [ txscanurl , settxscanurl ] = useState()
+	let [ buydate , setbuydate] = useState( [] )
+	let [ userinfo , setuserinfo ] = useState(null )
+	const fetchdata=async _=>{
+		let myaddress = getmyaddress()
 
+		axios.get(API.API_USERINFO + `/${myaddress}`).then(resp=>{ LOGGER( '' , resp.data )
+			let { status , respdata} =resp.data
+			if ( status =='OK' ){
+				setuserinfo( respdata )
+			}
+		})
+		axios.get(API.API_QUERY_SINGLEROW + 
+			`/transactions/username/${myaddress}?typestr=STAKE&status=1`			
+		).then(resp=>{			LOGGER('' , resp.data )
+			let { status , respdata }=resp.data
+			if (status =='OK'){
+				let { txhash } =respdata
+				setstakedata( respdata )
+				settxhash( strDot(txhash , 16 , 0) )
+				settxscanurl ( MAP_NETTYPE_SCAN[ respdata.nettype ] + `/tx/${txhash}` ) 
+				let buydatetime=moment( respdata.createdat )
+				setbuydate( [
+						buydatetime.year().toString().substr(2) 
+					, (1 + buydatetime.month()).toString().padStart(2,'0'  )
+					, buydatetime.day().toString().padStart(2,'0'  )
+					, buydatetime.hour().toString().padStart(2,'0'  )
+				])
+			}
+		})
+		query_with_arg({
+			contractaddress: addresses.contract_ticketnft , // ETH_TESTNET.
+			abikind: "TICKETNFT",
+			methodname: "_balance_user_itemhash",
+			aargs: [ myaddress ], // ETH_TESTNET.
+		}).then(async (resp) => {
+			let myitemhash = resp 
+			let mytokenid
+			try { mytokenid = await query_with_arg ({
+					contractaddress : addresses.contract_ticketnft
+					, abikind : 'TICKETNFT'
+					, methodname : '_itemhash_tokenid'
+					, aargs : [ myitemhash ]
+				})
+				LOGGER( 'GEVKU97nIv' , mytokenid )
+				setmytokenid( mytokenid )
+			} catch(err){LOGGER(err); mytokenid=null; return 
+			}			
+		})
+	}
+
+	useEffect(_=>{
+		setTimeout(_=>{
+			fetchdata()
+		} , TIME_FETCH_MYADDRESS_DEF )
+	} , [] )
   if (isMobile)
     return (
       <MmyItemsBox>
@@ -72,7 +140,7 @@ export default function MyItems() {
         </div>
 
         <ul className="itemList">
-          <li className="stakingBox">
+          <li className="stakingBox" style={isstaked? {} : { display : 'none'}}>
             <div className="imgBox">
               <div className="topBar">
                 <img className="itemImg" src={E_staking} alt="" />
@@ -86,14 +154,14 @@ export default function MyItems() {
               </div>
             </div>
 
-            <div className="infoBox">
+            <div className="infoBox" >
               <div className="titleBox">
-                <strong className="title">Lucky Ticket #00001</strong>
+                <strong className="title">Lucky Ticket #{(''+mytokenid)?.padStart( 5, '0') }</strong>
               </div>
 
               <div className="ownedBox">
                 <p className="key">Owned by</p>
-                <p className="value">@andyfeltham</p>
+                <p className="value">@{userinfo?.nickname}</p>
               </div>
 
               <div className="saleBox">
@@ -103,12 +171,12 @@ export default function MyItems() {
                 </div>
 
                 <div className="time">
-                  <p className="key">Ending in</p>
+                  <p className="key">Bought</p>
                   <ul className="timeList">
-                    <li>00</li>
-                    <li>00</li>
-                    <li>00</li>
-                    <li>00</li>
+                    <li>{ buydate[ 0 ] }</li>
+                    <li>{ buydate[ 1 ] }</li>
+                    <li>{ buydate[ 2 ] }</li>
+                    <li>{ buydate[ 3 ] }</li>
                   </ul>
                 </div>
               </div>
@@ -122,9 +190,11 @@ export default function MyItems() {
                   <p className="key">Transaction price</p>
                   <p className="value">688 USDT</p>
                 </li>
-                <li>
-                  <p className="key">Fee</p>
-                  <p className="value">8%</p>
+                <li onClick={evt=>{
+									window.open( txscanurl )
+								}}>
+                  <p className="key">TxHash</p>
+                  <p className="value">{ txhash }</p>
                 </li>
               </ul>
 
@@ -192,9 +262,12 @@ export default function MyItems() {
                   <p className="key">Transaction price</p>
                   <p className="value">688 USDT</p>
                 </li>
-                <li>
-                  <p className="key">Fee</p>
-                  <p className="value">8%</p>
+                <li onClick={evt=>{
+									window.open( txscanurl )
+								}
+								}>
+                  <p className="key">TxHash</p>
+                  <p className="value">{ txhash }</p>
                 </li>
               </ul>
 
@@ -260,9 +333,11 @@ export default function MyItems() {
                   <p className="key">Transaction price</p>
                   <p className="value">688 USDT</p>
                 </li>
-                <li>
-                  <p className="key">Fee</p>
-                  <p className="value">8%</p>
+                <li onClick={evt=>{
+									window.open( txscanurl )
+								}}>
+                  <p className="key">TxHash</p>
+                  <p className="value">{ txhash }</p>
                 </li>
               </ul>
 
@@ -334,7 +409,7 @@ export default function MyItems() {
         </div>
 
         <ul className="itemList">
-          <li className="stakingBox">
+          <li className="stakingBox" style={isstaked? {} : { display : 'none'}} >
             <div className="imgBox">
               <div className="topBar">
                 <img className="itemImg" src={E_staking} alt="" />
@@ -348,30 +423,30 @@ export default function MyItems() {
               </div>
             </div>
 
-            <div className="infoBox">
+            <div className="infoBox" >
               <div className="titleBox">
-                <strong className="title">Lucky Ticket #00001</strong>
+                <strong className="title">Lucky Ticket #{(''+mytokenid)?.padStart( 5, '0') }</strong>
               </div>
 
               <div className="ownedBox">
                 <p className="key">Owned by</p>
-                <p className="value">@andyfeltham</p>
+                <p className="value">@{userinfo?.nickname}</p>
               </div>
 
               <div className="saleBox">
                 <div className="key">
                   <p className="price">Current price</p>
-                  <p className="time">Ending in</p>
+                  <p className="time">Bought</p>
                 </div>
 
                 <div className="value">
                   <strong className="price">{putCommaAtPrice(100)} USDT</strong>
 
                   <ul className="timeList">
-                    <li>00</li>
-                    <li>00</li>
-                    <li>00</li>
-                    <li>00</li>
+                    <li>{ buydate[ 0 ] }</li>
+                    <li>{ buydate[ 1 ] }</li>
+                    <li>{ buydate[ 2 ] }</li>
+                    <li>{ buydate[ 3 ] }</li>
                   </ul>
                 </div>
 
@@ -384,9 +459,11 @@ export default function MyItems() {
                     <p className="key">Transaction price</p>
                     <p className="value">688 USDT</p>
                   </li>
-                  <li>
-                    <p className="key">Fee</p>
-                    <p className="value">8%</p>
+                  <li onClick={evt=>{
+										window.open( txscanurl )
+									}}>
+                    <p className="key">TxHash</p>
+                    <p className="value">{ txhash }</p>
                   </li>
                 </ul>
               </div>
@@ -455,9 +532,11 @@ export default function MyItems() {
                     <p className="key">Transaction price</p>
                     <p className="value">688 USDT</p>
                   </li>
-                  <li>
-                    <p className="key">Fee</p>
-                    <p className="value">8%</p>
+                  <li onClick={evt=>{
+										window.open( txscanurl )
+									}}>
+                    <p className="key">TxHash</p>
+                    <p className="value">{ txhash }</p>
                   </li>
                 </ul>
               </div>
@@ -526,9 +605,11 @@ export default function MyItems() {
                     <p className="key">Transaction price</p>
                     <p className="value">15 USDT</p>
                   </li>
-                  <li>
-                    <p className="key">Fee</p>
-                    <p className="value">8%</p>
+                  <li onClick={evt=>{
+										window.open( txscanurl )
+									}}>
+                    <p className="key">TxHash</p>
+                    <p className="value">{ txhash }</p>
                   </li>
                 </ul>
               </div>

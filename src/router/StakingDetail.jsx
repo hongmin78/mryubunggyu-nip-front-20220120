@@ -17,14 +17,20 @@ import { query_with_arg, getabistr_forfunction } from "../util/contract-calls";
 import { getmyaddress } from "../util/common";
 import { messages } from "../configs/messages";
 import SetErrorBar from "../util/SetErrorBar";
-import { TIME_PAGE_TRANSITION_DEF } from "../configs/configs";
+import { TIME_PAGE_TRANSITION_DEF 
+	, TIME_FETCH_MYADDRESS_DEF
+} from "../configs/configs";
+import { getethrep } from "../util/eth";
 // import { useSelector } from "react-redux";
+// const MODE_DEV_PROD='DEV'
+const MODE_DEV_PROD='PROD'
 export default function StakingDetail() {
   const navigate = useNavigate();
   const param = useParams();
   const isMobile = useSelector((state) => state.common.isMobile);
   const [stakingPopup, setStakingPopup] = useState(false);
-  let [currentserialnumber, setcurrentserialnumber] = useState();
+	let [currentserialnumber, setcurrentserialnumber] = useState();
+	let [ stakecurrencybalance , setstakecurrencybalance] = useState()
   let myaddress = getmyaddress();
   let isLogin = useSelector((state) => state.common.isLogin);
   const onclickstakingbutton = async (_) => {
@@ -39,8 +45,19 @@ export default function StakingDetail() {
       });
     };
     if (isLogin) {
-      let resp = await querybalance();
-      LOGGER("h8UpKsxO1Y", resp);
+			let resp = await querybalance();
+			LOGGER("h8UpKsxO1Y", resp);
+			let respstakebalance = await query_with_arg({
+				contractaddress : addresses.contract_stake
+				, abikind : 'STAKE'
+				, methodname : '_balances'
+				, aargs : [ myaddress ]
+			})
+			if ( getethrep(respstakebalance) && getethrep(respstakebalance) > 0){
+				SetErrorBar( messages.MSG_YOU_ALREADY_HAVE_STAKED)
+				if(MODE_DEV_PROD=='DEV'){}
+				else {return }
+			} else {}      
     } else {
       SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
       setTimeout((_) => {
@@ -55,8 +72,25 @@ export default function StakingDetail() {
       LOGGER("vF16Vg7wEA", isLogin);
     },
     [isLogin]
-  );
+	);
+	const query_stake_currency_balance = (_) => {
+		let myaddress=getmyaddress()
+		if ( myaddress){} else {return }
+		console.log( '' , addresses.contract_USDT , [myaddress],) // ETH_TESTNET.
+		 query_with_arg({
+			contractaddress: addresses.contract_USDT, // ETH_TESTNET.
+			abikind: "ERC20",
+			methodname: "balanceOf",
+			aargs: [myaddress],
+		}).then(resp=>{
+			setstakecurrencybalance(getethrep(resp , 4 )) 
+		})
+	};
+
   useEffect((_) => {
+		setTimeout(_=>{
+			query_stake_currency_balance()
+		} , TIME_FETCH_MYADDRESS_DEF ) 
     return; //		alert(myaddress)
     LOGGER("", myaddress);
     if (myaddress) {
@@ -103,7 +137,7 @@ export default function StakingDetail() {
             <div className="contBox">
               <div className="availbleBox">
                 <p className="key">Available Balance</p>
-                <p className="value">0.00 USDT</p>
+                <p className="value">{ stakecurrencybalance } USDT</p>
               </div>
 
               <div className="priceBox">
@@ -161,7 +195,7 @@ export default function StakingDetail() {
             <div className="contBox">
               <div className="availbleBox">
                 <p className="key">Available Balance</p>
-                <p className="value">0.00 USDT</p>
+                <p className="value">{stakecurrencybalance} USDT</p>
               </div>
 
               <div className="priceBox">

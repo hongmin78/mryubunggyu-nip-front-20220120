@@ -32,6 +32,7 @@ import {
 import { TX_POLL_OPTIONS } from "../configs/configs";
 import I_spinner from "../img/icon/I_spinner.svg";
 import { strDot } from "../util/Util";
+const MODE_DEV_PROD='PROD'
 export default function StakingPopup({ off }) {
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
@@ -340,7 +341,7 @@ export default function StakingPopup({ off }) {
                   <p className="key">Distribution</p>
                   <p className="value">2022-03-12 00:00 UTC</p>
                 </li>
-                <li>
+                <li style={ MODE_DEV_PROD=='DEV' ? {}: {display:'none'}}>
                   <p className="key">Total Staked</p>
                   <p className="value">{tvl} USDT</p>
                 </li>
@@ -350,19 +351,19 @@ export default function StakingPopup({ off }) {
                 </li>
 
                 <li>
-                  <p className="key">your address</p>
+                  <p className="key">Your address</p>
                   <p className="value">{strDot(myaddress, 6, 0)}</p>
                 </li>
                 <li>
                   <p className="key">Your USDT balance</p>
                   <p className="value">{mybalance} USDT</p>
                 </li>
-                <li>
+                <li style={allowanceamount ?{display: 'none'} : {} }>
                   <p className="key">Allowance</p>
                   <p className="value">{allowanceamount} USDT</p>
                 </li>
                 <li>
-                  <p className="key">{BASE_CURRENCY} balance</p>
+                  <p className="key">Your {BASE_CURRENCY} balance</p>
                   <p className="value">
                     {myethbalance} {BASE_CURRENCY}
                   </p>
@@ -482,7 +483,7 @@ export default function StakingPopup({ off }) {
                 <p className="key">Distribution</p>
                 <p className="value">2022-03-12 00:00 UTC</p>
               </li>
-              <li>
+              <li style={ MODE_DEV_PROD=='DEV' ? {}: {display:'none'}}>
                 <p className="key">Total Staked</p>
                 <p className="value">{tvl} USDT</p>
               </li>
@@ -492,19 +493,19 @@ export default function StakingPopup({ off }) {
               </li>
 
               <li>
-                <p className="key">your address</p>
+                <p className="key">Your address</p>
                 <p className="value">{strDot(myaddress, 8, 0)} </p>
               </li>
               <li>
                 <p className="key">Your USDT balance</p>
                 <p className="value">{mybalance} USDT</p>
               </li>
-              <li>
+              <li style={allowanceamount ?{display: 'none'} : {}  }>
                 <p className="key">Allowance</p>
                 <p className="value">{allowanceamount} USDT</p>
               </li>
               <li>
-                <p className="key">{BASE_CURRENCY} balance</p>
+                <p className="key">Your {BASE_CURRENCY} balance</p>
                 <p className="value">
                   {myethbalance} {BASE_CURRENCY}
                 </p>

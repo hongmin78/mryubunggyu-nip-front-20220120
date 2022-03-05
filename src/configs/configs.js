@@ -14,6 +14,7 @@ const URL_BASE=`https://nftinfinity.world`
 // const URL_METADATA_BASE=`http://3.35.11 7.87/assets/json` // /2.json
 const URL_METADATA_BASE=`https://nftinfinity.world/assets/json` // /2.json
 const TIME_PAGE_TRANSITION_DEF = 3000
+const TIME_FETCH_MYADDRESS_DEF = 1500 // 3500
 const DECIMALS_DISP_DEF = 4
 const ITEM_PRICE_DEF = 372
 export { 
@@ -22,6 +23,7 @@ export {
 	, URL_BASE
 	, URL_METADATA_BASE
 	, TIME_PAGE_TRANSITION_DEF
+	, TIME_FETCH_MYADDRESS_DEF
 	, DECIMALS_DISP_DEF
 	, ITEM_PRICE_DEF
 }

@@ -14,6 +14,7 @@ const API={
 	, API_SIGNUP : URL + '/signup/signup'
 	, API_QUERY_REFERER : URL + '/queries/singlerow' // /:tablename/:fieldname/:fieldval
 	, API_QUERY_USERADDRESS : URL + '/queries/singlerow' 
+	, API_QUERY_SINGLEROW : URL + '/queries/singlerow'
 	, API_PREMIUMITEMS : URL + '/queries/rows'
 	, API_COMMONITEMS  : URL + '/queries/rows'
 	, API_ITEMDETAIL : URL + '/items/item' // /:itemid

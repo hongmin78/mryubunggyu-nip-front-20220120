@@ -3,6 +3,8 @@ import {web3} from '../configs/configweb3'
 import { abi as abierc20 } from '../contracts/abi-erc20'
 import { abi as abistake } from '../contracts/abi-staker'
 import { abi as abiadmin } from '../contracts/abi-admin'
+import { abi as abiticketnft } from '../contracts/abi-ticketnft'
+
 // import { abi_putons ale } from '../contracts/abi/abi_puton sale'
 import {LOGGER} from './common'
 import sha256 from 'js-sha256'
@@ -13,6 +15,7 @@ const MAP_STR_ABI = {
 	ERC20 : abierc20
 	, STAKE : abistake
 	, ADMIN : abiadmin
+	, TICKETNFT : abiticketnft
 }
 const getabistr_forfunction = jargs=>{let { contractaddress 
 		, abikind 

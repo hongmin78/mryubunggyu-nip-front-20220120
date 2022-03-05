@@ -11,7 +11,7 @@ const jaddresses ={
 			contract_USDT :		'0x55d398326f99059fF775485246999027B3197955' // owner : 0x83f714ad20e34748516e8367faf143abde6c3783
 		, contract_stake :	'0x53caf649502a39c1a6d360d77e12676425f74860'
 		, contract_admin :	'0x59e84ece084a0e2cabc1e344320b71d8be117ea9'
-		, 
+		, contract_ticketnft:'0x6208803CC8FAfdeCEA589666c96d40836daccB46'
 	}
 }
 let addresses= jaddresses [ net ]

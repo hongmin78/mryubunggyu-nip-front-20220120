@@ -29,7 +29,7 @@ export default function Staking() {
 				if ( respdata.isstaked ){
 					SetErrorBar( messages.MSG_YOU_ALREADY_HAVE_STAKED )
 				}else{
-          SetErrorBar( "FYI: YOU NEED TO STAKE " )
+          false && SetErrorBar( "FYI: YOU NEED TO STAKE " )
         }
 			}
 		}
