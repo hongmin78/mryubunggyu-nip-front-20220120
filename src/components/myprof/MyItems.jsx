@@ -27,12 +27,12 @@ const MAP_NETTYPE_SCAN = {
 export default function MyItems() {
   const navigate = useNavigate();
   const sortBtnRef = useRef();
-  const isMobile = useSelector((state) => state.common.isMobile);
+  const isMobile = useSelector(state => state.common.isMobile);
   const [filter, setFilter] = useState(0);
   const [sortOpt, setSortOpt] = useState(D_sortList[1]);
   const [sortPopup, setSortPopup] = useState(false);
   const [isstaked, setisstaked] = useState(true);
-  const [itemData, setItemData] = useState([]);
+  let [itemData, setItemData] = useState([]);
   let [mytokenid, setmytokenid] = useState(0);
   let [stakedata, setstakedata] = useState({});
   let [myaddress, setmyaddress] = useState();
@@ -40,33 +40,33 @@ export default function MyItems() {
   let [txscanurl, settxscanurl] = useState();
   let [buydate, setbuydate] = useState([]);
   let [userinfo, setuserinfo] = useState(null);
-  const fetchdata = async (_) => {
-    let myaddress = getmyaddress();
 
-    axios.get(API.API_USERINFO + `/${myaddress}`).then((resp) => {
+  const fetchdata = async _ => {
+    let myaddress = getmyaddress();
+    console.log("myaddress", myaddress);
+
+    axios.get(API.API_USERINFO + `/${myaddress}`).then(resp => {
       LOGGER("", resp.data);
       let { status, respdata } = resp.data;
       if (status == "OK") {
         setuserinfo(respdata);
       }
     });
-
-    // fetching receivables data
     axios
       .get(API.API_RECEIVABLES + `/${myaddress}`)
-      .then((res) => {
+      .then(res => {
+        console.log(res);
         let { list } = res.data;
         setItemData(list);
-        console.log("receivables", itemData);
+        LOGGER("receivables", list);
       })
-      .catch((err) => console.log(err));
-
+      .catch(err => console.log(err));
     axios
       .get(
         API.API_QUERY_SINGLEROW +
           `/transactions/username/${myaddress}?typestr=STAKE&status=1`
       )
-      .then((resp) => {
+      .then(resp => {
         LOGGER("", resp.data);
         let { status, respdata } = resp.data;
         if (status == "OK") {
@@ -88,7 +88,7 @@ export default function MyItems() {
       abikind: "TICKETNFT",
       methodname: "_balance_user_itemhash",
       aargs: [myaddress], // ETH_TESTNET.
-    }).then(async (resp) => {
+    }).then(async resp => {
       let myitemhash = resp;
       let mytokenid;
       try {
@@ -108,11 +108,34 @@ export default function MyItems() {
     });
   };
 
-  useEffect((_) => {
-    setTimeout((_) => {
+  // const fetchReceivables = () => {
+  //   let myAddress = getmyaddress();
+  //   // fetching receivables data
+  //   axios
+  //     .get(API.API_RECEIVABLES + `/${myAddress}`)
+  //     .then(res => {
+  //       console.log(res);
+  //       // let { list } = res.data;
+  //       // setItemData(list);
+  //       // LOGGER("receivables", list);
+  //     })
+  //     .catch(err => console.log(err));
+  // };
+
+  // useEffect(() => {
+  //   fetchReceivables();
+  // }, []);
+
+  useEffect(_ => {
+    setTimeout(_ => {
       fetchdata();
     }, TIME_FETCH_MYADDRESS_DEF);
   }, []);
+
+  useEffect(() => {
+    LOGGER("receivables1", itemData);
+  }, [itemData]);
+
   if (isMobile)
     return (
       <MmyItemsBox>
@@ -217,7 +240,7 @@ export default function MyItems() {
                   <p className="value">688 USDT</p>
                 </li>
                 <li
-                  onClick={(evt) => {
+                  onClick={evt => {
                     window.open(txscanurl);
                   }}
                 >
@@ -291,7 +314,7 @@ export default function MyItems() {
                   <p className="value">688 USDT</p>
                 </li>
                 <li
-                  onClick={(evt) => {
+                  onClick={evt => {
                     window.open(txscanurl);
                   }}
                 >
@@ -363,7 +386,7 @@ export default function MyItems() {
                   <p className="value">688 USDT</p>
                 </li>
                 <li
-                  onClick={(evt) => {
+                  onClick={evt => {
                     window.open(txscanurl);
                   }}
                 >
@@ -496,7 +519,7 @@ export default function MyItems() {
                     <p className="value">688 USDT</p>
                   </li>
                   <li
-                    onClick={(evt) => {
+                    onClick={evt => {
                       window.open(txscanurl);
                     }}
                   >
@@ -522,83 +545,85 @@ export default function MyItems() {
             </div>
           </li>
 
-          {itemData.map((item) => (
-            <li className="swapBox">
-              <div className="imgBox">
-                <img className="itemImg" src={E_item2} alt="" />
-                {/* <img className="itemImg" src={item.itemData.url} alt="" /> */}
+          {itemData.length !== 0 &&
+            itemData.map(item => (
+              <li className="swapBox">
+                <div className="imgBox">
+                  {/* <img className="itemImg" src={E_item2} alt="" /> */}
+                  <img className="itemImg" src={item.itemData?.url} alt="" />
 
-                <div className="topBar">
-                  <button className="likeBtn" onClick={() => {}}>
-                    <img src={I_heartO} alt="" />
-                    <p>22</p>
-                  </button>
-                </div>
-              </div>
-
-              <div className="infoBox">
-                <div className="titleBox">
-                  <strong className="title">Series Kong #010000</strong>
+                  <div className="topBar">
+                    <button className="likeBtn" onClick={() => {}}>
+                      <img src={I_heartO} alt="" />
+                      <p>22</p>
+                    </button>
+                  </div>
                 </div>
 
-                <div className="ownedBox">
-                  <p className="key">Owned by</p>
-                  <p className="value">@andyfeltham</p>
-                </div>
-
-                <div className="saleBox">
-                  <div className="key">
-                    <p className="price">Current price</p>
-                    <p className="time">Ending in</p>
+                <div className="infoBox">
+                  <div className="titleBox">
+                    <strong className="title">Series Kong #010000</strong>
                   </div>
 
-                  <div className="value">
-                    <strong className="price">
-                      {putCommaAtPrice(372)} USDT
-                    </strong>
+                  <div className="ownedBox">
+                    <p className="key">Owned by</p>
+                    <p className="value">@andyfeltham</p>
+                  </div>
 
-                    <ul className="timeList">
-                      <li>00</li>
-                      <li>00</li>
-                      <li>00</li>
-                      <li>00</li>
+                  <div className="saleBox">
+                    <div className="key">
+                      <p className="price">Current price</p>
+                      <p className="time">Ending in</p>
+                    </div>
+
+                    <div className="value">
+                      <strong className="price">
+                        {putCommaAtPrice(372)} USDT
+                      </strong>
+
+                      <ul className="timeList">
+                        <li>00</li>
+                        <li>00</li>
+                        <li>00</li>
+                        <li>00</li>
+                      </ul>
+                    </div>
+
+                    <ul className="priceBox">
+                      <li>
+                        <p className="key">Current price</p>
+                        <p className="value">586 USDT</p>
+                      </li>
+                      <li>
+                        <p className="key">Transaction price</p>
+                        <p className="value">688 USDT</p>
+                      </li>
+                      <li
+                        onClick={evt => {
+                          window.open(txscanurl);
+                        }}
+                      >
+                        <p className="key">TxHash</p>
+                        <p className="value">{txhash}</p>
+                      </li>
                     </ul>
                   </div>
 
-                  <ul className="priceBox">
-                    <li>
-                      <p className="key">Current price</p>
-                      <p className="value">586 USDT</p>
-                    </li>
-                    <li>
-                      <p className="key">Transaction price</p>
-                      <p className="value">688 USDT</p>
-                    </li>
-                    <li
-                      onClick={(evt) => {
-                        window.open(txscanurl);
-                      }}
-                    >
-                      <p className="key">TxHash</p>
-                      <p className="value">{txhash}</p>
-                    </li>
-                  </ul>
+                  <button className="actionBtn">Swap</button>
+
+                  <p className="description">
+                    The NFT purchased by participating in the subscription
+                    auction generates 12% of profits after 3 days and is sold
+                    random. In addition, the results are announced at 9:00 AM,
+                    and the transaction is completed from 9:00 AM to 21:00 PM.
+                    If the transaction is not completed within time, all
+                    transactions in your account will be suspended. It operates
+                    normally after applying a penalty of 10% of the winning bid
+                    amount.
+                  </p>
                 </div>
-
-                <button className="actionBtn">Swap</button>
-
-                <p className="description">
-                  The NFT purchased by participating in the subscription auction
-                  generates 12% of profits after 3 days and is sold random. In
-                  addition, the results are announced at 9:00 AM, and the
-                  transaction is completed from 9:00 AM to 21:00 PM. If the
-                  transaction is not completed within time, all transactions in
-                  your account will be suspended. It operates normally after
-                  applying a penalty of 10% of the winning bid amount.
-                </p>
-              </div>
-            </li>
-          ))}
+              </li>
+            ))}
 
           {/* <li className="sellBox">
             <div className="imgBox">
@@ -651,7 +676,7 @@ export default function MyItems() {
                     <p className="value">15 USDT</p>
                   </li>
                   <li
-                    onClick={(evt) => {
+                    onClick={evt => {
                       window.open(txscanurl);
                     }}
                   >
