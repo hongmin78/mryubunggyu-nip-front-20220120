@@ -62,6 +62,11 @@ export default function MyItems() {
         let { list } = res.data;
         setItemData(list);
         LOGGER("receivables", list);
+        list.forEach((el) => {
+          let { duetimeunix } = el;
+          const current = moment().unix() - duetimeunix;
+          console.log(moment.unix(current).format("YYYY-MM-DD"));
+        });
       })
       .catch((err) => console.log(err));
     false &&
@@ -532,8 +537,8 @@ export default function MyItems() {
           </li>
 
           {itemData.length !== 0 &&
-            itemData.map((item) => (
-              <li className="swapBox">
+            itemData.map((item, index) => (
+              <li key={index} className="swapBox">
                 <div className="imgBox">
                   <img className="itemImg" src={item.itemdata.url} alt="" />
 
@@ -547,7 +552,7 @@ export default function MyItems() {
 
                 <div className="infoBox">
                   <div className="titleBox">
-                    <strong className="title">Series Kong #010000</strong>
+                    <strong className="title">{item.itemdata.titlename}</strong>
                   </div>
 
                   <div className="ownedBox">
@@ -595,7 +600,7 @@ export default function MyItems() {
                   </div>
 
                   <button className="actionBtn" onClick={openModal}>
-                    Buy
+                    Pay
                   </button>
 
                   <p className="description">
