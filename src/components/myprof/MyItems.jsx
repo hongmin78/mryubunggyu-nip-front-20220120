@@ -18,6 +18,8 @@ import { query_with_arg } from "../../util/contract-calls";
 import { addresses } from "../../configs/addresses";
 import { TIME_FETCH_MYADDRESS_DEF } from "../../configs/configs";
 import { getmyaddress, LOGGER } from "../../util/common";
+// import BidPopup from "../BidPopup";
+import StakingPopup from "../StakingPopup";
 import moment from "moment";
 
 const MAP_NETTYPE_SCAN = {
@@ -32,6 +34,7 @@ export default function MyItems() {
   const [sortOpt, setSortOpt] = useState(D_sortList[1]);
   const [sortPopup, setSortPopup] = useState(false);
   const [isstaked, setisstaked] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   let [itemData, setItemData] = useState([]);
   let [mytokenid, setmytokenid] = useState(0);
   let [stakedata, setstakedata] = useState({});
@@ -43,7 +46,7 @@ export default function MyItems() {
 
   const fetchdata = async (_) => {
     let myaddress = getmyaddress();
-    console.log("myaddress", myaddress);
+    LOGGER("myaddress", myaddress);
 
     axios.get(API.API_USERINFO + `/${myaddress}`).then((resp) => {
       LOGGER("", resp.data);
@@ -61,28 +64,29 @@ export default function MyItems() {
         LOGGER("receivables", list);
       })
       .catch((err) => console.log(err));
-    axios
-      .get(
-        API.API_QUERY_SINGLEROW +
-          `/transactions/username/${myaddress}?typestr=STAKE&status=1`
-      )
-      .then((resp) => {
-        LOGGER("", resp.data);
-        let { status, respdata } = resp.data;
-        if (status == "OK") {
-          let { txhash } = respdata;
-          setstakedata(respdata);
-          settxhash(strDot(txhash, 16, 0));
-          settxscanurl(MAP_NETTYPE_SCAN[respdata.nettype] + `/tx/${txhash}`);
-          let buydatetime = moment(respdata.createdat);
-          setbuydate([
-            buydatetime.year().toString().substr(2),
-            (1 + buydatetime.month()).toString().padStart(2, "0"),
-            buydatetime.day().toString().padStart(2, "0"),
-            buydatetime.hour().toString().padStart(2, "0"),
-          ]);
-        }
-      });
+    false &&
+      axios
+        .get(
+          API.API_QUERY_SINGLEROW +
+            `/transactions/username/${myaddress}?typestr=STAKE&status=1`
+        )
+        .then((resp) => {
+          LOGGER("", resp.data);
+          let { status, respdata } = resp.data;
+          if (status == "OK") {
+            let { txhash } = respdata;
+            setstakedata(respdata);
+            settxhash(strDot(txhash, 16, 0));
+            settxscanurl(MAP_NETTYPE_SCAN[respdata.nettype] + `/tx/${txhash}`);
+            let buydatetime = moment(respdata.createdat);
+            setbuydate([
+              buydatetime.year().toString().substr(2),
+              (1 + buydatetime.month()).toString().padStart(2, "0"),
+              buydatetime.day().toString().padStart(2, "0"),
+              buydatetime.hour().toString().padStart(2, "0"),
+            ]);
+          }
+        });
     query_with_arg({
       contractaddress: addresses.contract_ticketnft, // ETH_TESTNET.
       abikind: "TICKETNFT",
@@ -108,36 +112,15 @@ export default function MyItems() {
     });
   };
 
-  // const fetchReceivables = () => {
-  //   let myAddress = getmyaddress();
-  //   // fetching receivables data
-  //   axios
-  //     .get(API.API_RECEIVABLES + `/${myAddress}`)
-  //     .then(res => {
-  //       console.log(res);
-  //       // let { list } = res.data;
-  //       // setItemData(list);
-  //       // LOGGER("receivables", list);
-  //     })
-  //     .catch(err => console.log(err));
-  // };
-
-  // useEffect(() => {
-  //   fetchReceivables();
-  // }, []);
-
   useEffect((_) => {
     setTimeout((_) => {
       fetchdata();
     }, TIME_FETCH_MYADDRESS_DEF);
   }, []);
 
-  useEffect(() => {
-    LOGGER("receivables1", itemData);
-    itemData.forEach((el) => {
-      console.log(el.itemdata.url);
-    });
-  }, [itemData]);
+  const openModal = () => {
+    setIsOpen((prevState) => !prevState);
+  };
 
   if (isMobile)
     return (
@@ -611,7 +594,9 @@ export default function MyItems() {
                     </ul>
                   </div>
 
-                  <button className="actionBtn">Swap</button>
+                  <button className="actionBtn" onClick={openModal}>
+                    Buy
+                  </button>
 
                   <p className="description">
                     The NFT purchased by participating in the subscription
@@ -626,6 +611,8 @@ export default function MyItems() {
                 </div>
               </li>
             ))}
+
+          {isOpen && <StakingPopup off={openModal} />}
 
           {/* <li className="sellBox">
             <div className="imgBox">
