@@ -27,7 +27,7 @@ const MAP_NETTYPE_SCAN = {
 export default function MyItems() {
   const navigate = useNavigate();
   const sortBtnRef = useRef();
-  const isMobile = useSelector(state => state.common.isMobile);
+  const isMobile = useSelector((state) => state.common.isMobile);
   const [filter, setFilter] = useState(0);
   const [sortOpt, setSortOpt] = useState(D_sortList[1]);
   const [sortPopup, setSortPopup] = useState(false);
@@ -41,11 +41,11 @@ export default function MyItems() {
   let [buydate, setbuydate] = useState([]);
   let [userinfo, setuserinfo] = useState(null);
 
-  const fetchdata = async _ => {
+  const fetchdata = async (_) => {
     let myaddress = getmyaddress();
     console.log("myaddress", myaddress);
 
-    axios.get(API.API_USERINFO + `/${myaddress}`).then(resp => {
+    axios.get(API.API_USERINFO + `/${myaddress}`).then((resp) => {
       LOGGER("", resp.data);
       let { status, respdata } = resp.data;
       if (status == "OK") {
@@ -54,19 +54,19 @@ export default function MyItems() {
     });
     axios
       .get(API.API_RECEIVABLES + `/${myaddress}`)
-      .then(res => {
+      .then((res) => {
         console.log(res);
         let { list } = res.data;
         setItemData(list);
         LOGGER("receivables", list);
       })
-      .catch(err => console.log(err));
+      .catch((err) => console.log(err));
     axios
       .get(
         API.API_QUERY_SINGLEROW +
           `/transactions/username/${myaddress}?typestr=STAKE&status=1`
       )
-      .then(resp => {
+      .then((resp) => {
         LOGGER("", resp.data);
         let { status, respdata } = resp.data;
         if (status == "OK") {
@@ -88,7 +88,7 @@ export default function MyItems() {
       abikind: "TICKETNFT",
       methodname: "_balance_user_itemhash",
       aargs: [myaddress], // ETH_TESTNET.
-    }).then(async resp => {
+    }).then(async (resp) => {
       let myitemhash = resp;
       let mytokenid;
       try {
@@ -126,8 +126,8 @@ export default function MyItems() {
   //   fetchReceivables();
   // }, []);
 
-  useEffect(_ => {
-    setTimeout(_ => {
+  useEffect((_) => {
+    setTimeout((_) => {
       fetchdata();
     }, TIME_FETCH_MYADDRESS_DEF);
   }, []);
@@ -240,7 +240,7 @@ export default function MyItems() {
                   <p className="value">688 USDT</p>
                 </li>
                 <li
-                  onClick={evt => {
+                  onClick={(evt) => {
                     window.open(txscanurl);
                   }}
                 >
@@ -314,7 +314,7 @@ export default function MyItems() {
                   <p className="value">688 USDT</p>
                 </li>
                 <li
-                  onClick={evt => {
+                  onClick={(evt) => {
                     window.open(txscanurl);
                   }}
                 >
@@ -386,7 +386,7 @@ export default function MyItems() {
                   <p className="value">688 USDT</p>
                 </li>
                 <li
-                  onClick={evt => {
+                  onClick={(evt) => {
                     window.open(txscanurl);
                   }}
                 >
@@ -519,7 +519,7 @@ export default function MyItems() {
                     <p className="value">688 USDT</p>
                   </li>
                   <li
-                    onClick={evt => {
+                    onClick={(evt) => {
                       window.open(txscanurl);
                     }}
                   >
@@ -546,10 +546,10 @@ export default function MyItems() {
           </li>
 
           {itemData.length !== 0 &&
-            itemData.map(item => (
+            itemData.map((item) => (
               <li className="swapBox">
                 <div className="imgBox">
-                  {/* <img className="itemImg" src={E_item2} alt="" /> */}
+                  <img className="itemImg" src={E_item2} alt="" />
                   <img className="itemImg" src={item.itemData?.url} alt="" />
 
                   <div className="topBar">
@@ -599,7 +599,7 @@ export default function MyItems() {
                         <p className="value">688 USDT</p>
                       </li>
                       <li
-                        onClick={evt => {
+                        onClick={(evt) => {
                           window.open(txscanurl);
                         }}
                       >
