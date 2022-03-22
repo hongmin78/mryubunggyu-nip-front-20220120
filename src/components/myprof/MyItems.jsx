@@ -134,6 +134,9 @@ export default function MyItems() {
 
   useEffect(() => {
     LOGGER("receivables1", itemData);
+    itemData.forEach((el) => {
+      console.log(el.itemdata.url);
+    });
   }, [itemData]);
 
   if (isMobile)
@@ -549,8 +552,7 @@ export default function MyItems() {
             itemData.map((item) => (
               <li className="swapBox">
                 <div className="imgBox">
-                  <img className="itemImg" src={E_item2} alt="" />
-                  <img className="itemImg" src={item.itemData?.url} alt="" />
+                  <img className="itemImg" src={item.itemdata.url} alt="" />
 
                   <div className="topBar">
                     <button className="likeBtn" onClick={() => {}}>
