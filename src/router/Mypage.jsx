@@ -16,11 +16,11 @@ import I_upload from "../img/icon/I_upload.svg";
 import I_clip from "../img/icon/I_clip.svg";
 import Staking from "../components/myprof/Staking";
 import { getmyaddress, LOGGER } from "../util/common";
-import moment from 'moment'
+import moment from "moment";
 import axios from "axios";
 import { API } from "../configs/api";
-import { addresses } from '../configs/addresses'
-import { TIME_FETCH_MYADDRESS_DEF } from '../configs/configs'
+import { addresses } from "../configs/addresses";
+import { TIME_FETCH_MYADDRESS_DEF } from "../configs/configs";
 
 export default function Mypage() {
   const navigate = useNavigate();
@@ -29,22 +29,24 @@ export default function Mypage() {
   const [category, setCategory] = useState(0);
   const [showEditBtn, setShowEditBtn] = useState(false);
   const [showCopyBtn, setShowCopyBtn] = useState(false);
-	let [ userinfo , setuserinfo ] = useState()
-	const fetchdata=async _=>{
-		let myaddress = getmyaddress()
-		axios.get(API.API_USERINFO + `/${myaddress}`).then(resp=>{ LOGGER( '' , resp.data )
-			let { status , respdata} =resp.data
-			if ( status =='OK' ){
-				setuserinfo( respdata )
-			}
-		})
-	}
-		useEffect(_=>{
-			setTimeout(_=>{
-				fetchdata()
-			} , TIME_FETCH_MYADDRESS_DEF )
-		} , [] )
-	
+  let [userinfo, setuserinfo] = useState();
+
+  const fetchdata = async (_) => {
+    let myaddress = getmyaddress();
+    axios.get(API.API_USERINFO + `/${myaddress}`).then((resp) => {
+      LOGGER("", resp.data);
+      let { status, respdata } = resp.data;
+      if (status == "OK") {
+        setuserinfo(respdata);
+      }
+    });
+  };
+  useEffect((_) => {
+    setTimeout((_) => {
+      fetchdata();
+    }, TIME_FETCH_MYADDRESS_DEF);
+  }, []);
+
   if (isMobile)
     return (
       <>
@@ -106,7 +108,7 @@ export default function Mypage() {
               </div>
 
               <span className="adressContainer">
-                <span className="name">@{ userinfo?.nickname }</span>
+                <span className="name">@{userinfo?.nickname}</span>
                 <span className="addressBox">
                   <p>{strDot(isLogin, 4, 4)}</p>
                   <img src={I_copy} alt="" />
@@ -155,7 +157,7 @@ export default function Mypage() {
                 </span>
 
                 <span className="adressContainer">
-                  <span className="name">@{ userinfo?.nickname }</span>
+                  <span className="name">@{userinfo?.nickname}</span>
                   <span className="addressBox">
                     <p>{strDot(isLogin, 4, 4)}</p>
                     <img src={I_copy} alt="" />
