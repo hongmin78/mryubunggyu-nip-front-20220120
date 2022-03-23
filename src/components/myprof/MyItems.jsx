@@ -20,7 +20,7 @@ import { TIME_FETCH_MYADDRESS_DEF } from "../../configs/configs";
 import { getmyaddress, LOGGER } from "../../util/common";
 // import BidPopup from "../BidPopup";
 import StakingPopup from "../StakingPopup";
-import moment from "moment";
+import moment, { HTML5_FMT } from "moment";
 
 const MAP_NETTYPE_SCAN = {
   ETH_TESTNET: "https://etherscan.io",
@@ -55,20 +55,6 @@ export default function MyItems() {
         setuserinfo(respdata);
       }
     });
-    axios
-      .get(API.API_RECEIVABLES + `/${myaddress}`)
-      .then((res) => {
-        console.log(res);
-        let { list } = res.data;
-        setItemData(list);
-        LOGGER("receivables", list);
-        list.forEach((el) => {
-          let { duetimeunix } = el;
-          const current = moment().unix() - duetimeunix;
-          console.log(moment.unix(current).format("YYYY-MM-DD"));
-        });
-      })
-      .catch((err) => console.log(err));
     false &&
       axios
         .get(
@@ -117,11 +103,38 @@ export default function MyItems() {
     });
   };
 
-  useEffect((_) => {
-    setTimeout((_) => {
-      fetchdata();
-    }, TIME_FETCH_MYADDRESS_DEF);
+  const fetchReceivables = () => {
+    axios
+      .get(API.API_RECEIVABLES + `/${myaddress}`)
+      .then((res) => {
+        console.log(res);
+        if (res.data.list) {
+          let { list } = res.data;
+          setItemData(list);
+          LOGGER("receivables", list);
+          LOGGER("receivables-useState", itemData);
+          list.forEach((el) => {
+            let { duetimeunix } = el;
+            const current = moment().unix() - duetimeunix;
+            console.log(moment.unix(current).format("YYYY-MM-DD"));
+          });
+        }
+      })
+      .catch((err) => console.log(err));
+  };
+
+  useEffect(() => {
+    fetchReceivables();
   }, []);
+
+  useEffect(
+    (_) => {
+      setTimeout((_) => {
+        fetchdata();
+      }, TIME_FETCH_MYADDRESS_DEF);
+    },
+    [itemData]
+  );
 
   const openModal = () => {
     setIsOpen((prevState) => !prevState);
@@ -536,8 +549,8 @@ export default function MyItems() {
             </div>
           </li>
 
-          {itemData.length !== 0 &&
-            itemData.map((item, index) => (
+          {itemData.length !== 0 ? (
+            itemData.map((item, index) => {
               <li key={index} className="swapBox">
                 <div className="imgBox">
                   <img className="itemImg" src={item.itemdata.url} alt="" />
@@ -614,8 +627,11 @@ export default function MyItems() {
                     amount.
                   </p>
                 </div>
-              </li>
-            ))}
+              </li>;
+            })
+          ) : (
+            <h1>You have no receivables!</h1>
+          )}
 
           {isOpen && <StakingPopup off={openModal} />}
 
@@ -1294,6 +1310,10 @@ const PmyItemsBox = styled.section`
             }
           }
         }
+      }
+
+      h5 {
+        text-align: center;
       }
 
       &.swapBox {
