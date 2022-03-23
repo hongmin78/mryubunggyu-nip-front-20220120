@@ -6,33 +6,42 @@ const LOGGER = console.log;
 const KEYS = Object.keys;
 const ISFINITE = Number.isFinite;
 const STRINGER = JSON.stringify;
-const PARSER = JSON.parse
+const PARSER = JSON.parse;
 
-const conv_jdata_arrkeyvalue=jdata=>{
-	if (jdata){}
-	else {return [] } 
-	if (KEYS( jdata).length ){}
-	else {return [] }
-	return KEYS( jdata ).map ( elem =>{ 
-		return {key : elem , value : jdata[elem ]}
-	})
-}
-const getobjtype=object=>{
+const conv_jdata_arrkeyvalue = (jdata) => {
+  if (jdata) {
+  } else {
+    return [];
+  }
+  if (KEYS(jdata).length) {
+  } else {
+    return [];
+  }
+  return KEYS(jdata).map((elem) => {
+    return { key: elem, value: jdata[elem] };
+  });
+};
+const getobjtype = (object) => {
   var stringConstructor = "test".constructor;
   var arrayConstructor = [].constructor;
-  var objectConstructor = ({}).constructor;
-  if (object === null) {      return "null";
+  var objectConstructor = {}.constructor;
+  if (object === null) {
+    return "null";
   }
-  if (object === undefined) {      return "undefined";
+  if (object === undefined) {
+    return "undefined";
   }
-  if (object.constructor === stringConstructor) {      return "String";
+  if (object.constructor === stringConstructor) {
+    return "String";
   }
-  if (object.constructor === arrayConstructor) {      return "Array";
+  if (object.constructor === arrayConstructor) {
+    return "Array";
   }
-  if (object.constructor === objectConstructor) {      return "Object";
+  if (object.constructor === objectConstructor) {
+    return "Object";
   }
-  return null ;
-}
+  return null;
+};
 const getqueriesspeckey = (key) => {
   let location = window.location.href;
   let atkns = location.split(/\?/);
@@ -41,7 +50,7 @@ const getqueriesspeckey = (key) => {
   } else {
     return null;
   }
-}
+};
 const _getqueriesspeckey_str = (str, key) => {
   str = str.replace(/\?/g, "");
   const aargs = str.split("&"); // ;let jdata={} //	aargs.some(e=>{	const atkns=e.split('=');		// jdata[atkns[0]]=atkns[1]
@@ -86,8 +95,7 @@ const generaterandomstr_charset = (length, charsetcode) => {
   } else if (charsetcode == "notconfusing") {
     characters = "2345679BCDEGHKLQSUZadehiopqstu";
   } else {
-    characters =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   }
   var charactersLength = characters.length;
   let result = "";
@@ -163,11 +171,9 @@ const getmyaddress = (_) => {
   if (walletConnector.connected) {
     return walletConnector._accounts[0];
   } else { */
-    window.ethereum &&
-      window.ethereum.selectedAddress &&
-      LOGGER(window.ethereum.selectedAddress);
-    return window.ethereum ? window.ethereum.selectedAddress : null;
-//  }
+  window.ethereum && window.ethereum.selectedAddress && LOGGER(window.ethereum.selectedAddress);
+  return window.ethereum ? window.ethereum.selectedAddress : null;
+  //  }
 };
 const MAP_TIME_FORMAT = {
   0: "YYYY-MM-DDTHH:mm:ss",
@@ -190,9 +196,7 @@ const getdiffindays = (time1, time0) => {
     return diffindays == 1 ? `${diffindays} day ago` : `${diffindays} days ago`;
   } else {
     let diffinhours = time1.diff(time0, "hours");
-    return diffinhours == 1
-      ? `${diffinhours} hour ago`
-      : `${diffinhours} hours ago`;
+    return diffinhours == 1 ? `${diffinhours} hour ago` : `${diffinhours} hours ago`;
   }
 };
 const get_lasttoken_url = (_) => {
@@ -207,19 +211,25 @@ const show_in_exp_form = (number) => {
   return (+number).toExponential();
 };
 const POST_ON_CONFIRM_OR_RECEIPT = 1;
-function onclickcopy ( copyText ) {
-	const textArea = document.createElement("textarea");
-	document.body.appendChild(textArea);
-//	const copyText = `${url}/${document.location.hash}`;
-	textArea.value = copyText;
-	textArea.select();
-	document.execCommand("copy");
-	document.body.removeChild(textArea);
-//	SetErrorBar("Link Copied!");
+function onclickcopy(copyText) {
+  const textArea = document.createElement("textarea");
+  document.body.appendChild(textArea);
+  //	const copyText = `${url}/${document.location.hash}`;
+  textArea.value = copyText;
+  textArea.select();
+  document.execCommand("copy");
+  document.body.removeChild(textArea);
+  //	SetErrorBar("Link Copied!");
+}
+function copy_to_clipboard() {
+  var copyText = document.getElementById("myInput");
+  copyText.select();
+  document.execCommand("Copy");
+  console.log("Copied!");
 }
 export {
-	conv_jdata_arrkeyvalue ,
-	getobjtype ,
+  conv_jdata_arrkeyvalue,
+  getobjtype,
   LOGGER,
   ISFINITE,
   STRINGER,
@@ -239,6 +249,7 @@ export {
   getqueriesspeckey,
   get_lasttoken_url,
   show_in_exp_form,
-	POST_ON_CONFIRM_OR_RECEIPT,
-	onclickcopy
+  POST_ON_CONFIRM_OR_RECEIPT,
+  onclickcopy,
+  copy_to_clipboard,
 };

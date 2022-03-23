@@ -13,19 +13,16 @@ import { autoAuctionList } from "../data/Dmain";
 import AuctionItem0228 from "../components/AuctionItem0228";
 import Details from "../components/itemDetail/Details";
 import Details0303 from "../components/itemDetail/Details0303";
-
 import Properties from "../components/itemDetail/Properties";
 import { useSelector } from "react-redux";
 import Header from "../components/header/Header";
 import PopupBg from "../components/PopupBg";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import { LOGGER , getmyaddress, onclickcopy, PARSER
-	, conv_jdata_arrkeyvalue
-} from "../util/common";
+import { LOGGER, getmyaddress, onclickcopy, PARSER, conv_jdata_arrkeyvalue } from "../util/common";
 import { API } from "../configs/api";
-import SetErrorBar from '../util/SetErrorBar'
-import { messages } from '../configs/messages'
+import SetErrorBar from "../util/SetErrorBar";
+import { messages } from "../configs/messages";
 
 export default function AuctionDetail() {
   const params = useParams();
@@ -35,34 +32,41 @@ export default function AuctionDetail() {
   const [category, setCategory] = useState(0);
   const [moreIndex, setMoreIndex] = useState(0);
   const [showCopyBtn, setShowCopyBtn] = useState(false);
-  const [itemdata, setitemdata ] = useState({});
+  const [itemdata, setitemdata] = useState({});
   const [moreCollection, setMoreCollection] = useState([]);
-	let [ attributes , setattributes ] = useState ( [] )
-	const onclicklike=_=>{
-		let myaddress = getmyaddress()
-		if (myaddress){} else {SetErrorBar( messages.MSG_PLEASE_CONNECT_WALLET ) ; return }
-		axios.post ( API.API_TOGGLE_FAVORITE + `/${itemdata?.itemid}` , {username : myaddress } ).then(			resp=>{ LOGGER( '' , resp.data )
-			let { status , respdata }=resp.data
-			if ( status =='OK'){
-				setToggleLike ( respdata? true : false )
-				switch(+respdata ){
-					case 1 : SetErrorBar ( messages.MSG_DONE_LIKE )
-					break
-					default : SetErrorBar ( messages.MSG_DONE_UNLIKE)
-					break
-				}
-			}
-		}	)
-		setToggleLike(!toggleLike)
-	}
+  let [attributes, setattributes] = useState([]);
+  const onclicklike = (_) => {
+    let myaddress = getmyaddress();
+    if (myaddress) {
+    } else {
+      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+      return;
+    }
+    axios.post(API.API_TOGGLE_FAVORITE + `/${itemdata?.itemid}`, { username: myaddress }).then((resp) => {
+      LOGGER("", resp.data);
+      let { status, respdata } = resp.data;
+      if (status == "OK") {
+        setToggleLike(respdata ? true : false);
+        switch (+respdata) {
+          case 1:
+            SetErrorBar(messages.MSG_DONE_LIKE);
+            break;
+          default:
+            SetErrorBar(messages.MSG_DONE_UNLIKE);
+            break;
+        }
+      }
+    });
+    setToggleLike(!toggleLike);
+  };
 
-	const onclickfavorite=_=>{
-		axios.post (API.API_TOGGLE_FAVORITE ).then(resp=>{
-			LOGGER( 'xMYQNYFa9d' , resp.data )
-		})
-		setToggleLike(!toggleLike)
-		LOGGER('8FCYJgzDZX')
-	} 
+  const onclickfavorite = (_) => {
+    axios.post(API.API_TOGGLE_FAVORITE).then((resp) => {
+      LOGGER("xMYQNYFa9d", resp.data);
+    });
+    setToggleLike(!toggleLike);
+    LOGGER("8FCYJgzDZX");
+  };
   function onClickAuctionNextBtn() {
     if (!moreRef.current.children[0]) return;
     const wrapWidth = moreRef.current.offsetWidth;
@@ -72,38 +76,40 @@ export default function AuctionDetail() {
     if (moreIndex < pageNum - 1) setMoreIndex(moreIndex + 1);
     else setMoreIndex(0);
   }
-	const getitem=_=>{
-		axios.get( API.API_ITEMDETAIL + `/${params.itemid }`).then ( resp => { LOGGER ('7FzS4oxYPN' , resp.data )
-		let { status , respdata}=resp.data
-		if (status == 'OK'){
-			setitemdata( respdata )
-			let { metadata}=respdata
-			if ( metadata ) {
-				let jmetadata= PARSER( metadata )
-				LOGGER ( 'oXhffF8eTM' , conv_jdata_arrkeyvalue ( jmetadata ) )
-				setattributes ( conv_jdata_arrkeyvalue ( jmetadata ) )
-			}
-		}
-	})
-	}
+  const getitem = (_) => {
+    axios.get(API.API_ITEMDETAIL + `/${params.itemid}`).then((resp) => {
+      LOGGER("7FzS4oxYPN", resp.data);
+      let { status, respdata } = resp.data;
+      if (status == "OK") {
+        setitemdata(respdata);
+        let { metadata } = respdata;
+        if (metadata) {
+          let jmetadata = PARSER(metadata);
+          LOGGER("oXhffF8eTM", conv_jdata_arrkeyvalue(jmetadata));
+          setattributes(conv_jdata_arrkeyvalue(jmetadata));
+        }
+      }
+    });
+  };
   function getAuction() {
-		axios //      .get("http://3.35.1 17.87:34705/auction/list", { params: { limit: 8 } })
-			.get(API.API_COMMONITEMS + `/items/group_/kong/0/128/id/DESC` )
-      .then( resp => {	LOGGER( '' , resp.data )
-				let { status ,list }=resp.data
-				if ( status =='OK'){
-					setMoreCollection( list )
-				}
-//        console.log(res.data);
-  //      setMoreCollection(res.data);
+    axios //      .get("http://3.35.1 17.87:34705/auction/list", { params: { limit: 8 } })
+      .get(API.API_COMMONITEMS + `/items/group_/kong/0/128/id/DESC`)
+      .then((resp) => {
+        LOGGER("", resp.data);
+        let { status, list } = resp.data;
+        if (status == "OK") {
+          setMoreCollection(list);
+        }
+        //        console.log(res.data);
+        //      setMoreCollection(res.data);
       });
   }
 
-	useEffect (_=>{
-		getitem()
-		getAuction()
-	} , [] )
-/**   useEffect(() => {
+  useEffect((_) => {
+    getitem();
+    getAuction();
+  }, []);
+  /**   useEffect(() => {
     axios
       .ge t(`http://3.35.117.87:34705/auction/item/${params.dna}`)
       .then((res) => {
@@ -120,15 +126,13 @@ export default function AuctionDetail() {
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
     if (moreRef.current?.scrollTo) {
       if (moreIndex === 0) {
-        moreRef.current.scrollTo( {
+        moreRef.current.scrollTo({
           left: 0,
           behavior: "smooth",
         });
       } else {
         moreRef.current.scrollTo({
-          left:
-            contWidth * itemNumByPage * moreIndex +
-            moreIndex * getStyle(moreRef, "gap") * itemNumByPage,
+          left: contWidth * itemNumByPage * moreIndex + moreIndex * getStyle(moreRef, "gap") * itemNumByPage,
           behavior: "smooth",
         });
       }
@@ -143,7 +147,7 @@ export default function AuctionDetail() {
         <MauctionDetailBox>
           <section className="itemInfoContainer">
             <span className="itemImgBox">
-              <img className="itemImg" src={itemdata?.url } alt="" />
+              <img className="itemImg" src={itemdata?.url} alt="" />
             </span>
 
             <article className="infoBox">
@@ -153,16 +157,13 @@ export default function AuctionDetail() {
                     <div className="btnBox">
                       <button
                         className="likeBtn hoverBtn"
-												onClick={() => { onclicklike () // onclick favorite ()
-												} }
+                        onClick={() => {
+                          onclicklike(); // onclick favorite ()
+                        }}
                       >
                         <img src={toggleLike ? I_heartO : I_heart} alt="" />
                       </button>
-
-                      <button
-                        className="moreBtn hoverBtn"
-                        onClick={() => setShowCopyBtn(true)}
-                      >
+                      <button className="moreBtn hoverBtn" onClick={() => setShowCopyBtn(true)}>
                         <img src={I_3dot} alt="" />
                       </button>
                     </div>
@@ -172,10 +173,10 @@ export default function AuctionDetail() {
                         <button
                           className="copyBtn displayBtn"
                           onClick={() => {
-														onclickcopy ( window.location.href )
-														SetErrorBar(messages.MSG_COPIED )
-														setShowCopyBtn(false)														
-													}}
+                            onclickcopy(window.location.href);
+                            SetErrorBar(messages.MSG_COPIED);
+                            setShowCopyBtn(false);
+                          }}
                         >
                           <img src={I_clip} alt="" />
                           Copy Link
@@ -196,9 +197,7 @@ export default function AuctionDetail() {
                 <div className="saleBox">
                   <div className="price">
                     <p className="key">Current price</p>
-                    <strong className="value">
-                      {putCommaAtPrice(372)} USDT
-                    </strong>
+                    <strong className="value">{putCommaAtPrice(372)} USDT</strong>
                   </div>
 
                   <div className="time">
@@ -232,8 +231,8 @@ export default function AuctionDetail() {
 
                 <div className="contBox">
                   {category === 0 && <Offer />}
-                  {category === 1 && <Details0303 attributes={ attributes } />}
-                  {category === 2 && <Properties itemdata={ itemdata } />}
+                  {category === 1 && <Details0303 attributes={attributes} />}
+                  {category === 2 && <Properties itemdata={itemdata} />}
                 </div>
               </div>
             </article>
@@ -299,43 +298,39 @@ export default function AuctionDetail() {
         <PauctionDetailBox>
           <section className="itemInfoContainer">
             <span className="itemImgBox">
-              <img className="itemImg" src={itemdata?.url } alt="" />
+              <img className="itemImg" src={itemdata?.url} alt="" />
             </span>
 
             <article className="infoBox">
               <div className="itemInfoBox">
                 <div className="titleBox">
-                  <strong className="title">
-                    Series Kong {itemdata?.titlename }
-                  </strong>
+                  <strong className="title">Series Kong {itemdata?.titlename}</strong>
 
                   <div className="btnBox">
                     <div className="posBox">
                       <button
                         className="likeBtn hoverBtn"
-												onClick={() => { onclicklike () // onclickfavorite()
-												} }
+                        onClick={() => {
+                          onclicklike(); // onclickfavorite()
+                        }}
                       >
                         <img src={toggleLike ? I_heartO : I_heart} alt="" />
                       </button>
                     </div>
 
                     <div className="posBox">
-                      <button
-                        className="moreBtn hoverBtn"
-                        onClick={() => setShowCopyBtn(true)}
-                      >
+                      <button className="moreBtn hoverBtn" onClick={() => setShowCopyBtn(true)}>
                         <img src={I_3dot} alt="" />
                       </button>
 
                       <div className="hoverBox">
                         <button
                           className="copyBtn displayBtn"
-													onClick={() =>{ 
-														onclickcopy ( window.location.href )
-														SetErrorBar(messages.MSG_COPIED )
-														setShowCopyBtn(false)														
-													}}
+                          onClick={() => {
+                            onclickcopy(window.location.href);
+                            SetErrorBar(messages.MSG_COPIED);
+                            setShowCopyBtn(false);
+                          }}
                         >
                           <img src={I_clip} alt="" />
                           Copy Link
@@ -357,9 +352,7 @@ export default function AuctionDetail() {
                   </div>
 
                   <div className="value">
-                    <strong className="price">
-                      {putCommaAtPrice(372)} USDT
-                    </strong>
+                    <strong className="price">{putCommaAtPrice(372)} USDT</strong>
 
                     <ul className="timeList">
                       <li>00</li>
@@ -391,8 +384,8 @@ export default function AuctionDetail() {
 
                 <div className="contBox">
                   {category === 0 && <Offer />}
-                  {category === 1 && <Details0303 attributes={ attributes } />}
-                  {category === 2 && <Properties itemdata={ itemdata } />}
+                  {category === 1 && <Details0303 attributes={attributes} />}
+                  {category === 2 && <Properties itemdata={itemdata} />}
                 </div>
               </div>
             </article>

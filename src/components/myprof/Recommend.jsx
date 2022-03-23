@@ -5,6 +5,7 @@ import { D_recommendList } from "../../data/DmyPage";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { strDot } from "../../util/Util";
+import { onclickcopy } from "../../util/common.js";
 
 export default function Recommend() {
   const isMobile = useSelector((state) => state.common.isMobile);
@@ -22,11 +23,9 @@ export default function Recommend() {
             <strong className="contTitle">Friend Recommendation</strong>
 
             <p className="explain">
-              Share your referral link! When a new user who accesses this link
-              purchases a product,
+              Share your referral link! When a new user who accesses this link purchases a product,
               <br />
-              an additional 2% of the sales amount is paid. Referral rewards are
-              paid in lump sum every month.
+              an additional 2% of the sales amount is paid. Referral rewards are paid in lump sum every month.
             </p>
           </li>
 
@@ -40,7 +39,10 @@ export default function Recommend() {
                   <p>98Dd4DBE</p>
                   <button
                     className="copyBtn"
-                    onClick={() => setToggleCode(true)}
+                    onClick={() => {
+                      onclickcopy();
+                      setToggleCode(true);
+                    }}
                   >
                     <img src={toggleCode ? I_circleChk : I_copy} alt="" />
                   </button>
@@ -49,17 +51,12 @@ export default function Recommend() {
               <li className="linkBox">
                 <strong className="key">
                   Link{" "}
-                  <button
-                    className="copyBtn"
-                    onClick={() => setToggleLink(true)}
-                  >
+                  <button className="copyBtn" onClick={() => setToggleLink(true)}>
                     <img src={toggleLink ? I_circleChk : I_copy} alt="" />
                   </button>
                 </strong>
                 <span className="value">
-                  <p>
-                    https://ausp.io/market/?ref=0x97b155a698d4bdec4c4bf3a92e9071190093cafb
-                  </p>
+                  <p>https://ausp.io/market/?ref=0x97b155a698d4bdec4c4bf3a92e9071190093cafb</p>
                 </span>
               </li>
             </ul>
@@ -99,11 +96,9 @@ export default function Recommend() {
             <strong className="contTitle">Friend Recommendation</strong>
 
             <p className="explain">
-              Share your referral link! When a new user who accesses this link
-              purchases a product,
+              Share your referral link! When a new user who accesses this link purchases a product,
               <br />
-              an additional 2% of the sales amount is paid. Referral rewards are
-              paid in lump sum every month.
+              an additional 2% of the sales amount is paid. Referral rewards are paid in lump sum every month.
             </p>
           </li>
 
@@ -117,7 +112,10 @@ export default function Recommend() {
                   <p>98Dd4DBE</p>
                   <button
                     className="copyBtn"
-                    onClick={() => setToggleCode(true)}
+                    onClick={() => {
+                      onclickcopy("98Dd4DBE");
+                      setToggleCode(true);
+                    }}
                   >
                     <img src={toggleCode ? I_circleChk : I_copy} alt="" />
                   </button>
@@ -126,12 +124,13 @@ export default function Recommend() {
               <li className="linkBox">
                 <strong className="key">Link</strong>
                 <span className="value">
-                  <p>
-                    https://ausp.io/market/?ref=0x97b155a698d4bdec4c4bf3a92e9071190093cafb
-                  </p>
+                  <p>https://ausp.io/market/?ref=0x97b155a698d4bdec4c4bf3a92e9071190093cafb</p>
                   <button
                     className="copyBtn"
-                    onClick={() => setToggleLink(true)}
+                    onClick={() => {
+                      setToggleLink(true);
+                      onclickcopy("https://ausp.io/market/?ref=0x97b155a698d4bdec4c4bf3a92e9071190093cafb");
+                    }}
                   >
                     <img src={toggleLink ? I_circleChk : I_copy} alt="" />
                   </button>
@@ -413,11 +412,4 @@ const PrecommendBox = styled.section`
   }
 `;
 
-const headerList = [
-  "No",
-  "Account",
-  "Symbol",
-  "Recommender Level",
-  "Date of subscription	",
-  "Points Received",
-];
+const headerList = ["No", "Account", "Symbol", "Recommender Level", "Date of subscription	", "Points Received"];

@@ -19,8 +19,8 @@ import { addresses } from "../../configs/addresses";
 import { TIME_FETCH_MYADDRESS_DEF } from "../../configs/configs";
 import { getmyaddress, LOGGER } from "../../util/common";
 // import BidPopup from "../BidPopup";
-import StakingPopup from "../StakingPopup";
-import moment, { HTML5_FMT } from "moment";
+import PayPopup from "../PayPopup";
+import moment from "moment";
 
 const MAP_NETTYPE_SCAN = {
   ETH_TESTNET: "https://etherscan.io",
@@ -633,7 +633,7 @@ export default function MyItems() {
             <h1>You have no receivables!</h1>
           )}
 
-          {isOpen && <StakingPopup off={openModal} />}
+          {isOpen && <PayPopup off={openModal} />}
 
           {/* <li className="sellBox">
             <div className="imgBox">

@@ -17,18 +17,18 @@ const MAP_STR_ABI = {
 	, ADMIN : abiadmin
 	, TICKETNFT : abiticketnft
 }
-const getabistr_forfunction = jargs=>{let { contractaddress 
+const getabistr_forfunction = jargs=>{	let { contractaddress 
 		, abikind 
 		, methodname 
 		, aargs 
 	}=jargs
 	let contract; contractaddress=contractaddress.toLowerCase()
 	let sig = sha256 (contractaddress + methodname )
-  if( jcontracts[sig ] ){
+  if( jcontracts[sig ] ) {
 		contract = jcontracts[ sig ] }
 	else {
-		contract=new web3.eth.Contract( MAP_STR_ABI[abikind] , contractaddress)
-		jcontracts[ sig ] = contract 
+		contract=new web3.eth.Contract( MAP_STR_ABI [ abikind ] , contractaddress)
+		jcontracts[ sig ] = contract
 	}
 	return contract.methods[ methodname ](... aargs ).encodeABI()
 }

@@ -23,7 +23,7 @@ import { TX_POLL_OPTIONS } from "../configs/configs";
 import I_spinner from "../img/icon/I_spinner.svg";
 import { strDot } from "../util/Util";
 const MODE_DEV_PROD = "PROD";
-export default function StakingPopup({ off }) {
+export default function PayPopup({ off }) {
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
   const [termChk, setTermChk] = useState(false);
@@ -168,12 +168,12 @@ export default function StakingPopup({ off }) {
           nettype: NETTYPE,
         })
         .then((resp) => {
-          LOGGER("", resp);
+          LOGGER("APPROVE RESP", resp);
           SetErrorBar(messages.MSG_TX_REQUEST_SENT);
         });
 
       awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then((minedtxreceipt) => {
-        LOGGER("", minedtxreceipt);
+        LOGGER("minedtxreceipt", minedtxreceipt);
         SetErrorBar(messages.MSG_TX_FINALIZED);
 
         query_with_arg({
@@ -414,7 +414,7 @@ export default function StakingPopup({ off }) {
                     false && navigate(-1);
                   }}
                 >
-                  Confirm
+                  Pay
                 </button>
               </div>
             </div>
@@ -428,7 +428,7 @@ export default function StakingPopup({ off }) {
       <PstakingPopupBox>
         <article className="topBar">
           <span className="blank" />
-          <p className="title">Stake</p>
+          <p className="title">Pay</p>
           <button className="exitBtn" onClick={() => off()}>
             <img src={I_x} alt="" />
           </button>
@@ -527,7 +527,7 @@ export default function StakingPopup({ off }) {
               onClick={() => {
                 onclick_approve();
               }}
-              style={+allowanceamount > 0 ? { visibility: "hidden" } : { display: "inline" }}
+              style={{ display: "inline" }}
             >
               {" "}
               Approve
