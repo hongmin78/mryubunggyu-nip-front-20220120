@@ -13,7 +13,6 @@ import { autoAuctionList } from "../data/Dmain";
 import AuctionItem0228 from "../components/AuctionItem0228";
 import Details from "../components/itemDetail/Details";
 import Details0303 from "../components/itemDetail/Details0303";
-
 import Properties from "../components/itemDetail/Properties";
 import { useSelector } from "react-redux";
 import Header from "../components/header/Header";
