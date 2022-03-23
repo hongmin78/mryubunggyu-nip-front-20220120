@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+
+=======
+>>>>>>> sam
+>>>>>>> d56ce6068a24ab40c1da582745d64b0ceadad154
 pragma solidity ^0.8.0;
 
 interface IERC20 {

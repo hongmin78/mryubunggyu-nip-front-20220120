@@ -35,6 +35,7 @@ export default function MyItems() {
   const [sortPopup, setSortPopup] = useState(false);
   const [isstaked, setisstaked] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
+  const [receivables, setReceivables] = useState();
   let [itemData, setItemData] = useState([]);
   let [mytokenid, setmytokenid] = useState(0);
   let [stakedata, setstakedata] = useState({});
@@ -43,6 +44,14 @@ export default function MyItems() {
   let [txscanurl, settxscanurl] = useState();
   let [buydate, setbuydate] = useState([]);
   let [userinfo, setuserinfo] = useState(null);
+
+  const threeSecods = () => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve("success");
+      }, 3000);
+    });
+  };
 
   const fetchdata = async (_) => {
     let myaddress = getmyaddress();
@@ -53,6 +62,7 @@ export default function MyItems() {
       let { status, respdata } = resp.data;
       if (status == "OK") {
         setuserinfo(respdata);
+        console.log("userinfo", userinfo);
       }
     });
     false &&
@@ -78,29 +88,30 @@ export default function MyItems() {
             ]);
           }
         });
-    query_with_arg({
-      contractaddress: addresses.contract_ticketnft, // ETH_TESTNET.
-      abikind: "TICKETNFT",
-      methodname: "_balance_user_itemhash",
-      aargs: [myaddress], // ETH_TESTNET.
-    }).then(async (resp) => {
-      let myitemhash = resp;
-      let mytokenid;
-      try {
-        mytokenid = await query_with_arg({
-          contractaddress: addresses.contract_ticketnft,
-          abikind: "TICKETNFT",
-          methodname: "_itemhash_tokenid",
-          aargs: [myitemhash],
-        });
-        LOGGER("GEVKU97nIv", mytokenid);
-        setmytokenid(mytokenid);
-      } catch (err) {
-        LOGGER(err);
-        mytokenid = null;
-        return;
-      }
-    });
+    false &&
+      query_with_arg({
+        contractaddress: addresses.contract_ticketnft, // ETH_TESTNET.
+        abikind: "TICKETNFT",
+        methodname: "_balance_user_itemhash",
+        aargs: [myaddress], // ETH_TESTNET.
+      }).then(async (resp) => {
+        let myitemhash = resp;
+        let mytokenid;
+        try {
+          mytokenid = await query_with_arg({
+            contractaddress: addresses.contract_ticketnft,
+            abikind: "TICKETNFT",
+            methodname: "_itemhash_tokenid",
+            aargs: [myitemhash],
+          });
+          LOGGER("GEVKU97nIv", mytokenid);
+          setmytokenid(mytokenid);
+        } catch (err) {
+          LOGGER(err);
+          mytokenid = null;
+          return;
+        }
+      });
   };
 
   const fetchReceivables = () => {
@@ -549,9 +560,8 @@ export default function MyItems() {
               </p>
             </div>
           </li>
-
-          {itemData.length !== 0 ? (
-            itemData.map((item, index) => {
+          {itemData.length !== 0 &&
+            itemData.map((item, index) => (
               <li key={index} className="swapBox">
                 <div className="imgBox">
                   <img className="itemImg" src={item.itemdata.url} alt="" />
@@ -628,11 +638,8 @@ export default function MyItems() {
                     amount.
                   </p>
                 </div>
-              </li>;
-            })
-          ) : (
-            <h1>You have no receivables!</h1>
-          )}
+              </li>
+            ))}
 
           {isOpen && <PayPopup off={openModal} />}
 
