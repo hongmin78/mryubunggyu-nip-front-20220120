@@ -144,14 +144,14 @@ export default function StakingPopup({ off }) {
     fetchdata();
   }, []);
   const onclick_approve = async (_) => {
-    LOGGER("");
+    LOGGER("")
     let myaddress = getmyaddress();
     let abistr = getabistr_forfunction({
       contractaddress: addresses.contract_USDT, // ETH_TESTNET.
       abikind: "ERC20",
       methodname: "approve",
       aargs: [addresses.contract_stake, getweirep("" + 10 ** 10)], // .ETH_TESTNET
-    });
+    })
 		LOGGER("", abistr);
 		setisloader_00 ( true )
     requesttransaction({

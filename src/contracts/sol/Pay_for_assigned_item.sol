@@ -12,20 +12,18 @@ interface IERC20 {
         address recipient,
         uint256 amount
     ) external returns (bool);
-    event Transfer (address indexed from, address indexed to, uint256 value);
-    event Approval(address indexed owner, address indexed spender, uint256 value);
+    event Transfer ( address indexed from, address indexed to, uint256 value);
+    event Approval( address indexed owner, address indexed spender, uint256 value);
 }
 contract PayForAssignedItem {
 	address public _owner ;
 	address public _feecollector ;
 	uint256 _fraction_sellerprofit = 9700;
 	uint256 _fraction_adminfee = 300 ;
-
-     modifier onlyowner( address _address ) {
-        require( _owner == _address , "Ownable: caller is not the owner");
-        _;
-    }
-
+  modifier onlyowner( address _address ) {
+		require( _owner == _address , "Ownable: caller is not the owner");
+		_;
+  }
 	function set_feecollector ( address _address ) public onlyowner ( msg.sender ){
 		require ( _address != _feecollector , "ERR() redundant call");
 		_feecollector = _address ;
