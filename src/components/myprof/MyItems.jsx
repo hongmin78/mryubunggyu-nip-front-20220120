@@ -104,6 +104,7 @@ export default function MyItems() {
   };
 
   const fetchReceivables = () => {
+    let myaddress = getmyaddress();
     axios
       .get(API.API_RECEIVABLES + `/${myaddress}`)
       .then((res) => {
