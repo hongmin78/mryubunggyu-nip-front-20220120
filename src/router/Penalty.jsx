@@ -9,13 +9,22 @@ import E_marketItem1 from "../img/main/E_marketItem1.png";
 import { useNavigate } from "react-router-dom";
 import LogoHeader from "../components/header/LogoHeader";
 import { useSelector } from "react-redux";
+import PayDelinquency from "../components/PayDelinquency";
 
 export default function Penalty() {
   const navigate = useNavigate();
 
   const isMobile = useSelector((state) => state.common.isMobile);
+  const delinquencyAmount = useSelector(
+    (state) => state.common.delinquencyAmount
+  );
 
   const [like, setLike] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
+
+  const modalToggle = () => {
+    setOpenModal(() => !openModal);
+  };
 
   if (isMobile)
     return (
@@ -33,10 +42,14 @@ export default function Penalty() {
                 </div>
 
                 <div className="explain">
-                  <p className="cong">
+                  {/* <p className="cong">
                     If the winning auction bid amount is not paid by 9:00 on the
                     same day, the account will be locked and a 10% penalty will
                     be charged
+                  </p> */}
+                  <p className="cong">
+                    Your profile is blocked temporarily. Please pay for your
+                    delinquency.
                   </p>
                   <p className="pay">Pay 688 USDT for your NFT transfer</p>
                 </div>
@@ -85,8 +98,11 @@ export default function Penalty() {
                 It will be canceled and your account will be locked.
               </p>
 
-              <button className="confirmBtn" onClick={() => navigate("/")}>
+              {/* <button className="confirmBtn" onClick={() => navigate("/")}>
                 Confirm checkout
+              </button> */}
+              <button className="confirmBtn" onClick={modalToggle}>
+                Pay now
               </button>
             </article>
           </section>
@@ -150,28 +166,38 @@ export default function Penalty() {
                   </strong>
 
                   <div className="explain">
-                    <p className="cong">
+                    {/* <p className="cong">
                       If the winning auction bid amount is not paid by 9:00 on
                       the same day, the account will be locked and a 10% penalty
                       will be charged
-                    </p>
-                    <p className="pay">Pay 688 USDT for your NFT transfer</p>
+                    </p> */}
+                    <p className="cong">Please pay {delinquencyAmount}</p>
+                    {/* <p className="pay">Pay 688 USDT for your NFT transfer</p> */}
                   </div>
                 </div>
 
                 <div className="btnBox">
-                  <p className="explain">
+                  {/* <p className="explain">
                     If payment is not made by 2022-01-22 21:00:00, payment will
                     be It will be canceled and your account will be locked.
-                  </p>
+                  </p> */}
 
-                  <button className="confirmBtn" onClick={() => navigate("/")}>
+                  {/* <button className="confirmBtn" onClick={() => navigate("/")}>
                     Confirm checkout
+                  </button> */}
+                  <button className="confirmBtn" onClick={modalToggle}>
+                    Pay now
                   </button>
                 </div>
               </div>
             </article>
           </section>
+          {openModal && (
+            <PayDelinquency
+              off={modalToggle}
+              delinquencyAmount={delinquencyAmount}
+            />
+          )}
         </PpenaltyBox>
       </>
     );

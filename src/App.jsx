@@ -1,7 +1,7 @@
 import { useLayoutEffect } from "react";
-import { useEffect , useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { HashRouter, Route, Routes } from "react-router-dom";
+import { HashRouter, Route, Routes, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Auction from "./router/Auction";
 import AuctionDetail from "./router/AuctionDetail";
@@ -20,71 +20,82 @@ import Term from "./router/Term";
 import Test from "./router/Test";
 import Winning from "./router/Winning";
 import GlobalStyle from "./util/GlobalStyle";
-import { setLogin, setMobile , setaddress } from "./util/store/commonSlice";
+import { setLogin, setMobile, setaddress } from "./util/store/commonSlice";
 import { messages } from "./configs/messages";
-import SetErrorBar from './util/SetErrorBar'
+import SetErrorBar from "./util/SetErrorBar";
 import { LOGGER } from "./util/common";
 import { strDot } from "./util/Util";
 import axios from "axios";
 import { API } from "./configs/api";
 
 function App() {
-	const dispatch = useDispatch()
-//	let [ address , setaddress ] = useState()
+  const dispatch = useDispatch();
+  //	let [ address , setaddress ] = useState()
   function handleResize() {
     if (window.innerWidth > 1024) dispatch(setMobile(false));
     else dispatch(setMobile(true));
   }
-	useEffect( _=> {
-		const queryuseraddress=address =>{
-			axios.get (API.API_QUERY_USERADDRESS + `/users/username/${address}`).then(resp=>{
-				LOGGER( 'QlzCkJ0KYu' , resp.data ) 
-				let { status , respdata }=resp.data
-				if ( status =='OK' ){
-					if ( respdata?.id ) {
-						dispatch( setaddress( address ) )
-						dispatch( setLogin ( address ) )
-						setaddress ( address )		
-					}
-				}	else { LOGGER( 'user not found')
-				}			
-			})
-		}
-		let { ethereum }=window
-		if ( ethereum){}
-		else {return }
-		let { selectedAddress : address } = ethereum
-		if ( address) {
-			queryuseraddress( address )
-		}
-		else {}
-		ethereum.on( 'accountsChanged' , resp=>{ LOGGER( 'GsnRPWi8Zg@accountsChanged' , resp )
-			SetErrorBar( messages.MSG_ACCOUNTS_CHANGED )
-			if( resp[ 0 ] ){
-				let address = resp[0]
-				dispatch( setaddress( address ) )
-				dispatch( setLogin ( address ) )
-				setaddress ( address )
-			} else {
-				dispatch( setaddress( null ) )
-				dispatch( setLogin ( null ) )
-				setaddress ( null )
-			}			
-		})
-		ethereum.on('networkChanged', function (networkId) { LOGGER( networkId )
-			// Time to reload your interface with the new networkId
-		})
-		ethereum.on('chainChanged',  chainId => {
-			LOGGER('@chainChanged' , chainId )
-		} )
-//		dispatch( setaddress(  ) )  // strDot(ethereum.selectedAddress , 8 , 0 ) )
-	} , [ window.ethereum ] )
+
+  useEffect(
+    (_) => {
+      const queryuseraddress = (address) => {
+        axios
+          .get(API.API_QUERY_USERADDRESS + `/users/username/${address}`)
+          .then((resp) => {
+            LOGGER("QlzCkJ0KYu", resp.data);
+            let { status, respdata } = resp.data;
+            if (status == "OK") {
+              if (respdata?.id) {
+                dispatch(setaddress(address));
+                dispatch(setLogin(address));
+                setaddress(address);
+              }
+            } else {
+              LOGGER("user not found");
+            }
+          });
+      };
+      let { ethereum } = window;
+      if (ethereum) {
+      } else {
+        return;
+      }
+      let { selectedAddress: address } = ethereum;
+      if (address) {
+        queryuseraddress(address);
+      } else {
+      }
+      ethereum.on("accountsChanged", (resp) => {
+        LOGGER("GsnRPWi8Zg@accountsChanged", resp);
+        SetErrorBar(messages.MSG_ACCOUNTS_CHANGED);
+        if (resp[0]) {
+          let address = resp[0];
+          dispatch(setaddress(address));
+          dispatch(setLogin(address));
+          setaddress(address);
+        } else {
+          dispatch(setaddress(null));
+          dispatch(setLogin(null));
+          setaddress(null);
+        }
+      });
+      ethereum.on("networkChanged", function (networkId) {
+        LOGGER(networkId);
+        // Time to reload your interface with the new networkId
+      });
+      ethereum.on("chainChanged", (chainId) => {
+        LOGGER("@chainChanged", chainId);
+      });
+      //		dispatch( setaddress(  ) )  // strDot(ethereum.selectedAddress , 8 , 0 ) )
+    },
+    [window.ethereum]
+  );
   useLayoutEffect(async () => {
-//    const walletAddress = localStorage.getItem("walletAddress");
-	//	console.log("walletAddress", walletAddress);
-		setLogin(null)
-//    if (walletAddress) dispatch(setLogin(walletAddress));
-  })
+    //    const walletAddress = localStorage.getItem("walletAddress");
+    //	console.log("walletAddress", walletAddress);
+    setLogin(null);
+    //    if (walletAddress) dispatch(setLogin(walletAddress));
+  });
 
   useEffect(() => {
     if (window.innerWidth > 1024) dispatch(setMobile(false));
@@ -128,7 +139,10 @@ function App() {
 
           <Route path="/connectwallet" element={<ConnectWallet />} />
           <Route path="/connectwallet/:popup" element={<ConnectWallet />} />
-					<Route path="/emailauth/:email/:authNum/:walletaddress" element={<EmailAuth />} />
+          <Route
+            path="/emailauth/:email/:authNum/:walletaddress"
+            element={<EmailAuth />}
+          />
           <Route path="/emailauth/:email/:authNum" element={<EmailAuth />} />
 
           <Route path="/staking" element={<Staking />} />
@@ -140,7 +154,10 @@ function App() {
 
           <Route path="/market" element={<Market />} />
           <Route path="/market/detail/:itemid" element={<MarketDetail />} />
-          <Route path="/market/detail/:itemid/:popup" element={<MarketDetail />} />
+          <Route
+            path="/market/detail/:itemid/:popup"
+            element={<MarketDetail />}
+          />
 
           <Route path="/mypage" element={<Mypage />} />
           <Route path="/editprof" element={<EditProf />} />
