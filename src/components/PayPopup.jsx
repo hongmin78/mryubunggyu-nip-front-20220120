@@ -261,6 +261,7 @@ export default function PayPopup({ off, receivables }) {
               currency: PAY_CURRENCY,
               currencyaddress: addresses.contract_USDT, // ETH_TESTNET.
             },
+            itemid: receivables.itemid,
             nettype: NETTYPE,
           })
           .then((resp) => {

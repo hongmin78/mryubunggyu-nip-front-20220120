@@ -20,6 +20,7 @@ const API = {
   API_EMAIL_VERIFY: `${URL}/signup/email/auth`,
   API_RECEIVABLES: `${URL}/queries/receivables/username`,
   API_DELINQUENCY: `${URL}/queries/delinquencies/username`,
+  API_ITEMBALANCES: `${URL}/queries/itembalances/username`,
 };
 
 export { API };

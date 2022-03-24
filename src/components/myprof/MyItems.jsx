@@ -38,6 +38,7 @@ export default function MyItems() {
   const [isOpen, setIsOpen] = useState(false);
   const [receivables, setReceivables] = useState();
   let [itemData, setItemData] = useState([]);
+  let [itemBalData, setItemBalData] = useState([]);
   let [mytokenid, setmytokenid] = useState(0);
   let [stakedata, setstakedata] = useState({});
   let [myaddress, setmyaddress] = useState();
@@ -67,7 +68,19 @@ export default function MyItems() {
         list.forEach((el) => {
           let { duetimeunix } = el;
           const current = moment().unix() - duetimeunix;
-          console.log(moment.unix(current).format("YYYY-MM-DD"));
+        });
+      })
+      .catch((err) => console.log(err));
+    axios
+      .get(API.API_ITEMBALANCES + `/${myaddress}`)
+      .then((res) => {
+        console.log(res);
+        let { list } = res.data;
+        setItemBalData(list);
+        LOGGER("ITEMBALANCES", list);
+        list.forEach((el) => {
+          let { duetimeunix } = el;
+          const current = moment().unix() - duetimeunix;
         });
       })
       .catch((err) => console.log(err));
@@ -115,9 +128,6 @@ export default function MyItems() {
       });
   };
 
-  console.log("receivables");
-  console.log(receivables);
-
   useEffect((_) => {
     setTimeout((_) => {
       fetchdata();
@@ -127,6 +137,9 @@ export default function MyItems() {
   const openModal = () => {
     setIsOpen((prevState) => !prevState);
   };
+
+  console.log("itemData");
+  console.log(itemData);
 
   if (isMobile)
     return (
@@ -489,19 +502,106 @@ export default function MyItems() {
           </li>
 
           {itemData.length !== 0 &&
-            itemData.map((item, index) => (
-              <li key={index} className="swapBox">
-                <div className="imgBox">
-                  <img className="itemImg" src={item.itemdata.url} alt="" />
+            itemData.map((item, index) => {
+              return (
+                <li key={index} className="swapBox">
+                  <div className="imgBox">
+                    <img className="itemImg" src={item.itemdata.url} alt="" />
 
-                  <div className="topBar">
-                    <button className="likeBtn" onClick={() => {}}>
+                    <div className="topBar">
+                      <button className="likeBtn" onClick={() => {}}>
+                        <img src={I_heartO} alt="" />
+                        <p>22</p>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="infoBox">
+                    <div className="titleBox">
+                      <strong className="title">{item.itemdata.titlename}</strong>
+                    </div>
+
+                    <div className="ownedBox">
+                      <p className="key">Owned by</p>
+                      <p className="value">@andyfeltham</p>
+                    </div>
+                    <div className="ownedBox">
+                      <p className="key">Round Number</p>
+                      <p className="value">{item.roundnumber}Round</p>
+                    </div>
+
+                    <div className="saleBox">
+                      <div className="key">
+                        <p className="price">Current price</p>
+                        <p className="time">Ending in</p>
+                      </div>
+
+                      <div className="value">
+                        <strong className="price">{putCommaAtPrice(372)} USDT</strong>
+
+                        <ul className="timeList">
+                          <li>00</li>
+                          <li>00</li>
+                          <li>00</li>
+                          <li>00</li>
+                        </ul>
+                      </div>
+
+                      <ul className="priceBox">
+                        <li>
+                          <p className="key">Current price</p>
+                          <p className="value">586 USDT</p>
+                        </li>
+                        <li>
+                          <p className="key">Transaction price</p>
+                          <p className="value">688 USDT</p>
+                        </li>
+                        <li
+                          onClick={(evt) => {
+                            window.open(txscanurl);
+                          }}
+                        >
+                          <p className="key">TxHash</p>
+                          <p className="value">{txhash}</p>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <button
+                      className="actionBtn"
+                      onClick={() => {
+                        setReceivables(item);
+                        openModal();
+                      }}
+                    >
+                      Pay
+                    </button>
+
+                    <p className="description">
+                      The NFT purchased by participating in the subscription auction generates 12% of profits after 3
+                      days and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
+                      completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all
+                      transactions in your account will be suspended. It operates normally after applying a penalty of
+                      10% of the winning bid amount.
+                    </p>
+                  </div>
+                </li>
+              );
+            })}
+
+          {itemBalData.length !== 0 &&
+            itemBalData.map((item, index) => (
+              <li key={index} className="swapBox">
+                <div className="imgBoxBal">
+                  <img className="itemImgBal" src={item.itemdata.url} alt="" />
+
+                  <div className="topBarBal">
+                    <button className="likeBtnBal" onClick={() => {}}>
                       <img src={I_heartO} alt="" />
                       <p>22</p>
                     </button>
                   </div>
                 </div>
-
                 <div className="infoBox">
                   <div className="titleBox">
                     <strong className="title">{item.itemdata.titlename}</strong>
@@ -968,9 +1068,295 @@ const PmyItemsBox = styled.section`
       .imgBox {
         width: 760px;
         height: 760px;
-        border-radius: 12px;
         position: relative;
         overflow: hidden;
+        border-radius: 12px;
+        border: 6px solid transparent;
+        background-image: linear-gradient(red, red), linear-gradient(to right, red 0%, orange 100%);
+        background-origin: border-box;
+        background-clip: content-box, border-box;
+        @media screen and (max-width: 1440px) {
+          min-width: 500px;
+          height: 500px;
+        }
+        .itemImg {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          position: absolute;
+          border-radius: 12px;
+        }
+        .topBar {
+          display: flex;
+          justify-content: flex-end;
+          padding: 36px;
+          .likeBtn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            width: 110px;
+            height: 54px;
+            font-size: 22px;
+            font-weight: 500;
+            color: #ff5050;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(60px);
+            border-radius: 30px;
+          }
+        }
+      }
+      .infoBox {
+        max-width: 608px;
+        min-width: 445px;
+        width: 100%;
+        .titleBox {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 56px;
+          font-weight: 600;
+          line-height: 84px;
+          .title {
+            font-family: "Poppins", sans-serif;
+          }
+          .btnBox {
+            display: flex;
+            gap: 20px;
+            button {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              width: 40px;
+              height: 40px;
+              padding: 10px;
+              border-radius: 50%;
+              box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+              img {
+                width: 100%;
+              }
+            }
+          }
+        }
+        .ownedBox {
+          display: flex;
+          gap: 10px;
+          margin: 14px 0 0 0;
+          font-size: 18px;
+          font-weight: 500;
+          .key {
+            color: #7a7a7a;
+          }
+        }
+        .saleBox {
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+          margin: 44px 0 0 0;
+          .key {
+            display: flex;
+            justify-content: space-between;
+            font-size: 18px;
+            font-weight: 500;
+            line-height: 21px;
+          }
+          .value {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            .price {
+              font-size: 38px;
+            }
+            .timeList {
+              display: flex;
+              gap: 10px;
+              li {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 45px;
+                height: 45px;
+                font-weight: 700;
+                font-size: 24px;
+                line-height: 24px;
+                color: #fff;
+                background: #000;
+                border-radius: 6px;
+              }
+            }
+          }
+          .priceBox {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 20px;
+            background: #f7f7f7;
+            border-radius: 12px;
+            li {
+              font-size: 18px;
+              font-weight: 500;
+            }
+          }
+        }
+        .actionBtn {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+          height: 60px;
+          margin: 60px 0 0 0;
+          font-size: 20px;
+          font-weight: 500;
+          line-height: 20px;
+          color: #fff;
+          font-family: "Poppins", sans-serif;
+          background: #000;
+          border-radius: 12px;
+        }
+        .description {
+          margin: 30px 0 0 0;
+          font-size: 18px;
+          color: #7a7a7a;
+        }
+      }
+      &.stakingBox {
+        .imgBox {
+          background: #000;
+          .itemImg {
+            width: 400px;
+            height: 400px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+          }
+          .topBar {
+            height: unset;
+            padding: 25px 40px;
+            justify-content: space-between;
+            .profImg {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              width: 82px;
+              height: 82px;
+              padding: 16px;
+              border-radius: 50%;
+              background: #fff;
+              border: 7px solid #333;
+              backdrop-filter: blur(60px);
+              img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+              }
+            }
+            .profName {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              width: 206px;
+              height: 52px;
+              border-radius: 30px;
+              font-size: 22px;
+              color: #fff;
+              background: #333;
+              strong {
+                font-family: "Poppins", sans-serif;
+              }
+            }
+          }
+        }
+      }
+      &.swapBox {
+        .saleBox {
+          .key {
+            .time {
+              color: #ff5050;
+            }
+          }
+          .value {
+            .timeList {
+              li {
+                background: #d9d9d9;
+              }
+            }
+          }
+        }
+      }
+      &.sellBox {
+        .btnBox {
+          display: flex;
+          gap: 20px;
+          button {
+            flex: 1;
+          }
+        }
+      }
+    }
+  }
+  .imgBoxBal {
+    display: flex;
+    flex-direction: column;
+    * {
+      font-family: "Roboto", sans-serif;
+    }
+    width: 760px;
+    height: 760px;
+    position: relative;
+    overflow: hidden;
+    @media screen and (max-width: 1440px) {
+      min-width: 500px;
+      height: 500px;
+    }
+    .itemImgBal {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      position: absolute;
+      border-radius: 12px;
+    }
+    .topBarBal {
+      display: flex;
+      justify-content: flex-end;
+      padding: 36px;
+      .likeBtnBal {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        width: 110px;
+        height: 54px;
+        font-size: 22px;
+        font-weight: 500;
+        color: #ff5050;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(60px);
+        border-radius: 30px;
+      }
+    }
+  }
+  .itemList {
+    display: flex;
+    flex-direction: column;
+    gap: 90px;
+    * {
+      font-family: "Roboto", sans-serif;
+    }
+
+    li {
+      display: flex;
+      justify-content: space-between;
+      gap: 40px;
+      .imgBox {
+        width: 760px;
+        height: 760px;
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+        border: 8px solid transparent;
+        background-image: linear-gradient(to right, red 0%, orange 100%), linear-gradient(to right, red 0%, orange 100%);
+        background-origin: border-box;
+        background-clip: content-box, border-box;
         @media screen and (max-width: 1440px) {
           min-width: 500px;
           height: 500px;
