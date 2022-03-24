@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useRef } from "react";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import styled from "styled-components";
 import { D_faqList, D_issueList, marketPlaceList } from "../data/Dmain";
 import Footer from "./Footer";
@@ -17,7 +18,7 @@ import {
 } from "../util/Util";
 import FaqItem from "../components/FaqCont";
 import { useNavigate } from "react-router-dom";
-
+import SetErrorBar from "../util/SetErrorBar";
 import E_interview from "../img/main/E_interview.svg";
 import E_issueProf from "../img/main/E_issueProf.png";
 import I_rtArw from "../img/icon/I_rtArw.svg";
@@ -30,7 +31,8 @@ import B_tip2 from "../img/main/B_tip2.png";
 import B_tip3 from "../img/main/B_tip3.png";
 import axios from "axios";
 import { API } from "../configs/api";
-import { LOGGER } from "../util/common";
+import { LOGGER, getmyaddress } from "../util/common";
+import { setDelinquencyAmount } from "../util/store/commonSlice";
 
 export default function Main() {
   const navigate = useNavigate();
@@ -55,6 +57,7 @@ export default function Main() {
   const [auctionListSecond, setAuctionListSecond] = useState([]);
   const [likeObj, setLikeObj] = useState({});
   let [premiumitemlist, setpremiumitemlist] = useState([]);
+  const dispatch = useDispatch();
 
   function onClickTopBtn() {
     window.scrollTo({
@@ -63,16 +66,50 @@ export default function Main() {
     });
   }
 
+  useEffect(() => {
+    setTimeout(() => {
+      let address = getmyaddress();
+      console.log("address", address);
+      axios
+        .get(`${API.API_DELINQUENCY}/${address}`)
+        .then((res) => {
+          console.log("RES", res);
+          let { status } = res.data;
+
+          if (status === "OK") {
+            let { list } = res.data;
+            if (list && list?.length > 0) {
+              // const amount = list.reduce((a, b) => a.amount + b.amount, 0);
+              let sum = 0;
+              list.forEach((item) => {
+                sum += +item.amount;
+              });
+              dispatch(setDelinquencyAmount(sum.toFixed(2)));
+              console.log(sum);
+
+              SetErrorBar("Please pay delinquency fee");
+              navigate("/penalty");
+            }
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          alert(err.message);
+        });
+    }, 1500);
+  }, []);
+
   function fetchitems() {
     axios
-//      .get(  "http://3.35.117.87:34705/auction/list", { params: { limit: 16 } })
-			.get( API.API_COMMONITEMS + `/items/group_/kong/0/128/id/DESC` )
-      .then((res) => { // console.log(res.data);
-				let { status , list }=res.data
-				if ( status == 'OK'){
-					setAuctionListFirst( list.slice(0, 64 ) )
-					setAuctionListSecond(list.slice( 64 ) )
-				}
+      //      .get(  "http://3.35.117.87:34705/auction/list", { params: { limit: 16 } })
+      .get(API.API_COMMONITEMS + `/items/group_/kong/0/128/id/DESC`)
+      .then((res) => {
+        // console.log(res.data);
+        let { status, list } = res.data;
+        if (status == "OK") {
+          setAuctionListFirst(list.slice(0, 64));
+          setAuctionListSecond(list.slice(64));
+        }
       });
     axios
       .get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC`)
@@ -278,7 +315,10 @@ export default function Main() {
               </div>
             </article>
 
-            <article className="marketplaceBox itemListBox" style={{display:'none'}} >
+            <article
+              className="marketplaceBox itemListBox"
+              style={{ display: "none" }}
+            >
               <strong className="title">MarketPlace</strong>
               <div className="posBox">
                 <ul className="itemList" ref={marketRef}>
@@ -580,7 +620,10 @@ export default function Main() {
               </div>
             </article>
 
-            <article className="marketplaceBox itemListBox"  style={{display:'none'}} >
+            <article
+              className="marketplaceBox itemListBox"
+              style={{ display: "none" }}
+            >
               <strong className="title">MarketPlace</strong>
               <div className="posBox">
                 <ul className="itemList" ref={marketRef}>

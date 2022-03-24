@@ -3,8 +3,9 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   isLogin: "",
   pathName: "",
-	isMobile: false,
-	address : null
+  isMobile: false,
+  address: null,
+  delinquencyAmount: 0,
 };
 
 export const todoSlice = createSlice({
@@ -19,20 +20,26 @@ export const todoSlice = createSlice({
     setPathName: (state, action) => {
       state.pathname = action.payload;
     },
-		setMobile: (state, action) => {
+    setMobile: (state, action) => {
       state.isMobile = action.payload;
-		},
-		setaddress : ( state , action ) =>{
-			state.address = action.payload
-		}
+    },
+    setaddress: (state, action) => {
+      state.address = action.payload;
+    },
+    setDelinquencyAmount: (state, action) => {
+      console.log(action.payload);
+      state.delinquencyAmount = action.payload;
+    },
   },
-})
+});
 
-export const { setAllPopupOff
-	, setLogin
-	, setPathName 
-	, setMobile
-	, setaddress
+export const {
+  setAllPopupOff,
+  setLogin,
+  setPathName,
+  setMobile,
+  setaddress,
+  setDelinquencyAmount,
 } = todoSlice.actions;
 
 export default todoSlice.reducer;
