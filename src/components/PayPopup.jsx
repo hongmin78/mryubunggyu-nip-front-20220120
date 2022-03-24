@@ -8,12 +8,7 @@ import { useSelector } from "react-redux";
 import PopupBg from "./PopupBg";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import {
-  getabistr_forfunction,
-  query_with_arg,
-  query_noarg,
-  query_eth_balance,
-} from "../util/contract-calls";
+import { getabistr_forfunction, query_with_arg, query_noarg, query_eth_balance } from "../util/contract-calls";
 import { addresses } from "../configs/addresses";
 import { DECIMALS_DISP_DEF } from "../configs/configs"; // MIN_STAKE_AMOUNT,
 import { LOGGER, getmyaddress, getobjtype } from "../util/common";
@@ -23,17 +18,14 @@ import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
 import { API } from "../configs/api";
 import awaitTransactionMined from "await-transaction-mined";
-import {
-  web3,
-  BASE_CURRENCY,
-  PAY_CURRENCY,
-  NETTYPE,
-} from "../configs/configweb3";
+import { web3, BASE_CURRENCY, PAY_CURRENCY, NETTYPE } from "../configs/configweb3";
 import { TX_POLL_OPTIONS } from "../configs/configs";
 import I_spinner from "../img/icon/I_spinner.svg";
 import { strDot } from "../util/Util";
 const MODE_DEV_PROD = "PROD";
 export default function PayPopup({ off, receivables }) {
+  console.log("receivables");
+  console.log(receivables);
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
   const [termChk, setTermChk] = useState(false);
@@ -53,21 +45,15 @@ export default function PayPopup({ off, receivables }) {
   let [MIN_STAKE_AMOUNT, setMIN_STAKE_AMOUNT] = useState(receivables.amount);
   useEffect((_) => {
     const spinner = spinnerHref.current; // document.querySelector("Spinner");
-    spinner.animate(
-      [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
-      {
-        duration: 1000,
-        iterations: Infinity,
-      }
-    );
+    spinner.animate([{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], {
+      duration: 1000,
+      iterations: Infinity,
+    });
     const spinner_approve = spinnerHref_approve.current; // document.querySelector("Spinner");
-    spinner_approve.animate(
-      [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
-      {
-        duration: 1000,
-        iterations: Infinity,
-      }
-    );
+    spinner_approve.animate([{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], {
+      duration: 1000,
+      iterations: Infinity,
+    });
     const fetchdata = async (_) => {
       axios.get(API.API_TICKERS).then((resp) => {
         LOGGER("MDmEMQ5xde", resp.data);
@@ -155,10 +141,7 @@ export default function PayPopup({ off, receivables }) {
       contractaddress: addresses.contract_USDT, // ETH_TESTNET.
       abikind: "ERC20",
       methodname: "approve",
-      aargs: [
-        addresses.contract_pay_for_assigned_item,
-        getweirep("" + 10 ** 10),
-      ], // .ETH_TESTNET
+      aargs: [addresses.contract_pay_for_assigned_item, getweirep("" + 10 ** 10)], // .ETH_TESTNET
     });
     LOGGER("", abistr);
     setisloader_00(true);
@@ -191,32 +174,29 @@ export default function PayPopup({ off, receivables }) {
           SetErrorBar(messages.MSG_TX_REQUEST_SENT);
         });
 
-      awaitTransactionMined
-        .awaitTx(web3, txhash, TX_POLL_OPTIONS)
-        .then((minedtxreceipt) => {
-          LOGGER("minedtxreceipt", minedtxreceipt);
-          SetErrorBar(messages.MSG_TX_FINALIZED);
+      awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then((minedtxreceipt) => {
+        LOGGER("minedtxreceipt", minedtxreceipt);
+        SetErrorBar(messages.MSG_TX_FINALIZED);
 
-          query_with_arg({
-            contractaddress: addresses.contract_USDT, // .ETH_TESTNET
-            abikind: "ERC20",
-            methodname: "allowance",
-            aargs: [myaddress, addresses.contract_pay_for_assigned_item], // ETH_TESTNET.
-          }).then((resp) => {
-            let allowanceineth = getethrep(resp);
-            LOGGER("gCwXF6Jjkh", resp, allowanceineth);
-            setallowanceamount(allowanceineth); //				setallowanceamount ( 100 )
-            if (allowanceineth > 0) {
-              setisallowanceok(false);
-            } else {
-            }
-          });
-          //					Setisloader(false);
+        query_with_arg({
+          contractaddress: addresses.contract_USDT, // .ETH_TESTNET
+          abikind: "ERC20",
+          methodname: "allowance",
+          aargs: [myaddress, addresses.contract_pay_for_assigned_item], // ETH_TESTNET.
+        }).then((resp) => {
+          let allowanceineth = getethrep(resp);
+          LOGGER("gCwXF6Jjkh", resp, allowanceineth);
+          setallowanceamount(allowanceineth); //				setallowanceamount ( 100 )
+          if (allowanceineth > 0) {
+            setisallowanceok(false);
+          } else {
+          }
         });
+        //					Setisloader(false);
+      });
     });
   };
 
-  console.log(allowanceamount);
   const onclick_buy = async (_) => {
     setDone(true);
     LOGGER("YFVGAF0sBJ");
@@ -289,22 +269,20 @@ export default function PayPopup({ off, receivables }) {
             off();
           });
         /***** */
-        awaitTransactionMined
-          .awaitTx(web3, txhash, TX_POLL_OPTIONS)
-          .then(async (minedtxreceipt) => {
-            LOGGER("minedtxreceipt", minedtxreceipt);
-            SetErrorBar(messages.MSG_TX_FINALIZED);
-            setDone(false);
-            let resp_balances = await query_with_arg({
-              contractaddress: addresses.contract_pay_for_assigned_iteme,
-              abikind: "PAY",
-              methodname: "pay",
-              aargs: [myaddress],
-            });
-            LOGGER("uQJ2POHvP8", resp_balances);
-            setstakedbalance(getethrep(resp_balances));
-            off();
+        awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
+          LOGGER("minedtxreceipt", minedtxreceipt);
+          SetErrorBar(messages.MSG_TX_FINALIZED);
+          setDone(false);
+          let resp_balances = await query_with_arg({
+            contractaddress: addresses.contract_pay_for_assigned_iteme,
+            abikind: "PAY",
+            methodname: "pay",
+            aargs: [myaddress],
           });
+          LOGGER("uQJ2POHvP8", resp_balances);
+          setstakedbalance(getethrep(resp_balances));
+          off();
+        });
       } catch (err) {
         setisloader_01(false);
         LOGGER();
@@ -337,10 +315,7 @@ export default function PayPopup({ off, receivables }) {
                 <ul className="priceList">
                   <li className="price">{MIN_STAKE_AMOUNT} USDT</li>
                   <li className="exchange">
-                    $
-                    {+MIN_STAKE_AMOUNT && tickerusdt
-                      ? putCommaAtPrice(+MIN_STAKE_AMOUNT * +tickerusdt)
-                      : null}
+                    ${+MIN_STAKE_AMOUNT && tickerusdt ? putCommaAtPrice(+MIN_STAKE_AMOUNT * +tickerusdt) : null}
                   </li>
                 </ul>
               </div>
@@ -371,13 +346,7 @@ export default function PayPopup({ off, receivables }) {
                   <p className="key">Your USDT balance</p>
                   <p className="value">{mybalance} USDT</p>
                 </li>
-                <li
-                  style={
-                    allowanceamount && +allowanceamount
-                      ? { display: "block" }
-                      : {}
-                  }
-                >
+                <li style={allowanceamount && +allowanceamount ? { display: "block" } : {}}>
                   <p className="key">Allowance</p>
                   <p className="value">{allowanceamount} USDT</p>
                 </li>
@@ -425,11 +394,7 @@ export default function PayPopup({ off, receivables }) {
                   onclick_approve();
                   false && navigate(-1);
                 }}
-                style={
-                  allowanceamount && +allowanceamount
-                    ? { display: "none" }
-                    : { display: "inline" }
-                }
+                style={allowanceamount && +allowanceamount ? { display: "none" } : { display: "inline" }}
               >
                 Approve!
                 <img
@@ -484,10 +449,7 @@ export default function PayPopup({ off, receivables }) {
               <ul className="priceList">
                 <li className="price">{MIN_STAKE_AMOUNT} USDT</li>
                 <li className="exchange">
-                  $
-                  {+MIN_STAKE_AMOUNT && tickerusdt
-                    ? putCommaAtPrice(+MIN_STAKE_AMOUNT * +tickerusdt)
-                    : null}
+                  ${+MIN_STAKE_AMOUNT && tickerusdt ? putCommaAtPrice(+MIN_STAKE_AMOUNT * +tickerusdt) : null}
                 </li>
               </ul>
             </div>
@@ -565,11 +527,7 @@ export default function PayPopup({ off, receivables }) {
               onClick={() => {
                 onclick_approve();
               }}
-              style={
-                allowanceamount && +allowanceamount
-                  ? { display: "none" }
-                  : { display: "inline" }
-              }
+              style={allowanceamount && +allowanceamount ? { display: "none" } : { display: "inline" }}
             >
               {" "}
               Approve
@@ -623,41 +581,34 @@ const MstakingPopupBox = styled.section`
   position: fixed;
   z-index: 6;
   overflow: hidden;
-
   .topBar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     height: 15.55vw;
     padding: 0 5.55vw;
-
     .title {
       font-size: 5vw;
       font-weight: 600;
       line-height: 5vw;
     }
-
     .blank,
     .exitBtn img {
       width: 4.44vw;
     }
   }
-
   .contBox {
     display: flex;
     flex-direction: column;
     gap: 4.44vw;
     padding: 3.61vw 5.55vw 7.77vw 5.55vw;
-
     * {
       font-family: "Roboto", sans-serif;
     }
-
     .infoBox {
       display: flex;
       flex-direction: column;
       gap: 4.16vw;
-
       .coinBox {
         display: flex;
         align-items: center;
@@ -666,7 +617,6 @@ const MstakingPopupBox = styled.section`
         padding: 0 4.72vw;
         background: #f6f6f6;
         border-radius: 3.33vw;
-
         .coinImgBox {
           display: flex;
           justify-content: center;
@@ -677,31 +627,26 @@ const MstakingPopupBox = styled.section`
           border-radius: 50%;
           background: #fff;
           box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
-
           img {
             width: 100%;
             object-fit: contain;
           }
         }
-
         .priceList {
           display: flex;
           flex-direction: column;
           gap: 6px;
           font-size: 5vw;
           line-height: 5vw;
-
           .price {
             font-weight: 600;
           }
-
           .exchange {
             font-weight: 500;
             color: #7a7a7a;
           }
         }
       }
-
       .dataList {
         display: flex;
         flex-direction: column;
@@ -709,45 +654,37 @@ const MstakingPopupBox = styled.section`
         font-size: 4.44vw;
         font-weight: 500;
         color: #7a7a7a;
-
         li {
           display: flex;
           flex-direction: column;
           gap: 0.8vw;
-
           .key {
             color: #aeaeae;
           }
         }
       }
     }
-
     .confirmBox {
       display: flex;
       flex-direction: column;
       gap: 20px;
-
       .termBox {
         display: flex;
         flex-direction: column;
         gap: 4.44vw;
-
         * {
           font-size: 4.44vw;
           line-height: 4.44vw;
         }
-
         .value {
           display: flex;
           justify-content: flex-end;
           align-items: center;
           gap: 5vw;
-
           button {
             display: flex;
             align-items: center;
             gap: 6px;
-
             .chkBtn {
               display: flex;
               justify-content: center;
@@ -760,7 +697,6 @@ const MstakingPopupBox = styled.section`
           }
         }
       }
-
       .confirmBtn {
         height: 13.88vw;
         font-size: 5.55vw;
@@ -782,41 +718,34 @@ const PstakingPopupBox = styled.section`
   transform: translate(-50%, -50%);
   position: fixed;
   z-index: 6;
-
   .topBar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     height: 72px;
     padding: 0 30px;
-
     .title {
       font-size: 24px;
       font-weight: 600;
       line-height: 24px;
     }
-
     .blank,
     .exitBtn {
       width: 22px;
     }
   }
-
   .contBox {
     display: flex;
     flex-direction: column;
     gap: 80px;
     padding: 40px;
-
     * {
       font-family: "Roboto", sans-serif;
     }
-
     .infoBox {
       display: flex;
       flex-direction: column;
       gap: 24px;
-
       .coinBox {
         display: flex;
         justify-content: space-between;
@@ -825,7 +754,6 @@ const PstakingPopupBox = styled.section`
         padding: 0 26px;
         background: #f6f6f6;
         border-radius: 12px;
-
         .coinImgBox {
           display: flex;
           justify-content: center;
@@ -836,13 +764,11 @@ const PstakingPopupBox = styled.section`
           border-radius: 50%;
           background: #fff;
           box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
-
           img {
             width: 100%;
             object-fit: contain;
           }
         }
-
         .priceList {
           display: flex;
           flex-direction: column;
@@ -850,18 +776,15 @@ const PstakingPopupBox = styled.section`
           gap: 6px;
           font-size: 20px;
           line-height: 20px;
-
           .price {
             font-weight: 600;
           }
-
           .exchange {
             font-weight: 500;
             color: #7a7a7a;
           }
         }
       }
-
       .dataList {
         display: flex;
         flex-direction: column;
@@ -869,39 +792,32 @@ const PstakingPopupBox = styled.section`
         font-size: 18px;
         font-weight: 500;
         color: #7a7a7a;
-
         li {
           display: flex;
           justify-content: space-between;
         }
       }
     }
-
     .confirmBox {
       display: flex;
       flex-direction: column;
       gap: 20px;
-
       .termBox {
         display: flex;
         align-items: center;
         gap: 10px;
-
         * {
           font-size: 18px;
           line-height: 18px;
         }
-
         .value {
           display: flex;
           gap: 18px;
           align-items: center;
-
           button {
             display: flex;
             align-items: center;
             gap: 6px;
-
             .chkBtn {
               display: flex;
               justify-content: center;
@@ -914,7 +830,6 @@ const PstakingPopupBox = styled.section`
           }
         }
       }
-
       .confirmBtn {
         display: flex;
         justify-content: center;
