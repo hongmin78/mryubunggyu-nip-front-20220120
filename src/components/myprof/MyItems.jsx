@@ -21,6 +21,7 @@ import { getmyaddress, LOGGER } from "../../util/common";
 // import BidPopup from "../BidPopup";
 import StakingPopup from "../StakingPopup";
 import moment from "moment";
+import PayPopup from "../PayPopup";
 
 const MAP_NETTYPE_SCAN = {
   ETH_TESTNET: "https://etherscan.io",
@@ -35,6 +36,7 @@ export default function MyItems() {
   const [sortPopup, setSortPopup] = useState(false);
   const [isstaked, setisstaked] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
+  const [receivables, setReceivables] = useState();
   let [itemData, setItemData] = useState([]);
   let [mytokenid, setmytokenid] = useState(0);
   let [stakedata, setstakedata] = useState({});
@@ -70,52 +72,51 @@ export default function MyItems() {
       })
       .catch((err) => console.log(err));
     false &&
-      axios
-        .get(
-          API.API_QUERY_SINGLEROW +
-            `/transactions/username/${myaddress}?typestr=STAKE&status=1`
-        )
-        .then((resp) => {
-          LOGGER("", resp.data);
-          let { status, respdata } = resp.data;
-          if (status == "OK") {
-            let { txhash } = respdata;
-            setstakedata(respdata);
-            settxhash(strDot(txhash, 16, 0));
-            settxscanurl(MAP_NETTYPE_SCAN[respdata.nettype] + `/tx/${txhash}`);
-            let buydatetime = moment(respdata.createdat);
-            setbuydate([
-              buydatetime.year().toString().substr(2),
-              (1 + buydatetime.month()).toString().padStart(2, "0"),
-              buydatetime.day().toString().padStart(2, "0"),
-              buydatetime.hour().toString().padStart(2, "0"),
-            ]);
-          }
-        });
-    query_with_arg({
-      contractaddress: addresses.contract_ticketnft, // ETH_TESTNET.
-      abikind: "TICKETNFT",
-      methodname: "_balance_user_itemhash",
-      aargs: [myaddress], // ETH_TESTNET.
-    }).then(async (resp) => {
-      let myitemhash = resp;
-      let mytokenid;
-      try {
-        mytokenid = await query_with_arg({
-          contractaddress: addresses.contract_ticketnft,
-          abikind: "TICKETNFT",
-          methodname: "_itemhash_tokenid",
-          aargs: [myitemhash],
-        });
-        LOGGER("GEVKU97nIv", mytokenid);
-        setmytokenid(mytokenid);
-      } catch (err) {
-        LOGGER(err);
-        mytokenid = null;
-        return;
-      }
-    });
+      axios.get(API.API_QUERY_SINGLEROW + `/transactions/username/${myaddress}?typestr=STAKE&status=1`).then((resp) => {
+        LOGGER("", resp.data);
+        let { status, respdata } = resp.data;
+        if (status == "OK") {
+          let { txhash } = respdata;
+          setstakedata(respdata);
+          settxhash(strDot(txhash, 16, 0));
+          settxscanurl(MAP_NETTYPE_SCAN[respdata.nettype] + `/tx/${txhash}`);
+          let buydatetime = moment(respdata.createdat);
+          setbuydate([
+            buydatetime.year().toString().substr(2),
+            (1 + buydatetime.month()).toString().padStart(2, "0"),
+            buydatetime.day().toString().padStart(2, "0"),
+            buydatetime.hour().toString().padStart(2, "0"),
+          ]);
+        }
+      });
+    false &&
+      query_with_arg({
+        contractaddress: addresses.contract_ticketnft, // ETH_TESTNET.
+        abikind: "TICKETNFT",
+        methodname: "_balance_user_itemhash",
+        aargs: [myaddress], // ETH_TESTNET.
+      }).then(async (resp) => {
+        let myitemhash = resp;
+        let mytokenid;
+        try {
+          mytokenid = await query_with_arg({
+            contractaddress: addresses.contract_ticketnft,
+            abikind: "TICKETNFT",
+            methodname: "_itemhash_tokenid",
+            aargs: [myitemhash],
+          });
+          LOGGER("GEVKU97nIv", mytokenid);
+          setmytokenid(mytokenid);
+        } catch (err) {
+          LOGGER(err);
+          mytokenid = null;
+          return;
+        }
+      });
   };
+
+  console.log("receivables");
+  console.log(receivables);
 
   useEffect((_) => {
     setTimeout((_) => {
@@ -135,12 +136,8 @@ export default function MyItems() {
             <button
               className="sortBtn"
               ref={sortBtnRef}
-              onFocus={() =>
-                (sortBtnRef.current.style.border = "3px solid #000")
-              }
-              onBlur={() =>
-                (sortBtnRef.current.style.border = "1px solid #d9d9d9")
-              }
+              onFocus={() => (sortBtnRef.current.style.border = "3px solid #000")}
+              onBlur={() => (sortBtnRef.current.style.border = "1px solid #d9d9d9")}
               onClick={() => setSortPopup(true)}
             >
               <p>{sortOpt}</p>
@@ -149,12 +146,7 @@ export default function MyItems() {
 
             {sortPopup && (
               <>
-                <SelectPopup
-                  off={setSortPopup}
-                  dataList={D_sortList}
-                  select={sortOpt}
-                  setFunc={setSortOpt}
-                />
+                <SelectPopup off={setSortPopup} dataList={D_sortList} select={sortOpt} setFunc={setSortOpt} />
 
                 <PopupBg off={setSortPopup} />
               </>
@@ -163,11 +155,7 @@ export default function MyItems() {
 
           <ul className="filterList">
             {filterList.map((cont, index) => (
-              <li
-                key={index}
-                className={filter === index ? "on" : ""}
-                onClick={() => setFilter(index)}
-              >
+              <li key={index} className={filter === index ? "on" : ""} onClick={() => setFilter(index)}>
                 {cont}
               </li>
             ))}
@@ -175,10 +163,7 @@ export default function MyItems() {
         </div>
 
         <ul className="itemList">
-          <li
-            className="stakingBox"
-            style={isstaked ? {} : { display: "none" }}
-          >
+          <li className="stakingBox" style={isstaked ? {} : { display: "none" }}>
             <div className="imgBox">
               <div className="topBar">
                 <img className="itemImg" src={E_staking} alt="" />
@@ -194,9 +179,7 @@ export default function MyItems() {
 
             <div className="infoBox">
               <div className="titleBox">
-                <strong className="title">
-                  Lucky Ticket #{("" + mytokenid)?.padStart(5, "0")}
-                </strong>
+                <strong className="title">Lucky Ticket #{("" + mytokenid)?.padStart(5, "0")}</strong>
               </div>
 
               <div className="ownedBox">
@@ -245,13 +228,10 @@ export default function MyItems() {
               </button>
 
               <p className="description">
-                The NFT purchased by participating in the subscription auction
-                generates 12% of profits after 3 days and is sold random. In
-                addition, the results are announced at 9:00 AM, and the
-                transaction is completed from 9:00 AM to 21:00 PM. If the
-                transaction is not completed within time, all transactions in
-                your account will be suspended. It operates normally after
-                applying a penalty of 10% of the winning bid amount.
+                The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days and
+                is sold random. In addition, the results are announced at 9:00 AM, and the transaction is completed from
+                9:00 AM to 21:00 PM. If the transaction is not completed within time, all transactions in your account
+                will be suspended. It operates normally after applying a penalty of 10% of the winning bid amount.
               </p>
             </div>
           </li>
@@ -317,13 +297,10 @@ export default function MyItems() {
               <button className="actionBtn">Swap</button>
 
               <p className="description">
-                The NFT purchased by participating in the subscription auction
-                generates 12% of profits after 3 days and is sold random. In
-                addition, the results are announced at 9:00 AM, and the
-                transaction is completed from 9:00 AM to 21:00 PM. If the
-                transaction is not completed within time, all transactions in
-                your account will be suspended. It operates normally after
-                applying a penalty of 10% of the winning bid amount.
+                The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days and
+                is sold random. In addition, the results are announced at 9:00 AM, and the transaction is completed from
+                9:00 AM to 21:00 PM. If the transaction is not completed within time, all transactions in your account
+                will be suspended. It operates normally after applying a penalty of 10% of the winning bid amount.
               </p>
             </div>
           </li>
@@ -387,19 +364,15 @@ export default function MyItems() {
               </ul>
 
               <div className="btnBox">
-                <button
-                  className="actionBtn"
-                  onClick={() => navigate("/resell")}
-                >
+                <button className="actionBtn" onClick={() => navigate("/resell")}>
                   Sell
                 </button>
                 <button className="actionBtn">Staking</button>
               </div>
 
               <p className="description">
-                King Kong NFT can be staking or sold to Marketplace at a price
-                of up to 25%. If you steaking, you will get 30% annual NIP COIN
-                reward.
+                King Kong NFT can be staking or sold to Marketplace at a price of up to 25%. If you steaking, you will
+                get 30% annual NIP COIN reward.
               </p>
             </div>
           </li>
@@ -412,11 +385,7 @@ export default function MyItems() {
         <div className="topBar">
           <ul className="filterList">
             {filterList.map((cont, index) => (
-              <li
-                key={index}
-                className={filter === index ? "on" : ""}
-                onClick={() => setFilter(index)}
-              >
+              <li key={index} className={filter === index ? "on" : ""} onClick={() => setFilter(index)}>
                 {cont}
               </li>
             ))}
@@ -426,12 +395,8 @@ export default function MyItems() {
             <button
               className="sortBtn"
               ref={sortBtnRef}
-              onFocus={() =>
-                (sortBtnRef.current.style.border = "3px solid #000")
-              }
-              onBlur={() =>
-                (sortBtnRef.current.style.border = "1px solid #d9d9d9")
-              }
+              onFocus={() => (sortBtnRef.current.style.border = "3px solid #000")}
+              onBlur={() => (sortBtnRef.current.style.border = "1px solid #d9d9d9")}
               onClick={() => setSortPopup(true)}
             >
               <p>{sortOpt}</p>
@@ -440,12 +405,7 @@ export default function MyItems() {
 
             {sortPopup && (
               <>
-                <SelectPopup
-                  off={setSortPopup}
-                  dataList={D_sortList}
-                  select={sortOpt}
-                  setFunc={setSortOpt}
-                />
+                <SelectPopup off={setSortPopup} dataList={D_sortList} select={sortOpt} setFunc={setSortOpt} />
 
                 <PopupBg off={setSortPopup} />
               </>
@@ -454,10 +414,7 @@ export default function MyItems() {
         </div>
 
         <ul className="itemList">
-          <li
-            className="stakingBox"
-            style={isstaked ? {} : { display: "none" }}
-          >
+          <li className="stakingBox" style={isstaked ? {} : { display: "none" }}>
             <div className="imgBox">
               <div className="topBar">
                 <img className="itemImg" src={E_staking} alt="" />
@@ -473,9 +430,7 @@ export default function MyItems() {
 
             <div className="infoBox">
               <div className="titleBox">
-                <strong className="title">
-                  Lucky Ticket #{("" + mytokenid)?.padStart(5, "0")}
-                </strong>
+                <strong className="title">Lucky Ticket #{("" + mytokenid)?.padStart(5, "0")}</strong>
               </div>
 
               <div className="ownedBox">
@@ -525,13 +480,10 @@ export default function MyItems() {
               </button>
 
               <p className="description">
-                The NFT purchased by participating in the subscription auction
-                generates 12% of profits after 3 days and is sold random. In
-                addition, the results are announced at 9:00 AM, and the
-                transaction is completed from 9:00 AM to 21:00 PM. If the
-                transaction is not completed within time, all transactions in
-                your account will be suspended. It operates normally after
-                applying a penalty of 10% of the winning bid amount.
+                The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days and
+                is sold random. In addition, the results are announced at 9:00 AM, and the transaction is completed from
+                9:00 AM to 21:00 PM. If the transaction is not completed within time, all transactions in your account
+                will be suspended. It operates normally after applying a penalty of 10% of the winning bid amount.
               </p>
             </div>
           </li>
@@ -567,9 +519,7 @@ export default function MyItems() {
                     </div>
 
                     <div className="value">
-                      <strong className="price">
-                        {putCommaAtPrice(372)} USDT
-                      </strong>
+                      <strong className="price">{putCommaAtPrice(372)} USDT</strong>
 
                       <ul className="timeList">
                         <li>00</li>
@@ -599,25 +549,28 @@ export default function MyItems() {
                     </ul>
                   </div>
 
-                  <button className="actionBtn" onClick={openModal}>
+                  <button
+                    className="actionBtn"
+                    onClick={() => {
+                      setReceivables(item);
+                      openModal();
+                    }}
+                  >
                     Pay
                   </button>
 
                   <p className="description">
-                    The NFT purchased by participating in the subscription
-                    auction generates 12% of profits after 3 days and is sold
-                    random. In addition, the results are announced at 9:00 AM,
-                    and the transaction is completed from 9:00 AM to 21:00 PM.
-                    If the transaction is not completed within time, all
-                    transactions in your account will be suspended. It operates
-                    normally after applying a penalty of 10% of the winning bid
-                    amount.
+                    The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days
+                    and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
+                    completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all
+                    transactions in your account will be suspended. It operates normally after applying a penalty of 10%
+                    of the winning bid amount.
                   </p>
                 </div>
               </li>
             ))}
 
-          {isOpen && <StakingPopup off={openModal} />}
+          {isOpen && <PayPopup off={openModal} receivables={receivables} />}
 
           {/* <li className="sellBox">
             <div className="imgBox">
