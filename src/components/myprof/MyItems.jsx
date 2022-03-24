@@ -71,17 +71,20 @@ export default function MyItems() {
         });
       })
       .catch((err) => console.log(err));
+
     axios
       .get(API.API_ITEMBALANCES + `/${myaddress}`)
       .then((res) => {
         console.log(res);
-        let { list } = res.data;
-        setItemBalData(list);
-        LOGGER("ITEMBALANCES", list);
-        list.forEach((el) => {
-          let { duetimeunix } = el;
-          const current = moment().unix() - duetimeunix;
-        });
+        let { list, status } = res.data;
+        if (status === "OK") {
+          setItemBalData(list);
+          LOGGER("ITEMBALANCES", list);
+          list.forEach((el) => {
+            let { duetimeunix } = el;
+            const current = moment().unix() - duetimeunix;
+          });
+        }
       })
       .catch((err) => console.log(err));
     false &&
@@ -501,7 +504,8 @@ export default function MyItems() {
             </div>
           </li>
 
-          {itemData.length !== 0 &&
+          {itemData &&
+            itemData?.length !== 0 &&
             itemData.map((item, index) => {
               return (
                 <li key={index} className="swapBox">

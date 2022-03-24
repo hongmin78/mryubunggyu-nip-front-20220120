@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { getabistr_forfunction, query_with_arg, query_noarg, query_eth_balance } from "../util/contract-calls";
 import { addresses } from "../configs/addresses";
-import { DECIMALS_DISP_DEF } from "../configs/configs"; // MIN_STAKE_AMOUNT,
+import { DECIMALS_DISP_DEF } from "../configs/configs"; // DueAmount,
 import { LOGGER, getmyaddress, getobjtype } from "../util/common";
 import { getweirep, getethrep } from "../util/eth";
 import { requesttransaction } from "../services/metamask";
@@ -24,8 +24,6 @@ import I_spinner from "../img/icon/I_spinner.svg";
 import { strDot } from "../util/Util";
 const MODE_DEV_PROD = "PROD";
 export default function PayPopup({ off, receivables }) {
-  console.log("receivables");
-  console.log(receivables);
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
   const [termChk, setTermChk] = useState(false);
@@ -33,7 +31,7 @@ export default function PayPopup({ off, receivables }) {
   let [mybalance, setmybalance] = useState();
   let [isallowanceok, setisallowanceok] = useState(false);
   let [allowanceamount, setallowanceamount] = useState();
-  let [stakedbalance, setstakedbalance] = useState();
+  // let [st akedbalance, setsta kedbalance] = useState();
   let [tvl, settvl] = useState();
   let [tickerusdt, settickerusdt] = useState(1);
   let [myethbalance, setmyethbalance] = useState();
@@ -42,7 +40,7 @@ export default function PayPopup({ off, receivables }) {
   let spinnerHref_approve = useRef();
   let [isloader_00, setisloader_00] = useState(false);
   let [isloader_01, setisloader_01] = useState(false);
-  let [MIN_STAKE_AMOUNT, setMIN_STAKE_AMOUNT] = useState(receivables.amount);
+  let [DueAmount, setDueAmount] = useState(receivables.amount);
   useEffect((_) => {
     const spinner = spinnerHref.current; // document.querySelector("Spinner");
     spinner.animate([{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], {
@@ -65,13 +63,13 @@ export default function PayPopup({ off, receivables }) {
       let myaddress = getmyaddress();
       LOGGER("", addresses.contract_pay_for_assigned_item, myaddress); // .ETH_TESTNET
       // let resp_balances = await query_with_arg({
-      //   contractaddress: addresses.contract_stake, // ETH_TESTNET.
+      //   contractaddress: addresses.contract_st ake, // ETH_TESTNET.
       //   abikind: "PAY",
       //   methodname: "_balances",
       //   aargs: [myaddress],
       // });
       // LOGGER("uQJ2POHvP8", resp_balances);
-      // setstakedbalance(getethrep(resp_balances));
+      // setst akedbalance(getethrep(resp_balances));
       query_with_arg({
         contractaddress: addresses.contract_USDT, // ETH_TESTNET.
         abikind: "ERC20",
@@ -97,8 +95,8 @@ export default function PayPopup({ off, receivables }) {
         setmybalance(getethrep(resp, 4));
       });
       // query_noarg({
-      //   contractaddress: addresses.contract_stake, // ETH_TESTNET.
-      //   abikind: "STAKE",
+      //   contractaddress: addresses.contract_st ake, // ETH_TESTNET.
+      //   abikind: "ST AKE",
       //   methodname: "_tvl",
       // }).then((resp) => {
       //   LOGGER("", resp);
@@ -108,7 +106,7 @@ export default function PayPopup({ off, receivables }) {
       // query_with_arg({
       //   contractaddress: addresses.contract_admin,
       //   abikind: "ADMIN",
-      //   methodname: "_stakeplans",
+      //   methodname: "_st akeplans",
       //   aargs: [addresses.contract_USDT],
       // }).then((resp) => {
       //   LOGGER("HSudcIgxuB", resp);
@@ -116,17 +114,17 @@ export default function PayPopup({ off, receivables }) {
       //   } else {
       //     return;
       //   }
-      //   setMIN_STAKE_AMOUNT(getethrep(resp[4]));
+      //   setMIN_ST AKE_AMOUNT(getethrep(resp[4]));
       // });
-      false &&
-        query_with_arg({
-          contractaddress: addresses.contract_stake, // .ETH_TESTNET
-          abikind: "STAKE",
-          methodname: "_tvl_nft",
-        }).then((resp) => {
-          LOGGER("", resp);
-          //				settvlnft ( resp )
-        });
+      // false &&
+      //   query_with_arg({
+      //     contractaddress: addresses.contract_st ake, // .ETH_TESTNET
+      //     abikind: "ST AKE",
+      //     methodname: "_tvl_nft",
+      //   }).then((resp) => {
+      //     LOGGER("", resp);
+      //     //				settvlnft ( resp )
+      //   });
       query_eth_balance(myaddress).then((resp) => {
         LOGGER("rmgUxgo5ye", resp);
         setmyethbalance((+getethrep(resp)).toFixed(DECIMALS_DISP_DEF));
@@ -202,7 +200,7 @@ export default function PayPopup({ off, receivables }) {
     LOGGER("YFVGAF0sBJ");
     let myaddress = getmyaddress();
     // LOGGER("eYJAgMYkR5", myaddress);
-    if (mybalance >= MIN_STAKE_AMOUNT) {
+    if (mybalance >= DueAmount) {
     } else {
       SetErrorBar(messages.MSG_BALANCE_NOT_ENOUGH);
       setDone(false);
@@ -281,7 +279,7 @@ export default function PayPopup({ off, receivables }) {
             aargs: [myaddress],
           });
           LOGGER("uQJ2POHvP8", resp_balances);
-          setstakedbalance(getethrep(resp_balances));
+          // setst akedbalance(getethrep(resp_balances));
           off();
         });
       } catch (err) {
@@ -314,9 +312,9 @@ export default function PayPopup({ off, receivables }) {
                 </span>
 
                 <ul className="priceList">
-                  <li className="price">{MIN_STAKE_AMOUNT} USDT</li>
+                  <li className="price">{DueAmount} USDT</li>
                   <li className="exchange">
-                    ${+MIN_STAKE_AMOUNT && tickerusdt ? putCommaAtPrice(+MIN_STAKE_AMOUNT * +tickerusdt) : null}
+                    ${+DueAmount && tickerusdt ? putCommaAtPrice(+DueAmount * +tickerusdt) : null}
                   </li>
                 </ul>
               </div>
@@ -334,9 +332,9 @@ export default function PayPopup({ off, receivables }) {
                   <p className="key">Total Staked</p>
                   <p className="value">{tvl} USDT</p>
                 </li>
-                <li>
-                  <p className="key">Your Stake</p>
-                  <p className="value">{stakedbalance} USDT</p>
+                <li style={{ display: "none" }}>
+                  <p className="key">Your St ake</p>
+                  {/* <p className="value">{st akedbalance} USDT</p> */}
                 </li>
 
                 <li>
@@ -448,9 +446,9 @@ export default function PayPopup({ off, receivables }) {
               </span>
 
               <ul className="priceList">
-                <li className="price">{MIN_STAKE_AMOUNT} USDT</li>
+                <li className="price">{DueAmount} USDT</li>
                 <li className="exchange">
-                  ${+MIN_STAKE_AMOUNT && tickerusdt ? putCommaAtPrice(+MIN_STAKE_AMOUNT * +tickerusdt) : null}
+                  ${+DueAmount && tickerusdt ? putCommaAtPrice(+DueAmount * +tickerusdt) : null}
                 </li>
               </ul>
             </div>
