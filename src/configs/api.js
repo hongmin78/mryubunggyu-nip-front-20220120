@@ -19,6 +19,7 @@ const API = {
   API_ITEMDETAIL: URL + "/items/item", // /:itemid
   API_EMAIL_VERIFY: `${URL}/signup/email/auth`,
   API_RECEIVABLES: `${URL}/queries/receivables/username`,
+  API_DELINQUENCY: `${URL}/queries/delinquencies/username`,
 };
 
 export { API };
