@@ -29,13 +29,15 @@ export default function Mypage() {
   const [category, setCategory] = useState(0);
   const [showEditBtn, setShowEditBtn] = useState(false);
   const [showCopyBtn, setShowCopyBtn] = useState(false);
-  let [userinfo, setuserinfo] = useState();
+  const [userinfo, setuserinfo] = useState();
 
   const fetchdata = async (_) => {
     let myaddress = getmyaddress();
+
     axios.get(API.API_USERINFO + `/${myaddress}`).then((resp) => {
-      LOGGER("", resp.data);
+      LOGGER("userInfo", resp.data);
       let { status, respdata } = resp.data;
+
       if (status == "OK") {
         setuserinfo(respdata);
       }
@@ -62,19 +64,13 @@ export default function Mypage() {
 
                 <div className="btnBox">
                   <div className="posBox">
-                    <button
-                      className="moreBtn hoverBtn"
-                      onClick={() => setShowEditBtn(true)}
-                    >
+                    <button className="moreBtn hoverBtn" onClick={() => setShowEditBtn(true)}>
                       <img src={I_3dot} alt="" />
                     </button>
 
                     {showEditBtn && (
                       <>
-                        <button
-                          className="editBtn displayBtn"
-                          onClick={() => navigate("/editprof")}
-                        >
+                        <button className="editBtn displayBtn" onClick={() => navigate("/editprof")}>
                           <p>Edit Profile</p>
                         </button>
                         <PopupBg off={setShowEditBtn} />
@@ -83,20 +79,14 @@ export default function Mypage() {
                   </div>
 
                   <div className="posBox">
-                    <button
-                      className="shareBtn hoverBtn"
-                      onClick={() => setShowCopyBtn(true)}
-                    >
+                    <button className="shareBtn hoverBtn" onClick={() => setShowCopyBtn(true)}>
                       <img src={I_upload} alt="" />
                       <p>Share</p>
                     </button>
 
                     {showCopyBtn && (
                       <>
-                        <button
-                          className="copyBtn displayBtn"
-                          onClick={() => setShowCopyBtn(false)}
-                        >
+                        <button className="copyBtn displayBtn" onClick={() => setShowCopyBtn(false)}>
                           <img src={I_clip} alt="" />
                           <p>Copy Link</p>
                         </button>
@@ -136,7 +126,7 @@ export default function Mypage() {
             <div className="contBox">
               {category === 0 && <MyItems />}
               {category === 1 && <Staking />}
-              {category === 2 && <Recommend />}
+              {category === 2 && <Recommend userinfo={userinfo} />}
             </div>
           </article>
         </MmypageBox>
@@ -172,10 +162,7 @@ export default function Mypage() {
                   </button>
 
                   <div className="hoverBox">
-                    <button
-                      className="editBtn displayBtn"
-                      onClick={() => navigate("/editprof")}
-                    >
+                    <button className="editBtn displayBtn" onClick={() => navigate("/editprof")}>
                       <p>Edit Profile</p>
                     </button>
                   </div>
@@ -217,7 +204,7 @@ export default function Mypage() {
             <div className="contBox">
               {category === 0 && <MyItems />}
               {category === 1 && <Staking />}
-              {category === 2 && <Recommend />}
+              {category === 2 && <Recommend userinfo={userinfo} />}
             </div>
           </article>
         </PmypageBox>

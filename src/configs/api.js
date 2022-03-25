@@ -21,6 +21,7 @@ const API = {
   API_RECEIVABLES: `${URL}/queries/receivables/username`,
   API_DELINQUENCY: `${URL}/queries/delinquencies/username`,
   API_ITEMBALANCES: `${URL}/queries/itembalances/username`,
+  API_GETUSER: `${URL}/user/info`,
 };
 
 export { API };

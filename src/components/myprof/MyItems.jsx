@@ -37,6 +37,7 @@ export default function MyItems() {
   const [isstaked, setisstaked] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [receivables, setReceivables] = useState();
+  const [userInfoRco, setUserInfoReco] = useState([]);
   let [itemData, setItemData] = useState([]);
   let [itemBalData, setItemBalData] = useState([]);
   let [mytokenid, setmytokenid] = useState(0);
@@ -75,7 +76,6 @@ export default function MyItems() {
     axios
       .get(API.API_ITEMBALANCES + `/${myaddress}`)
       .then((res) => {
-        console.log(res);
         let { list, status } = res.data;
         if (status === "OK") {
           setItemBalData(list);
@@ -87,6 +87,7 @@ export default function MyItems() {
         }
       })
       .catch((err) => console.log(err));
+
     false &&
       axios.get(API.API_QUERY_SINGLEROW + `/transactions/username/${myaddress}?typestr=STAKE&status=1`).then((resp) => {
         LOGGER("", resp.data);
@@ -653,7 +654,7 @@ export default function MyItems() {
                     </ul>
                   </div>
 
-                  <button
+                  {/* <button
                     className="actionBtn"
                     onClick={() => {
                       setReceivables(item);
@@ -661,7 +662,7 @@ export default function MyItems() {
                     }}
                   >
                     Pay
-                  </button>
+                  </button> */}
 
                   <p className="description">
                     The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days

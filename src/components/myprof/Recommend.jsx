@@ -2,17 +2,20 @@ import styled from "styled-components";
 import I_copy from "../../img/icon/I_copy.svg";
 import I_circleChk from "../../img/icon/I_circleChk.svg";
 import { D_recommendList } from "../../data/DmyPage";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { strDot } from "../../util/Util";
 import { onclickcopy } from "../../util/common.js";
 
-export default function Recommend() {
+export default function Recommend({ userinfo }) {
   const isMobile = useSelector((state) => state.common.isMobile);
 
   const [toggleCode, setToggleCode] = useState(false);
   const [toggleLink, setToggleLink] = useState(false);
+  const [userinfoProp, setUserinfoProp] = useState(userinfo);
 
+  console.log("userinfoProp");
+  console.log(userinfoProp);
   if (isMobile)
     return (
       <MrecommendBox>
@@ -109,11 +112,11 @@ export default function Recommend() {
               <li className="codeBox">
                 <strong className="key">Code</strong>
                 <span className="value">
-                  <p>98Dd4DBE</p>
+                  <p>{userinfoProp.myreferercode}</p>
                   <button
                     className="copyBtn"
                     onClick={() => {
-                      onclickcopy("98Dd4DBE");
+                      onclickcopy(userinfoProp.myreferercode);
                       setToggleCode(true);
                     }}
                   >
