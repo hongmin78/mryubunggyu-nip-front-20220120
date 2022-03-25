@@ -21,6 +21,8 @@ import axios from "axios";
 import { API } from "../configs/api";
 import { addresses } from "../configs/addresses";
 import { TIME_FETCH_MYADDRESS_DEF } from "../configs/configs";
+import SetErrorBar from "../util/SetErrorBar.js";
+import { messages } from "../configs/messages";
 
 export default function Mypage() {
   const navigate = useNavigate();
@@ -33,15 +35,18 @@ export default function Mypage() {
 
   const fetchdata = async (_) => {
     let myaddress = getmyaddress();
+    if (myaddress) {
+      axios.get(API.API_USERINFO + `/${myaddress}`).then((resp) => {
+        LOGGER("userInfo", resp.data);
+        let { status, respdata } = resp.data;
 
-    axios.get(API.API_USERINFO + `/${myaddress}`).then((resp) => {
-      LOGGER("userInfo", resp.data);
-      let { status, respdata } = resp.data;
-
-      if (status == "OK") {
-        setuserinfo(respdata);
-      }
-    });
+        if (status == "OK") {
+          setuserinfo(respdata);
+        }
+      });
+    } else {
+      SetErrorBar(messages.MSG_CONNECTWALET);
+    }
   };
   useEffect((_) => {
     setTimeout((_) => {

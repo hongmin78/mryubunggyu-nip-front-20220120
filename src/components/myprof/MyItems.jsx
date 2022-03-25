@@ -38,6 +38,8 @@ export default function MyItems() {
   const [isOpen, setIsOpen] = useState(false);
   const [receivables, setReceivables] = useState();
   const [userInfoRco, setUserInfoReco] = useState([]);
+  const [getTimeMoment, setGetTimeMoment] = useState();
+  const [TimeMoment, setTimeMoment] = useState();
   let [itemData, setItemData] = useState([]);
   let [itemBalData, setItemBalData] = useState([]);
   let [mytokenid, setmytokenid] = useState(0);
@@ -52,6 +54,12 @@ export default function MyItems() {
     let myaddress = getmyaddress();
     LOGGER("myaddress", myaddress);
 
+    // axios.get(API.API_GETTIME).then((resp) => {
+    //   // LOGGER("getTime", resp.data);
+    //   let { status, respdata } = resp.data;
+    //   setGetTimeMoment(resp.data.respdata.value_);
+    // });
+
     axios.get(API.API_USERINFO + `/${myaddress}`).then((resp) => {
       LOGGER("", resp.data);
       let { status, respdata } = resp.data;
@@ -62,7 +70,6 @@ export default function MyItems() {
     axios
       .get(API.API_RECEIVABLES + `/${myaddress}`)
       .then((res) => {
-        console.log(res);
         let { list } = res.data;
         setItemData(list);
         LOGGER("receivables", list);
@@ -73,20 +80,19 @@ export default function MyItems() {
       })
       .catch((err) => console.log(err));
 
-    axios
-      .get(API.API_ITEMBALANCES + `/${myaddress}`)
-      .then((res) => {
-        let { list, status } = res.data;
-        if (status === "OK") {
-          setItemBalData(list);
-          LOGGER("ITEMBALANCES", list);
-          list.forEach((el) => {
-            let { duetimeunix } = el;
-            const current = moment().unix() - duetimeunix;
-          });
-        }
-      })
-      .catch((err) => console.log(err));
+    axios.get(API.API_ITEMBALANCES + `/${myaddress}`).then((res) => {
+      let { list, status } = res.data;
+      if (status === "OK" && list.length) {
+        setItemBalData(list);
+        LOGGER("ITEMBALANCES", list);
+        list.forEach((el) => {
+          let { duetimeunix } = el;
+          const current = moment().unix() - duetimeunix;
+        });
+      } else {
+        navigate("/");
+      }
+    });
 
     false &&
       axios.get(API.API_QUERY_SINGLEROW + `/transactions/username/${myaddress}?typestr=STAKE&status=1`).then((resp) => {
@@ -132,6 +138,19 @@ export default function MyItems() {
       });
   };
 
+  // useEffect(() => {
+  //   axios.get(API.API_GETTIME).then((resp) => {
+  //     // LOGGER("getTime", resp.data);
+  //     let { status, respdata } = resp.data;
+  //     setGetTimeMoment(resp.data.respdata);
+  //   });
+  //   // setInterval(() => {
+  //   //   getTimeMoment && setTimeMoment(moment(moment.unix(getTimeMoment.value_) - moment()));
+  //   // }, 1000);
+  // }, []);
+
+  console.log("TimeMoment");
+  console.log(TimeMoment._i);
   useEffect((_) => {
     setTimeout((_) => {
       fetchdata();
@@ -141,9 +160,6 @@ export default function MyItems() {
   const openModal = () => {
     setIsOpen((prevState) => !prevState);
   };
-
-  console.log("itemData");
-  console.log(itemData);
 
   if (isMobile)
     return (
@@ -545,10 +561,11 @@ export default function MyItems() {
                         <strong className="price">{putCommaAtPrice(372)} USDT</strong>
 
                         <ul className="timeList">
-                          <li>00</li>
-                          <li>00</li>
-                          <li>00</li>
-                          <li>00</li>
+                          {/* <li>{getTimeMoment.value_}</li> */}
+                          <li>2</li>
+                          <li>0</li>
+                          <li>1</li>
+                          <li>2</li>
                         </ul>
                       </div>
 
@@ -627,10 +644,7 @@ export default function MyItems() {
                       <strong className="price">{putCommaAtPrice(372)} USDT</strong>
 
                       <ul className="timeList">
-                        <li>00</li>
-                        <li>00</li>
-                        <li>00</li>
-                        <li>00</li>
+                        <li>{/* <li>{getTimeMoment._i}</li> */}</li>
                       </ul>
                     </div>
 
