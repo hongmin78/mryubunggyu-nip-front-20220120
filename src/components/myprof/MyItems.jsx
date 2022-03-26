@@ -52,14 +52,8 @@ export default function MyItems() {
 
   const fetchdata = async (_) => {
     let myaddress = getmyaddress();
+    setmyaddress(myaddress);
     LOGGER("myaddress", myaddress);
-
-    // axios.get(API.API_GETTIME).then((resp) => {
-    //   // LOGGER("getTime", resp.data);
-    //   let { status, respdata } = resp.data;
-    //   setGetTimeMoment(resp.data.respdata.value_);
-    // });
-
     axios.get(API.API_USERINFO + `/${myaddress}`).then((resp) => {
       LOGGER("", resp.data);
       let { status, respdata } = resp.data;
@@ -82,15 +76,13 @@ export default function MyItems() {
 
     axios.get(API.API_ITEMBALANCES + `/${myaddress}`).then((res) => {
       let { list, status } = res.data;
-      if (status === "OK" && list.length) {
+      if (status === "OK" && list?.length) {
         setItemBalData(list);
         LOGGER("ITEMBALANCES", list);
         list.forEach((el) => {
           let { duetimeunix } = el;
           const current = moment().unix() - duetimeunix;
         });
-      } else {
-        navigate("/");
       }
     });
 
@@ -138,19 +130,19 @@ export default function MyItems() {
       });
   };
 
-  // useEffect(() => {
-  //   axios.get(API.API_GETTIME).then((resp) => {
-  //     // LOGGER("getTime", resp.data);
-  //     let { status, respdata } = resp.data;
-  //     setGetTimeMoment(resp.data.respdata);
-  //   });
-  //   // setInterval(() => {
-  //   //   getTimeMoment && setTimeMoment(moment(moment.unix(getTimeMoment.value_) - moment()));
-  //   // }, 1000);
-  // }, []);
+  useEffect(() => {
+    axios.get(API.API_GETTIME).then((resp) => {
+      // LOGGER("getTime", resp.data);
+      let { status, respdata } = resp.data;
+      console.log("resp");
+      console.log(respdata);
+      setGetTimeMoment(respdata.value_);
+    });
+    setInterval(() => {
+      getTimeMoment && setTimeMoment(moment(moment.unix(getTimeMoment) - moment()));
+    }, 1000);
+  }, [getTimeMoment]);
 
-  console.log("TimeMoment");
-  console.log(TimeMoment._i);
   useEffect((_) => {
     setTimeout((_) => {
       fetchdata();
@@ -561,7 +553,6 @@ export default function MyItems() {
                         <strong className="price">{putCommaAtPrice(372)} USDT</strong>
 
                         <ul className="timeList">
-                          {/* <li>{getTimeMoment.value_}</li> */}
                           <li>2</li>
                           <li>0</li>
                           <li>1</li>
@@ -637,14 +628,17 @@ export default function MyItems() {
                   <div className="saleBox">
                     <div className="key">
                       <p className="price">Current price</p>
-                      <p className="time">Ending in</p>
+                      <p className="time">{item.itemdata.s}</p>
                     </div>
 
                     <div className="value">
-                      <strong className="price">{putCommaAtPrice(372)} USDT</strong>
+                      <strong className="price">{putCommaAtPrice(item.buyprice)} USDT</strong>
 
                       <ul className="timeList">
-                        <li>{/* <li>{getTimeMoment._i}</li> */}</li>
+                        <li>{TimeMoment && TimeMoment.day()}일</li>
+                        <li>{TimeMoment && TimeMoment.hour()}시간</li>
+                        <li>{TimeMoment && TimeMoment.minutes()}분</li>
+                        <li>{TimeMoment && TimeMoment.second()}초</li>
                       </ul>
                     </div>
 
@@ -1189,6 +1183,7 @@ const PmyItemsBox = styled.section`
             .timeList {
               display: flex;
               gap: 10px;
+
               li {
                 display: flex;
                 justify-content: center;
@@ -1475,10 +1470,10 @@ const PmyItemsBox = styled.section`
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                width: 45px;
-                height: 45px;
+                width: 70px;
+                height: 50px;
                 font-weight: 700;
-                font-size: 24px;
+                font-size: 20px;
                 line-height: 24px;
                 color: #fff;
                 background: #000;
