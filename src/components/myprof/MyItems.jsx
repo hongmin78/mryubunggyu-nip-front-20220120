@@ -69,7 +69,6 @@ export default function MyItems() {
         LOGGER("receivables", list);
         list.forEach((el) => {
           let { duetimeunix } = el;
-          const current = moment().unix() - duetimeunix;
         });
       })
       .catch((err) => console.log(err));
@@ -81,7 +80,6 @@ export default function MyItems() {
         LOGGER("ITEMBALANCES", list);
         list.forEach((el) => {
           let { duetimeunix } = el;
-          const current = moment().unix() - duetimeunix;
         });
       }
     });
@@ -1084,7 +1082,7 @@ const PmyItemsBox = styled.section`
         position: relative;
         overflow: hidden;
         border-radius: 12px;
-        border: 6px solid transparent;
+        border: 20px solid transparent;
         background-image: linear-gradient(red, red), linear-gradient(to right, red 0%, orange 100%);
         background-origin: border-box;
         background-clip: content-box, border-box;
@@ -1367,7 +1365,7 @@ const PmyItemsBox = styled.section`
         position: relative;
         overflow: hidden;
         border-radius: 12px;
-        border: 8px solid transparent;
+        border: 20px solid transparent;
         background-image: linear-gradient(to right, red 0%, orange 100%), linear-gradient(to right, red 0%, orange 100%);
         background-origin: border-box;
         background-clip: content-box, border-box;

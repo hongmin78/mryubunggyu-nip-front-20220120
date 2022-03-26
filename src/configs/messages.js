@@ -19,5 +19,6 @@ const messages = {
   MSG_COPIED: "Copied",
   MSG_PLEASE_INPUT: "Please input ",
   MSG_CONNECTWALET: "Please Connect WALET",
+  MSG_DUPLICATEEMAIL: "DUPLICATE EMAIL",
 };
 export { messages };
