@@ -39,7 +39,7 @@ export default function MyItems() {
   const [receivables, setReceivables] = useState();
   const [userInfoRco, setUserInfoReco] = useState([]);
   const [getTimeMoment, setGetTimeMoment] = useState();
-  const [TimeMoment, setTimeMoment] = useState();
+  const [timeMoment, setTimeMoment] = useState();
   let [itemData, setItemData] = useState([]);
   let [itemBalData, setItemBalData] = useState([]);
   let [mytokenid, setmytokenid] = useState(0);
@@ -49,6 +49,8 @@ export default function MyItems() {
   let [txscanurl, settxscanurl] = useState();
   let [buydate, setbuydate] = useState([]);
   let [userinfo, setuserinfo] = useState(null);
+  const [timeReceivables, setTimeReceivables] = useState();
+  const [gettimeReceivables, setgetTimeReceivables] = useState();
 
   const fetchdata = async (_) => {
     let myaddress = getmyaddress();
@@ -75,6 +77,7 @@ export default function MyItems() {
 
     axios.get(API.API_ITEMBALANCES + `/${myaddress}`).then((res) => {
       let { list, status } = res.data;
+      LOGGER("getTime", res.data);
       if (status === "OK" && list?.length) {
         setItemBalData(list);
         LOGGER("ITEMBALANCES", list);
@@ -132,14 +135,32 @@ export default function MyItems() {
     axios.get(API.API_GETTIME).then((resp) => {
       // LOGGER("getTime", resp.data);
       let { status, respdata } = resp.data;
-      console.log("resp");
-      console.log(respdata);
       setGetTimeMoment(respdata.value_);
     });
+
     setInterval(() => {
       getTimeMoment && setTimeMoment(moment(moment.unix(getTimeMoment) - moment()));
     }, 1000);
   }, [getTimeMoment]);
+
+  useEffect(() => {
+    let myaddress = getmyaddress();
+    LOGGER("myaddress", myaddress);
+    axios
+      .get(API.API_RECEIVABLES + `/${myaddress}`)
+      .then((res) => {
+        let { list } = res.data;
+        // LOGGER("receivables", list);
+        // list.forEach((el) => {
+        //   let { duetimeunix } = el;
+        // });
+        setgetTimeReceivables(list[0]?.duetimeunix);
+      })
+      .catch((err) => console.log(err));
+    setInterval(() => {
+      gettimeReceivables && setTimeReceivables(moment(moment.unix(gettimeReceivables) - moment()));
+    }, 1000);
+  }, [gettimeReceivables]);
 
   useEffect((_) => {
     setTimeout((_) => {
@@ -548,13 +569,13 @@ export default function MyItems() {
                       </div>
 
                       <div className="value">
-                        <strong className="price">{putCommaAtPrice(372)} USDT</strong>
+                        <strong className="price">{putCommaAtPrice(item.amount)} USDT</strong>
 
                         <ul className="timeList">
-                          <li>2</li>
-                          <li>0</li>
-                          <li>1</li>
-                          <li>2</li>
+                          <li>{timeReceivables && timeReceivables.days()}일</li>
+                          <li>{timeReceivables && timeReceivables.hour()}시간</li>
+                          <li>{timeReceivables && timeReceivables.minutes()}분</li>
+                          <li>{timeReceivables && timeReceivables.second()}초</li>
                         </ul>
                       </div>
 
@@ -563,18 +584,18 @@ export default function MyItems() {
                           <p className="key">Current price</p>
                           <p className="value">586 USDT</p>
                         </li>
-                        <li>
+                        {/* <li>
                           <p className="key">Transaction price</p>
                           <p className="value">688 USDT</p>
-                        </li>
-                        <li
+                        </li> */}
+                        {/* <li
                           onClick={(evt) => {
                             window.open(txscanurl);
                           }}
                         >
                           <p className="key">TxHash</p>
                           <p className="value">{txhash}</p>
-                        </li>
+                        </li> */}
                       </ul>
                     </div>
 
@@ -633,10 +654,10 @@ export default function MyItems() {
                       <strong className="price">{putCommaAtPrice(item.buyprice)} USDT</strong>
 
                       <ul className="timeList">
-                        <li>{TimeMoment && TimeMoment.day()}일</li>
-                        <li>{TimeMoment && TimeMoment.hour()}시간</li>
-                        <li>{TimeMoment && TimeMoment.minutes()}분</li>
-                        <li>{TimeMoment && TimeMoment.second()}초</li>
+                        <li>{timeMoment && timeMoment.day()}일</li>
+                        <li>{timeMoment && timeMoment.hour()}시간</li>
+                        <li>{timeMoment && timeMoment.minutes()}분</li>
+                        <li>{timeMoment && timeMoment.second()}초</li>
                       </ul>
                     </div>
 
