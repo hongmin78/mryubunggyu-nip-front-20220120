@@ -14,6 +14,8 @@ const jaddresses = {
     contract_stake: "0x53caf649502a39c1a6d360d77e12676425f74860",
     contract_admin: "0x59e84ece084a0e2cabc1e344320b71d8be117ea9",
     contract_ticketnft: "0x6208803CC8FAfdeCEA589666c96d40836daccB46",
+    contract_pay_for_assigned_item: "0xda90f3b82c531f32af791fa3a3e7a67b36aa0844",
+    payment_for_delinquency: "0xc7b12c6b2c0214ed60cfc1e2f3efdd6d83b58f29",
   },
 };
 let addresses = jaddresses[net];
