@@ -23,6 +23,7 @@ const API = {
   API_ITEMBALANCES: `${URL}/queries/itembalances/username`,
   API_GETUSER: `${URL}/user/info`,
   API_GETTIME: `${URL}/queries/singlerow/settings/key_/BALLOT_NEXT_ROUND_START`,
+  API_TYPESTR: `${URL}/queries/logactions/typestr/PAY`,
 };
 
 export { API };

@@ -28,17 +28,16 @@ export default function AuctionDetail() {
   const [category, setCategory] = useState(0);
   const [moreIndex, setMoreIndex] = useState(0);
   const [showCopyBtn, setShowCopyBtn] = useState(false);
-  const [itemData, setItemData ] = useState({});
+  const [itemData, setItemData] = useState({});
   const [moreCollection, setMoreCollection] = useState([]);
 
-	const onclickfavorite=_=>{
-		axios.post (API.API_TOGGLE_FAVORITE ).then(resp=>{
-			LOGGER( 'xMYQNYFa9d' , resp.data )
-
-		})
-		setToggleLike(!toggleLike)
-		LOGGER('8FCYJgzDZX')
-	} 
+  const onclickfavorite = (_) => {
+    axios.post(API.API_TOGGLE_FAVORITE).then((resp) => {
+      LOGGER("xMYQNYFa9d", resp.data);
+    });
+    setToggleLike(!toggleLike);
+    LOGGER("8FCYJgzDZX");
+  };
   function onClickAuctionNextBtn() {
     if (!moreRef.current.children[0]) return;
     const wrapWidth = moreRef.current.offsetWidth;
@@ -51,8 +50,8 @@ export default function AuctionDetail() {
   }
 
   function getAuction() {
-		axios //      .get("http://3.35.1 17.87:34705/auction/list", { params: { limit: 8 } })
-			.get(API.API_COMMONITEMS  )
+    axios //      .get("http://3.35.1 17.87:34705/auction/list", { params: { limit: 8 } })
+      .get(API.API_COMMONITEMS)
       .then((res) => {
         console.log(res.data);
         setMoreCollection(res.data);
@@ -60,12 +59,10 @@ export default function AuctionDetail() {
   }
 
   useEffect(() => {
-    axios
-      .get(`http://3.35.117.87:34705/auction/item/${params.dna}`)
-      .then((res) => {
-        console.log(res.data[0]);
-        setItemData(res.data[0]);
-      });
+    axios.get(`http://3.35.117.87:34705/auction/item/${params.dna}`).then((res) => {
+      console.log(res.data[0]);
+      setItemData(res.data[0]);
+    });
 
     getAuction();
   }, []);
@@ -85,9 +82,7 @@ export default function AuctionDetail() {
         });
       } else {
         moreRef.current.scrollTo({
-          left:
-            contWidth * itemNumByPage * moreIndex +
-            moreIndex * getStyle(moreRef, "gap") * itemNumByPage,
+          left: contWidth * itemNumByPage * moreIndex + moreIndex * getStyle(moreRef, "gap") * itemNumByPage,
           behavior: "smooth",
         });
       }
@@ -112,26 +107,21 @@ export default function AuctionDetail() {
                     <div className="btnBox">
                       <button
                         className="likeBtn hoverBtn"
-												onClick={() => { onclickfavorite ()
-												} }
+                        onClick={() => {
+                          onclickfavorite();
+                        }}
                       >
                         <img src={toggleLike ? I_heartO : I_heart} alt="" />
                       </button>
 
-                      <button
-                        className="moreBtn hoverBtn"
-                        onClick={() => setShowCopyBtn(true)}
-                      >
+                      <button className="moreBtn hoverBtn" onClick={() => setShowCopyBtn(true)}>
                         <img src={I_3dot} alt="" />
                       </button>
                     </div>
 
                     {showCopyBtn && (
                       <>
-                        <button
-                          className="copyBtn displayBtn"
-                          onClick={() => {}}
-                        >
+                        <button className="copyBtn displayBtn" onClick={() => {}}>
                           <img src={I_clip} alt="" />
                           Copy Link
                         </button>
@@ -151,9 +141,7 @@ export default function AuctionDetail() {
                 <div className="saleBox">
                   <div className="price">
                     <p className="key">Current price</p>
-                    <strong className="value">
-                      {putCommaAtPrice(100)} USDT
-                    </strong>
+                    <strong className="value">{putCommaAtPrice(100)} USDT</strong>
                   </div>
 
                   <div className="time">
@@ -260,34 +248,27 @@ export default function AuctionDetail() {
             <article className="infoBox">
               <div className="itemInfoBox">
                 <div className="titleBox">
-                  <strong className="title">
-                    Series Kong {itemData?.name}
-                  </strong>
+                  <strong className="title">Series Kong {itemData?.name}</strong>
 
                   <div className="btnBox">
                     <div className="posBox">
                       <button
                         className="likeBtn hoverBtn"
-												onClick={() => { onclickfavorite()
-												} }
+                        onClick={() => {
+                          onclickfavorite();
+                        }}
                       >
                         <img src={toggleLike ? I_heartO : I_heart} alt="" />
                       </button>
                     </div>
 
                     <div className="posBox">
-                      <button
-                        className="moreBtn hoverBtn"
-                        onClick={() => setShowCopyBtn(true)}
-                      >
+                      <button className="moreBtn hoverBtn" onClick={() => setShowCopyBtn(true)}>
                         <img src={I_3dot} alt="" />
                       </button>
 
                       <div className="hoverBox">
-                        <button
-                          className="copyBtn displayBtn"
-                          onClick={() => setShowCopyBtn(false)}
-                        >
+                        <button className="copyBtn displayBtn" onClick={() => setShowCopyBtn(false)}>
                           <img src={I_clip} alt="" />
                           Copy Link
                         </button>
@@ -308,9 +289,7 @@ export default function AuctionDetail() {
                   </div>
 
                   <div className="value">
-                    <strong className="price">
-                      {putCommaAtPrice(100)} USDT
-                    </strong>
+                    <strong className="price">{putCommaAtPrice(100)} USDT</strong>
 
                     <ul className="timeList">
                       <li>00</li>

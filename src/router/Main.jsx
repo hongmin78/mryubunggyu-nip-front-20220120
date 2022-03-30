@@ -28,6 +28,7 @@ import axios from "axios";
 import { API } from "../configs/api";
 import { LOGGER, getmyaddress } from "../util/common";
 import { setDelinquencyAmount } from "../util/store/commonSlice";
+import moment from "moment";
 
 export default function Main() {
   const navigate = useNavigate();
@@ -52,6 +53,8 @@ export default function Main() {
   const [auctionListSecond, setAuctionListSecond] = useState([]);
   const [likeObj, setLikeObj] = useState({});
   let [premiumitemlist, setpremiumitemlist] = useState([]);
+  const [typestrPay, setTypestrPay] = useState([]);
+
   const dispatch = useDispatch();
 
   function onClickTopBtn() {
@@ -120,6 +123,13 @@ export default function Main() {
       let { status, list } = resp.data;
       if (status == "OK") {
         setpremiumitemlist(list);
+      }
+    });
+    axios.get(API.API_TYPESTR).then((resp) => {
+      LOGGER("API_TYPESTR", resp.data);
+      let { status, payload } = resp.data;
+      if (status == "OK") {
+        setTypestrPay(payload.rowdata);
       }
     });
   }
@@ -451,17 +461,17 @@ export default function Main() {
 
           <section className="issueContainer">
             <ul className="issueList" ref={issueRef}>
-              {D_issueList.map((cont, index) => (
+              {typestrPay.map((cont, index) => (
                 <li className="issueBox" key={index}>
                   <div className="infoBox">
                     <div className="profBox">
                       <img src={E_issueProf} alt="" />
-                      <p className="nickname">@andyfeltham</p>
+                      <p className="nickname">{cont.username}</p>
                     </div>
-                    <div className="timeBox">4 mins ago</div>
+                    <div className="timeBox">{moment(cont.updatedat).minutes()} mins ago</div>
                   </div>
                   <p className="cont">
-                    purchased <u>Kingkong #122</u> at 158 USDT
+                    {cont.typestr === "PAY" ? "purchased" : ""} <u>{cont.actionname}</u> at {cont.price} USDT
                   </p>
                 </li>
               ))}
@@ -1078,7 +1088,7 @@ const PmainBox = styled.div`
         display: flex;
         justify-content: space-between;
         align-items: center;
-        width: 820px;
+        width: 1000px;
         height: 60px;
         min-height: 60px;
         padding: 0 34px;

@@ -2,14 +2,14 @@ import { useSelector } from "react-redux";
 import styled from "styled-components";
 import { D_details } from "../../data/DauctionDetail";
 
-export default function Details0303 ({ itemdata }) {
+export default function Details0303({ itemdata }) {
   const isMobile = useSelector((state) => state.common.isMobile);
-  console.log( itemdata )
+  console.log(itemdata);
 
   if (isMobile)
     return (
       <MdetailsBox>
-        {itemdata.map( (cont, index) => (
+        {itemdata?.map((cont, index) => (
           <li key={index}>
             <p className="part">{cont.key}</p>
             <p className="option">{cont.value}</p>
@@ -20,10 +20,10 @@ export default function Details0303 ({ itemdata }) {
   else
     return (
       <PdetailsBox>
-        {itemdata.map( (cont, index) => (
+        {itemdata?.map((cont, index) => (
           <li key={index}>
-            <p className="part">{cont.key }</p>
-            <p className="option">{cont.value }</p>
+            <p className="part">{cont.key}</p>
+            <p className="option">{cont.value}</p>
           </li>
         ))}
       </PdetailsBox>
