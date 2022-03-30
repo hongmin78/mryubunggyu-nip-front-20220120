@@ -39,11 +39,11 @@ export default function Recommend({ userinfo }) {
               <li className="codeBox">
                 <strong className="key">Code</strong>
                 <span className="value">
-                  <p>98Dd4DBE</p>
+                  <p>{userinfoProp.myreferercode}</p>
                   <button
                     className="copyBtn"
                     onClick={() => {
-                      onclickcopy();
+                      onclickcopy(userinfoProp.myreferercode);
                       setToggleCode(true);
                     }}
                   >
@@ -52,14 +52,18 @@ export default function Recommend({ userinfo }) {
                 </span>
               </li>
               <li className="linkBox">
-                <strong className="key">
-                  Link{" "}
-                  <button className="copyBtn" onClick={() => setToggleLink(true)}>
-                    <img src={toggleLink ? I_circleChk : I_copy} alt="" />
-                  </button>
-                </strong>
+                <strong className="key">Link</strong>
                 <span className="value">
                   <p>https://ausp.io/market/?ref=0x97b155a698d4bdec4c4bf3a92e9071190093cafb</p>
+                  <button
+                    className="copyBtn"
+                    onClick={() => {
+                      setToggleLink(true);
+                      onclickcopy("https://ausp.io/market/?ref=0x97b155a698d4bdec4c4bf3a92e9071190093cafb");
+                    }}
+                  >
+                    <img src={toggleLink ? I_circleChk : I_copy} alt="" />
+                  </button>
                 </span>
               </li>
             </ul>
@@ -68,23 +72,26 @@ export default function Recommend({ userinfo }) {
           <li className="recommenderBox">
             <strong className="contTitle">My recommender</strong>
 
-            <ul className="dataList">
-              {D_recommendList.map((cont, index) => (
-                <li key={index}>
-                  <div>
-                    <p className="account">{cont.account}</p>
-                    <p className="symbol">{cont.symbol ? cont.symbol : "-"}</p>
-                  </div>
-                  <div>
-                    <p className="level">{cont.level} Level</p>
-                  </div>
-                  <div>
-                    <p className="point">{cont.point} USDT</p>
-                    <p className="date">{cont.date}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <div className="listBox">
+              <ul className="listHeader">
+                {headerList.map((cont, index) => (
+                  <li key={index}>{cont}</li>
+                ))}
+              </ul>
+
+              <ul className="dataList">
+                {D_recommendList.map((cont, index) => (
+                  <li key={index}>
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    <span>{strDot(cont.account, 4, 4)}</span>
+                    <span>{cont.symbol ? cont.symbol : "-"}</span>
+                    <span>{cont.level} Level</span>
+                    <span>{cont.date}</span>
+                    <span>{cont.point} USDT</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </li>
         </ul>
       </MrecommendBox>

@@ -279,52 +279,140 @@ export default function MyItems() {
               </p>
             </div>
           </li>
+          {itemData &&
+            itemData?.length !== 0 &&
+            itemData.map((item, index) => {
+              return (
+                <li className="swapBox">
+                  <div className="imgBox">
+                    <img className="itemImg" src={item.itemdata.url} alt="" />
 
-          <li className="swapBox">
-            <div className="imgBox">
-              <img className="itemImg" src={E_item2} alt="" />
+                    <div className="topBar">
+                      <button className="likeBtn" onClick={() => {}}>
+                        <img src={I_heartO} alt="" />
+                        <p>22</p>
+                      </button>
+                    </div>
+                  </div>
 
-              <div className="topBar">
-                <button className="likeBtn" onClick={() => {}}>
-                  <img src={I_heartO} alt="" />
-                  <p>22</p>
-                </button>
-              </div>
-            </div>
+                  <div className="infoBox">
+                    <div className="titleBox">
+                      <strong className="title">{item.itemdata.titlename}</strong>
+                    </div>
 
-            <div className="infoBox">
-              <div className="titleBox">
-                <strong className="title">Series Kong #010000</strong>
-              </div>
+                    <div className="ownedBox">
+                      <p className="key">Owned by</p>
+                      <p className="value">@andyfeltham</p>
+                    </div>
+                    <div className="ownedBox">
+                      <p className="key">Round Number</p>
+                      <p className="value">{item.roundnumber}Round</p>
+                    </div>
 
-              <div className="ownedBox">
-                <p className="key">Owned by</p>
-                <p className="value">@andyfeltham</p>
-              </div>
+                    <div className="saleBox">
+                      <div className="price">
+                        <p className="key">Current price</p>
+                      </div>
 
-              <div className="saleBox">
-                <div className="price">
-                  <p className="key">Current price</p>
-                  <strong className="value">{putCommaAtPrice(372)} USDT</strong>
-                </div>
+                      <div className="time">
+                        <p className="key">Ending in</p>
+                        <ul className="timeList">
+                          <li>{timeReceivables && timeReceivables.days()}일</li>
+                          <li>{timeReceivables && timeReceivables.hour()}시간</li>
+                          <li>{timeReceivables && timeReceivables.minutes()}분</li>
+                          <li>{timeReceivables && timeReceivables.second()}초</li>
+                        </ul>
+                      </div>
+                    </div>
 
-                <div className="time">
-                  <p className="key">Ending in</p>
-                  <ul className="timeList">
-                    <li>00</li>
-                    <li>00</li>
-                    <li>00</li>
-                    <li>00</li>
-                  </ul>
-                </div>
-              </div>
+                    <ul className="priceBox">
+                      <li>
+                        <p className="key">Current price</p>
+                        <p className="value">586 USDT</p>
+                      </li>
+                      {/* <li>
+                  <p className="key">Transaction price</p>
+                  <p className="value">688 USDT</p>
+                </li> */}
+                      {/* <li
+                  onClick={(evt) => {
+                    window.open(txscanurl);
+                  }}
+                >
+                  <p className="key">TxHash</p>
+                  <p className="value">{txhash}</p>
+                </li> */}
+                    </ul>
 
-              <ul className="priceBox">
-                <li>
-                  <p className="key">Current price</p>
-                  <p className="value">372 USDT</p>
+                    <button
+                      className="actionBtn"
+                      onClick={() => {
+                        setReceivables(item);
+                        openModal();
+                      }}
+                    >
+                      Pay
+                    </button>
+
+                    <p className="description">
+                      The NFT purchased by participating in the subscription auction generates 12% of profits after 3
+                      days and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
+                      completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all
+                      transactions in your account will be suspended. It operates normally after applying a penalty of
+                      10% of the winning bid amount.
+                    </p>
+                  </div>
                 </li>
-                <li>
+              );
+            })}
+          {itemBalData.length !== 0 &&
+            itemBalData.map((item, index) => (
+              <li className="sellBox">
+                <div className="imgBoxBal">
+                  <img className="itemImgBal" src={item.itemdata.url} alt="" />
+
+                  <div className="topBarBal">
+                    <button className="likeBtnBal" onClick={() => {}}>
+                      <img src={I_heartO} alt="" />
+                      <p>22</p>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="infoBox">
+                  <div className="titleBox">
+                    <strong className="title">{item.itemdata.titlename}</strong>
+                  </div>
+
+                  <div className="ownedBox">
+                    <p className="key">Owned by</p>
+                    <p className="value">@andyfeltham</p>
+                  </div>
+
+                  <div className="saleBox">
+                    <div className="price">
+                      <p className="key">Current price</p>
+
+                      <strong className="value">{putCommaAtPrice(100)} USDT</strong>
+                    </div>
+
+                    <div className="time">
+                      <p className="key">Ending in</p>
+                      <ul className="timeList">
+                        <li>{timeMoment && timeMoment.day()}일</li>
+                        <li>{timeMoment && timeMoment.hour()}시간</li>
+                        <li>{timeMoment && timeMoment.minutes()}분</li>
+                        <li>{timeMoment && timeMoment.second()}초</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <ul className="priceBox">
+                    <li>
+                      <p className="key">Current price</p>
+                      <p className="value">586 USDT</p>
+                    </li>
+                    {/* <li>
                   <p className="key">Transaction price</p>
                   <p className="value">688 USDT</p>
                 </li>
@@ -335,91 +423,24 @@ export default function MyItems() {
                 >
                   <p className="key">TxHash</p>
                   <p className="value">{txhash}</p>
-                </li>
-              </ul>
-
-              <button className="actionBtn">Swap</button>
-
-              <p className="description">
-                The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days and
-                is sold random. In addition, the results are announced at 9:00 AM, and the transaction is completed from
-                9:00 AM to 21:00 PM. If the transaction is not completed within time, all transactions in your account
-                will be suspended. It operates normally after applying a penalty of 10% of the winning bid amount.
-              </p>
-            </div>
-          </li>
-
-          <li className="sellBox">
-            <div className="imgBox">
-              <img className="itemImg" src={E_item3} alt="" />
-
-              <div className="topBar">
-                <button className="likeBtn" onClick={() => {}}>
-                  <img src={I_heartO} alt="" />
-                  <p>22</p>
-                </button>
-              </div>
-            </div>
-
-            <div className="infoBox">
-              <div className="titleBox">
-                <strong className="title">King Kong #010000</strong>
-              </div>
-
-              <div className="ownedBox">
-                <p className="key">Owned by</p>
-                <p className="value">@andyfeltham</p>
-              </div>
-
-              <div className="saleBox">
-                <div className="price">
-                  <p className="key">Current price</p>
-                  <strong className="value">{putCommaAtPrice(100)} USDT</strong>
-                </div>
-
-                <div className="time">
-                  <p className="key">Ending in</p>
-                  <ul className="timeList">
-                    <li>00</li>
-                    <li>00</li>
-                    <li>00</li>
-                    <li>00</li>
+                </li> */}
                   </ul>
+
+                  {/* <div className="btnBox">
+                    <button className="actionBtn" onClick={() => navigate("/resell")}>
+                      Sell
+                    </button>
+                    <button className="actionBtn">Staking</button>
+                  </div> */}
+
+                  <p className="description">
+                    King Kong NFT can be staking or sold to Marketplace at a price of up to 25%. If you steaking, you
+                    will get 30% annual NIP COIN reward.
+                  </p>
                 </div>
-              </div>
-
-              <ul className="priceBox">
-                <li>
-                  <p className="key">Current price</p>
-                  <p className="value">586 USDT</p>
-                </li>
-                <li>
-                  <p className="key">Transaction price</p>
-                  <p className="value">688 USDT</p>
-                </li>
-                <li
-                  onClick={(evt) => {
-                    window.open(txscanurl);
-                  }}
-                >
-                  <p className="key">TxHash</p>
-                  <p className="value">{txhash}</p>
-                </li>
-              </ul>
-
-              <div className="btnBox">
-                <button className="actionBtn" onClick={() => navigate("/resell")}>
-                  Sell
-                </button>
-                <button className="actionBtn">Staking</button>
-              </div>
-
-              <p className="description">
-                King Kong NFT can be staking or sold to Marketplace at a price of up to 25%. If you steaking, you will
-                get 30% annual NIP COIN reward.
-              </p>
-            </div>
-          </li>
+              </li>
+            ))}
+          {isOpen && <PayPopup off={openModal} receivables={receivables} />}
         </ul>
       </MmyItemsBox>
     );
@@ -666,7 +687,7 @@ export default function MyItems() {
                         <p className="key">Current price</p>
                         <p className="value">586 USDT</p>
                       </li>
-                      <li>
+                      {/* <li>
                         <p className="key">Transaction price</p>
                         <p className="value">688 USDT</p>
                       </li>
@@ -677,7 +698,7 @@ export default function MyItems() {
                       >
                         <p className="key">TxHash</p>
                         <p className="value">{txhash}</p>
-                      </li>
+                      </li> */}
                     </ul>
                   </div>
 
@@ -839,6 +860,12 @@ const MmyItemsBox = styled.section`
         border-radius: 3.33vw;
         position: relative;
         overflow: hidden;
+        border-radius: 12px;
+        border: 20px solid transparent;
+        background-image: linear-gradient(to right, red 0%, orange 100%), linear-gradient(to right, red 0%, orange 100%);
+        background-origin: border-box;
+        background-clip: content-box, border-box;
+
         .itemImg {
           width: 100%;
           height: 100%;
@@ -922,14 +949,14 @@ const MmyItemsBox = styled.section`
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                width: 9.72vw;
-                height: 9.72vw;
+                width: 80px;
+                height: 45px;
                 font-weight: 700;
-                font-size: 5.55vw;
-                line-height: 5.55vw;
+                font-size: 24px;
+                line-height: 24px;
                 color: #fff;
                 background: #000;
-                border-radius: 1.66vw;
+                border-radius: 6px;
               }
             }
           }
@@ -1040,6 +1067,43 @@ const MmyItemsBox = styled.section`
           button {
             flex: 1;
           }
+        }
+      }
+    }
+    .imgBoxBal {
+      display: flex;
+      flex-direction: column;
+      * {
+        font-family: "Roboto", sans-serif;
+      }
+      width: 760px;
+      height: 760px;
+      position: relative;
+      overflow: hidden;
+      .itemImgBal {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        position: absolute;
+        border-radius: 12px;
+      }
+      .topBarBal {
+        display: flex;
+        justify-content: flex-end;
+        padding: 36px;
+        .likeBtnBal {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 8px;
+          width: 110px;
+          height: 54px;
+          font-size: 22px;
+          font-weight: 500;
+          color: #ff5050;
+          background: rgba(255, 255, 255, 0.2);
+          backdrop-filter: blur(60px);
+          border-radius: 30px;
         }
       }
     }

@@ -62,53 +62,47 @@ export default function Mypage() {
           <article className="profBox">
             <img className="bg" src={B_mypage} alt="" />
             <div className="contBox">
-              <div className="topBar">
+              <div className="leftBox">
                 <span className="profImg">
                   <img src={E_prof} alt="" />
                 </span>
 
-                <div className="btnBox">
-                  <div className="posBox">
-                    <button className="moreBtn hoverBtn" onClick={() => setShowEditBtn(true)}>
-                      <img src={I_3dot} alt="" />
-                    </button>
+                <span className="adressContainer">
+                  <span className="name">@{userinfo?.nickname}</span>
+                  <span className="addressBox">
+                    <p>{strDot(isLogin, 4, 4)}</p>
+                    <img src={I_copy} alt="" />
+                  </span>
+                </span>
+              </div>
 
-                    {showEditBtn && (
-                      <>
-                        <button className="editBtn displayBtn" onClick={() => navigate("/editprof")}>
-                          <p>Edit Profile</p>
-                        </button>
-                        <PopupBg off={setShowEditBtn} />
-                      </>
-                    )}
+              <div className="btnBox">
+                <div className="posBox">
+                  <button className="moreBtn hoverBtn" onClick={() => {}}>
+                    <img src={I_3dot} alt="" />
+                  </button>
+
+                  <div className="hoverBox">
+                    <button className="editBtn displayBtn" onClick={() => navigate("/editprof")}>
+                      <p>Edit Profile</p>
+                    </button>
                   </div>
+                </div>
 
-                  <div className="posBox">
-                    <button className="shareBtn hoverBtn" onClick={() => setShowCopyBtn(true)}>
-                      <img src={I_upload} alt="" />
-                      <p>Share</p>
+                <div className="posBox">
+                  <button className="shareBtn hoverBtn" onClick={() => {}}>
+                    <img src={I_upload} alt="" />
+                    <p>Share</p>
+                  </button>
+
+                  <div className="hoverBox">
+                    <button className="copyBtn displayBtn" onClick={() => {}}>
+                      <img src={I_clip} alt="" />
+                      <p>Copy Link</p>
                     </button>
-
-                    {showCopyBtn && (
-                      <>
-                        <button className="copyBtn displayBtn" onClick={() => setShowCopyBtn(false)}>
-                          <img src={I_clip} alt="" />
-                          <p>Copy Link</p>
-                        </button>
-                        <PopupBg off={setShowCopyBtn} />
-                      </>
-                    )}
                   </div>
                 </div>
               </div>
-
-              <span className="adressContainer">
-                <span className="name">@{userinfo?.nickname}</span>
-                <span className="addressBox">
-                  <p>{strDot(isLogin, 4, 4)}</p>
-                  <img src={I_copy} alt="" />
-                </span>
-              </span>
             </div>
           </article>
 

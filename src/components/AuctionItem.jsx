@@ -18,10 +18,7 @@ export default function AuctionItem({ data, index, likeObj, setLikeObj }) {
 
   if (isMobile)
     return (
-      <Mitem
-        className="item"
-        onClick={() => navigate(`/auction/detail/${data.dna}`)}
-      >
+      <Mitem className="item" onClick={() => navigate(`/auction/detail/${data.dna}`)}>
         <div className="topBar">
           <div className="profBox">
             <img src={autoAuctionList[index]?.profImg} alt="" />
@@ -29,10 +26,7 @@ export default function AuctionItem({ data, index, likeObj, setLikeObj }) {
           </div>
 
           {likeObj && (
-            <button
-              className="likeBtn"
-              onClick={(e) => onClickItemLike(e, index)}
-            >
+            <button className="likeBtn" onClick={(e) => onClickItemLike(e, index)}>
               <img src={likeObj[index] ? I_heartO : I_heart} alt="" />
               <p
                 className="count"
@@ -60,23 +54,15 @@ export default function AuctionItem({ data, index, likeObj, setLikeObj }) {
     );
   else
     return (
-      <Pitem
-        className="item"
-        onClick={() => navigate(`/auction/detail/${data.dna}`)}
-      >
+      <Pitem className="item" onClick={() => navigate(`/auction/detail/${data.dna}`)}>
         <div className="topBar">
           <div className="profBox">
             <img src={autoAuctionList[index]?.profImg} alt="" />
-            <p className="address">
-              {strDot(autoAuctionList[index]?.address, 5, 4)}
-            </p>
+            <p className="address">{strDot(autoAuctionList[index]?.address, 5, 4)}</p>
           </div>
 
           {likeObj && (
-            <button
-              className="likeBtn"
-              onClick={(e) => onClickItemLike(e, index)}
-            >
+            <button className="likeBtn" onClick={(e) => onClickItemLike(e, index)}>
               <img src={likeObj[index] ? I_heartO : I_heart} alt="" />
               <p
                 className="count"
@@ -97,9 +83,7 @@ export default function AuctionItem({ data, index, likeObj, setLikeObj }) {
 
           <ul className="detailList">
             <li>Last sold for</li>
-            <li>
-              100&nbsp;USDT
-            </li>
+            <li>100&nbsp;USDT</li>
           </ul>
         </div>
       </Pitem>

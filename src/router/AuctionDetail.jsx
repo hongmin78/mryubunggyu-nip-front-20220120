@@ -84,13 +84,16 @@ export default function AuctionDetail() {
         setitemdata(respdata);
         let { metadata } = respdata;
         if (metadata) {
-          let jmetadata = PARSER(metadata);
+          let jmetadata = JSON.parse(metadata);
           LOGGER("oXhffF8eTM", conv_jdata_arrkeyvalue(jmetadata));
-          setattributes(conv_jdata_arrkeyvalue(jmetadata));
+          setattributes(jmetadata);
         }
       }
     });
   };
+
+  // console.log("attributes");
+  // console.log(attributes);
   function getAuction() {
     axios //      .get("http://3.35.1 17.87:34705/auction/list", { params: { limit: 8 } })
       .get(API.API_COMMONITEMS + `/items/group_/kong/0/128/id/DESC`)

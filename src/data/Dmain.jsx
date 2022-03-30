@@ -69,7 +69,7 @@ const autoAuctionList = [
     address: "0x5c7MMMMd8d7",
     like: 22,
     item: E_auctionItem2,
-    title: "Series Kong #1",
+    title: "Series Kongasdasd #1",
     price: 0.5,
     unit: "USDT",
   },
@@ -181,10 +181,9 @@ const D_faqList = [
     title: "What is a non-fungible token (NFT)?",
     cont: (
       <p>
-        A non-fungible token (NFT) is a cryptographic token that represents a
-        unique asset. They function as verifiable proofs of authenticity and
-        ownership within a blockchain network. NFTs are not interchangeable with
-        each other and introduce scarcity to the digital world.
+        A non-fungible token (NFT) is a cryptographic token that represents a unique asset. They function as verifiable
+        proofs of authenticity and ownership within a blockchain network. NFTs are not interchangeable with each other
+        and introduce scarcity to the digital world.
       </p>
     ),
   },
@@ -192,10 +191,9 @@ const D_faqList = [
     title: "How do I create an NFT?",
     cont: (
       <p>
-        Click [Create] and choose your file to upload. We currently support JPG,
-        PNG, GIF, PDF, MP4, MP3, MPEG, AVI, WAV, and SVG. Please note that your
-        NFT cannot be changed or revised once created. To create a revised/new
-        NFT, you will have to start the process again.
+        Click [Create] and choose your file to upload. We currently support JPG, PNG, GIF, PDF, MP4, MP3, MPEG, AVI,
+        WAV, and SVG. Please note that your NFT cannot be changed or revised once created. To create a revised/new NFT,
+        you will have to start the process again.
       </p>
     ),
   },
@@ -203,12 +201,10 @@ const D_faqList = [
     title: "How do I buy an NFT?",
     cont: (
       <p>
-        For fixed price NFT, click the Purchase button on the product page to
-        complete the transaction. If the transaction is successful, the NFT will
-        be transferred to the wallet and the seller will receive the funds. In
-        the case of auction NFT, you will be eligible to purchase tickets. You
-        can check the successful bid at 9:00 AM every day. Transfer is made by
-        9:00 PM and you will receive NFT when the transaction is completed.
+        For fixed price NFT, click the Purchase button on the product page to complete the transaction. If the
+        transaction is successful, the NFT will be transferred to the wallet and the seller will receive the funds. In
+        the case of auction NFT, you will be eligible to purchase tickets. You can check the successful bid at 9:00 AM
+        every day. Transfer is made by 9:00 PM and you will receive NFT when the transaction is completed.
       </p>
     ),
   },
@@ -216,12 +212,10 @@ const D_faqList = [
     title: "How do I sell an NFT?",
     cont: (
       <p>
-        To list an NFT for sale, our team will first of all approve the content
-        to make sure it’s appropriate for listing. This process usually takes
-        4-8 hours. Upon successful approval, your NFT will list immediately on
-        the Marketplace as either an auction or fixed price sale, according to
-        your preference. Alternatively, you can also choose to list your NFT at
-        a fixed time (with a minimum of 12 hours after approval).
+        To list an NFT for sale, our team will first of all approve the content to make sure it’s appropriate for
+        listing. This process usually takes 4-8 hours. Upon successful approval, your NFT will list immediately on the
+        Marketplace as either an auction or fixed price sale, according to your preference. Alternatively, you can also
+        choose to list your NFT at a fixed time (with a minimum of 12 hours after approval).
       </p>
     ),
   },
@@ -229,21 +223,17 @@ const D_faqList = [
     title: "What is NFT Marketplace?",
     cont: (
       <p>
-        NFT Marketplace brings together artists, creators, and crypto
-        enthusiasts on a single platform to create and trade top NFTs. The
-        platform features 3 product lines:
+        NFT Marketplace brings together artists, creators, and crypto enthusiasts on a single platform to create and
+        trade top NFTs. The platform features 3 product lines:
         <br />
         <br />
-        • Subscription auction: 12% automatic purchase and sale will take place
-        on 3 days.
+        • Subscription auction: 12% automatic purchase and sale will take place on 3 days.
         <br />
-        • Marketplace: NFT issuance, purchase, and bidding by creators around
-        the world
-        <br />• LUCKY TICKET: You can participate in the subscription auction by
-        purchasing a ticket.
+        • Marketplace: NFT issuance, purchase, and bidding by creators around the world
+        <br />• LUCKY TICKET: You can participate in the subscription auction by purchasing a ticket.
       </p>
     ),
   },
 ];
 
-export {  D_issueList, autoAuctionList, marketPlaceList, D_faqList };
+export { D_issueList, autoAuctionList, marketPlaceList, D_faqList };

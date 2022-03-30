@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { autoAuctionList } from "../data/Dmain";
 
-export default function AuctionItem0228 ({ data, index, likeObj, setLikeObj }) {
+export default function AuctionItem0228({ data, index, likeObj, setLikeObj }) {
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
   function onClickItemLike(e, index) {
@@ -19,8 +19,8 @@ export default function AuctionItem0228 ({ data, index, likeObj, setLikeObj }) {
   if (isMobile)
     return (
       <Mitem
-				className="item"
-				onClick={() => navigate(`/auction/detail/${data.itemid }`)}
+        className="item"
+        onClick={() => navigate(`/auction/detail/${data.itemid}`)}
         // onClick={() => navigate(`/auction/detail/${data.dna}`)}
       >
         <div className="topBar">
@@ -30,10 +30,7 @@ export default function AuctionItem0228 ({ data, index, likeObj, setLikeObj }) {
           </div>
 
           {likeObj && (
-            <button
-              className="likeBtn"
-              onClick={(e) => onClickItemLike(e, index)}
-            >
+            <button className="likeBtn" onClick={(e) => onClickItemLike(e, index)}>
               <img src={likeObj[index] ? I_heartO : I_heart} alt="" />
               <p
                 className="count"
@@ -47,10 +44,10 @@ export default function AuctionItem0228 ({ data, index, likeObj, setLikeObj }) {
           )}
         </div>
 
-        <img className="itemImg" src={data?.url } alt="" />
+        <img className="itemImg" src={data?.url} alt="" />
 
         <div className="infoBox">
-          <p className="title">Series Kong{data?.titlename }</p>
+          <p className="title">Series Kong{data?.titlename}</p>
 
           <ul className="detailList">
             <li>Last sold for</li>
@@ -63,22 +60,17 @@ export default function AuctionItem0228 ({ data, index, likeObj, setLikeObj }) {
     return (
       <Pitem
         className="item"
-//				onClick={() => navigate(`/auction/detail/${data.dna}`)}
-				onClick={() => navigate(`/auction/detail/${data.itemid }`)}
+        //				onClick={() => navigate(`/auction/detail/${data.dna}`)}
+        onClick={() => navigate(`/auction/detail/${data.itemid}`)}
       >
         <div className="topBar">
           <div className="profBox">
             <img src={autoAuctionList[index]?.profImg} alt="" />
-            <p className="address">
-              {strDot(autoAuctionList[index]?.address, 5, 4)}
-            </p>
+            <p className="address">{strDot(autoAuctionList[index]?.address, 5, 4)}</p>
           </div>
 
           {likeObj && (
-            <button
-              className="likeBtn"
-              onClick={(e) => onClickItemLike(e, index)}
-            >
+            <button className="likeBtn" onClick={(e) => onClickItemLike(e, index)}>
               <img src={likeObj[index] ? I_heartO : I_heart} alt="" />
               <p
                 className="count"
@@ -92,16 +84,14 @@ export default function AuctionItem0228 ({ data, index, likeObj, setLikeObj }) {
           )}
         </div>
 
-        <img className="itemImg" src={data?.url } alt="" />
+        <img className="itemImg" src={data?.url} alt="" />
 
         <div className="infoBox">
-          <p className="title">Series Kong{data?.titlename }</p>
+          <p className="title">Series Kong{data?.titlename}</p>
 
           <ul className="detailList">
             <li>Last sold for</li>
-            <li>
-              100&nbsp;USDT
-            </li>
+            <li>100&nbsp;USDT</li>
           </ul>
         </div>
       </Pitem>

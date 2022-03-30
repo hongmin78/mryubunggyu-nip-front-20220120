@@ -12,11 +12,8 @@ export default function Offer() {
         {D_offer.map((cont, index) => (
           <li key={index}>
             <img src={cont.prfoImg} alt="" />
-
             <div className="infoBox">
-              <p className="info">
-                {`${cont.price} ${cont.unit} ${strDot(cont.address, 11, 4)}`}
-              </p>
+              <p className="info">{`${cont.price} ${cont.unit} ${strDot(cont.address, 11, 4)}`}</p>
               <p className="time">{cont.time}</p>
             </div>
           </li>
@@ -31,11 +28,7 @@ export default function Offer() {
             <img src={cont.prfoImg} alt="" />
 
             <div className="infoBox">
-              <p className="info">{`${cont.price} ${cont.unit} ${strDot(
-                cont.address,
-                11,
-                4
-              )}`}</p>
+              <p className="info">{`${cont.price} ${cont.unit} ${strDot(cont.address, 11, 4)}`}</p>
               <p className="time">{cont.time}</p>
             </div>
           </li>
