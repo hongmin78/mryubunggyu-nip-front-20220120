@@ -265,18 +265,50 @@ const MrecommendBox = styled.section`
       }
 
       &.recommenderBox {
+        .listBox {
+          box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.16);
+          border-radius: 20px;
+          overflow: hidden;
+          .listHeader {
+            display: flex;
+            align-items: center;
+            height: 55px;
+            padding: 0 20px;
+            font-weight: 600;
+          }
+        }
+        .listHeader li,
+        .dataList span {
+          &:nth-of-type(1) {
+            width: 4.64%;
+            text-align: center;
+          }
+          &:nth-of-type(2) {
+            width: 17.85%;
+            text-align: center;
+          }
+          &:nth-of-type(3) {
+            width: 15%;
+            margin: 0 0 0 3.71%;
+          }
+          &:nth-of-type(4) {
+            width: 22.28%;
+          }
+          &:nth-of-type(5) {
+            width: 20.85%;
+          }
+          &:nth-of-type(6) {
+            flex: 1;
+          }
+        }
         .dataList {
-          display: flex;
-          flex-direction: column;
-          gap: 4.44vw;
-
           li {
             display: flex;
-            flex-direction: column;
-            gap: 3.33vw;
-            padding: 4.44vw;
-            box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.25);
-            border-radius: 2.22vw;
+            align-items: center;
+            height: 70px;
+            padding: 0 20px;
+            font-weight: 500;
+            border-top: 1px solid #d9d9d9;
 
             & > div {
               display: flex;
