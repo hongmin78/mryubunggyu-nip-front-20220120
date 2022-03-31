@@ -263,7 +263,8 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
               currency: PAY_CURRENCY,
               currencyaddress: addresses.contract_USDT, // ETH_TESTNET.
               nettype: NETTYPE,
-            },
+						},
+						nettype: NETTYPE,
           })
           .then((resp) => {
             LOGGER("", resp);
