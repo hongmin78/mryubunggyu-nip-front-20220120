@@ -13,7 +13,7 @@ import { strDot } from "../../util/Util";
 import MmenuPopup from "./MmenuPopup";
 import { query_with_arg } from "../../util/contract-calls";
 import { LOGGER, getmyaddress } from "../../util/common";
-import { addresses } from '../../configs/addresses'
+import { addresses } from "../../configs/addresses";
 import { getethrep } from "../../util/eth";
 
 export default function Header() {
@@ -21,13 +21,13 @@ export default function Header() {
   const pathname = useLocation().pathname;
   let isStaking = pathname.indexOf("/staking") !== -1;
   const isMobile = useSelector((state) => state.common.isMobile);
-	const isLogin = useSelector((state) => state.common.isLogin);
-	let address = useSelector ( state => state.common.address )
+  const isLogin = useSelector((state) => state.common.isLogin);
+  let address = useSelector((state) => state.common.address);
   const [headerPopup, setHeaderPopup] = useState(false);
-	const [menuPopup, setMenuPopup] = useState(false)
-	let [ mybalance , setmybalance ] = useState()
-	let [ myaddress , setmyaddress ] = useState()
-/**  	useEffect(_=>{
+  const [menuPopup, setMenuPopup] = useState(false);
+  let [mybalance, setmybalance] = useState();
+  let [myaddress, setmyaddress] = useState();
+  /**  	useEffect(_=>{
 		const spinner = document.querySelector("#Spinner");
     spinner.animate(
       [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
@@ -36,31 +36,43 @@ export default function Header() {
       }
     )
 	} , [] ) */
-	useEffect(_=>{
-		if( address ){} // isLogin
-		else { return }
-		const fetchdata = _=>{
-			let myaddress = getmyaddress() ; LOGGER( 'MXZfykw8Mw' , myaddress )
-			setmyaddress( myaddress )
-			if ( myaddress){}
-			else { return }
-      console.log(addresses.contract_USDT, [myaddress]) // ETH_TESTNET.
-			query_with_arg ({contractaddress : addresses.contract_USDT // ETH_TESTNET.
-				, abikind : 'ERC20'
-				, methodname : 'balanceOf'
-				, aargs : [ myaddress 
-			] } ).then(resp=>{LOGGER( 'Ce4mDMhjbS' , resp )
-				setmybalance( getethrep ( resp ) )				
-			})
+  useEffect(
+    (_) => {
+      if (address) {
+      } // isLogin
+      else {
+        return;
+      }
+      const fetchdata = (_) => {
+        let myaddress = getmyaddress();
+        LOGGER("MXZfykw8Mw", myaddress);
+        setmyaddress(myaddress);
+        if (myaddress) {
+        } else {
+          return;
+        }
+        console.log(addresses.contract_USDT, [myaddress]); // ETH_TESTNET.
+        query_with_arg({
+          contractaddress: addresses.contract_USDT, // ETH_TESTNET.
+          abikind: "ERC20",
+          methodname: "balanceOf",
+          aargs: [myaddress],
+        }).then((resp) => {
+          LOGGER("Ce4mDMhjbS", resp);
+          setmybalance(getethrep(resp));
+        });
 
-			window.ethereum.on('networkChanged', function (networkId) { LOGGER( '' ,  networkId )
-				// Time to reload your interface with the new networkId
-			})
-		}
-		setTimeout(_=>{ 
-			fetchdata()
-		} , 3000 )
-	} , [ isLogin , address ] )
+        window.ethereum.on("networkChanged", function (networkId) {
+          LOGGER("", networkId);
+          // Time to reload your interface with the new networkId
+        });
+      };
+      setTimeout((_) => {
+        fetchdata();
+      }, 1500);
+    },
+    [isLogin, address]
+  );
   if (isMobile) {
     return (
       <>
@@ -82,36 +94,23 @@ export default function Header() {
       <PheaderBox style={{ background: isStaking && "unset" }}>
         <section className="innerBox">
           <button className="logoBox" onClick={() => navigate("/")}>
-            <img
-              className="logoImg"
-              src={isStaking ? I_headerLogoWhite : I_headerLogo}
-              alt=""
-            />
+            <img className="logoImg" src={isStaking ? I_headerLogoWhite : I_headerLogo} alt="" />
           </button>
 
           <article className="rightBox">
             <nav>
-              <button
-                style={{ color: isStaking && "#fff" }}
-                onClick={() => navigate(`/staking`)}
-              >
+              <button style={{ color: isStaking && "#fff" }} onClick={() => navigate(`/staking`)}>
                 Lucky Ticket
               </button>
-              <button
-                style={{ color: isStaking && "#fff" }}
-                onClick={() => navigate("/auction")}
-              >
+              <button style={{ color: isStaking && "#fff" }} onClick={() => navigate("/auction")}>
                 Subscription Auction
               </button>
-              <button
-                style={{ color: isStaking && "#fff" }}
-                onClick={() => navigate("/market")}
-              >
+              <button style={{ color: isStaking && "#fff" }} onClick={() => navigate("/market")}>
                 Marketplece
               </button>
             </nav>
 
-{/**  <button className='menuBtn' >
+            {/**  <button className='menuBtn' >
 		<span className='balanceBox'>Switch network</span></button>*/}
             {isLogin ? (
               <button
@@ -123,7 +122,7 @@ export default function Header() {
                 onClick={() => setHeaderPopup(!headerPopup)}
               >
                 <span className="balanceBox">
-                  <p className="price">{ mybalance }</p>
+                  <p className="price">{mybalance}</p>
                   <p className="unit">USDT</p>
                 </span>
 
@@ -141,11 +140,11 @@ export default function Header() {
             ) : (
               <button
                 className="connectBtn"
-								onClick={() => {	navigate("/connectwallet")
-
-								} }
+                onClick={() => {
+                  navigate("/connectwallet");
+                }}
               >
-                { myaddress ? strDot(myaddress , 8 , 0 )  : 'Connect Wallet' }
+                {myaddress ? strDot(myaddress, 8, 0) : "Connect Wallet"}
               </button>
             )}
           </article>

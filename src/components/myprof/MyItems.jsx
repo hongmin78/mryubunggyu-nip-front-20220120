@@ -51,18 +51,27 @@ export default function MyItems() {
   let [userinfo, setuserinfo] = useState(null);
   const [timeReceivables, setTimeReceivables] = useState();
   const [gettimeReceivables, setgetTimeReceivables] = useState();
+  const [logstakes, setlogstakes] = useState();
+  const [getTickTimer, setGetTickTimer] = useState();
+  const [tickTimer, setTickTimer] = useState();
 
   const fetchdata = async (_) => {
     let myaddress = getmyaddress();
     setmyaddress(myaddress);
     LOGGER("myaddress", myaddress);
     axios.get(API.API_USERINFO + `/${myaddress}`).then((resp) => {
-      LOGGER("", resp.data);
+      LOGGER("myticket", resp.data);
       let { status, respdata } = resp.data;
       if (status == "OK") {
         setuserinfo(respdata);
       }
     });
+    axios.get(API.API_GETTIME).then((resp) => {
+      // LOGGER("getTime", resp.data);
+      let { status, respdata } = resp.data;
+      setGetTimeMoment(respdata.value_);
+    });
+
     axios
       .get(API.API_RECEIVABLES + `/${myaddress}`)
       .then((res) => {
@@ -72,6 +81,7 @@ export default function MyItems() {
         list.forEach((el) => {
           let { duetimeunix } = el;
         });
+        setgetTimeReceivables(list[0]?.duetimeunix);
       })
       .catch((err) => console.log(err));
 
@@ -132,41 +142,38 @@ export default function MyItems() {
   };
 
   useEffect(() => {
-    axios.get(API.API_GETTIME).then((resp) => {
-      // LOGGER("getTime", resp.data);
-      let { status, respdata } = resp.data;
-      setGetTimeMoment(respdata.value_);
-    });
-
     setInterval(() => {
       getTimeMoment && setTimeMoment(moment(moment.unix(getTimeMoment) - moment()));
     }, 1000);
-  }, [getTimeMoment]);
+  }, [timeMoment]);
 
   useEffect(() => {
-    let myaddress = getmyaddress();
-    LOGGER("myaddress", myaddress);
-    axios
-      .get(API.API_RECEIVABLES + `/${myaddress}`)
-      .then((res) => {
-        let { list } = res.data;
-        // LOGGER("receivables", list);
-        // list.forEach((el) => {
-        //   let { duetimeunix } = el;
-        // });
-        setgetTimeReceivables(list[0]?.duetimeunix);
-      })
-      .catch((err) => console.log(err));
     setInterval(() => {
       gettimeReceivables && setTimeReceivables(moment(moment.unix(gettimeReceivables) - moment()));
     }, 1000);
-  }, [gettimeReceivables]);
+  }, [timeReceivables]);
 
   useEffect((_) => {
     setTimeout((_) => {
       fetchdata();
     }, TIME_FETCH_MYADDRESS_DEF);
   }, []);
+
+  useEffect(() => {
+    let myaddress = getmyaddress();
+    axios.get(API.API_LOGSTAKES + `/${myaddress}`).then((resp) => {
+      LOGGER("API_LOGSTAKES", resp.data);
+      let { status, respdata } = resp.data;
+      if (status == "OK") {
+        setlogstakes(respdata);
+        setGetTickTimer(respdata.createdat);
+      }
+    });
+
+    setInterval(() => {
+      getTickTimer && setTickTimer(moment(getTickTimer).add(90, "days") - moment());
+    }, 1000);
+  }, [tickTimer]);
 
   const openModal = () => {
     setIsOpen((prevState) => !prevState);
@@ -510,32 +517,34 @@ export default function MyItems() {
                 </div>
 
                 <div className="value">
-                  <strong className="price">{putCommaAtPrice(100)} USDT</strong>
+                  <strong className="price">
+                    {putCommaAtPrice(logstakes?.amount)} {logstakes?.currency}
+                  </strong>
 
                   <ul className="timeList">
-                    <li>{buydate[0]}</li>
-                    <li>{buydate[1]}</li>
-                    <li>{buydate[2]}</li>
-                    <li>{buydate[3]}</li>
+                    <li>{tickTimer && tickTimer.days()}일</li>
+                    <li>{tickTimer && tickTimer.hour()}시간</li>
+                    <li>{tickTimer && tickTimer.minutes()}분</li>
+                    <li>{tickTimer && tickTimer.second()}초</li>
                   </ul>
                 </div>
 
                 <ul className="priceBox">
                   <li>
                     <p className="key">Current price</p>
-                    <p className="value">586 USDT</p>
+                    <p className="value">100 USDT</p>
                   </li>
-                  <li>
+                  {/* <li>
                     <p className="key">Transaction price</p>
-                    <p className="value">688 USDT</p>
-                  </li>
+                    <p className="value">100 USDT</p>
+                  </li> */}
                   <li
                     onClick={(evt) => {
                       window.open(txscanurl);
                     }}
                   >
-                    <p className="key">TxHash</p>
-                    <p className="value">{txhash}</p>
+                    {/* <p className="key">TxHash</p>
+                    <p className="value">{txhash}</p> */}
                   </li>
                 </ul>
               </div>
@@ -603,7 +612,7 @@ export default function MyItems() {
                       <ul className="priceBox">
                         <li>
                           <p className="key">Current price</p>
-                          <p className="value">586 USDT</p>
+                          <p className="value">{putCommaAtPrice(item.amount)} USDT</p>
                         </li>
                         {/* <li>
                           <p className="key">Transaction price</p>
@@ -685,7 +694,7 @@ export default function MyItems() {
                     <ul className="priceBox">
                       <li>
                         <p className="key">Current price</p>
-                        <p className="value">586 USDT</p>
+                        <p className="value">{item.buyprice} USDT</p>
                       </li>
                       {/* <li>
                         <p className="key">Transaction price</p>

@@ -24,6 +24,7 @@ const API = {
   API_GETUSER: `${URL}/user/info`,
   API_GETTIME: `${URL}/queries/singlerow/settings/key_/BALLOT_NEXT_ROUND_START`,
   API_TYPESTR: `${URL}/queries/logactions/typestr/PAY`,
+  API_LOGSTAKES: `${URL}/queries/singlerow/logstakes/username`,
 };
 
 export { API };

@@ -14,8 +14,6 @@ export default function Recommend({ userinfo }) {
   const [toggleLink, setToggleLink] = useState(false);
   const [userinfoProp, setUserinfoProp] = useState(userinfo);
 
-  console.log("userinfoProp");
-  console.log(userinfoProp);
   if (isMobile)
     return (
       <MrecommendBox>
@@ -134,12 +132,12 @@ export default function Recommend({ userinfo }) {
               <li className="linkBox">
                 <strong className="key">Link</strong>
                 <span className="value">
-                  <p>https://ausp.io/market/?ref=0x97b155a698d4bdec4c4bf3a92e9071190093cafb</p>
+                  <p>http://nftinfinityworld.net/#/staking?referer=${userinfoProp.myreferercode}</p>
                   <button
                     className="copyBtn"
                     onClick={() => {
                       setToggleLink(true);
-                      onclickcopy("https://ausp.io/market/?ref=0x97b155a698d4bdec4c4bf3a92e9071190093cafb");
+                      onclickcopy(`http://nftinfinityworld.net/#/staking?referer=${userinfoProp.myreferercode}`);
                     }}
                   >
                     <img src={toggleLink ? I_circleChk : I_copy} alt="" />

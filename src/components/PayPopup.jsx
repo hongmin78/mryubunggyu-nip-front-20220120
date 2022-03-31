@@ -130,7 +130,9 @@ export default function PayPopup({ off, receivables }) {
         setmyethbalance((+getethrep(resp)).toFixed(DECIMALS_DISP_DEF));
       });
     };
-    fetchdata();
+    setTimeout(() => {
+      fetchdata();
+    }, 1500);
   }, []);
   const onclick_approve = async (_) => {
     LOGGER("");
@@ -258,9 +260,9 @@ export default function PayPopup({ off, receivables }) {
               amount: receivables.amount,
               currency: PAY_CURRENCY,
               currencyaddress: addresses.contract_USDT, // ETH_TESTNET.
+              nettype: NETTYPE,
             },
             itemid: receivables.itemid,
-            nettype: NETTYPE,
           })
           .then((resp) => {
             LOGGER("", resp);

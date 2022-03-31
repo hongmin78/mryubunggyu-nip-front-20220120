@@ -130,7 +130,9 @@ export default function StakingPopup({ off }) {
         setmyethbalance((+getethrep(resp)).toFixed(DECIMALS_DISP_DEF));
       });
     };
-    fetchdata();
+    setTimeout(() => {
+      fetchdata();
+    }, 1500);
   }, []);
   const onclick_approve = async (_) => {
     LOGGER("");
@@ -256,8 +258,8 @@ export default function StakingPopup({ off }) {
               amount: MIN_STAKE_AMOUNT,
               currency: STAKE_CURRENCY,
               currencyaddress: addresses.contract_USDT, // ETH_TESTNET.
+              nettype: NETTYPE,
             },
-            nettype: NETTYPE,
           })
           .then((resp) => {
             LOGGER("", resp);
@@ -276,7 +278,7 @@ export default function StakingPopup({ off }) {
           });
           LOGGER("uQJ2POHvP8", resp_balances);
           setstakedbalance(getethrep(resp_balances));
-          off();
+          off(false);
         });
       } catch (err) {
         setisloader_01(false);
@@ -316,14 +318,14 @@ export default function StakingPopup({ off }) {
               </div>
 
               <ul className="dataList">
-                <li>
+                {/* <li>
                   <p className="key">Calculation</p>
                   <p className="value">2022-01-11 00:00 UTC</p>
                 </li>
                 <li>
                   <p className="key">Distribution</p>
                   <p className="value">2022-03-12 00:00 UTC</p>
-                </li>
+                </li> */}
                 <li style={MODE_DEV_PROD == "DEV" ? {} : { display: "none" }}>
                   <p className="key">Total Staked</p>
                   <p className="value">{tvl} USDT</p>
@@ -429,7 +431,7 @@ export default function StakingPopup({ off }) {
         <article className="topBar">
           <span className="blank" />
           <p className="title">Stake</p>
-          <button className="exitBtn" onClick={() => off()}>
+          <button className="exitBtn" onClick={() => off(false)}>
             <img src={I_x} alt="" />
           </button>
         </article>
@@ -450,14 +452,14 @@ export default function StakingPopup({ off }) {
             </div>
 
             <ul className="dataList">
-              <li>
+              {/* <li>
                 <p className="key">Calculation</p>
                 <p className="value">2022-01-11 00:00 UTC</p>
               </li>
               <li>
                 <p className="key">Distribution</p>
                 <p className="value">2022-03-12 00:00 UTC</p>
-              </li>
+              </li> */}
               <li style={MODE_DEV_PROD == "DEV" ? {} : { display: "none" }}>
                 <p className="key">Total Staked</p>
                 <p className="value">{tvl} USDT</p>
@@ -544,7 +546,7 @@ export default function StakingPopup({ off }) {
               disabled={done}
               onClick={() => {
                 onclick_buy();
-                false && off();
+                false && off(false);
               }}
             >
               {done ? "Pending" : "Confirm"}

@@ -2,21 +2,36 @@ import styled from "styled-components";
 import I_copy from "../../img/icon/I_copy.svg";
 import I_circleChk from "../../img/icon/I_circleChk.svg";
 import { D_recommendList } from "../../data/DmyPage";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { strDot } from "../../util/Util";
-import {
-  D_rewardHeader,
-  D_rewardList,
-  D_vaultHeader,
-  D_vaultList,
-} from "../../data/Dstaking";
+import { D_rewardHeader, D_rewardList, D_vaultHeader, D_vaultList } from "../../data/Dstaking";
+import { getmyaddress, LOGGER } from "../../util/common";
+import axios from "axios";
+import moment from "moment";
+import { API } from "../../configs/api";
 
 export default function Staking() {
   const isMobile = useSelector((state) => state.common.isMobile);
 
   const [toggleCode, setToggleCode] = useState(false);
   const [toggleLink, setToggleLink] = useState(false);
+  const [logstakes, setLogstakes] = useState();
+
+  const fatchData = () => {
+    let myaddress = getmyaddress();
+    axios.get(API.API_LOGSTAKES + `/${myaddress}`).then((resp) => {
+      LOGGER("API_LOGSTAKES", resp.data);
+      let { status, respdata } = resp.data;
+      if (status == "OK") {
+        setLogstakes([respdata]);
+      }
+    });
+  };
+
+  useEffect(() => {
+    fatchData();
+  }, []);
 
   if (isMobile)
     return (
@@ -115,28 +130,29 @@ export default function Staking() {
               </ul>
 
               <ul className="list">
-                {D_vaultList.map((cont, index) => (
-                  <li key={index}>
-                    <span>
-                      <img src={cont.img} alt="" />
-                      <p>{cont.name}</p>
-                    </span>
+                {logstakes &&
+                  logstakes?.map((cont, index) => (
+                    <li key={index}>
+                      <span>
+                        {/* <img src={cont.img} alt="" />
+                      <p>{cont.name}</p> */}
+                      </span>
 
-                    <span>
-                      <p>{cont.amount}&nbsp;USDT</p>
-                    </span>
+                      <span>
+                        <p>{cont.amount}&nbsp;USDT</p>
+                      </span>
 
-                    <span>{cont.start}</span>
+                      <span>{moment(cont.createdat).format("YYYY-MM-DD hh:mm:ss")}</span>
 
-                    <span>{cont.end}</span>
+                      <span>{moment(cont.createdat).add(90, "day").format("YYYY-MM-DD hh:mm:ss")}</span>
 
-                    <span>
-                      <button className="unstakeBtn" onClick={() => {}}>
-                        Unstake
-                      </button>
-                    </span>
-                  </li>
-                ))}
+                      <span>
+                        <button className="unstakeBtn" onClick={() => {}}>
+                          Unstake
+                        </button>
+                      </span>
+                    </li>
+                  ))}
               </ul>
             </div>
           </li>
