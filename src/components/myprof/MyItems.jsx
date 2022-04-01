@@ -115,7 +115,7 @@ export default function MyItems() {
           ]);
         }
       });
-    false &&
+    true &&
       query_with_arg({
         contractaddress: addresses.contract_ticketnft, // ETH_TESTNET.
         abikind: "TICKETNFT",
@@ -145,19 +145,13 @@ export default function MyItems() {
     setInterval(() => {
       getTimeMoment && setTimeMoment(moment(moment.unix(getTimeMoment) - moment()));
     }, 1000);
-  }, [timeMoment]);
+  }, [getTimeMoment]);
 
   useEffect(() => {
     setInterval(() => {
       gettimeReceivables && setTimeReceivables(moment(moment.unix(gettimeReceivables) - moment()));
     }, 1000);
-  }, [timeReceivables]);
-
-  useEffect((_) => {
-    setTimeout((_) => {
-      fetchdata();
-    }, TIME_FETCH_MYADDRESS_DEF);
-  }, []);
+  }, [gettimeReceivables]);
 
   useEffect(() => {
     let myaddress = getmyaddress();
@@ -166,14 +160,23 @@ export default function MyItems() {
       let { status, respdata } = resp.data;
       if (status == "OK") {
         setlogstakes(respdata);
-        setGetTickTimer(respdata.createdat);
+        setGetTickTimer(respdata?.createdat);
       }
     });
 
     setInterval(() => {
       getTickTimer && setTickTimer(moment(getTickTimer).add(90, "days") - moment());
     }, 1000);
-  }, [tickTimer]);
+  }, [getTickTimer]);
+  useEffect((_) => {
+    setTimeout((_) => {
+      fetchdata();
+    }, TIME_FETCH_MYADDRESS_DEF);
+  }, []);
+
+  // console.log("asodiasdoiasjd");
+  // // // console.log(getTickTimer);
+  // console.log(moment(moment(getTickTimer).add(90, "days") - moment(getTickTimer)).format("yyyy-MM-DD"));
 
   const openModal = () => {
     setIsOpen((prevState) => !prevState);
@@ -274,7 +277,11 @@ export default function MyItems() {
                 </li>
               </ul>
 
-              <button className="actionBtn" onClick={() => navigate("/resell")}>
+              <button
+                className="actionBtn"
+                disabled={tickTimer !== 0 ? true : false}
+                onClick={() => navigate("/resell")}
+              >
                 Sell
               </button>
 
@@ -522,10 +529,10 @@ export default function MyItems() {
                   </strong>
 
                   <ul className="timeList">
-                    <li>{tickTimer && tickTimer.days()}일</li>
-                    <li>{tickTimer && tickTimer.hour()}시간</li>
-                    <li>{tickTimer && tickTimer.minutes()}분</li>
-                    <li>{tickTimer && tickTimer.second()}초</li>
+                    <li>{tickTimer && moment(tickTimer).days()}일</li>
+                    <li>{tickTimer && moment(tickTimer).hours()}시간</li>
+                    <li>{tickTimer && moment(tickTimer).minutes()}분</li>
+                    <li>{tickTimer && moment(tickTimer).seconds()}초</li>
                   </ul>
                 </div>
 
@@ -549,7 +556,11 @@ export default function MyItems() {
                 </ul>
               </div>
 
-              <button className="actionBtn" onClick={() => navigate("/resell")}>
+              <button
+                className="actionBtn"
+                disabled={tickTimer !== 0 ? true : false}
+                onClick={() => navigate("/resell")}
+              >
                 Sell
               </button>
 

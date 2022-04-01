@@ -213,85 +213,89 @@ export default function PayPopup({ off, receivables }) {
 			SetErrorBar( messages.MSG_PLEASE_ CONNECT_WALLET )
 			return 
 		} */
-    let abistr = getabistr_forfunction({
-      contractaddress: addresses.contract_pay_for_assigned_item, // .ETH_TESTNET
-      abikind: "PAY",
-      methodname: "pay",
-      aargs: [
-        addresses.contract_USDT, // .ETH_TESTNET
-        getweirep("" + receivables.amount),
-        myaddress,
-        receivables.itemdata.itemid,
-      ],
-    });
-    LOGGER("abistr", abistr); //		return
-    const callreqtx = async (_) => {
-      let resp;
-      try {
-        setisloader_01(true);
-        resp = await requesttransaction({
-          from: myaddress,
-          to: addresses.contract_pay_for_assigned_item, // .ETH_TESTNET
-          data: abistr,
-          //			, value : ''
-        });
-        setisloader_01(false);
-        if (resp) {
-        } else {
-          SetErrorBar(messages.MSG_USER_DENIED_TX);
-          return;
-        }
-        let resptype = getobjtype(resp);
-        let txhash;
-        switch (resptype) {
-          case "String":
-            txhash = resp;
-            break;
-          case "Object":
-            txhash = resp.txHash;
-            break;
-        }
-        axios
-          .post(API.API_TXS + `/${txhash}`, {
-            txhash,
-            username: myaddress,
-            typestr: "PAY",
-            auxdata: {
-              amount: receivables.amount,
-              currency: PAY_CURRENCY,
-              currencyaddress: addresses.contract_USDT, // ETH_TESTNET.
-              nettype: NETTYPE,
-            },
-            itemid: receivables.itemid,
-          })
-          .then((resp) => {
-            LOGGER("", resp);
-            SetErrorBar(messages.MSG_TX_REQUEST_SENT);
+    if (receivables.seller) {
+      let abistr = getabistr_forfunction({
+        contractaddress: addresses.contract_pay_for_assigned_item, // .ETH_TESTNET
+        abikind: "PAY",
+        methodname: "pay",
+        aargs: [
+          addresses.contract_USDT, // .ETH_TESTNET
+          getweirep("" + receivables.amount),
+          myaddress,
+          receivables.seller,
+        ],
+      });
+      LOGGER("abistr", abistr); //		return
+      const callreqtx = async (_) => {
+        let resp;
+        try {
+          setisloader_01(true);
+          resp = await requesttransaction({
+            from: myaddress,
+            to: addresses.contract_pay_for_assigned_item, // .ETH_TESTNET
+            data: abistr,
+            //			, value : ''
+          });
+          setisloader_01(false);
+          if (resp) {
+          } else {
+            SetErrorBar(messages.MSG_USER_DENIED_TX);
+            return;
+          }
+          let resptype = getobjtype(resp);
+          let txhash;
+          switch (resptype) {
+            case "String":
+              txhash = resp;
+              break;
+            case "Object":
+              txhash = resp.txHash;
+              break;
+          }
+          axios
+            .post(API.API_TXS + `/${txhash}`, {
+              txhash,
+              username: myaddress,
+              typestr: "PAY",
+              auxdata: {
+                amount: receivables.amount,
+                currency: PAY_CURRENCY,
+                currencyaddress: addresses.contract_USDT, // ETH_TESTNET.
+                nettype: NETTYPE,
+              },
+              itemid: receivables.itemid,
+            })
+            .then((resp) => {
+              LOGGER("", resp);
+              SetErrorBar(messages.MSG_TX_REQUEST_SENT);
+              off();
+            });
+          /***** */
+          awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
+            LOGGER("minedtxreceipt", minedtxreceipt);
+            SetErrorBar(messages.MSG_TX_FINALIZED);
+            setDone(false);
+            let resp_balances = await query_with_arg({
+              contractaddress: addresses.contract_pay_for_assigned_iteme,
+              abikind: "PAY",
+              methodname: "pay",
+              aargs: [myaddress],
+            });
+            LOGGER("uQJ2POHvP8", resp_balances);
+            // setst akedbalance(getethrep(resp_balances));
             off();
           });
-        /***** */
-        awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
-          LOGGER("minedtxreceipt", minedtxreceipt);
-          SetErrorBar(messages.MSG_TX_FINALIZED);
-          setDone(false);
-          let resp_balances = await query_with_arg({
-            contractaddress: addresses.contract_pay_for_assigned_iteme,
-            abikind: "PAY",
-            methodname: "pay",
-            aargs: [myaddress],
-          });
-          LOGGER("uQJ2POHvP8", resp_balances);
-          // setst akedbalance(getethrep(resp_balances));
-          off();
-        });
-      } catch (err) {
-        setisloader_01(false);
-        LOGGER();
-        SetErrorBar(messages.MSG_USER_DENIED_TX);
-      }
-    };
-    callreqtx();
-    //		.then(resp=>{ LOGGER( '' , resp )		})
+        } catch (err) {
+          setisloader_01(false);
+          LOGGER();
+          SetErrorBar(messages.MSG_USER_DENIED_TX);
+        }
+      };
+      callreqtx();
+      //		.then(resp=>{ LOGGER( '' , resp )		})
+    } else {
+      SetErrorBar("셀러가 없습니다 관리자에게 문의 해 주세요");
+    }
   };
 
   if (isMobile)

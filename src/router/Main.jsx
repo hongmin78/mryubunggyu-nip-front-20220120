@@ -83,6 +83,7 @@ export default function Main() {
                 sum += +item.amount;
               });
               dispatch(setDelinquencyAmount(sum.toFixed(2)));
+              localStorage.setItem("seller", list[0].seller);
               console.log(sum);
               SetErrorBar("Please pay delinquency fee");
               navigate("/penalty");

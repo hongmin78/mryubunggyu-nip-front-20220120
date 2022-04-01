@@ -24,6 +24,9 @@ import I_spinner from "../img/icon/I_spinner.svg";
 import { strDot } from "../util/Util";
 const MODE_DEV_PROD = "PROD";
 export default function PayDelinquency({ off, delinquencyAmount }) {
+  const seller = localStorage.getItem("seller");
+  console.log("seller");
+  console.log(seller);
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
   const [termChk, setTermChk] = useState(false);
@@ -222,7 +225,7 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
       aargs: [
         addresses.contract_USDT, // .ETH_TESTNET
         getweirep("" + delinquencyAmount),
-        myaddress,
+        seller, // myaddress,
         "abc",
       ],
     });
@@ -263,8 +266,8 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
               currency: PAY_CURRENCY,
               currencyaddress: addresses.contract_USDT, // ETH_TESTNET.
               nettype: NETTYPE,
-						},
-						nettype: NETTYPE,
+            },
+            nettype: NETTYPE,
           })
           .then((resp) => {
             LOGGER("", resp);

@@ -6,9 +6,11 @@ import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { strDot } from "../../util/Util";
 import { onclickcopy } from "../../util/common.js";
+import { useNavigate } from "react-router-dom";
 
 export default function Recommend({ userinfo }) {
   const isMobile = useSelector((state) => state.common.isMobile);
+  const navigate = useNavigate();
 
   const [toggleCode, setToggleCode] = useState(false);
   const [toggleLink, setToggleLink] = useState(false);
@@ -132,7 +134,13 @@ export default function Recommend({ userinfo }) {
               <li className="linkBox">
                 <strong className="key">Link</strong>
                 <span className="value">
-                  <p>http://nftinfinityworld.net/#/staking?referer=${userinfoProp.myreferercode}</p>
+                  <p
+                    onClick={() => {
+                      navigate(`http://nftinfinityworld.net/#/staking?referer=${userinfoProp.myreferercode}`);
+                    }}
+                  >
+                    http://nftinfinityworld.net/#/staking?referer=${userinfoProp.myreferercode}
+                  </p>
                   <button
                     className="copyBtn"
                     onClick={() => {

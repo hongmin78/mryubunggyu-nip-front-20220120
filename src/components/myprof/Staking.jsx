@@ -134,8 +134,8 @@ export default function Staking() {
                   logstakes?.map((cont, index) => (
                     <li key={index}>
                       <span>
-                        {/* <img src={cont.img} alt="" />
-                      <p>{cont.name}</p> */}
+                        {/* <img src={cont.img} alt="" /> */}
+                        <p>{cont.active === 1 ? "ACTIVE" : "UNACTIVE"}</p>
                       </span>
 
                       <span>
