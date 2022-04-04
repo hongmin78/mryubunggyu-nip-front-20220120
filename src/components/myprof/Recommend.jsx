@@ -21,13 +21,15 @@ export default function Recommend({ userinfo }) {
 
   const fetchdata = () => {
     userinfoProp.myreferercode &&
-      axios.get(API.API_REFERER + `/huBH2pd2ZB/0/10/id/DESC`).then((resp) => {
-        console.log(resp.data)
-        let { status, list } = resp.data
-        if (status == 'OK') {
-          setMyRefererList(list)
-        }
-      })
+      axios
+        .get(API.API_REFERER + `/${userinfoProp?.myreferercode}/0/10/id/DESC`)
+        .then((resp) => {
+          console.log(resp.data)
+          let { status, list } = resp.data
+          if (status == 'OK') {
+            setMyRefererList(list)
+          }
+        })
   }
 
   useEffect(() => {
