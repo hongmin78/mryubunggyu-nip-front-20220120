@@ -1,20 +1,38 @@
-import styled from "styled-components";
-import I_copy from "../../img/icon/I_copy.svg";
-import I_circleChk from "../../img/icon/I_circleChk.svg";
-import { D_recommendList } from "../../data/DmyPage";
-import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
-import { strDot } from "../../util/Util";
-import { onclickcopy } from "../../util/common.js";
-import { useNavigate } from "react-router-dom";
+import styled from 'styled-components'
+import I_copy from '../../img/icon/I_copy.svg'
+import I_circleChk from '../../img/icon/I_circleChk.svg'
+import { D_recommendList } from '../../data/DmyPage'
+import { useState, useEffect } from 'react'
+import { useSelector } from 'react-redux'
+import { strDot } from '../../util/Util'
+import { onclickcopy } from '../../util/common.js'
+import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import { API } from '../../configs/api'
 
 export default function Recommend({ userinfo }) {
-  const isMobile = useSelector((state) => state.common.isMobile);
-  const navigate = useNavigate();
+  const isMobile = useSelector((state) => state.common.isMobile)
+  const navigate = useNavigate()
 
-  const [toggleCode, setToggleCode] = useState(false);
-  const [toggleLink, setToggleLink] = useState(false);
-  const [userinfoProp, setUserinfoProp] = useState(userinfo);
+  const [toggleCode, setToggleCode] = useState(false)
+  const [toggleLink, setToggleLink] = useState(false)
+  const [userinfoProp, setUserinfoProp] = useState(userinfo)
+  const [myRefererList, setMyRefererList] = useState([])
+
+  const fetchdata = () => {
+    userinfoProp.myreferercode &&
+      axios.get(API.API_REFERER + `/huBH2pd2ZB/0/10/id/DESC`).then((resp) => {
+        console.log(resp.data)
+        let { status, list } = resp.data
+        if (status == 'OK') {
+          setMyRefererList(list)
+        }
+      })
+  }
+
+  useEffect(() => {
+    fetchdata()
+  }, [])
 
   if (isMobile)
     return (
@@ -26,9 +44,11 @@ export default function Recommend({ userinfo }) {
             <strong className="contTitle">Friend Recommendation</strong>
 
             <p className="explain">
-              Share your referral link! When a new user who accesses this link purchases a product,
+              Share your referral link! When a new user who accesses this link
+              purchases a product,
               <br />
-              an additional 2% of the sales amount is paid. Referral rewards are paid in lump sum every month.
+              an additional 2% of the sales amount is paid. Referral rewards are
+              paid in lump sum every month.
             </p>
           </li>
 
@@ -43,8 +63,8 @@ export default function Recommend({ userinfo }) {
                   <button
                     className="copyBtn"
                     onClick={() => {
-                      onclickcopy(userinfoProp.myreferercode);
-                      setToggleCode(true);
+                      onclickcopy(userinfoProp.myreferercode)
+                      setToggleCode(true)
                     }}
                   >
                     <img src={toggleCode ? I_circleChk : I_copy} alt="" />
@@ -54,12 +74,16 @@ export default function Recommend({ userinfo }) {
               <li className="linkBox">
                 <strong className="key">Link</strong>
                 <span className="value">
-                  <p>https://ausp.io/market/?ref=0x97b155a698d4bdec4c4bf3a92e9071190093cafb</p>
+                  <p>
+                    https://ausp.io/market/?ref=0x97b155a698d4bdec4c4bf3a92e9071190093cafb
+                  </p>
                   <button
                     className="copyBtn"
                     onClick={() => {
-                      setToggleLink(true);
-                      onclickcopy("https://ausp.io/market/?ref=0x97b155a698d4bdec4c4bf3a92e9071190093cafb");
+                      setToggleLink(true)
+                      onclickcopy(
+                        'https://ausp.io/market/?ref=0x97b155a698d4bdec4c4bf3a92e9071190093cafb',
+                      )
                     }}
                   >
                     <img src={toggleLink ? I_circleChk : I_copy} alt="" />
@@ -80,14 +104,14 @@ export default function Recommend({ userinfo }) {
               </ul>
 
               <ul className="dataList">
-                {D_recommendList.map((cont, index) => (
+                {myRefererList.map((cont, index) => (
                   <li key={index}>
-                    <span>{String(index + 1).padStart(2, "0")}</span>
-                    <span>{strDot(cont.account, 4, 4)}</span>
-                    <span>{cont.symbol ? cont.symbol : "-"}</span>
-                    <span>{cont.level} Level</span>
-                    <span>{cont.date}</span>
-                    <span>{cont.point} USDT</span>
+                    <span>{cont.id}</span>
+                    <span>{strDot(cont.username, 4, 4)}</span>
+                    <span>{cont.symbol ? cont.symbol : '-'}</span>
+                    <span>{cont.referer}</span>
+                    <span>{cont.createdat.substring(0, 10)}</span>
+                    <span>{cont.hasreceivables} USDT</span>
                   </li>
                 ))}
               </ul>
@@ -95,7 +119,7 @@ export default function Recommend({ userinfo }) {
           </li>
         </ul>
       </MrecommendBox>
-    );
+    )
   else
     return (
       <PrecommendBox>
@@ -106,9 +130,11 @@ export default function Recommend({ userinfo }) {
             <strong className="contTitle">Friend Recommendation</strong>
 
             <p className="explain">
-              Share your referral link! When a new user who accesses this link purchases a product,
+              Share your referral link! When a new user who accesses this link
+              purchases a product,
               <br />
-              an additional 2% of the sales amount is paid. Referral rewards are paid in lump sum every month.
+              an additional 2% of the sales amount is paid. Referral rewards are
+              paid in lump sum every month.
             </p>
           </li>
 
@@ -119,12 +145,12 @@ export default function Recommend({ userinfo }) {
               <li className="codeBox">
                 <strong className="key">Code</strong>
                 <span className="value">
-                  <p>{userinfoProp.myreferercode}</p>
+                  <p>{userinfoProp?.myreferercode}</p>
                   <button
                     className="copyBtn"
                     onClick={() => {
-                      onclickcopy(userinfoProp.myreferercode);
-                      setToggleCode(true);
+                      onclickcopy(userinfoProp?.myreferercode)
+                      setToggleCode(true)
                     }}
                   >
                     <img src={toggleCode ? I_circleChk : I_copy} alt="" />
@@ -136,16 +162,21 @@ export default function Recommend({ userinfo }) {
                 <span className="value">
                   <p
                     onClick={() => {
-                      navigate(`http://nftinfinityworld.net/#/staking?referer=${userinfoProp.myreferercode}`);
+                      navigate(
+                        `http://nftinfinityworld.net/#/staking?referer=${userinfoProp?.myreferercode}`,
+                      )
                     }}
                   >
-                    http://nftinfinityworld.net/#/staking?referer=${userinfoProp.myreferercode}
+                    http://nftinfinityworld.net/#/staking?referer=$
+                    {userinfoProp?.myreferercode}
                   </p>
                   <button
                     className="copyBtn"
                     onClick={() => {
-                      setToggleLink(true);
-                      onclickcopy(`http://nftinfinityworld.net/#/staking?referer=${userinfoProp.myreferercode}`);
+                      setToggleLink(true)
+                      onclickcopy(
+                        `http://nftinfinityworld.net/#/staking?referer=${userinfoProp?.myreferercode}`,
+                      )
                     }}
                   >
                     <img src={toggleLink ? I_circleChk : I_copy} alt="" />
@@ -166,14 +197,14 @@ export default function Recommend({ userinfo }) {
               </ul>
 
               <ul className="dataList">
-                {D_recommendList.map((cont, index) => (
+                {myRefererList?.map((cont, index) => (
                   <li key={index}>
-                    <span>{String(index + 1).padStart(2, "0")}</span>
-                    <span>{strDot(cont.account, 4, 4)}</span>
-                    <span>{cont.symbol ? cont.symbol : "-"}</span>
-                    <span>{cont.level} Level</span>
-                    <span>{cont.date}</span>
-                    <span>{cont.point} USDT</span>
+                    <span>{cont.id}</span>
+                    <span>{strDot(cont.username, 4, 4)}</span>
+                    <span>{cont.symbol ? cont.symbol : '-'}</span>
+                    <span>{cont.referer}</span>
+                    <span>{cont.createdat.substring(0, 10)}</span>
+                    <span>{cont.hasreceivables} USDT</span>
                   </li>
                 ))}
               </ul>
@@ -181,14 +212,14 @@ export default function Recommend({ userinfo }) {
           </li>
         </ul>
       </PrecommendBox>
-    );
+    )
 }
 
 const MrecommendBox = styled.section`
   padding: 9.16vw 5.55vw 0 5.55vw;
 
   * {
-    font-family: "Roboto", sans-serif;
+    font-family: 'Roboto', sans-serif;
   }
 
   .title {
@@ -340,13 +371,13 @@ const MrecommendBox = styled.section`
       }
     }
   }
-`;
+`
 
 const PrecommendBox = styled.section`
   padding: 60px 0 0 0;
 
   * {
-    font-family: "Roboto", sans-serif;
+    font-family: 'Roboto', sans-serif;
   }
 
   .title {
@@ -458,6 +489,13 @@ const PrecommendBox = styled.section`
       }
     }
   }
-`;
+`
 
-const headerList = ["No", "Account", "Symbol", "Recommender Level", "Date of subscription	", "Points Received"];
+const headerList = [
+  'No',
+  'Account',
+  'Symbol',
+  'Recommender',
+  'Date of subscription	',
+  'Points Received',
+]
