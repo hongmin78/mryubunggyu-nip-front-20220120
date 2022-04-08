@@ -144,8 +144,6 @@ export default function Main() {
 
   useEffect(() => {
     fetchitems()
-    console.log('issueRef?.current?.children[0]')
-    console.log(issueRef?.current?.children[0])
     setInterval(() => {
       if (!issueRef.current) return
       if (issueRef.current?.children[0]) {
