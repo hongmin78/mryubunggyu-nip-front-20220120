@@ -76,15 +76,22 @@ export default function Recommend({ userinfo }) {
               <li className="linkBox">
                 <strong className="key">Link</strong>
                 <span className="value">
-                  <p>
-                    https://ausp.io/market/?ref=0x97b155a698d4bdec4c4bf3a92e9071190093cafb
+                  <p
+                    onClick={() => {
+                      window.location.replace(
+                        `http://nftinfinityworld.net/#/staking?referer=${userinfoProp?.myreferercode}`,
+                      )
+                    }}
+                  >
+                    http://nftinfinityworld.net/#/staking?referer=$
+                    {userinfoProp?.myreferercode}
                   </p>
                   <button
                     className="copyBtn"
                     onClick={() => {
                       setToggleLink(true)
                       onclickcopy(
-                        'https://ausp.io/market/?ref=0x97b155a698d4bdec4c4bf3a92e9071190093cafb',
+                        `http://nftinfinityworld.net/#/staking?referer=${userinfoProp?.myreferercode}`,
                       )
                     }}
                   >
@@ -106,7 +113,7 @@ export default function Recommend({ userinfo }) {
               </ul>
 
               <ul className="dataList">
-                {myRefererList.map((cont, index) => (
+                {myRefererList?.map((cont, index) => (
                   <li key={index}>
                     <span>{cont.id}</span>
                     <span>{strDot(cont.username, 4, 4)}</span>
@@ -164,7 +171,7 @@ export default function Recommend({ userinfo }) {
                 <span className="value">
                   <p
                     onClick={() => {
-                      navigate(
+                      window.location.replace(
                         `http://nftinfinityworld.net/#/staking?referer=${userinfoProp?.myreferercode}`,
                       )
                     }}
