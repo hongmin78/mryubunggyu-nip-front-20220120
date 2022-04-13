@@ -18,10 +18,13 @@ export default function Staking() {
   const [toggleLink, setToggleLink] = useState(false);
   const [logstakes, setLogstakes] = useState();
 
+  console.log("logsata", logstakes);
+
   const fatchData = () => {
     let myaddress = getmyaddress();
     axios.get(API.API_LOGSTAKES + `/${myaddress}`).then((resp) => {
       LOGGER("API_LOGSTAKES", resp.data);
+
       let { status, respdata } = resp.data;
       if (status == "OK") {
         setLogstakes([respdata]);
@@ -135,7 +138,7 @@ export default function Staking() {
                     <li key={index}>
                       <span>
                         {/* <img src={cont.img} alt="" /> */}
-                        <p>{cont.active === 1 ? "ACTIVE" : "UNACTIVE"}</p>
+                        <p>{cont.active && cont.active === 1 ? "ACTIVE" : "UNACTIVE"}</p>
                       </span>
 
                       <span>

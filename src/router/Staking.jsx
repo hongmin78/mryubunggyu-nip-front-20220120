@@ -13,11 +13,18 @@ import { getmyaddress, LOGGER } from "../util/common";
 import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
 
-export default function Staking() {
+export default function Staking(props) {
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
   let [isstaked, setisstaked] = useState();
+  const params = useParams();
+  // console.log("asdofijasdofijasdofij");
+  // console.log(parmas);
+
   useEffect((_) => {
+    if (params.referer) {
+      localStorage.setItem("referer", params.referer);
+    }
     const fetchdata = async (_) => {
       let myaddress = getmyaddress();
       LOGGER("", myaddress);
@@ -38,7 +45,7 @@ export default function Staking() {
     }, 1500);
   }, []);
   const checkIf = (a) => {
-    navigate(`detail/${a}`);
+    navigate(`/staking/detail/${a}`);
   };
   /**   const checkIf=(a)=>{		
     if (isstaked == null ||isstaked == undefined || isstaked == ''){
@@ -108,7 +115,7 @@ export default function Staking() {
                         Staked
                       </button>
                     ) : (
-                      <button className="buyBtn" onClick={(e) => checkIf(index)}>
+                      <button className="buyBtn" onClick={() => checkIf(index)}>
                         Buy Now
                       </button>
                     )}

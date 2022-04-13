@@ -1,40 +1,62 @@
-import styled from 'styled-components'
-import I_copy from '../../img/icon/I_copy.svg'
-import I_circleChk from '../../img/icon/I_circleChk.svg'
-import { D_recommendList } from '../../data/DmyPage'
-import { useState, useEffect } from 'react'
-import { useSelector } from 'react-redux'
-import { strDot } from '../../util/Util'
-import { onclickcopy } from '../../util/common.js'
-import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
-import { API } from '../../configs/api'
+import styled from "styled-components";
+import I_copy from "../../img/icon/I_copy.svg";
+import I_circleChk from "../../img/icon/I_circleChk.svg";
+import { D_recommendList } from "../../data/DmyPage";
+import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import { strDot } from "../../util/Util";
+import { onclickcopy } from "../../util/common.js";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { API } from "../../configs/api";
+import { getmyaddress, LOGGER } from "../../util/common";
+import SetErrorBar from "../../util/SetErrorBar.js";
+import { messages } from "../../configs/messages";
+import { TIME_FETCH_MYADDRESS_DEF } from "../../configs/configs";
 
-export default function Recommend({ userinfo }) {
-  const isMobile = useSelector((state) => state.common.isMobile)
-  const navigate = useNavigate()
+export default function Recommend() {
+  const isMobile = useSelector((state) => state.common.isMobile);
+  const navigate = useNavigate();
 
-  const [toggleCode, setToggleCode] = useState(false)
-  const [toggleLink, setToggleLink] = useState(false)
-  const [userinfoProp, setUserinfoProp] = useState(userinfo)
-  const [myRefererList, setMyRefererList] = useState([])
+  const [toggleCode, setToggleCode] = useState(false);
+  const [toggleLink, setToggleLink] = useState(false);
+  const [userinfoProp, setUserinfoProp] = useState([]);
+  const [myRefererList, setMyRefererList] = useState([]);
+
+  const fetchdataUserInfo = async (_) => {
+    let myaddress = getmyaddress();
+    if (myaddress) {
+      axios.get(API.API_USERINFO + `/${myaddress}`).then((resp) => {
+        let { status, respdata } = resp.data;
+        LOGGER("userInfo", respdata);
+        if (status == "OK") {
+          setUserinfoProp(respdata);
+        }
+      });
+    } else {
+      SetErrorBar(messages.MSG_CONNECTWALET);
+    }
+  };
+  useEffect((_) => {
+    setTimeout((_) => {
+      fetchdataUserInfo();
+    }, TIME_FETCH_MYADDRESS_DEF);
+  }, []);
 
   const fetchdata = () => {
     userinfoProp.myreferercode &&
-      axios
-        .get(API.API_REFERER + `/${userinfoProp?.myreferercode}/0/10/id/DESC`)
-        .then((resp) => {
-          console.log(resp.data)
-          let { status, list } = resp.data
-          if (status == 'OK') {
-            setMyRefererList(list)
-          }
-        })
-  }
+      axios.get(API.API_REFERER + `/${userinfoProp?.myreferercode}/0/10/id/DESC`).then((resp) => {
+        console.log(resp.data);
+        let { status, list } = resp.data;
+        if (status == "OK") {
+          setMyRefererList(list);
+        }
+      });
+  };
 
   useEffect(() => {
-    fetchdata()
-  }, [])
+    fetchdata();
+  }, []);
 
   if (isMobile)
     return (
@@ -46,11 +68,9 @@ export default function Recommend({ userinfo }) {
             <strong className="contTitle">Friend Recommendation</strong>
 
             <p className="explain">
-              Share your referral link! When a new user who accesses this link
-              purchases a product,
+              Share your referral link! When a new user who accesses this link purchases a product,
               <br />
-              an additional 2% of the sales amount is paid. Referral rewards are
-              paid in lump sum every month.
+              an additional 2% of the sales amount is paid. Referral rewards are paid in lump sum every month.
             </p>
           </li>
 
@@ -65,8 +85,8 @@ export default function Recommend({ userinfo }) {
                   <button
                     className="copyBtn"
                     onClick={() => {
-                      onclickcopy(userinfoProp.myreferercode)
-                      setToggleCode(true)
+                      onclickcopy(userinfoProp.myreferercode);
+                      setToggleCode(true);
                     }}
                   >
                     <img src={toggleCode ? I_circleChk : I_copy} alt="" />
@@ -79,8 +99,8 @@ export default function Recommend({ userinfo }) {
                   <p
                     onClick={() => {
                       window.location.replace(
-                        `http://nftinfinityworld.net/#/staking?referer=${userinfoProp?.myreferercode}`,
-                      )
+                        `http://nftinfinityworld.net/#/staking?referer=${userinfoProp?.myreferercode}`
+                      );
                     }}
                   >
                     http://nftinfinityworld.net/#/staking?referer=$
@@ -89,10 +109,8 @@ export default function Recommend({ userinfo }) {
                   <button
                     className="copyBtn"
                     onClick={() => {
-                      setToggleLink(true)
-                      onclickcopy(
-                        `http://nftinfinityworld.net/#/staking?referer=${userinfoProp?.myreferercode}`,
-                      )
+                      setToggleLink(true);
+                      onclickcopy(`http://nftinfinityworld.net/#/staking?referer=${userinfoProp?.myreferercode}`);
                     }}
                   >
                     <img src={toggleLink ? I_circleChk : I_copy} alt="" />
@@ -117,7 +135,7 @@ export default function Recommend({ userinfo }) {
                   <li key={index}>
                     <span>{cont.id}</span>
                     <span>{strDot(cont.username, 4, 4)}</span>
-                    <span>{cont.symbol ? cont.symbol : '-'}</span>
+                    <span>{cont.symbol ? cont.symbol : "-"}</span>
                     <span>{cont.referer}</span>
                     <span>{cont.createdat.substring(0, 10)}</span>
                     <span>{cont.hasreceivables} USDT</span>
@@ -128,7 +146,7 @@ export default function Recommend({ userinfo }) {
           </li>
         </ul>
       </MrecommendBox>
-    )
+    );
   else
     return (
       <PrecommendBox>
@@ -139,11 +157,9 @@ export default function Recommend({ userinfo }) {
             <strong className="contTitle">Friend Recommendation</strong>
 
             <p className="explain">
-              Share your referral link! When a new user who accesses this link
-              purchases a product,
+              Share your referral link! When a new user who accesses this link purchases a product,
               <br />
-              an additional 2% of the sales amount is paid. Referral rewards are
-              paid in lump sum every month.
+              an additional 2% of the sales amount is paid. Referral rewards are paid in lump sum every month.
             </p>
           </li>
 
@@ -158,8 +174,8 @@ export default function Recommend({ userinfo }) {
                   <button
                     className="copyBtn"
                     onClick={() => {
-                      onclickcopy(userinfoProp?.myreferercode)
-                      setToggleCode(true)
+                      onclickcopy(userinfoProp?.myreferercode);
+                      setToggleCode(true);
                     }}
                   >
                     <img src={toggleCode ? I_circleChk : I_copy} alt="" />
@@ -171,21 +187,16 @@ export default function Recommend({ userinfo }) {
                 <span className="value">
                   <p
                     onClick={() => {
-                      window.location.replace(
-                        `http://nftinfinityworld.net/#/staking?referer=${userinfoProp?.myreferercode}`,
-                      )
+                      navigate(`/staking/${userinfoProp?.myreferercode}`);
                     }}
                   >
-                    http://nftinfinityworld.net/#/staking?referer=$
-                    {userinfoProp?.myreferercode}
+                    https://nftinfinity.world/#/staking/${userinfoProp?.myreferercode}
                   </p>
                   <button
                     className="copyBtn"
                     onClick={() => {
-                      setToggleLink(true)
-                      onclickcopy(
-                        `http://nftinfinityworld.net/#/staking?referer=${userinfoProp?.myreferercode}`,
-                      )
+                      setToggleLink(true);
+                      onclickcopy(`https://nftinfinity.world/#/staking/${userinfoProp?.myreferercode}`);
                     }}
                   >
                     <img src={toggleLink ? I_circleChk : I_copy} alt="" />
@@ -210,7 +221,7 @@ export default function Recommend({ userinfo }) {
                   <li key={index}>
                     <span>{cont.id}</span>
                     <span>{strDot(cont.username, 4, 4)}</span>
-                    <span>{cont.symbol ? cont.symbol : '-'}</span>
+                    <span>{cont.symbol ? cont.symbol : "-"}</span>
                     <span>{cont.referer}</span>
                     <span>{cont.createdat.substring(0, 10)}</span>
                     <span>{cont.hasreceivables} USDT</span>
@@ -221,14 +232,14 @@ export default function Recommend({ userinfo }) {
           </li>
         </ul>
       </PrecommendBox>
-    )
+    );
 }
 
 const MrecommendBox = styled.section`
   padding: 9.16vw 5.55vw 0 5.55vw;
 
   * {
-    font-family: 'Roboto', sans-serif;
+    font-family: "Roboto", sans-serif;
   }
 
   .title {
@@ -380,13 +391,13 @@ const MrecommendBox = styled.section`
       }
     }
   }
-`
+`;
 
 const PrecommendBox = styled.section`
   padding: 60px 0 0 0;
 
   * {
-    font-family: 'Roboto', sans-serif;
+    font-family: "Roboto", sans-serif;
   }
 
   .title {
@@ -498,13 +509,6 @@ const PrecommendBox = styled.section`
       }
     }
   }
-`
+`;
 
-const headerList = [
-  'No',
-  'Account',
-  'Symbol',
-  'Recommender',
-  'Date of subscription	',
-  'Points Received',
-]
+const headerList = ["No", "Account", "Symbol", "Recommender", "Date of subscription	", "Points Received"];

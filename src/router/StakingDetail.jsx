@@ -19,14 +19,16 @@ import { messages } from "../configs/messages";
 import SetErrorBar from "../util/SetErrorBar";
 import { TIME_PAGE_TRANSITION_DEF, TIME_FETCH_MYADDRESS_DEF } from "../configs/configs";
 import { getethrep } from "../util/eth";
+
 // import { useSelector } from "react-redux";
 // const MODE_DEV_PROD='DEV'
 const MODE_DEV_PROD = "PROD";
 export default function StakingDetail() {
   const navigate = useNavigate();
   const param = useParams();
+
   const isMobile = useSelector((state) => state.common.isMobile);
-  const [stakingPopup, setStakingPopup] = useState(true);
+  const [stakingPopup, setStakingPopup] = useState(false);
   let [currentserialnumber, setcurrentserialnumber] = useState();
   let [stakecurrencybalance, setstakecurrencybalance] = useState();
   let myaddress = getmyaddress();

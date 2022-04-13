@@ -1,139 +1,140 @@
-import { useLayoutEffect } from 'react'
-import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
-import { HashRouter, Route, Routes, useNavigate } from 'react-router-dom'
-import styled from 'styled-components'
-import Auction from './router/Auction'
-import AuctionDetail from './router/AuctionDetail'
-import ConnectWallet from './router/ConnectWallet'
-import EditProf from './router/EditProf'
-import EmailAuth from './router/EmailAuth'
-import Main from './router/Main'
-import Market from './router/Market'
-import MarketDetail from './router/MarketDetail'
-import Mypage from './router/Mypage'
-import Penalty from './router/Penalty'
-import Resell from './router/Resell'
-import Staking from './router/Staking'
-import StakingDetail from './router/StakingDetail'
-import Term from './router/Term'
-import Test from './router/Test'
-import Winning from './router/Winning'
-import GlobalStyle from './util/GlobalStyle'
-import { setLogin, setMobile, setaddress } from './util/store/commonSlice'
-import { messages } from './configs/messages'
-import SetErrorBar from './util/SetErrorBar'
-import { LOGGER } from './util/common'
-import { strDot } from './util/Util'
-import axios from 'axios'
-import { API } from './configs/api'
+import { useLayoutEffect } from "react";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { HashRouter, Route, Routes, useNavigate } from "react-router-dom";
+import styled from "styled-components";
+import Auction from "./router/Auction";
+import AuctionDetail from "./router/AuctionDetail";
+import ConnectWallet from "./router/ConnectWallet";
+import EditProf from "./router/EditProf";
+import EmailAuth from "./router/EmailAuth";
+import Main from "./router/Main";
+import Market from "./router/Market";
+import MarketDetail from "./router/MarketDetail";
+import Mypage from "./router/Mypage";
+import Penalty from "./router/Penalty";
+import Resell from "./router/Resell";
+import Staking from "./router/Staking";
+import StakingDetail from "./router/StakingDetail";
+import Term from "./router/Term";
+import Test from "./router/Test";
+import Winning from "./router/Winning";
+import GlobalStyle from "./util/GlobalStyle";
+import { setLogin, setMobile, setaddress } from "./util/store/commonSlice";
+import { messages } from "./configs/messages";
+import SetErrorBar from "./util/SetErrorBar";
+import { LOGGER } from "./util/common";
+import { strDot } from "./util/Util";
+import axios from "axios";
+import { API } from "./configs/api";
+import { browserName, browserVersion, isChrome, isFirefox, isSafari, isEdge } from "react-device-detect";
 
 function App() {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   //	let [ address , setaddress ] = useState()
   function handleResize() {
-    if (window.innerWidth > 1024) dispatch(setMobile(false))
-    else dispatch(setMobile(true))
+    if (window.innerWidth > 1024) dispatch(setMobile(false));
+    else dispatch(setMobile(true));
   }
 
   useEffect(
     (_) => {
       const queryuseraddress = (address) => {
-        axios
-          .get(API.API_QUERY_USERADDRESS + `/users/username/${address}`)
-          .then((resp) => {
-            LOGGER('QlzCkJ0KYu', resp.data)
-            let { status, respdata } = resp.data
-            if (status == 'OK') {
-              if (respdata?.id) {
-                dispatch(setaddress(address))
-                dispatch(setLogin(address))
-                setaddress(address)
-              }
-            } else {
-              LOGGER('user not found')
+        axios.get(API.API_QUERY_USERADDRESS + `/users/username/${address}`).then((resp) => {
+          LOGGER("QlzCkJ0KYu", resp.data);
+          let { status, respdata } = resp.data;
+          if (status == "OK") {
+            if (respdata?.id) {
+              dispatch(setaddress(address));
+              dispatch(setLogin(address));
+              setaddress(address);
             }
-          })
-      }
-      let { ethereum } = window
-      if (ethereum) {
-        let { selectedAddress: address } = ethereum
-        ethereum.on('accountsChanged', (resp) => {
-          LOGGER('GsnRPWi8Zg@accountsChanged', resp)
-          SetErrorBar(messages.MSG_ACCOUNTS_CHANGED)
-          if (resp[0]) {
-            let address = resp[0]
-            dispatch(setaddress(address))
-            dispatch(setLogin(address))
-            setaddress(address)
-            dispatch(setLogin(address))
           } else {
-            dispatch(setaddress(null))
-            dispatch(setLogin(null))
-            dispatch(setLogin(null))
-            setaddress(null)
+            LOGGER("user not found");
           }
-        })
-        ethereum.on('networkChanged', function (networkId) {
-          LOGGER(networkId)
+        });
+      };
+      let { ethereum } = window;
+      if (ethereum) {
+        let { selectedAddress: address } = ethereum;
+        ethereum.on("accountsChanged", (resp) => {
+          LOGGER("GsnRPWi8Zg@accountsChanged", resp);
+          window.location.replace("/");
+          SetErrorBar(messages.MSG_ACCOUNTS_CHANGED);
+          if (resp[0]) {
+            let address = resp[0];
+            dispatch(setaddress(address));
+            dispatch(setLogin(address));
+            setaddress(address);
+            dispatch(setLogin(address));
+          } else {
+            dispatch(setaddress(null));
+            dispatch(setLogin(null));
+            dispatch(setLogin(null));
+            setaddress(null);
+          }
+        });
+        ethereum.on("networkChanged", function (networkId) {
+          LOGGER(networkId);
           // Time to reload your interface with the new networkId
-        })
-        ethereum.on('chainChanged', (chainId) => {
-          LOGGER('@chainChanged', chainId)
-        })
+        });
+        ethereum.on("chainChanged", (chainId) => {
+          LOGGER("@chainChanged", chainId);
+        });
 
         if (address) {
-          queryuseraddress(address)
+          queryuseraddress(address);
 
           //		dispatch( setaddress(  ) )  // strDot(ethereum.selectedAddress , 8 , 0 ) )
         }
       } else {
-        SetErrorBar('Please Install MetaMask')
-        window.open(
-          'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=ko',
-          '_blank',
-        )
+        SetErrorBar("Please Install MetaMask");
+        if (isChrome) {
+          window.open(
+            "https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en",
+            "_blank"
+          );
+        }
+        if (isSafari) {
+          alert("No supported MetaMask on safari,Please running on chrome");
+        }
+        if (isEdge) {
+          window.open(
+            "https://microsoftedge.microsoft.com/addons/detail/metamask/ejbalbakoplchlghecdalmeeeajnimhm?hl=en-US",
+            "_blank"
+          );
+        }
       }
     },
-    [window.ethereum],
-  )
+    [window.ethereum]
+  );
   useLayoutEffect(async () => {
     //    const walletAddress = localStorage.getItem("walletAddress");
     //	console.log("walletAddress", walletAddress);
-    setLogin(null)
+    setLogin(null);
     //    if (walletAddress) dispatch(setLogin(walletAddress));
-  })
+  });
 
   useEffect(() => {
-    if (window.innerWidth > 1024) dispatch(setMobile(false))
-    else dispatch(setMobile(true))
+    if (window.innerWidth > 1024) dispatch(setMobile(false));
+    else dispatch(setMobile(true));
 
-    window.addEventListener('resize', handleResize)
+    window.addEventListener("resize", handleResize);
     return () => {
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [])
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   return (
     <AppBox>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossOrigin="true"
-      />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
       <link
         href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
         rel="stylesheet"
       />
-      <link
-        href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap"
-        rel="stylesheet"
-      />
-      <link
-        href="https://fonts.googleapis.com/css2?family=Red+Hat+Mono:wght@500&display=swap"
-        rel="stylesheet"
-      />
+      <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Mono:wght@500&display=swap" rel="stylesheet" />
 
       <GlobalStyle />
       <HashRouter>
@@ -146,13 +147,11 @@ function App() {
 
           <Route path="/connectwallet" element={<ConnectWallet />} />
           <Route path="/connectwallet/:popup" element={<ConnectWallet />} />
-          <Route
-            path="/emailauth/:email/:authNum/:walletaddress"
-            element={<EmailAuth />}
-          />
+          <Route path="/emailauth/:email/:authNum/:walletaddress" element={<EmailAuth />} />
           <Route path="/emailauth/:email/:authNum" element={<EmailAuth />} />
 
           <Route path="/staking" element={<Staking />} />
+          <Route path="/staking/:referer" element={<Staking />} />
           <Route path="/staking/:popup" element={<Staking />} />
           <Route path="/staking/detail/:id" element={<StakingDetail />} />
 
@@ -161,10 +160,7 @@ function App() {
 
           <Route path="/market" element={<Market />} />
           <Route path="/market/detail/:itemid" element={<MarketDetail />} />
-          <Route
-            path="/market/detail/:itemid/:popup"
-            element={<MarketDetail />}
-          />
+          <Route path="/market/detail/:itemid/:popup" element={<MarketDetail />} />
 
           <Route path="/mypage" element={<Mypage />} />
           <Route path="/editprof" element={<EditProf />} />
@@ -174,11 +170,11 @@ function App() {
         </Routes>
       </HashRouter>
     </AppBox>
-  )
+  );
 }
 
 const AppBox = styled.div`
   background: #fff;
-`
+`;
 
-export default App
+export default App;

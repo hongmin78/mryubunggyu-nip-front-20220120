@@ -122,7 +122,7 @@ export default function Header() {
                 onClick={() => setHeaderPopup(!headerPopup)}
               >
                 <span className="balanceBox">
-                  <p className="price">{mybalance}</p>
+                  <p className="price">{mybalance ? mybalance : "0"}</p>
                   <p className="unit">USDT</p>
                 </span>
 

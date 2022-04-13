@@ -18,23 +18,27 @@ export default function SignUpPopup({ walletAddress }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isMobile = useSelector((state) => state.common.isMobile);
+  const referer = localStorage.getItem("referer");
   const [email, setEmail] = useState("");
   const [emailAlarm, setEmailAlarm] = useState("");
   const [pw, setPw] = useState("");
   const [pwConfrim, setPwConfirm] = useState("");
   const [pwAlarm, setPwAlarm] = useState("");
-  const [referral, setReferal] = useState("");
+  const [referral, setReferal] = useState(referer ? referer : "");
   const [agreeList, setAgreeList] = useState(new Array(2).fill(false));
   const [pending, setPending] = useState(false);
   const [mailcheck, setMailcheck] = useState(false);
   let [isemailrequested, setisemailrequested] = useState(false);
   let [myaddress, setmyaddress] = useState(getmyaddress());
   let [nickname, setnickname] = useState("");
+
   localStorage.setItem("mailcheck", false);
+
   function clickRegistrationBtn() {
     setPending(true);
     localStorage.setItem("MAIL_CHECK", false);
     let myaddress = getmyaddress();
+
     axios
       .post(API.API_EMAIL_REQUEST, { email, walletAddress: myaddress })
       .then((resp) => {
@@ -122,13 +126,18 @@ export default function SignUpPopup({ walletAddress }) {
         nickname,
       })
       .then((resp) => {
+        console.log("resp", resp.data.message);
         LOGGER("VrPcFLisLA", resp.data);
-        let { status } = resp.data;
+
+        let { status, message } = resp.data;
         if (status == "OK") {
           SetErrorBar(messages.MSG_DONE_REGISTERING);
           setTimeout(() => {
             navigate("/staking");
           }, TIME_PAGE_TRANSITION_DEF);
+        } else if (message === "ERR_EMAIL_COUNTING") {
+          SetErrorBar("You can use a Email for only ten MetaMask addresses");
+          return;
         } else {
           SetErrorBar(messages.MSG_SERVER_ERR);
           return;
@@ -376,8 +385,9 @@ export default function SignUpPopup({ walletAddress }) {
               <div className="inputBox">
                 <input
                   value={referral}
+                  defaultValue={referral ? referral : null}
                   onChange={(e) => setReferal(e.target.value)}
-                  placeholder="Friend Recommendation"
+                  placeholder={referer ? referer : "Friend Recommendation"}
                 />
               </div>
             </div>
@@ -419,6 +429,7 @@ export default function SignUpPopup({ walletAddress }) {
             Sign up
           </button>
         </ul>
+        <div className="scrollPadding"></div>
       </PsignUpPopupBox>
     );
 }
@@ -427,7 +438,7 @@ const MsignUpBox = styled.section`
   display: flex;
   flex-direction: column;
   padding: 0 0 9.44vw 0;
-
+  overflow-y: scroll;
   .topBar {
     display: flex;
     justify-content: space-between;
@@ -542,7 +553,7 @@ const MsignUpBox = styled.section`
     display: flex;
     gap: 24px;
     margin: 8.33vw 0 0 0;
-    padding: 0 5.55vw;
+    padding: 0, 5.55vw;
 
     button {
       flex: 1;
@@ -586,6 +597,10 @@ const PsignUpPopupBox = styled.div`
   position: fixed;
   z-index: 6;
 
+  .scrollPadding {
+    padding: 0 0 50px 0;
+  }
+
   .title {
     font-size: 24px;
     font-weight: 600;
@@ -596,7 +611,7 @@ const PsignUpPopupBox = styled.div`
   .inputList {
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 8px;
 
     li {
       display: flex;

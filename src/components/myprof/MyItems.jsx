@@ -51,7 +51,7 @@ export default function MyItems() {
   let [userinfo, setuserinfo] = useState(null);
   const [timeReceivables, setTimeReceivables] = useState();
   const [gettimeReceivables, setgetTimeReceivables] = useState();
-  const [logstakes, setlogstakes] = useState();
+  const [logstakes, setlogstakes] = useState(null);
   const [getTickTimer, setGetTickTimer] = useState();
   const [tickTimer, setTickTimer] = useState();
 
@@ -122,6 +122,7 @@ export default function MyItems() {
         methodname: "_balance_user_itemhash",
         aargs: [myaddress], // ETH_TESTNET.
       }).then(async (resp) => {
+        LOGGER("dasdasdasd", resp);
         let myitemhash = resp;
         let mytokenid;
         try {
@@ -230,68 +231,92 @@ export default function MyItems() {
                 </span>
               </div>
             </div>
-
-            <div className="infoBox">
-              <div className="titleBox">
-                <strong className="title">Lucky Ticket #{("" + mytokenid)?.padStart(5, "0")}</strong>
-              </div>
-
-              <div className="ownedBox">
-                <p className="key">Owned by</p>
-                <p className="value">@{userinfo?.nickname}</p>
-              </div>
-
-              <div className="saleBox">
-                <div className="price">
-                  <p className="key">Current price</p>
-                  <strong className="value">{putCommaAtPrice(100)} USDT</strong>
+            {mytokenid == null && (
+              <div className="infoBox">
+                <div className="titleBox">
+                  <strong className="title">
+                    Need a buy <hr />
+                    "Lucky Ticket"
+                  </strong>
                 </div>
 
-                <div className="time">
-                  <p className="key">Bought</p>
-                  <ul className="timeList">
-                    <li>{buydate[0]}</li>
-                    <li>{buydate[1]}</li>
-                    <li>{buydate[2]}</li>
-                    <li>{buydate[3]}</li>
-                  </ul>
-                </div>
-              </div>
+                <button className="actionBtn" onClick={() => navigate("/staking")}>
+                  Buy
+                </button>
 
-              <ul className="priceBox">
-                <li>
-                  <p className="key">Current price</p>
-                  <p className="value">586 USDT</p>
-                </li>
-                <li>
-                  <p className="key">Transaction price</p>
-                  <p className="value">688 USDT</p>
-                </li>
-                <li
-                  onClick={(evt) => {
-                    window.open(txscanurl);
-                  }}
+                <p className="description">
+                  The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days
+                  and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
+                  completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all transactions
+                  in your account will be suspended. It operates normally after applying a penalty of 10% of the winning
+                  bid amount.
+                </p>
+              </div>
+            )}
+            {mytokenid && (
+              <div className="infoBox">
+                <div className="titleBox">
+                  <strong className="title">Lucky Ticket #{"" + mytokenid}</strong>
+                </div>
+
+                <div className="ownedBox">
+                  <p className="key">Owned by</p>
+                  <p className="value">@{userinfo?.nickname}</p>
+                </div>
+
+                <div className="saleBox">
+                  <div className="price">
+                    <p className="key">Current price</p>
+                    <strong className="value">{putCommaAtPrice(100)} USDT</strong>
+                  </div>
+
+                  <div className="time">
+                    <p className="key">Bought</p>
+                    <ul className="timeList">
+                      <li>{tickTimer && moment(tickTimer).days()}일</li>
+                      <li>{tickTimer && moment(tickTimer).hours()}시간</li>
+                      <li>{tickTimer && moment(tickTimer).minutes()}분</li>
+                      <li>{tickTimer && moment(tickTimer).seconds()}초</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <ul className="priceBox">
+                  <li>
+                    <p className="key">Current price</p>
+                    <p className="value">586 USDT</p>
+                  </li>
+                  {/* <li>
+                    <p className="key">Transaction price</p>
+                    <p className="value">688 USDT</p>
+                  </li> */}
+                  <li
+                    onClick={(evt) => {
+                      window.open(txscanurl);
+                    }}
+                  >
+                    {/* <p className="key">TxHash</p>
+                    <p className="value">{txhash}</p> */}
+                  </li>
+                </ul>
+
+                <button
+                  className="actionBtn"
+                  disabled={tickTimer !== 0 ? true : false}
+                  onClick={() => navigate("/resell")}
                 >
-                  <p className="key">TxHash</p>
-                  <p className="value">{txhash}</p>
-                </li>
-              </ul>
+                  Sell
+                </button>
 
-              <button
-                className="actionBtn"
-                disabled={tickTimer !== 0 ? true : false}
-                onClick={() => navigate("/resell")}
-              >
-                Sell
-              </button>
-
-              <p className="description">
-                The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days and
-                is sold random. In addition, the results are announced at 9:00 AM, and the transaction is completed from
-                9:00 AM to 21:00 PM. If the transaction is not completed within time, all transactions in your account
-                will be suspended. It operates normally after applying a penalty of 10% of the winning bid amount.
-              </p>
-            </div>
+                <p className="description">
+                  The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days
+                  and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
+                  completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all transactions
+                  in your account will be suspended. It operates normally after applying a penalty of 10% of the winning
+                  bid amount.
+                </p>
+              </div>
+            )}
           </li>
           {itemData &&
             itemData?.length !== 0 &&
@@ -506,71 +531,97 @@ export default function MyItems() {
                 </span>
               </div>
             </div>
-
-            <div className="infoBox">
-              <div className="titleBox">
-                <strong className="title">Lucky Ticket #{("" + mytokenid)?.padStart(5, "0")}</strong>
-              </div>
-
-              <div className="ownedBox">
-                <p className="key">Owned by</p>
-                <p className="value">@{userinfo?.nickname}</p>
-              </div>
-
-              <div className="saleBox">
-                <div className="key">
-                  <p className="price">Current price</p>
-                  <p className="time">Bought</p>
-                </div>
-
-                <div className="value">
-                  <strong className="price">
-                    {putCommaAtPrice(logstakes?.amount)} {logstakes?.currency}
+            {mytokenid == null && (
+              <div className="infoBox">
+                <div className="titleBox">
+                  <strong className="title">
+                    Need a buy <hr />
+                    "Lucky Ticket"
                   </strong>
+                </div>
+                <div className="saleBox"></div>
 
-                  <ul className="timeList">
-                    <li>{tickTimer && moment(tickTimer).days()}일</li>
-                    <li>{tickTimer && moment(tickTimer).hours()}시간</li>
-                    <li>{tickTimer && moment(tickTimer).minutes()}분</li>
-                    <li>{tickTimer && moment(tickTimer).seconds()}초</li>
-                  </ul>
+                <button className="actionBtn" onClick={() => navigate("/staking")}>
+                  Buy
+                </button>
+
+                <p className="description">
+                  The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days
+                  and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
+                  completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all transactions
+                  in your account will be suspended. It operates normally after applying a penalty of 10% of the winning
+                  bid amount.
+                </p>
+              </div>
+            )}
+
+            {mytokenid && (
+              <div className="infoBox">
+                <div className="titleBox">
+                  <strong className="title">Lucky Ticket #{"" + mytokenid}</strong>
                 </div>
 
-                <ul className="priceBox">
-                  <li>
-                    <p className="key">Current price</p>
-                    <p className="value">100 USDT</p>
-                  </li>
-                  {/* <li>
+                <div className="ownedBox">
+                  <p className="key">Owned by</p>
+                  <p className="value">@{userinfo?.nickname}</p>
+                </div>
+
+                <div className="saleBox">
+                  <div className="key">
+                    <p className="price">Current price</p>
+                    <p className="time">Bought</p>
+                  </div>
+
+                  <div className="value">
+                    <strong className="price">
+                      {putCommaAtPrice(logstakes?.amount)} {logstakes?.currency}
+                    </strong>
+
+                    <ul className="timeList">
+                      <li>{tickTimer && moment(tickTimer).days()}일</li>
+                      <li>{tickTimer && moment(tickTimer).hours()}시간</li>
+                      <li>{tickTimer && moment(tickTimer).minutes()}분</li>
+                      <li>{tickTimer && moment(tickTimer).seconds()}초</li>
+                    </ul>
+                  </div>
+
+                  <ul className="priceBox">
+                    <li>
+                      <p className="key">Current price</p>
+                      <p className="value">100 USDT</p>
+                    </li>
+                    {/* <li>
                     <p className="key">Transaction price</p>
                     <p className="value">100 USDT</p>
                   </li> */}
-                  <li
-                    onClick={(evt) => {
-                      window.open(txscanurl);
-                    }}
-                  >
-                    {/* <p className="key">TxHash</p>
+                    <li
+                      onClick={(evt) => {
+                        window.open(txscanurl);
+                      }}
+                    >
+                      {/* <p className="key">TxHash</p>
                     <p className="value">{txhash}</p> */}
-                  </li>
-                </ul>
+                    </li>
+                  </ul>
+                </div>
+
+                <button
+                  className="actionBtn"
+                  disabled={tickTimer !== 0 ? true : false}
+                  onClick={() => navigate("/resell")}
+                >
+                  Sell
+                </button>
+
+                <p className="description">
+                  The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days
+                  and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
+                  completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all transactions
+                  in your account will be suspended. It operates normally after applying a penalty of 10% of the winning
+                  bid amount.
+                </p>
               </div>
-
-              <button
-                className="actionBtn"
-                disabled={tickTimer !== 0 ? true : false}
-                onClick={() => navigate("/resell")}
-              >
-                Sell
-              </button>
-
-              <p className="description">
-                The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days and
-                is sold random. In addition, the results are announced at 9:00 AM, and the transaction is completed from
-                9:00 AM to 21:00 PM. If the transaction is not completed within time, all transactions in your account
-                will be suspended. It operates normally after applying a penalty of 10% of the winning bid amount.
-              </p>
-            </div>
+            )}
           </li>
 
           {itemData &&
