@@ -28,6 +28,7 @@ import { strDot } from "./util/Util";
 import axios from "axios";
 import { API } from "./configs/api";
 import { browserName, browserVersion, isChrome, isFirefox, isSafari, isEdge } from "react-device-detect";
+import { CURRENT_TIME } from "./configs/configs";
 
 function App() {
   const dispatch = useDispatch();
@@ -39,6 +40,16 @@ function App() {
 
   useEffect(
     (_) => {
+      axios.get(API.API_KEY_TIME_STAMP).then((resp) => {
+        LOGGER("asdasdasdasds", resp.data);
+        let { status, respdata } = resp.data;
+        if (status == "OK") {
+          if (parseInt(respdata.value) > CURRENT_TIME) window.location.reload("/");
+        } else {
+          return;
+        }
+      });
+
       const queryuseraddress = (address) => {
         axios.get(API.API_QUERY_USERADDRESS + `/users/username/${address}`).then((resp) => {
           LOGGER("QlzCkJ0KYu", resp.data);

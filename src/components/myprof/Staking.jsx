@@ -26,7 +26,7 @@ export default function Staking() {
       LOGGER("API_LOGSTAKES", resp.data);
 
       let { status, respdata } = resp.data;
-      if (status == "OK") {
+      if (status == "OK" && !respdata == null) {
         setLogstakes([respdata]);
       }
     });
@@ -160,7 +160,7 @@ export default function Staking() {
             </div>
           </li>
 
-          <li className="rewardBox">
+          {/* <li className="rewardBox">
             <strong className="contTitle">Earned Rewards</strong>
 
             <div className="listBox">
@@ -196,7 +196,7 @@ export default function Staking() {
                 ))}
               </ul>
             </div>
-          </li>
+          </li> */}
         </ul>
       </PstakingBox>
     );

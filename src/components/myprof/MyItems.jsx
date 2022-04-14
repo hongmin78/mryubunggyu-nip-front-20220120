@@ -18,6 +18,8 @@ import { query_with_arg } from "../../util/contract-calls";
 import { addresses } from "../../configs/addresses";
 import { TIME_FETCH_MYADDRESS_DEF } from "../../configs/configs";
 import { getmyaddress, LOGGER } from "../../util/common";
+import { web3 } from "../../configs/configweb3-bscmainnet";
+import { abi } from "../../contracts/abi-staker-20220414";
 // import BidPopup from "../BidPopup";
 import StakingPopup from "../StakingPopup";
 import moment from "moment";
@@ -42,7 +44,7 @@ export default function MyItems() {
   const [timeMoment, setTimeMoment] = useState();
   let [itemData, setItemData] = useState([]);
   let [itemBalData, setItemBalData] = useState([]);
-  let [mytokenid, setmytokenid] = useState(0);
+  let [mytokenid, setmytokenid] = useState();
   let [stakedata, setstakedata] = useState({});
   let [myaddress, setmyaddress] = useState();
   let [txhash, settxhash] = useState();
@@ -161,17 +163,36 @@ export default function MyItems() {
       let { status, respdata } = resp.data;
       if (status == "OK") {
         setlogstakes(respdata);
-        setGetTickTimer(respdata?.createdat);
+        setGetTickTimer(moment(respdata?.createdat).unix());
       }
     });
+  }, []);
 
-    setInterval(() => {
-      getTickTimer && setTickTimer(moment(getTickTimer).add(90, "days") - moment());
-    }, 1000);
-  }, [getTickTimer]);
+  useEffect(() => {
+    if (getTickTimer > 0) {
+      const Counter = setInterval(() => {
+        const date = moment().unix();
+        const ticktiem = getTickTimer + 7257600;
+        getTickTimer && setTickTimer(moment(ticktiem - date).unix());
+      }, 1000);
+
+      return () => clearInterval(Counter);
+    }
+  });
+  const date = moment().unix();
+  console.log("asdfasdsd", tickTimer);
+  // 더한 값이 1657164482 이다 안더한값이 1649906882 dete 값 1649923113 // 뺀값 7241
+
   useEffect((_) => {
     setTimeout((_) => {
       fetchdata();
+    }, TIME_FETCH_MYADDRESS_DEF);
+  }, []);
+  useEffect((_) => {
+    setTimeout((_) => {
+      fetchdata();
+
+      // console.log("moment", moment().toDate());
     }, TIME_FETCH_MYADDRESS_DEF);
   }, []);
 
@@ -253,10 +274,10 @@ export default function MyItems() {
                 </p>
               </div>
             )}
-            {mytokenid && (
+            {logstakes && (
               <div className="infoBox">
                 <div className="titleBox">
-                  <strong className="title">Lucky Ticket #{"" + mytokenid}</strong>
+                  <strong className="title">Lucky Ticket #{"" + logstakes.id}</strong>
                 </div>
 
                 <div className="ownedBox">
@@ -272,12 +293,12 @@ export default function MyItems() {
 
                   <div className="time">
                     <p className="key">Bought</p>
-                    <ul className="timeList">
-                      <li>{tickTimer && moment(tickTimer).days()}일</li>
-                      <li>{tickTimer && moment(tickTimer).hours()}시간</li>
-                      <li>{tickTimer && moment(tickTimer).minutes()}분</li>
-                      <li>{tickTimer && moment(tickTimer).seconds()}초</li>
-                    </ul>
+                    {/* <ul className="timeList">
+                      <li>{tickDate?.days()}일</li>
+                      <li>{tickDate?.hours()}시간</li>
+                      <li>{tickDate?.minutes()}분</li>
+                      <li>{tickDate?.seconds()}초</li>
+                    </ul> */}
                   </div>
                 </div>
 
@@ -531,7 +552,7 @@ export default function MyItems() {
                 </span>
               </div>
             </div>
-            {mytokenid == null && (
+            {logstakes == null && (
               <div className="infoBox">
                 <div className="titleBox">
                   <strong className="title">
@@ -555,10 +576,10 @@ export default function MyItems() {
               </div>
             )}
 
-            {mytokenid && (
+            {logstakes && (
               <div className="infoBox">
                 <div className="titleBox">
-                  <strong className="title">Lucky Ticket #{"" + mytokenid}</strong>
+                  <strong className="title">Lucky Ticket #{"" + logstakes.id}</strong>
                 </div>
 
                 <div className="ownedBox">
@@ -578,10 +599,10 @@ export default function MyItems() {
                     </strong>
 
                     <ul className="timeList">
-                      <li>{tickTimer && moment(tickTimer).days()}일</li>
-                      <li>{tickTimer && moment(tickTimer).hours()}시간</li>
-                      <li>{tickTimer && moment(tickTimer).minutes()}분</li>
-                      <li>{tickTimer && moment(tickTimer).seconds()}초</li>
+                      <li>{moment(tickTimer).days()}일</li>
+                      <li>{moment(tickTimer).hours()}시간</li>
+                      <li>{moment(tickTimer).month()}분</li>
+                      <li>{moment(tickTimer).second()}초</li>
                     </ul>
                   </div>
 

@@ -36,26 +36,19 @@ export default function Recommend() {
     } else {
       SetErrorBar(messages.MSG_CONNECTWALET);
     }
-  };
-  useEffect((_) => {
-    setTimeout((_) => {
-      fetchdataUserInfo();
-    }, TIME_FETCH_MYADDRESS_DEF);
-  }, []);
-
-  const fetchdata = () => {
     userinfoProp.myreferercode &&
       axios.get(API.API_REFERER + `/${userinfoProp?.myreferercode}/0/10/id/DESC`).then((resp) => {
-        console.log(resp.data);
+        console.log("myRefererList", resp.data);
         let { status, list } = resp.data;
         if (status == "OK") {
           setMyRefererList(list);
         }
       });
   };
-
-  useEffect(() => {
-    fetchdata();
+  useEffect((_) => {
+    setTimeout((_) => {
+      fetchdataUserInfo();
+    }, []);
   }, []);
 
   if (isMobile)
@@ -217,7 +210,7 @@ export default function Recommend() {
               </ul>
 
               <ul className="dataList">
-                {myRefererList?.map((cont, index) => (
+                {myRefererList.map((cont, index) => (
                   <li key={index}>
                     <span>{cont.id}</span>
                     <span>{strDot(cont.username, 4, 4)}</span>
