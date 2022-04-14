@@ -163,22 +163,43 @@ export default function MyItems() {
       let { status, respdata } = resp.data;
       if (status == "OK") {
         setlogstakes(respdata);
-        setGetTickTimer(moment(respdata?.createdat).unix());
+        setGetTickTimer(respdata?.createdat);
       }
     });
   }, []);
 
-  useEffect(() => {
-    if (getTickTimer > 0) {
-      const Counter = setInterval(() => {
-        const date = moment().unix();
-        const ticktiem = getTickTimer + 7257600;
-        getTickTimer && setTickTimer(moment(ticktiem - date).unix());
-      }, 1000);
+  // useEffect(() => {
+  //   if (getTickTimer > 0) {
+  //     const Counter = setInterval(() => {
+  //       const date = moment().unix();
+  //       const ticktiem = getTickTimer + 7257600;
+  //       getTickTimer && setTickTimer(moment(ticktiem - date).unix());
+  //     }, 1000);
 
-      return () => clearInterval(Counter);
-    }
-  });
+  //     return () => clearInterval(Counter);
+  //   }
+  // }, [tickTimer]);
+
+  useEffect(() => {
+    let myaddress = getmyaddress();
+    axios.get(API.API_LOGSTAKES + `/${myaddress}`).then((resp) => {
+      LOGGER("API_LOGSTAKES", resp.data);
+      let { status, respdata } = resp.data;
+      if (status == "OK") {
+        setlogstakes(respdata);
+        setGetTickTimer(respdata?.createdat);
+      }
+    });
+
+    setInterval(() => {
+      getTickTimer && setTickTimer(moment(getTickTimer).add(90, "days") - moment());
+    }, 1000);
+  }, [getTickTimer]);
+  useEffect((_) => {
+    setTimeout((_) => {
+      fetchdata();
+    });
+  }, []);
   const date = moment().unix();
   console.log("asdfasdsd", tickTimer);
   // 더한 값이 1657164482 이다 안더한값이 1649906882 dete 값 1649923113 // 뺀값 7241
