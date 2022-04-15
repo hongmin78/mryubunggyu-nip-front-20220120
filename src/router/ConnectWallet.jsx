@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import I_metaMask from "../img/icon/I_metaMask.svg";
@@ -65,6 +65,11 @@ export default function ConnectWallet() {
       // dispatch(setLogin(address));
     });
   }
+  useEffect((_) => {
+    if (param.referer) {
+      localStorage.setItem("referer", param.referer);
+    }
+  }, []);
 
   if (param.popup) return <SignUpPopup walletAddress={walletAddress} />;
   else

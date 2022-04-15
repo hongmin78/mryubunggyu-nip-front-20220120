@@ -1,83 +1,67 @@
-import styled from 'styled-components'
-import I_x from '../img/icon/I_x.svg'
-import I_tIcon from '../img/icon/I_tIcon.png'
-import I_chkWhite from '../img/icon/I_chkWhite.svg'
-import { putCommaAtPrice } from '../util/Util'
-import { useState, useEffect, useRef } from 'react'
-import { useSelector } from 'react-redux'
-import PopupBg from './PopupBg'
-import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
-import {
-  getabistr_forfunction,
-  query_with_arg,
-  query_noarg,
-  query_eth_balance,
-} from '../util/contract-calls'
-import { addresses } from '../configs/addresses'
-import { DECIMALS_DISP_DEF } from '../configs/configs' // DueAmount,
-import { LOGGER, getmyaddress, getobjtype } from '../util/common'
-import { getweirep, getethrep } from '../util/eth'
-import { requesttransaction } from '../services/metamask'
-import SetErrorBar from '../util/SetErrorBar'
-import { messages } from '../configs/messages'
-import { API } from '../configs/api'
-import awaitTransactionMined from 'await-transaction-mined'
-import {
-  web3,
-  BASE_CURRENCY,
-  PAY_CURRENCY,
-  NETTYPE,
-} from '../configs/configweb3'
-import { TX_POLL_OPTIONS } from '../configs/configs'
-import I_spinner from '../img/icon/I_spinner.svg'
-import { strDot } from '../util/Util'
-const MODE_DEV_PROD = 'PROD'
+import styled from "styled-components";
+import I_x from "../img/icon/I_x.svg";
+import I_tIcon from "../img/icon/I_tIcon.png";
+import I_chkWhite from "../img/icon/I_chkWhite.svg";
+import { putCommaAtPrice } from "../util/Util";
+import { useState, useEffect, useRef } from "react";
+import { useSelector } from "react-redux";
+import PopupBg from "./PopupBg";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { getabistr_forfunction, query_with_arg, query_noarg, query_eth_balance } from "../util/contract-calls";
+import { addresses } from "../configs/addresses";
+import { DECIMALS_DISP_DEF } from "../configs/configs"; // DueAmount,
+import { LOGGER, getmyaddress, getobjtype } from "../util/common";
+import { getweirep, getethrep } from "../util/eth";
+import { requesttransaction } from "../services/metamask";
+import SetErrorBar from "../util/SetErrorBar";
+import { messages } from "../configs/messages";
+import { API } from "../configs/api";
+import awaitTransactionMined from "await-transaction-mined";
+import { web3, BASE_CURRENCY, PAY_CURRENCY, NETTYPE } from "../configs/configweb3";
+import { TX_POLL_OPTIONS } from "../configs/configs";
+import I_spinner from "../img/icon/I_spinner.svg";
+import { strDot } from "../util/Util";
+const MODE_DEV_PROD = "PROD";
 export default function PayPopup({ off, receivables }) {
-  const navigate = useNavigate()
-  const isMobile = useSelector((state) => state.common.isMobile)
-  const [termChk, setTermChk] = useState(false)
-  let [myaddress, setmyaddress] = useState(getmyaddress())
-  let [mybalance, setmybalance] = useState()
-  let [isallowanceok, setisallowanceok] = useState(false)
-  let [allowanceamount, setallowanceamount] = useState()
+  const navigate = useNavigate();
+  const isMobile = useSelector((state) => state.common.isMobile);
+  const [termChk, setTermChk] = useState(false);
+  let [myaddress, setmyaddress] = useState(getmyaddress());
+  let [mybalance, setmybalance] = useState();
+  let [isallowanceok, setisallowanceok] = useState(false);
+  let [allowanceamount, setallowanceamount] = useState();
   // let [st akedbalance, setsta kedbalance] = useState();
-  let [tvl, settvl] = useState()
-  let [tickerusdt, settickerusdt] = useState(1)
-  let [myethbalance, setmyethbalance] = useState()
-  let [done, setDone] = useState(false)
-  let spinnerHref = useRef()
-  let spinnerHref_approve = useRef()
-  let [isloader_00, setisloader_00] = useState(false)
-  let [isloader_01, setisloader_01] = useState(false)
-  let [DueAmount, setDueAmount] = useState(receivables.amount)
+  let [tvl, settvl] = useState();
+  let [tickerusdt, settickerusdt] = useState(1);
+  let [myethbalance, setmyethbalance] = useState();
+  let [done, setDone] = useState(false);
+  let spinnerHref = useRef();
+  let spinnerHref_approve = useRef();
+  let [isloader_00, setisloader_00] = useState(false);
+  let [isloader_01, setisloader_01] = useState(false);
+  let [DueAmount, setDueAmount] = useState(receivables.amount);
   useEffect((_) => {
-    const spinner = spinnerHref.current // document.querySelector("Spinner");
-    spinner.animate(
-      [{ transform: 'rotate(0deg)' }, { transform: 'rotate(360deg)' }],
-      {
-        duration: 1000,
-        iterations: Infinity,
-      },
-    )
-    const spinner_approve = spinnerHref_approve.current // document.querySelector("Spinner");
-    spinner_approve.animate(
-      [{ transform: 'rotate(0deg)' }, { transform: 'rotate(360deg)' }],
-      {
-        duration: 1000,
-        iterations: Infinity,
-      },
-    )
+    const spinner = spinnerHref.current; // document.querySelector("Spinner");
+    spinner.animate([{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], {
+      duration: 1000,
+      iterations: Infinity,
+    });
+    const spinner_approve = spinnerHref_approve.current; // document.querySelector("Spinner");
+    spinner_approve.animate([{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], {
+      duration: 1000,
+      iterations: Infinity,
+    });
     const fetchdata = async (_) => {
       axios.get(API.API_TICKERS).then((resp) => {
-        LOGGER('MDmEMQ5xde', resp.data)
-        let { status, payload, list } = resp
+        LOGGER("MDmEMQ5xde", resp.data);
+        let { status, payload, list } = resp;
         //				let { USDT } = payload.list
         //			LOGGER( 'mlB7HasjBh' , USDT )
         //		settickerusdt ( USDT )
-      })
-      let myaddress = getmyaddress()
-      LOGGER('', addresses.contract_pay_for_assigned_item, myaddress) // .ETH_TESTNET
+      });
+      let myaddress = getmyaddress();
+      LOGGER("", addresses.contract_pay_for_assigned_item, myaddress); // .ETH_TESTNET
       // let resp_balances = await query_with_arg({
       //   contractaddress: addresses.contract_st ake, // ETH_TESTNET.
       //   abikind: "PAY",
@@ -88,28 +72,28 @@ export default function PayPopup({ off, receivables }) {
       // setst akedbalance(getethrep(resp_balances));
       query_with_arg({
         contractaddress: addresses.contract_USDT, // ETH_TESTNET.
-        abikind: 'ERC20',
-        methodname: 'allowance',
+        abikind: "ERC20",
+        methodname: "allowance",
         aargs: [myaddress, addresses.contract_pay_for_assigned_item], // ETH_TESTNET.
       }).then((resp) => {
-        let allowanceineth = getethrep(resp)
-        LOGGER('8LYRxjNp8k', resp, allowanceineth)
-        setallowanceamount(allowanceineth)
+        let allowanceineth = getethrep(resp);
+        LOGGER("8LYRxjNp8k", resp, allowanceineth);
+        setallowanceamount(allowanceineth);
         //				setallowanceamount ( 100 )
         if (allowanceineth > 0) {
-          setisallowanceok(false)
+          setisallowanceok(false);
         } else {
         }
-      })
+      });
       query_with_arg({
         contractaddress: addresses.contract_USDT, // ETH_TESTNET.
-        abikind: 'ERC20',
-        methodname: 'balanceOf',
+        abikind: "ERC20",
+        methodname: "balanceOf",
         aargs: [myaddress],
       }).then((resp) => {
-        LOGGER('mybalance', resp)
-        setmybalance(getethrep(resp, 4))
-      })
+        LOGGER("mybalance", resp);
+        setmybalance(getethrep(resp, 4));
+      });
       // query_noarg({
       //   contractaddress: addresses.contract_st ake, // ETH_TESTNET.
       //   abikind: "ST AKE",
@@ -142,46 +126,43 @@ export default function PayPopup({ off, receivables }) {
       //     //				settvlnft ( resp )
       //   });
       query_eth_balance(myaddress).then((resp) => {
-        LOGGER('rmgUxgo5ye', resp)
-        setmyethbalance((+getethrep(resp)).toFixed(DECIMALS_DISP_DEF))
-      })
-    }
+        LOGGER("rmgUxgo5ye", resp);
+        setmyethbalance((+getethrep(resp)).toFixed(DECIMALS_DISP_DEF));
+      });
+    };
     setTimeout(() => {
-      fetchdata()
-    }, 1500)
-  }, [])
+      fetchdata();
+    }, 1500);
+  }, []);
   const onclick_approve = async (_) => {
-    LOGGER('')
-    let myaddress = getmyaddress()
+    LOGGER("");
+    let myaddress = getmyaddress();
     let abistr = getabistr_forfunction({
       contractaddress: addresses.contract_USDT, // ETH_TESTNET.
-      abikind: 'ERC20',
-      methodname: 'approve',
-      aargs: [
-        addresses.contract_pay_for_assigned_item,
-        getweirep('' + 10 ** 10),
-      ], // .ETH_TESTNET
-    })
-    LOGGER('', abistr)
-    setisloader_00(true)
+      abikind: "ERC20",
+      methodname: "approve",
+      aargs: [addresses.contract_pay_for_assigned_item, getweirep("" + 10 ** 10)], // .ETH_TESTNET
+    });
+    LOGGER("", abistr);
+    setisloader_00(true);
     requesttransaction({
       from: myaddress,
       to: addresses.contract_USDT, // ETH_TESTNET.
       data: abistr,
     }).then((resp) => {
-      setisloader_00(false)
+      setisloader_00(false);
       if (resp) {
       } else {
-        SetErrorBar(messages.MSG_USER_DENIED_TX)
-        return
+        SetErrorBar(messages.MSG_USER_DENIED_TX);
+        return;
       }
-      let txhash = resp
-      SetErrorBar(messages.MSG_TX_REQUEST_SENT)
+      let txhash = resp;
+      SetErrorBar(messages.MSG_TX_REQUEST_SENT);
       axios
         .post(API.API_TXS + `/${txhash}`, {
           txhash,
           username: myaddress,
-          typestr: 'APPROVE',
+          typestr: "APPROVE",
           auxdata: {
             erc20: addresses.contract_USDT, // .ETH_TESTNET
             target: addresses.contract_pay_for_assigned_item, // .ETH_TESTNET
@@ -189,45 +170,43 @@ export default function PayPopup({ off, receivables }) {
           nettype: NETTYPE,
         })
         .then((resp) => {
-          LOGGER('APPROVE RESP', resp)
-          SetErrorBar(messages.MSG_TX_REQUEST_SENT)
-        })
+          LOGGER("APPROVE RESP", resp);
+          SetErrorBar(messages.MSG_TX_REQUEST_SENT);
+        });
 
-      awaitTransactionMined
-        .awaitTx(web3, txhash, TX_POLL_OPTIONS)
-        .then((minedtxreceipt) => {
-          LOGGER('minedtxreceipt', minedtxreceipt)
-          SetErrorBar(messages.MSG_TX_FINALIZED)
+      awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then((minedtxreceipt) => {
+        LOGGER("minedtxreceipt", minedtxreceipt);
+        SetErrorBar(messages.MSG_TX_FINALIZED);
 
-          query_with_arg({
-            contractaddress: addresses.contract_USDT, // .ETH_TESTNET
-            abikind: 'ERC20',
-            methodname: 'allowance',
-            aargs: [myaddress, addresses.contract_pay_for_assigned_item], // ETH_TESTNET.
-          }).then((resp) => {
-            let allowanceineth = getethrep(resp)
-            LOGGER('gCwXF6Jjkh', resp, allowanceineth)
-            setallowanceamount(allowanceineth) //				setallowanceamount ( 100 )
-            if (allowanceineth > 0) {
-              setisallowanceok(false)
-            } else {
-            }
-          })
-          //					Setisloader(false);
-        })
-    })
-  }
+        query_with_arg({
+          contractaddress: addresses.contract_USDT, // .ETH_TESTNET
+          abikind: "ERC20",
+          methodname: "allowance",
+          aargs: [myaddress, addresses.contract_pay_for_assigned_item], // ETH_TESTNET.
+        }).then((resp) => {
+          let allowanceineth = getethrep(resp);
+          LOGGER("gCwXF6Jjkh", resp, allowanceineth);
+          setallowanceamount(allowanceineth); //				setallowanceamount ( 100 )
+          if (allowanceineth > 0) {
+            setisallowanceok(false);
+          } else {
+          }
+        });
+        //					Setisloader(false);
+      });
+    });
+  };
 
   const onclick_buy = async (_) => {
-    setDone(true)
-    LOGGER('YFVGAF0sBJ')
-    let myaddress = getmyaddress()
+    setDone(true);
+    LOGGER("YFVGAF0sBJ");
+    let myaddress = getmyaddress();
     // LOGGER("eYJAgMYkR5", myaddress);
     if (mybalance >= DueAmount) {
     } else {
-      SetErrorBar(messages.MSG_BALANCE_NOT_ENOUGH)
-      setDone(false)
-      return
+      SetErrorBar(messages.MSG_BALANCE_NOT_ENOUGH);
+      setDone(false);
+      return;
     }
     /** 		if (myaddress){}
 		else { 
@@ -237,46 +216,46 @@ export default function PayPopup({ off, receivables }) {
     if (receivables.seller) {
       let abistr = getabistr_forfunction({
         contractaddress: addresses.contract_pay_for_assigned_item, // .ETH_TESTNET
-        abikind: 'PAY',
-        methodname: 'pay',
+        abikind: "PAY",
+        methodname: "pay",
         aargs: [
           addresses.contract_USDT, // .ETH_TESTNET
-          getweirep('' + receivables.amount),
+          getweirep("" + receivables.amount),
           receivables.seller,
         ],
-      })
-      LOGGER('abistr', abistr) //		return
+      });
+      LOGGER("abistr", abistr); //		return
       const callreqtx = async (_) => {
-        let resp
+        let resp;
         try {
-          setisloader_01(true)
+          setisloader_01(true);
           resp = await requesttransaction({
             from: myaddress,
             to: addresses.contract_pay_for_assigned_item, // .ETH_TESTNET
             data: abistr,
             //			, value : ''
-          })
-          setisloader_01(false)
+          });
+          setisloader_01(false);
           if (resp) {
           } else {
-            SetErrorBar(messages.MSG_USER_DENIED_TX)
-            return
+            SetErrorBar(messages.MSG_USER_DENIED_TX);
+            return;
           }
-          let resptype = getobjtype(resp)
-          let txhash
+          let resptype = getobjtype(resp);
+          let txhash;
           switch (resptype) {
-            case 'String':
-              txhash = resp
-              break
-            case 'Object':
-              txhash = resp.txHash
-              break
+            case "String":
+              txhash = resp;
+              break;
+            case "Object":
+              txhash = resp.txHash;
+              break;
           }
           axios
             .post(API.API_TXS + `/${txhash}`, {
               txhash,
               username: myaddress,
-              typestr: 'PAY',
+              typestr: "PAY",
               auxdata: {
                 amount: receivables.amount,
                 currency: PAY_CURRENCY,
@@ -286,39 +265,37 @@ export default function PayPopup({ off, receivables }) {
               itemid: receivables.itemid,
             })
             .then((resp) => {
-              LOGGER('', resp)
-              SetErrorBar(messages.MSG_TX_REQUEST_SENT)
-              off()
-            })
+              LOGGER("", resp);
+              SetErrorBar(messages.MSG_TX_REQUEST_SENT);
+              off();
+            });
           /***** */
-          awaitTransactionMined
-            .awaitTx(web3, txhash, TX_POLL_OPTIONS)
-            .then(async (minedtxreceipt) => {
-              LOGGER('minedtxreceipt', minedtxreceipt)
-              SetErrorBar(messages.MSG_TX_FINALIZED)
-              setDone(false)
-              let resp_balances = await query_with_arg({
-                contractaddress: addresses.contract_pay_for_assigned_iteme,
-                abikind: 'PAY',
-                methodname: 'pay',
-                aargs: [myaddress],
-              })
-              LOGGER('uQJ2POHvP8', resp_balances)
-              // setst akedbalance(getethrep(resp_balances));
-              off()
-            })
+          awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
+            LOGGER("minedtxreceipt", minedtxreceipt);
+            SetErrorBar(messages.MSG_TX_FINALIZED);
+            setDone(false);
+            let resp_balances = await query_with_arg({
+              contractaddress: addresses.contract_pay_for_assigned_iteme,
+              abikind: "PAY",
+              methodname: "pay",
+              aargs: [myaddress],
+            });
+            LOGGER("uQJ2POHvP8", resp_balances);
+            // setst akedbalance(getethrep(resp_balances));
+            off();
+          });
         } catch (err) {
-          setisloader_01(false)
-          LOGGER()
-          SetErrorBar(messages.MSG_USER_DENIED_TX)
+          setisloader_01(false);
+          LOGGER();
+          SetErrorBar(messages.MSG_USER_DENIED_TX);
         }
-      }
-      callreqtx()
+      };
+      callreqtx();
       //		.then(resp=>{ LOGGER( '' , resp )		})
     } else {
-      SetErrorBar('셀러가 없습니다 관리자에게 문의 해 주세요')
+      SetErrorBar("셀러가 없습니다 관리자에게 문의 해 주세요");
     }
-  }
+  };
 
   if (isMobile)
     return (
@@ -342,10 +319,7 @@ export default function PayPopup({ off, receivables }) {
                 <ul className="priceList">
                   <li className="price">{DueAmount} USDT</li>
                   <li className="exchange">
-                    $
-                    {+DueAmount && tickerusdt
-                      ? putCommaAtPrice(+DueAmount * +tickerusdt)
-                      : null}
+                    ${+DueAmount && tickerusdt ? putCommaAtPrice(+DueAmount * +tickerusdt) : null}
                   </li>
                 </ul>
               </div>
@@ -359,11 +333,11 @@ export default function PayPopup({ off, receivables }) {
                   <p className="key">Distribution</p>
                   <p className="value">2022-03-12 00:00 UTC</p>
                 </li>
-                <li style={MODE_DEV_PROD == 'DEV' ? {} : { display: 'none' }}>
+                <li style={MODE_DEV_PROD == "DEV" ? {} : { display: "none" }}>
                   <p className="key">Total Staked</p>
                   <p className="value">{tvl} USDT</p>
                 </li>
-                <li style={{ display: 'none' }}>
+                <li style={{ display: "none" }}>
                   <p className="key">Your St ake</p>
                   {/* <p className="value">{st akedbalance} USDT</p> */}
                 </li>
@@ -376,13 +350,7 @@ export default function PayPopup({ off, receivables }) {
                   <p className="key">Your USDT balance</p>
                   <p className="value">{mybalance} USDT</p>
                 </li>
-                <li
-                  style={
-                    allowanceamount && +allowanceamount
-                      ? { display: 'block' }
-                      : {}
-                  }
-                >
+                <li style={allowanceamount && +allowanceamount ? { display: "block" } : {}}>
                   <p className="key">Allowance</p>
                   <p className="value">{allowanceamount} USDT</p>
                 </li>
@@ -403,7 +371,7 @@ export default function PayPopup({ off, receivables }) {
                     <span
                       className="chkBtn"
                       style={{
-                        background: termChk && '#000',
+                        background: termChk && "#000",
                       }}
                     >
                       <img src={I_chkWhite} alt="" />
@@ -414,7 +382,7 @@ export default function PayPopup({ off, receivables }) {
                     <span
                       className="chkBtn"
                       style={{
-                        background: !termChk && '#000',
+                        background: !termChk && "#000",
                       }}
                     >
                       <img src={I_chkWhite} alt="" />
@@ -427,14 +395,10 @@ export default function PayPopup({ off, receivables }) {
               <button
                 className="confirmBtn"
                 onClick={() => {
-                  onclick_approve()
-                  false && navigate(-1)
+                  onclick_approve();
+                  false && navigate(-1);
                 }}
-                style={
-                  allowanceamount && +allowanceamount
-                    ? { display: 'none' }
-                    : { display: 'inline' }
-                }
+                style={allowanceamount && +allowanceamount ? { display: "none" } : { display: "inline" }}
               >
                 Approve!
                 <img
@@ -442,21 +406,21 @@ export default function PayPopup({ off, receivables }) {
                   src={I_spinner}
                   alt=""
                   style={{
-                    display: isloader_00 ? 'block' : 'none',
-                    width: '18px',
-                    position: 'absolute',
-                    margin: '0 0 0 64px',
+                    display: isloader_00 ? "block" : "none",
+                    width: "18px",
+                    position: "absolute",
+                    margin: "0 0 0 64px",
                   }}
                 />
               </button>
 
               <div>
-                {' '}
+                {" "}
                 <button
                   className="confirmBtn"
                   onClick={() => {
-                    onclick_buy()
-                    false && navigate(-1)
+                    onclick_buy();
+                    false && navigate(-1);
                   }}
                 >
                   Pay
@@ -467,7 +431,7 @@ export default function PayPopup({ off, receivables }) {
         </MstakingPopupBox>
         <PopupBg blur />
       </>
-    )
+    );
   else
     return (
       <PstakingPopupBox>
@@ -489,10 +453,7 @@ export default function PayPopup({ off, receivables }) {
               <ul className="priceList">
                 <li className="price">{DueAmount} USDT</li>
                 <li className="exchange">
-                  $
-                  {+DueAmount && tickerusdt
-                    ? putCommaAtPrice(+DueAmount * +tickerusdt)
-                    : null}
+                  ${+DueAmount && tickerusdt ? putCommaAtPrice(+DueAmount * +tickerusdt) : null}
                 </li>
               </ul>
             </div>
@@ -506,7 +467,7 @@ export default function PayPopup({ off, receivables }) {
                 <p className="key">Distribution</p>
                 <p className="value">2022-03-12 00:00 UTC</p>
               </li>
-              <li style={MODE_DEV_PROD == 'DEV' ? {} : { display: 'none' }}>
+              <li style={MODE_DEV_PROD == "DEV" ? {} : { display: "none" }}>
                 <p className="key">Total Staked</p>
                 <p className="value">{tvl} USDT</p>
               </li>
@@ -518,7 +479,7 @@ export default function PayPopup({ off, receivables }) {
                 <p className="key">Your USDT balance</p>
                 <p className="value">{mybalance} USDT</p>
               </li>
-              <li style={allowanceamount ? { display: 'block' } : {}}>
+              <li style={allowanceamount ? { display: "block" } : {}}>
                 <p className="key">Allowance</p>
                 <p className="value">{allowanceamount} USDT</p>
               </li>
@@ -538,13 +499,13 @@ export default function PayPopup({ off, receivables }) {
                 <button
                   className="yesBtn"
                   onClick={() => {
-                    setTermChk(true)
+                    setTermChk(true);
                   }}
                 >
                   <span
                     className="chkBtn"
                     style={{
-                      background: termChk && '#000',
+                      background: termChk && "#000",
                     }}
                   >
                     <img src={I_chkWhite} alt="" />
@@ -555,7 +516,7 @@ export default function PayPopup({ off, receivables }) {
                   <span
                     className="chkBtn"
                     style={{
-                      background: !termChk && '#000',
+                      background: !termChk && "#000",
                     }}
                   >
                     <img src={I_chkWhite} alt="" />
@@ -568,25 +529,21 @@ export default function PayPopup({ off, receivables }) {
             <button
               className="confirmBtn"
               onClick={() => {
-                onclick_approve()
+                onclick_approve();
               }}
-              style={
-                allowanceamount && +allowanceamount
-                  ? { display: 'none' }
-                  : { display: 'inline' }
-              }
+              style={allowanceamount && +allowanceamount ? { display: "none" } : { display: "inline" }}
             >
-              {' '}
+              {" "}
               Approve
               <img
                 ref={spinnerHref_approve}
                 src={I_spinner}
                 alt=""
                 style={{
-                  display: isloader_00 ? 'block' : 'none',
-                  width: '18px',
-                  right: '160px',
-                  position: 'absolute',
+                  display: isloader_00 ? "block" : "none",
+                  width: "18px",
+                  right: "160px",
+                  position: "absolute",
                 }}
               />
             </button>
@@ -595,27 +552,27 @@ export default function PayPopup({ off, receivables }) {
               className="confirmBtn"
               disabled={done}
               onClick={() => {
-                onclick_buy()
-                false && off()
+                onclick_buy();
+                false && off();
               }}
             >
-              {done ? 'Pending' : 'Confirm'}
+              {done ? "Pending" : "Confirm"}
               <img
                 ref={spinnerHref}
                 src={I_spinner}
                 alt=""
                 style={{
-                  display: isloader_01 ? 'block' : 'none',
-                  width: '18px',
-                  right: '160px',
-                  position: 'absolute',
+                  display: isloader_01 ? "block" : "none",
+                  width: "18px",
+                  right: "160px",
+                  position: "absolute",
                 }}
               />
             </button>
           </div>
         </article>
       </PstakingPopupBox>
-    )
+    );
 }
 
 const MstakingPopupBox = styled.section`
@@ -650,7 +607,7 @@ const MstakingPopupBox = styled.section`
     gap: 4.44vw;
     padding: 3.61vw 5.55vw 7.77vw 5.55vw;
     * {
-      font-family: 'Roboto', sans-serif;
+      font-family: "Roboto", sans-serif;
     }
     .infoBox {
       display: flex;
@@ -754,7 +711,7 @@ const MstakingPopupBox = styled.section`
       }
     }
   }
-`
+`;
 
 const PstakingPopupBox = styled.section`
   width: 540px;
@@ -787,7 +744,7 @@ const PstakingPopupBox = styled.section`
     gap: 80px;
     padding: 40px;
     * {
-      font-family: 'Roboto', sans-serif;
+      font-family: "Roboto", sans-serif;
     }
     .infoBox {
       display: flex;
@@ -891,4 +848,4 @@ const PstakingPopupBox = styled.section`
       }
     }
   }
-`
+`;

@@ -158,11 +158,11 @@ function App() {
 
           <Route path="/connectwallet" element={<ConnectWallet />} />
           <Route path="/connectwallet/:popup" element={<ConnectWallet />} />
+          <Route path="/connectwallet/:referer" element={<ConnectWallet />} />
           <Route path="/emailauth/:email/:authNum/:walletaddress" element={<EmailAuth />} />
           <Route path="/emailauth/:email/:authNum" element={<EmailAuth />} />
 
           <Route path="/staking" element={<Staking />} />
-          <Route path="/staking/:referer" element={<Staking />} />
           <Route path="/staking/:popup" element={<Staking />} />
           <Route path="/staking/detail/:id" element={<StakingDetail />} />
 

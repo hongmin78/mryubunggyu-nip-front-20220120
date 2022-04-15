@@ -31,24 +31,23 @@ export default function Recommend() {
         LOGGER("userInfo", respdata);
         if (status == "OK") {
           setUserinfoProp(respdata);
+          respdata.myreferercode &&
+            axios.get(API.API_REFERER + `/${respdata.myreferercode}/0/10/id/DESC`).then((resp) => {
+              console.log("myRefererList", resp.data);
+              let { status, list } = resp.data;
+              if (status == "OK") {
+                setMyRefererList(list);
+              }
+            });
         }
       });
     } else {
       SetErrorBar(messages.MSG_CONNECTWALET);
     }
-    userinfoProp.myreferercode &&
-      axios.get(API.API_REFERER + `/${userinfoProp?.myreferercode}/0/10/id/DESC`).then((resp) => {
-        console.log("myRefererList", resp.data);
-        let { status, list } = resp.data;
-        if (status == "OK") {
-          setMyRefererList(list);
-        }
-      });
   };
   useEffect((_) => {
-    setTimeout((_) => {
-      fetchdataUserInfo();
-    }, []);
+    fetchdataUserInfo();
+    return () => {};
   }, []);
 
   if (isMobile)
@@ -63,7 +62,7 @@ export default function Recommend() {
             <p className="explain">
               Share your referral link! When a new user who accesses this link purchases a product,
               <br />
-              an additional 2% of the sales amount is paid. Referral rewards are paid in lump sum every month.
+              an additional 4% of the sales amount is paid. Referral rewards are paid in lump sum every month.
             </p>
           </li>
 
@@ -91,9 +90,7 @@ export default function Recommend() {
                 <span className="value">
                   <p
                     onClick={() => {
-                      window.location.replace(
-                        `http://nftinfinityworld.net/#/staking?referer=${userinfoProp?.myreferercode}`
-                      );
+                      navigate(`/connectwallet/${userinfoProp?.myreferercode}`);
                     }}
                   >
                     http://nftinfinityworld.net/#/staking?referer=$
@@ -103,7 +100,7 @@ export default function Recommend() {
                     className="copyBtn"
                     onClick={() => {
                       setToggleLink(true);
-                      onclickcopy(`http://nftinfinityworld.net/#/staking?referer=${userinfoProp?.myreferercode}`);
+                      onclickcopy(`https://nftinfinity.world/#/connectwallet/${userinfoProp?.myreferercode}`);
                     }}
                   >
                     <img src={toggleLink ? I_circleChk : I_copy} alt="" />
@@ -152,7 +149,7 @@ export default function Recommend() {
             <p className="explain">
               Share your referral link! When a new user who accesses this link purchases a product,
               <br />
-              an additional 2% of the sales amount is paid. Referral rewards are paid in lump sum every month.
+              an additional 4% of the sales amount is paid. Referral rewards are paid in lump sum every month.
             </p>
           </li>
 
@@ -180,16 +177,16 @@ export default function Recommend() {
                 <span className="value">
                   <p
                     onClick={() => {
-                      navigate(`/staking/${userinfoProp?.myreferercode}`);
+                      navigate(`/connectwallet/${userinfoProp?.myreferercode}`);
                     }}
                   >
-                    https://nftinfinity.world/#/staking/${userinfoProp?.myreferercode}
+                    https://nftinfinity.world/#/connectwallet/${userinfoProp?.myreferercode}
                   </p>
                   <button
                     className="copyBtn"
                     onClick={() => {
                       setToggleLink(true);
-                      onclickcopy(`https://nftinfinity.world/#/staking/${userinfoProp?.myreferercode}`);
+                      onclickcopy(`https://nftinfinity.world/#/connectwallet/${userinfoProp?.myreferercode}`);
                     }}
                   >
                     <img src={toggleLink ? I_circleChk : I_copy} alt="" />

@@ -15,10 +15,11 @@ import { API } from "../configs/api";
 import { TIME_PAGE_TRANSITION_DEF } from "../configs/configs";
 
 export default function SignUpPopup({ walletAddress }) {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const isMobile = useSelector((state) => state.common.isMobile);
   const referer = localStorage.getItem("referer");
+
+  const navigate = useNavigate();
+  const isAuthEmail = useSelector((state) => state.common.isAuthEmail);
+  const isMobile = useSelector((state) => state.common.isMobile);
   const [email, setEmail] = useState("");
   const [emailAlarm, setEmailAlarm] = useState("");
   const [pw, setPw] = useState("");
@@ -28,17 +29,21 @@ export default function SignUpPopup({ walletAddress }) {
   const [agreeList, setAgreeList] = useState(new Array(2).fill(false));
   const [pending, setPending] = useState(false);
   const [mailcheck, setMailcheck] = useState(false);
+  const [emailCodeNumber, setEmailCodeNumber] = useState("");
+  const [emailCodeState, setEmailCodeState] = useState(false);
   let [isemailrequested, setisemailrequested] = useState(false);
   let [myaddress, setmyaddress] = useState(getmyaddress());
   let [nickname, setnickname] = useState("");
-
-  localStorage.setItem("mailcheck", false);
+  const [emailAuthNumber, setEmailAuthNumber] = useState("");
+  const emailAuth = localStorage.getItem("MAIL_CHECK");
+  console.log("isAuthEmail", emailAuthNumber);
+  console.log("emailCodeNumber", emailCodeNumber);
+  console.log(typeof emailAuthNumber);
 
   function clickRegistrationBtn() {
     setPending(true);
     localStorage.setItem("MAIL_CHECK", false);
     let myaddress = getmyaddress();
-
     axios
       .post(API.API_EMAIL_REQUEST, { email, walletAddress: myaddress })
       .then((resp) => {
@@ -50,6 +55,7 @@ export default function SignUpPopup({ walletAddress }) {
           SetErrorBar(messages.MSG_EMAIL_SENT);
           //				setPending( false )
           setisemailrequested(true);
+          setEmailAuthNumber(String(message.code));
         }
       })
       .catch((err) => {
@@ -60,6 +66,16 @@ export default function SignUpPopup({ walletAddress }) {
       });
     //    getRequestEmail( email, walletAddress );
   }
+
+  const onClickEmailAuthBtn = () => {
+    if (emailAuthNumber === emailCodeNumber) {
+      setEmailCodeState(true);
+      SetErrorBar("SUCCESS");
+    } else {
+      setEmailCodeState(false);
+      SetErrorBar("FAIL");
+    }
+  };
 
   // 4pqaht46D4
   window.addEventListener(
@@ -75,13 +91,13 @@ export default function SignUpPopup({ walletAddress }) {
     let pwrandom = generaterandomstr_charset(6, "base58");
     setPw("");
     setPwConfirm("");
-    setReferal("");
     setEmail("");
   }, []);
 
   const disableConfirm =
-    !(email && pw && pwConfrim && agreeList[0] && agreeList[1] && isemailrequested) || emailAlarm || pwAlarm;
-
+    !(email && pw && pwConfrim && agreeList[0] && agreeList[1] && isemailrequested && emailCodeState) ||
+    emailAlarm ||
+    pwAlarm;
   function onClickAgreeList(index) {
     let dataList = agreeList;
     dataList[index] = !dataList[index];
@@ -109,15 +125,7 @@ export default function SignUpPopup({ walletAddress }) {
       SetErrorBar(messages.MSG_PLEASE_INPUT + " referer code");
       return;
     }
-    let respreferer = await axios.get(API.API_QUERY_REFERER + `/users/myreferercode/${referral}`);
-    LOGGER("", respreferer.data);
-    let { status, respdata } = respreferer.data;
-    if (status == "OK" && respdata && respdata?.myreferercode) {
-    } else {
-      SetErrorBar(messages.MSG_REFERER_CODE_INVALID);
-      return;
-    }
-    axios
+    await axios
       .post(API.API_SIGNUP, {
         walletAddress,
         email,
@@ -128,7 +136,6 @@ export default function SignUpPopup({ walletAddress }) {
       .then((resp) => {
         console.log("resp", resp.data.message);
         LOGGER("VrPcFLisLA", resp.data);
-
         let { status, message } = resp.data;
         if (status == "OK") {
           SetErrorBar(messages.MSG_DONE_REGISTERING);
@@ -136,13 +143,60 @@ export default function SignUpPopup({ walletAddress }) {
             navigate("/staking");
           }, TIME_PAGE_TRANSITION_DEF);
         } else if (message === "ERR_EMAIL_COUNTING") {
-          SetErrorBar("You can use a Email for only ten MetaMask addresses");
+          SetErrorBar("You can use only ten email for join");
           return;
         } else {
           SetErrorBar(messages.MSG_SERVER_ERR);
           return;
         }
       });
+
+    // let respreferer = await axios.get(API.API_QUERY_REFERER + `/users/myreferercode/${referral}`);
+    // LOGGER("", respreferer.data);
+    // let { status, respdata } = respreferer.data;
+    // if (status == "OK" && respdata && respdata?.myreferercode) {
+    // } else {
+    //   SetErrorBar(messages.MSG_REFERER_CODE_INVALID);
+    //   return;
+    // }
+    // axios.get(API.API_GET_EMAILAUTH).then((resp) => {
+    //   LOGGER("emailAddress", resp.data);
+    //   let { status, message } = resp.data;
+    //   if (status == "OK") {
+    //     axios
+    //       .post(API.API_SIGNUP, {
+    //         walletAddress,
+    //         email,
+    //         password: pw,
+    //         referral,
+    //         nickname,
+    //       })
+    //       .then((resp) => {
+    //         console.log("resp", resp.data.message);
+    //         LOGGER("VrPcFLisLA", resp.data);
+
+    //         let { status, message } = resp.data;
+    //         if (status == "OK") {
+    //           SetErrorBar(messages.MSG_DONE_REGISTERING);
+    //           setTimeout(() => {
+    //             navigate("/staking");
+    //           }, TIME_PAGE_TRANSITION_DEF);
+    //         } else if (message === "ERR_EMAIL_COUNTING") {
+    //           SetErrorBar("You can use a Email for only ten MetaMask addresses");
+    //           return;
+    //         } else {
+    //           SetErrorBar(messages.MSG_SERVER_ERR);
+    //           return;
+    //         }
+    //       });
+    //   } else if (message === "ERR_EMAIL_COUNTING") {
+    //     SetErrorBar("You can use a Email for only ten MetaMask addresses");
+    //     return;
+    //   } else {
+    //     SetErrorBar(messages.MSG_SERVER_ERR);
+    //     return;
+    //   }
+    // });
 
     /** 		const res = await signup(walletAddress, email, pw, referral);
     console.log(res);
@@ -335,8 +389,22 @@ export default function SignUpPopup({ walletAddress }) {
                   </button>
                 )}
               </div>
-
               {emailAlarm && <p className="alarm">{emailAlarm}</p>}
+
+              <div className="inputBox">
+                <input
+                  onChange={(e) => setEmailCodeNumber(e.target.value)}
+                  onClick={() => {}}
+                  placeholder="Please write your email verify code"
+                />
+                {emailCodeState ? (
+                  <button>{emailCodeState ? "SUCCESS" : "FAIL"}</button>
+                ) : (
+                  <button className="registrationBtn" onClick={onClickEmailAuthBtn}>
+                    Click Check
+                  </button>
+                )}
+              </div>
             </div>
           </li>
 
@@ -384,8 +452,8 @@ export default function SignUpPopup({ walletAddress }) {
             <div className="inputContainer">
               <div className="inputBox">
                 <input
-                  value={referral}
-                  defaultValue={referral ? referral : null}
+                  defaultValue={referer ? referer : null}
+                  disabled={referer ? true : false}
                   onChange={(e) => setReferal(e.target.value)}
                   placeholder={referer ? referer : "Friend Recommendation"}
                 />

@@ -266,10 +266,12 @@ export default function StakingPopup({ off }) {
             SetErrorBar(messages.MSG_TX_REQUEST_SENT);
           });
         /***** */
+        setDone(true);
         awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
           LOGGER("", minedtxreceipt);
           SetErrorBar(messages.MSG_TX_FINALIZED);
-          setDone(false);
+          setDone(true);
+          setisloader_01(true);
           let resp_balances = await query_with_arg({
             contractaddress: addresses.ETH_TESTNET.contract_stake,
             abikind: "STAKE",
@@ -278,10 +280,12 @@ export default function StakingPopup({ off }) {
           });
           LOGGER("uQJ2POHvP8", resp_balances);
           setstakedbalance(getethrep(resp_balances));
-          off(false);
+          setDone(false);
+          off(true);
         });
       } catch (err) {
         setisloader_01(false);
+        setDone(false);
         LOGGER();
         SetErrorBar(messages.MSG_USER_DENIED_TX);
       }

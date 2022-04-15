@@ -19,14 +19,17 @@ import { messages } from "../configs/messages";
 import SetErrorBar from "../util/SetErrorBar";
 import { TIME_PAGE_TRANSITION_DEF, TIME_FETCH_MYADDRESS_DEF } from "../configs/configs";
 import { getethrep } from "../util/eth";
+import { useLocation } from "react-router-dom";
 
 // import { useSelector } from "react-redux";
 // const MODE_DEV_PROD='DEV'
 const MODE_DEV_PROD = "PROD";
-export default function StakingDetail() {
+export default function StakingDetail(props) {
   const navigate = useNavigate();
   const param = useParams();
+  const location = useLocation();
 
+  console.log("location", location);
   const isMobile = useSelector((state) => state.common.isMobile);
   const [stakingPopup, setStakingPopup] = useState(false);
   let [currentserialnumber, setcurrentserialnumber] = useState();
@@ -54,7 +57,7 @@ export default function StakingDetail() {
         aargs: [myaddress],
       });
       if (getethrep(respstakebalance) && getethrep(respstakebalance) > 0) {
-        SetErrorBar(messages.MSG_YOU_ALREADY_HAVE_STAKED);
+        // SetErrorBar(messages.MSG_YOU_ALREADY_HAVE_STAKED);
         if (MODE_DEV_PROD == "DEV") {
         } else {
           return;

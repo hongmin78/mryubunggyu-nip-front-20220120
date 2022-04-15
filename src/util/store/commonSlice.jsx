@@ -6,6 +6,7 @@ const initialState = {
   isMobile: false,
   address: null,
   delinquencyAmount: 0,
+  isAuthEmail: false,
 };
 
 export const todoSlice = createSlice({
@@ -27,19 +28,16 @@ export const todoSlice = createSlice({
       state.address = action.payload;
     },
     setDelinquencyAmount: (state, action) => {
-      console.log(action.payload);
       state.delinquencyAmount = action.payload;
+    },
+    setisAuthEmail: (state, action) => {
+      console.log(action.payload);
+      state.isAuthEmail = action.payload;
     },
   },
 });
 
-export const {
-  setAllPopupOff,
-  setLogin,
-  setPathName,
-  setMobile,
-  setaddress,
-  setDelinquencyAmount,
-} = todoSlice.actions;
+export const { setisAuthEmail, setAllPopupOff, setLogin, setPathName, setMobile, setaddress, setDelinquencyAmount } =
+  todoSlice.actions;
 
 export default todoSlice.reducer;

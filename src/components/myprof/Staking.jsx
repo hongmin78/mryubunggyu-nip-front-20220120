@@ -10,24 +10,23 @@ import { getmyaddress, LOGGER } from "../../util/common";
 import axios from "axios";
 import moment from "moment";
 import { API } from "../../configs/api";
+import ticketImg from "../../img/staking/E_prof1.png";
 
 export default function Staking() {
   const isMobile = useSelector((state) => state.common.isMobile);
 
   const [toggleCode, setToggleCode] = useState(false);
   const [toggleLink, setToggleLink] = useState(false);
-  const [logstakes, setLogstakes] = useState();
-
-  console.log("logsata", logstakes);
+  const [ticketInfo, setItckInfo] = useState();
 
   const fatchData = () => {
     let myaddress = getmyaddress();
-    axios.get(API.API_LOGSTAKES + `/${myaddress}`).then((resp) => {
-      LOGGER("API_LOGSTAKES", resp.data);
+    axios.get(API.API_GET_TICK_INFO + `/${myaddress}`).then((resp) => {
+      LOGGER("API_ticketInfo", resp.data);
 
       let { status, respdata } = resp.data;
-      if (status == "OK" && !respdata == null) {
-        setLogstakes([respdata]);
+      if (status == "OK" && respdata !== null) {
+        setItckInfo([respdata]);
       }
     });
   };
@@ -35,6 +34,8 @@ export default function Staking() {
   useEffect(() => {
     fatchData();
   }, []);
+
+  console.log("logsataasdasd", ticketInfo);
 
   if (isMobile)
     return (
@@ -45,76 +46,74 @@ export default function Staking() {
 
             <div className="listBox">
               <ul className="list">
-                {D_vaultList.map((cont, index) => (
-                  <li key={index}>
-                    <div className="topBar">
-                      <img src={cont.img} alt="" />
-                      <p className="title">{cont.name}</p>
-                    </div>
+                {ticketInfo &&
+                  ticketInfo.map((cont, index) => (
+                    <li key={index}>
+                      <div className="topBar">
+                        <img src={ticketImg} alt="" />
+                        <p>{cont.active && cont.active === 1 ? "ACTIVE" : "UNACTIVE"}</p>
+                      </div>
 
-                    <ul className="dataList">
-                      <li>
-                        <p className="key">Staking Amount</p>
-                        <p className="value">{cont.amount} USDT</p>
-                      </li>
-                      <li>
-                        <p className="key">Start</p>
-                        <p className="value">{cont.start}</p>
-                      </li>
-                      <li>
-                        <p className="key">Ended</p>
-                        <p className="value">{cont.end}</p>
-                      </li>
-                    </ul>
+                      <ul className="dataList">
+                        <li>
+                          <p className="key">Staking Amount</p>
+                          <p>{cont.amount}&nbsp;USDT</p>
+                        </li>
+                        <li>
+                          <p className="key">Start</p>
+                          <p className="value">{moment(cont.createdat).format("YYYY-MM-DD hh:mm:ss")}</p>
+                        </li>
+                        <li>
+                          <p className="key">Ended</p>
+                          <p className="value">{moment(cont.createdat).add(90, "day").format("YYYY-MM-DD hh:mm:ss")}</p>
+                        </li>
+                      </ul>
 
-                    <button className="unstakeBtn" onClick={() => {}}>
-                      Unstake
-                    </button>
-                  </li>
-                ))}
+                      <button className="unstakeBtn" onClick={() => {}}>
+                        Unstake
+                      </button>
+                    </li>
+                  ))}
               </ul>
             </div>
           </li>
 
-          <li className="rewardBox">
+          {/* <li className="rewardBox">
             <strong className="contTitle">Earned Rewards</strong>
 
             <div className="listBox">
               <ul className="list">
-                {D_rewardList.map((cont, index) => (
-                  <li key={index}>
-                    <div className="topBar">
-                      <img src={cont.img} alt="" />
-                      <p className="title">{cont.name}</p>
-                    </div>
+                {ticketInfo &&
+                  ticketInfo.map((cont, index) => (
+                    <li key={index}>
+                      <div className="topBar">
+                        <img src={ticketImg} alt="" />
+                        <p>{cont.active && cont.active === 1 ? "ACTIVE" : "UNACTIVE"}</p>
+                      </div>
 
-                    <ul className="dataList">
-                      <li>
-                        <p className="key">Staking Amount</p>
-                        <p className="value">{cont.amount} USDT</p>
-                      </li>
-                      <li>
-                        <p className="key">APY</p>
-                        <p className="value">{cont.apy}</p>
-                      </li>
-                      <li>
-                        <p className="key">Reward Distribution Cycle</p>
-                        <p className="value">{cont.cycle}</p>
-                      </li>
-                      <li>
-                        <p className="key">Earned</p>
-                        <p className="value">{cont.earned} NIP</p>
-                      </li>
-                    </ul>
+                      <ul className="dataList">
+                        <li>
+                          <p className="key">Staking Amount</p>
+                          <p>{cont.amount}&nbsp;USDT</p>
+                        </li>
+                        <li>
+                          <p className="key">Start</p>
+                          <p className="value">{cont.cycle}</p>
+                        </li>
+                        <li>
+                          <p className="key">Ended</p>
+                          <span>{moment(cont.createdat).add(90, "day").format("YYYY-MM-DD hh:mm:ss")}</span>
+                        </li>
+                      </ul>
 
-                    <button className="unstakeBtn" onClick={() => {}}>
-                      Claim
-                    </button>
-                  </li>
-                ))}
+                      <button className="unstakeBtn" onClick={() => {}}>
+                        Claim
+                      </button>
+                    </li>
+                  ))}
               </ul>
             </div>
-          </li>
+          </li> */}
         </ul>
       </MstakingBox>
     );
@@ -133,11 +132,11 @@ export default function Staking() {
               </ul>
 
               <ul className="list">
-                {logstakes &&
-                  logstakes?.map((cont, index) => (
+                {ticketInfo &&
+                  ticketInfo?.map((cont, index) => (
                     <li key={index}>
                       <span>
-                        {/* <img src={cont.img} alt="" /> */}
+                        <img src={ticketImg} alt="" />
                         <p>{cont.active && cont.active === 1 ? "ACTIVE" : "UNACTIVE"}</p>
                       </span>
 

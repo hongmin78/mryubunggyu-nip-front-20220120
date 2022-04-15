@@ -17,14 +17,12 @@ export default function Staking(props) {
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
   let [isstaked, setisstaked] = useState();
-  const params = useParams();
+
+  console.log("isMobile", isMobile);
   // console.log("asdofijasdofijasdofij");
   // console.log(parmas);
 
   useEffect((_) => {
-    if (params.referer) {
-      localStorage.setItem("referer", params.referer);
-    }
     const fetchdata = async (_) => {
       let myaddress = getmyaddress();
       LOGGER("", myaddress);

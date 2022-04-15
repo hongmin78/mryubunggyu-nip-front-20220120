@@ -6,7 +6,7 @@ import HeaderPopup from "../../components/HeaderPopup";
 import I_headerLogo from "../../img/icon/I_headerLogo.png";
 import I_headerLogoM from "../../img/icon/I_headerLogoM.png";
 import I_headerLogoWhite from "../../img/icon/I_headerLogoWhite.png";
-
+import axios from "axios";
 import I_3line from "../../img/icon/I_3line.svg";
 import I_3lineWhite from "../../img/icon/I_3lineWhite.svg";
 import { strDot } from "../../util/Util";
@@ -15,6 +15,9 @@ import { query_with_arg } from "../../util/contract-calls";
 import { LOGGER, getmyaddress } from "../../util/common";
 import { addresses } from "../../configs/addresses";
 import { getethrep } from "../../util/eth";
+import { API } from "../../configs/api";
+import SetErrorBar from "../../util/SetErrorBar.js";
+import { messages } from "../../configs/messages";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -22,57 +25,67 @@ export default function Header() {
   let isStaking = pathname.indexOf("/staking") !== -1;
   const isMobile = useSelector((state) => state.common.isMobile);
   const isLogin = useSelector((state) => state.common.isLogin);
+  const isAddress = useSelector((state) => state.common.address);
+  let [isstaked, setisstaked] = useState(false);
   let address = useSelector((state) => state.common.address);
   const [headerPopup, setHeaderPopup] = useState(false);
   const [menuPopup, setMenuPopup] = useState(false);
   let [mybalance, setmybalance] = useState();
   let [myaddress, setmyaddress] = useState();
-  /**  	useEffect(_=>{
-		const spinner = document.querySelector("#Spinner");
-    spinner.animate(
-      [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
-      {        duration: 1000,
-        iterations: Infinity,
-      }
-    )
-	} , [] ) */
+
+  const fetchdataStaked = async () => {
+    let myaddress = getmyaddress();
+    LOGGER("", myaddress);
+    let resp = await axios.get(API.API_USERINFO + `/${myaddress}`);
+    LOGGER("rBojncz0CD", resp.data);
+    let { status, respdata } = resp.data;
+    if (status == "OK") {
+      setisstaked(respdata.isstaked ? true : false);
+    }
+  };
+  const fetchdata = (_) => {
+    let myaddress = getmyaddress();
+    LOGGER("MXZfykw8Mw", myaddress);
+    setmyaddress(myaddress);
+    if (myaddress) {
+      query_with_arg({
+        contractaddress: addresses.contract_USDT, // ETH_TESTNET.
+        abikind: "ERC20",
+        methodname: "balanceOf",
+        aargs: [myaddress],
+      }).then((resp) => {
+        LOGGER("Ce4mDMhjbS", resp);
+        setmybalance(getethrep(resp));
+      });
+
+      window.ethereum.on("networkChanged", function (networkId) {
+        LOGGER("", networkId);
+        // Time to reload your interface with the new networkId
+      });
+    } else {
+      return;
+    }
+    console.log("asdoiajsod", addresses.contract_USDT, [myaddress]); // ETH_TESTNET.
+  };
+
   useEffect(
     (_) => {
-      if (address) {
-      } // isLogin
-      else {
-        return;
-      }
-      const fetchdata = (_) => {
-        let myaddress = getmyaddress();
-        LOGGER("MXZfykw8Mw", myaddress);
-        setmyaddress(myaddress);
-        if (myaddress) {
-        } else {
-          return;
-        }
-        console.log(addresses.contract_USDT, [myaddress]); // ETH_TESTNET.
-        query_with_arg({
-          contractaddress: addresses.contract_USDT, // ETH_TESTNET.
-          abikind: "ERC20",
-          methodname: "balanceOf",
-          aargs: [myaddress],
-        }).then((resp) => {
-          LOGGER("Ce4mDMhjbS", resp);
-          setmybalance(getethrep(resp));
-        });
-
-        window.ethereum.on("networkChanged", function (networkId) {
-          LOGGER("", networkId);
-          // Time to reload your interface with the new networkId
-        });
-      };
-      setTimeout((_) => {
-        fetchdata();
-      }, 1500);
+      fetchdataStaked();
+      fetchdata();
     },
     [isLogin, address]
   );
+
+  console.log("mybalance", mybalance);
+
+  const onclick_staked_val_btn = (currentValue) => {
+    if (isstaked) {
+      navigate(currentValue);
+    } else {
+      SetErrorBar("You need purchased lucky ticket");
+    }
+  };
+
   if (isMobile) {
     return (
       <>
@@ -99,13 +112,28 @@ export default function Header() {
 
           <article className="rightBox">
             <nav>
-              <button style={{ color: isStaking && "#fff" }} onClick={() => navigate(`/staking`)}>
+              <button
+                style={{ color: isStaking && "#fff" }}
+                onClick={() => {
+                  navigate("/staking");
+                }}
+              >
                 Lucky Ticket
               </button>
-              <button style={{ color: isStaking && "#fff" }} onClick={() => navigate("/auction")}>
+              <button
+                style={{ color: isStaking && "#fff" }}
+                onClick={() => {
+                  onclick_staked_val_btn("/auction");
+                }}
+              >
                 Subscription Auction
               </button>
-              <button style={{ color: isStaking && "#fff" }} onClick={() => navigate("/market")}>
+              <button
+                style={{ color: isStaking && "#fff" }}
+                onClick={() => {
+                  onclick_staked_val_btn("/market");
+                }}
+              >
                 Marketplece
               </button>
             </nav>
@@ -119,10 +147,16 @@ export default function Header() {
                   color: isStaking && "#000",
                   background: isStaking && "#fff",
                 }}
-                onClick={() => setHeaderPopup(!headerPopup)}
+                onClick={() => {
+                  if (isstaked) {
+                    setHeaderPopup(!headerPopup);
+                  } else {
+                    SetErrorBar("You need purchased tickets");
+                  }
+                }}
               >
                 <span className="balanceBox">
-                  <p className="price">{mybalance ? mybalance : "0"}</p>
+                  <p className="price">{mybalance}</p>
                   <p className="unit">USDT</p>
                 </span>
 
