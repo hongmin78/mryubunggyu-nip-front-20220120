@@ -32,6 +32,19 @@ export default function Header() {
   const [menuPopup, setMenuPopup] = useState(false);
   let [mybalance, setmybalance] = useState();
   let [myaddress, setmyaddress] = useState();
+  const [ticketInfo, setTickInfo] = useState();
+
+  useEffect(() => {
+    let myaddress = getmyaddress();
+    axios.get(API.API_GET_TICK_INFO + `/${myaddress}`).then((resp) => {
+      LOGGER("API_ticketInfo", resp.data);
+
+      let { status, respdata } = resp.data;
+      if (status == "OK" && respdata !== null) {
+        setTickInfo(respdata);
+      }
+    });
+  }, []);
 
   const fetchdataStaked = async () => {
     let myaddress = getmyaddress();
@@ -41,6 +54,7 @@ export default function Header() {
     let { status, respdata } = resp.data;
     if (status == "OK") {
       setisstaked(respdata.isstaked ? true : false);
+      console.log("dddd", respdata);
     }
   };
   const fetchdata = (_) => {
@@ -79,7 +93,7 @@ export default function Header() {
   console.log("mybalance", mybalance);
 
   const onclick_staked_val_btn = (currentValue) => {
-    if (isstaked) {
+    if (ticketInfo) {
       navigate(currentValue);
     } else {
       SetErrorBar("You need purchased lucky ticket");
