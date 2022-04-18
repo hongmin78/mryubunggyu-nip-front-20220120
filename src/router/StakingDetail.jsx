@@ -1,127 +1,126 @@
-import styled from "styled-components";
-import B_staking from "../img/staking/B_staking.png";
-import I_tIcon from "../img/icon/I_tIcon.png";
-import E_staking from "../img/common/E_staking.png";
-import E_title from "../img/staking/E_title.svg";
-import { useState, useEffect } from "react";
-import PopupBg from "../components/PopupBg";
-import StakingPopup from "../components/StakingPopup";
-import { useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-import Header from "../components/header/Header";
-import { addresses } from "../configs/addresses";
-import axios from "axios";
-import { API } from "../configs/api";
-import { LOGGER } from "../util/common";
-import { query_with_arg, getabistr_forfunction } from "../util/contract-calls";
-import { getmyaddress } from "../util/common";
-import { messages } from "../configs/messages";
-import SetErrorBar from "../util/SetErrorBar";
-import { TIME_PAGE_TRANSITION_DEF, TIME_FETCH_MYADDRESS_DEF } from "../configs/configs";
-import { getethrep } from "../util/eth";
-import { useLocation } from "react-router-dom";
-
+import styled from 'styled-components'
+import B_staking from '../img/staking/B_staking.png'
+import I_tIcon from '../img/icon/I_tIcon.png'
+import E_staking from '../img/common/E_staking.png'
+import E_title from '../img/staking/E_title.svg'
+import { useState, useEffect } from 'react'
+import PopupBg from '../components/PopupBg'
+import StakingPopup from '../components/StakingPopup'
+import { useSelector } from 'react-redux'
+import { useNavigate, useParams } from 'react-router-dom'
+import Header from '../components/header/Header'
+import { addresses } from '../configs/addresses'
+import axios from 'axios'
+import { API } from '../configs/api'
+import { LOGGER } from '../util/common'
+import { query_with_arg, getabistr_forfunction } from '../util/contract-calls'
+import { getmyaddress } from '../util/common'
+import { messages } from '../configs/messages'
+import SetErrorBar from '../util/SetErrorBar'
+import {
+  TIME_PAGE_TRANSITION_DEF,
+  TIME_FETCH_MYADDRESS_DEF,
+} from '../configs/configs'
+import { getethrep } from '../util/eth'
 // import { useSelector } from "react-redux";
 // const MODE_DEV_PROD='DEV'
-const MODE_DEV_PROD = "PROD";
-export default function StakingDetail(props) {
-  const navigate = useNavigate();
-  const param = useParams();
-  const location = useLocation();
+const MODE_DEV_PROD = 'PROD'
+export default function StakingDetail() {
+  const navigate = useNavigate()
+  const param = useParams()
+  const isMobile = useSelector((state) => state.common.isMobile)
+  const [stakingPopup, setStakingPopup] = useState(false)
+  let [currentserialnumber, setcurrentserialnumber] = useState()
+  let [stakecurrencybalance, setstakecurrencybalance] = useState()
+  let myaddress = getmyaddress()
+  let isLogin = useSelector((state) => state.common.isLogin)
 
-  console.log("location", location);
-  const isMobile = useSelector((state) => state.common.isMobile);
-  const [stakingPopup, setStakingPopup] = useState(false);
-  let [currentserialnumber, setcurrentserialnumber] = useState();
-  let [stakecurrencybalance, setstakecurrencybalance] = useState();
-  let myaddress = getmyaddress();
-  let isLogin = useSelector((state) => state.common.isLogin);
   const onclickstakingbutton = async (_) => {
-    let myaddress = getmyaddress();
+    let myaddress = getmyaddress()
     const querybalance = (_) => {
-      console.log("", addresses.contract_USDT, [myaddress]); // ETH_TESTNET.
+      console.log('', addresses.contract_USDT, [myaddress]) // ETH_TESTNET.
       return query_with_arg({
         contractaddress: addresses.contract_USDT, // ETH_TESTNET.
-        abikind: "ERC20",
-        methodname: "balanceOf",
+        abikind: 'ERC20',
+        methodname: 'balanceOf',
         aargs: [myaddress],
-      });
-    };
+      })
+    }
     if (isLogin) {
-      let resp = await querybalance();
-      LOGGER("h8UpKsxO1Y", resp);
+      let resp = await querybalance()
+      LOGGER('h8UpKsxO1Y', resp)
       let respstakebalance = await query_with_arg({
         contractaddress: addresses.contract_stake,
-        abikind: "STAKE",
-        methodname: "_balances",
+        abikind: 'STAKE',
+        methodname: '_balances',
         aargs: [myaddress],
-      });
-      if (getethrep(respstakebalance) && getethrep(respstakebalance) > 0) {
-        // SetErrorBar(messages.MSG_YOU_ALREADY_HAVE_STAKED);
-        if (MODE_DEV_PROD == "DEV") {
+      })
+      if (stakecurrencybalance && stakecurrencybalance > 0) {
+        setStakingPopup(true)
+        if (MODE_DEV_PROD == 'DEV') {
         } else {
-          return;
+          return
         }
       } else {
+        SetErrorBar(messages.MSG_BALANCE_NOT_ENOUGH)
       }
     } else {
-      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET)
       setTimeout((_) => {
-        navigate("/connectwallet");
-      }, TIME_PAGE_TRANSITION_DEF);
-      return;
+        navigate('/connectwallet')
+      }, TIME_PAGE_TRANSITION_DEF)
+      return
     }
-    setStakingPopup(true);
-  };
+  }
   useEffect(
     (_) => {
-      LOGGER("vF16Vg7wEA", isLogin);
+      LOGGER('vF16Vg7wEA', isLogin)
     },
-    [isLogin]
-  );
+    [isLogin],
+  )
   const query_stake_currency_balance = (_) => {
-    let myaddress = getmyaddress();
+    let myaddress = getmyaddress()
     if (myaddress) {
+      query_with_arg({
+        contractaddress: addresses.contract_USDT, // ETH_TESTNET.
+        abikind: 'ERC20',
+        methodname: 'balanceOf',
+        aargs: [myaddress],
+      }).then((resp) => {
+        setstakecurrencybalance(getethrep(resp, 4))
+      })
     } else {
-      return;
+      return
     }
-    console.log("", addresses.contract_USDT, [myaddress]); // ETH_TESTNET.
-    query_with_arg({
-      contractaddress: addresses.contract_USDT, // ETH_TESTNET.
-      abikind: "ERC20",
-      methodname: "balanceOf",
-      aargs: [myaddress],
-    }).then((resp) => {
-      setstakecurrencybalance(getethrep(resp, 4));
-    });
-  };
+    console.log('', addresses.contract_USDT, [myaddress]) // ETH_TESTNET.
+  }
 
   useEffect((_) => {
     setTimeout((_) => {
-      query_stake_currency_balance();
-    }, TIME_FETCH_MYADDRESS_DEF);
-    return; //		alert(myaddress)
-    LOGGER("", myaddress);
-    if (myaddress) {
-    } else {
-      LOGGER(messages.MSG_PLEASE_CONNECT_WALLET);
-      return;
-    }
-    //		LOGGER(API.API_MAX + `/tickets/serialnumber`)
-    //		return
-    /** 		false && axios.get ( API.API_MAX + `/tickets/serialnumber`).then(resp=>{ LOGGER('' , resp.data )
-			let { status , payload } =resp.data
-			if ( status == 'OK' ){
-//				setcurrentserialnumber ( payload.max ? payload.max : 0 )
-			}
-		})*/
+      query_stake_currency_balance()
+    }, [])
+    // return //   alert(myaddress)
+    // LOGGER('', myaddress)
+    // if (myaddress) {
+    // } else {
+    //   LOGGER(messages.MSG_PLEASE_CONNECT_WALLET)
+    //   return
+    // }
+    //    LOGGER(API.API_MAX + `/tickets/serialnumber`)
+    //    return
+    /**     false && axios.get ( API.API_MAX + `/tickets/serialnumber`).then(resp=>{ LOGGER('' , resp.data )
+      let { status , payload } =resp.data
+      if ( status == 'OK' ){
+//        setcurrentserialnumber ( payload.max ? payload.max : 0 )
+      }
+    })*/
     /*query_with_arg ( {contractaddress : addresses.contract_USDT
-			, abikind : 'ERC20'
-			, methodname : 'balanceOf'
-			, aargs : [ myaddress ] 
-		} ) 		.then(resp=>{					LOGGER( 'R6H63xkTcs' , resp )
-		}) */
-  }, []);
+      , abikind : 'ERC20'
+      , methodname : 'balanceOf'
+      , aargs : [ myaddress ] 
+    } )     .then(resp=>{         LOGGER( 'R6H63xkTcs' , resp )
+    }) */
+  }, [])
   if (isMobile)
     return (
       <>
@@ -160,21 +159,22 @@ export default function StakingDetail(props) {
               <button
                 className="confirmBtn"
                 onClick={() => {
-                  onclickstakingbutton();
-                  false && navigate("popup");
+                  onclickstakingbutton()
+                  false && navigate('popup')
                 }}
               >
                 Staking
                 {/* You don’t have enough USDT */}
               </button>
-              <span style={{ color: "#fff" }}>
+              <span style={{ color: '#fff' }}>
                 <br />
-                You can participate in Subscription Auction by staking the LUCKY TICKET
+                You can participate in Subscription Auction by staking the LUCKY
+                TICKET
               </span>
             </div>
           </article>
 
-          {param.popup && (
+          {stakingPopup && (
             <>
               <StakingPopup off={setStakingPopup} />
               <PopupBg blur off={setStakingPopup} />
@@ -182,7 +182,7 @@ export default function StakingDetail(props) {
           )}
         </MstakingBox>
       </>
-    );
+    )
   else
     return (
       <>
@@ -217,15 +217,16 @@ export default function StakingDetail(props) {
               <button
                 className="confirmBtn"
                 onClick={() => {
-                  onclickstakingbutton();
+                  onclickstakingbutton()
                 }}
               >
                 Staking
                 {/* You don’t have enough USDT */}
               </button>
-              <span style={{ color: "#fff" }}>
+              <span style={{ color: '#fff' }}>
                 <br />
-                You can participate in Subscription Auction by staking the LUCKY TICKET
+                You can participate in Subscription Auction by staking the LUCKY
+                TICKET
               </span>
             </div>
           </article>
@@ -238,7 +239,7 @@ export default function StakingDetail(props) {
           )}
         </PstakingBox>
       </>
-    );
+    )
 }
 
 const MstakingBox = styled.div`
@@ -392,7 +393,7 @@ const MstakingBox = styled.div`
       }
     }
   }
-`;
+`
 
 const PstakingBox = styled.div`
   display: flex;
@@ -522,4 +523,4 @@ const PstakingBox = styled.div`
       }
     }
   }
-`;
+`
