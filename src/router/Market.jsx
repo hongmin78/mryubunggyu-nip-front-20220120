@@ -34,6 +34,17 @@ export default function Market() {
 			}
 		})
 	}
+
+  function sort(list, sortOpt) {
+    list.sort((a, b) => {
+      if(sortOpt === 'Recently Listed') {
+        return 1;
+      } else if(sortOpt === 'Oldest') {
+        return -1;
+      }
+    })
+  }
+
 	useEffect(()=>{
 		fetchdata()
 	}, [] )
@@ -95,7 +106,10 @@ export default function Market() {
             </section>
 
             <ul className="itemList">
-              {D_marketItemList.map( (cont, index) => {
+              {D_marketItemList.filter((cont) => {
+                if(search === '') { return cont }
+                else if(cont.titlename.toLowerCase().includes(search.toLowerCase())) { return cont }
+              }).map( (cont, index) => {
                 if (index < limit)
                   return (
                     <Fragment key={index}>
@@ -176,7 +190,14 @@ export default function Market() {
           </section>
 
           <ul className="itemList">
-            {D_marketItemList.map((cont, index) => {
+            {
+              sort(D_marketItemList, sortOpt)
+            }
+            {
+              D_marketItemList.filter((cont) => {
+                if(search === '') { return cont }
+                else if(cont.titlename.toLowerCase().includes(search.toLowerCase())) { return cont }
+              }).map((cont, index) => {
               if (index < limit)
                 return (
                   <Fragment key={index}>

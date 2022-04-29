@@ -17,16 +17,22 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
     setLikeObj({ ...dataObj });
   }
 
+  function contentsReload (id) {
+    window.location.href = `/#/market/detail/${id}`;
+    window.location.reload()
+    window.scrollTo(0, 0)
+  }
+
   if (isMobile)
     return (
       <Mitem
         className="item"
-        onClick={() => navigate(`/market/detail/${data?.itemid }`)}
+        onClick={() => { contentsReload(data?.itemid) }}
       >
         <div className="topBar">
           <div className="profBox">
             <img src={data.url} alt="" />
-            <p className="address">{strDot("0x123456789012345", 5, 4)}</p>
+            <p className="address">{strDot(data?.username, 5, 4)}</p>
           </div>
 
           {likeObj && (
@@ -41,16 +47,16 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
                   color: likeObj[index] && "#ff5050",
                 }}
               >
-                {data.like}
+                {data.like ? data.like : 0 }
               </p>
             </button>
           )}
         </div>
 
-        <img className="itemImg" src={data.url} alt="" />
+        <img className="itemImg" src={data?.url} alt="" />
 
         <div className="infoBox">
-          <p className="title">{data.titlename}</p>
+          <p className="title">{data?.titlename}</p>
 
           <ul className="detailList">
             <li>
@@ -59,10 +65,10 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
             </li>
             <li style={{ color: "#fff" }}>
               <p>
-                {data.price}&nbsp;{data.unit}
+                {data?.price}&nbsp;{data?.unit}
               </p>
 
-              <p>{moment(data.createdat).fromNow()}</p>
+              <p>{moment(data?.createdat).fromNow()}</p>
             </li>
           </ul>
         </div>
@@ -72,12 +78,12 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
     return (
       <Pitem
         className="item"
-        onClick={() => navigate(`/market/detail/${data?.itemid }`)}
+        onClick={() => { contentsReload(data?.itemid) }}
       >
         <div className="topBar">
           <div className="profBox">
             <img src={data.url} alt="" />
-            <p className="address">{strDot("0x123456789012345", 5, 4)}</p>
+            <p className="address">{strDot(data?.username, 5, 4)}</p>
           </div>
 
           {likeObj && (
@@ -92,7 +98,7 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
                   color: likeObj[index] && "#ff5050",
                 }}
               >
-                {data.like}
+                {data.like ? data.like : 0 }
               </p>
             </button>
           )}

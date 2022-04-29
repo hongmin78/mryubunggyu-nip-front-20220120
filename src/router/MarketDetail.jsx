@@ -21,7 +21,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Header from "../components/header/Header";
 import axios from "axios";
 import { API } from '../configs/api' // import API from "../api/API";
-import { LOGGER, getmyaddress } from "../util/common";
+import { LOGGER, getmyaddress, onclickcopy } from "../util/common";
 import { ITEM_PRICE_DEF } from '../configs/configs'
 import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
@@ -140,16 +140,20 @@ export default function MarketDetail() {
                     </div>
 
                     {showCopyBtn && (
-                      <>
+                      // <>
                         <button
                           className="copyBtn displayBtn"
-                          onClick={() => setShowCopyBtn(false)}
+                          onClick={() => {
+                            onclickcopy(window.location.href);
+                            SetErrorBar(messages.MSG_COPIED);
+                            setShowCopyBtn(false);
+                          }}
                         >
                           <img src={I_clip} alt="" />
                           Copy Link
                         </button>
-                        <PopupBg off={setShowCopyBtn} />
-                      </>
+                        // {/* <PopupBg off={setShowCopyBtn} /> */}
+                      // </>
                     )}
                   </div>
 
@@ -158,14 +162,14 @@ export default function MarketDetail() {
 
                 <div className="ownedBox">
                   <p className="key">Owned by</p>
-                  <p className="value">@andyfeltham</p>
+                  <p className="value">@ { itemdata?.username ? itemdata?.username : '-' }</p>
                 </div>
 
                 <div className="saleBox">
                   <div className="price">
                     <p className="key">Current price</p>
                     <strong className="value">
-                      { itemdata?.group_=='kong'? '100':ITEM_PRICE_DEF } USDT
+                    { itemdata?.group_=='kong'? itemdata?.price : ITEM_PRICE_DEF } { itemdata?.priceunit ? itemdata?.priceunit : 'USDT'}
                     </strong>
                   </div>
 
@@ -174,9 +178,9 @@ export default function MarketDetail() {
 
                     <ul className="timeList">
                       <li>00</li>
-                      <li>12</li>
-                      <li>59</li>
-                      <li>09</li>
+                      <li>00</li>
+                      <li>00</li>
+                      <li>00</li>
                     </ul>
                   </div>
                 </div>
@@ -305,7 +309,11 @@ export default function MarketDetail() {
                       <div className="hoverBox">
                         <button
                           className="copyBtn displayBtn"
-                          onClick={() => setShowCopyBtn(false)}
+                          onClick={() => {
+                            onclickcopy(window.location.href)
+                            SetErrorBar(messages.MSG_COPIED);
+                            setShowCopyBtn(false);         
+                          }}
                         >
                           <img src={I_clip} alt="" />
                           Copy Link
@@ -317,7 +325,7 @@ export default function MarketDetail() {
 
                 <div className="ownedBox">
                   <p className="key">Owned by</p>
-                  <p className="value">@andyfeltham</p>
+                  <p className="value">@ { itemdata?.username ? itemdata?.username : '-' }</p>
                 </div>
 
                 <div className="saleBox">
@@ -328,14 +336,14 @@ export default function MarketDetail() {
 
                   <div className="value">
                     <strong className="price">                      
-											{ itemdata?.group_=='kong'? '100':ITEM_PRICE_DEF } USDT
+											{ itemdata?.group_=='kong'? itemdata?.price : ITEM_PRICE_DEF } { itemdata?.priceunit ? itemdata?.priceunit : 'USDT'}
                     </strong>
 
                     <ul className="timeList">
                       <li>00</li>
-                      <li>12</li>
-                      <li>59</li>
-                      <li>09</li>
+                      <li>00</li>
+                      <li>00</li>
+                      <li>00</li>
                     </ul>
                   </div>
                 </div>
@@ -1095,11 +1103,12 @@ const PmarketDetailBox = styled.div`
   .moreBox {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 1.38vw;
     padding: 0;
-    margin: 120px 0 0 0;
+    margin: 15.55vw 0 0 0;
 
-    .title {
+    .title {     
+      padding: 0 20px;
       font-size: 30px;
     }
 

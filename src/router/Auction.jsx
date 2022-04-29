@@ -50,7 +50,7 @@ export default function Auction() {
                 <div className="searchBox" ref={searchBoxRef}>
                   <input
                     value={search}
-                    onChange={(e) => setSearch(e.target.value)}
+                    onChange={(e) => { setSearch(e.target.value) }}
                     onFocus={() =>
                       (searchBoxRef.current.style.border = "3px solid #000")
                     }
@@ -95,7 +95,10 @@ export default function Auction() {
             </section>
 
             <ul className="itemList">
-              {auctionList.map((cont, index) => {
+              {auctionList.filter((cont) => {
+                if(search === '') { return cont }
+                else if(cont.titlename.toLowerCase().includes(search.toLowerCase())) { return cont }
+              }).map((cont, index) => {
                 if (index < limit)
                   return (
                     <Fragment key={index}>
@@ -178,19 +181,22 @@ export default function Auction() {
           </section>
 
           <ul className="itemList">
-            {auctionList.map((cont, index) => {
-              if (index < limit)
-                return (
-                  <Fragment key={index}>
-                    <AuctionItem0228
-                      data={cont}
-                      index={index}
-                      likeObj={likeObj}
-                      setLikeObj={setLikeObj}
-                    />
-                  </Fragment>
-                );
-              else return <Fragment key={index} />;
+            {auctionList.filter((cont) => {
+                if(search === '') { return cont }
+                else if(cont.titlename.toLowerCase().includes(search.toLowerCase())) { return cont }
+              }).map((cont, index) => {
+                if (index < limit) 
+                  return (
+                    <Fragment key={index}>
+                      <AuctionItem0228
+                        data={cont}
+                        index={index}
+                        likeObj={likeObj}
+                        setLikeObj={setLikeObj}
+                      />
+                    </Fragment>
+                  );
+                else return <Fragment key={index} />;
             })}
           </ul>
 

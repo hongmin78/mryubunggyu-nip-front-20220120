@@ -26,10 +26,10 @@ export default function HeaderPopup() {
           <img src={I_person} alt="" />
           <p>My page</p>
         </button>
-        <button className="faqBtn" onClick={() => {}}>
+        {/* <button className="faqBtn" onClick={() => {}}>
           <img src={I_book} alt="" />
           <p>FAQ</p>
-        </button>
+        </button> */}
         <button className="disconnectBtn" onClick={onClickLogout}>
           <img src={I_power} alt="" />
           <p>Disconnect</p>

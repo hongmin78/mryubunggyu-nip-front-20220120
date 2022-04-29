@@ -33,6 +33,7 @@ import axios from 'axios'
 import { API } from '../configs/api'
 import { LOGGER, getmyaddress } from '../util/common'
 import { setDelinquencyAmount } from '../util/store/commonSlice'
+import { GET_CONTENTS_DEF } from '../configs/configs';
 import moment from 'moment'
 
 export default function Main() {
@@ -54,6 +55,7 @@ export default function Main() {
   const [premiumIndex, setPremiumIndex] = useState(0)
   const [ticketIndex, setTicketIndex] = useState(0)
   const [faqIndex, setFaqIndex] = useState(0)
+  const [auctionListAssigned, setAuctionListAssigned] = useState([])
   const [auctionListFirst, setAuctionListFirst] = useState([])
   const [auctionListSecond, setAuctionListSecond] = useState([])
   const [likeObj, setLikeObj] = useState({})
@@ -118,13 +120,25 @@ export default function Main() {
   function fetchitems() {
     axios
       //      .get(  "http://3.35.117.87:34705/auction/list", { params: { limit: 16 } })
+      .get(API.API_GET_CIRCULATIONS)
+      .then((res) => {
+        // console.log(res.data);
+        let { status, list } = res.data
+        if (status == 'OK') {
+          setAuctionListAssigned(list.slice(0, GET_CONTENTS_DEF))
+          // setAuctionListSecond(list.slice(64))
+        }
+      })
+    axios
+      //      .get(  "http://3.35.117.87:34705/auction/list", { params: { limit: 16 } })
       .get(API.API_COMMONITEMS + `/items/group_/kong/0/128/id/DESC`)
       .then((res) => {
         // console.log(res.data);
         let { status, list } = res.data
         if (status == 'OK') {
-          setAuctionListFirst(list.slice(0, 64))
-          setAuctionListSecond(list.slice(64))
+          setAuctionListFirst(list.slice(0, GET_CONTENTS_DEF))
+          setAuctionListSecond(list.slice(GET_CONTENTS_DEF))
+
         }
       })
     axios
@@ -133,7 +147,7 @@ export default function Main() {
         LOGGER('De0Mlt93PT', resp.data)
         let { status, list } = resp.data
         if (status == 'OK') {
-          setpremiumitemlist(list)
+          setpremiumitemlist(list.slice(0, GET_CONTENTS_DEF))
         }
       })
     axios.get(API.API_TYPESTR).then((resp) => {
@@ -297,7 +311,16 @@ export default function Main() {
               <div className="listBox">
                 <div className="posBox">
                   <ul className="itemList" ref={firstAuctionRef}>
-                    {auctionListFirst.map((cont, index) => (
+                  {
+                      auctionListAssigned.length < GET_CONTENTS_DEF && (
+                        auctionListFirst.forEach(element => {
+                          auctionListAssigned.push(element)
+                        }) 
+                      )
+                    }
+
+                    {auctionListAssigned.map((cont, index) => (
+                      index < GET_CONTENTS_DEF ?
                       <Fragment key={index}>
                         <AuctionItem0228
                           data={cont}
@@ -306,6 +329,8 @@ export default function Main() {
                           setLikeObj={setLikeObj}
                         />
                       </Fragment>
+                      :  auctionListSecond.indexOf(cont) === -1 &&
+                          auctionListSecond.unshift(cont)
                     ))}
                   </ul>
                   <button
@@ -325,6 +350,7 @@ export default function Main() {
                 <div className="posBox">
                   <ul className="itemList">
                     {auctionListSecond.map((cont, index) => (
+                      index <= GET_CONTENTS_DEF &&
                       <Fragment key={index}>
                         <AuctionItem0228
                           data={cont}
@@ -349,7 +375,7 @@ export default function Main() {
               <strong className="title">MarketPlace</strong>
               <div className="posBox">
                 <ul className="itemList" ref={marketRef}>
-                  {marketPlaceList.map((cont, index) => (
+                  {premiumitemlist.map((cont, index) => (
                     <Fragment key={index}>
                       <MarketItem
                         data={cont}
@@ -567,7 +593,7 @@ export default function Main() {
 
           <section className="issueContainer">
             <ul className="issueList" ref={issueRef}>
-              {typestrPay?.map((cont, index) => (
+              {[1, 2, 3, 4].map((cont, index) => (
                 <li className="issueBox" key={index}>
                   <div className="infoBox">
                     <div className="profBox">
@@ -594,7 +620,16 @@ export default function Main() {
               <div className="listBox">
                 <div className="posBox">
                   <ul className="itemList" ref={firstAuctionRef}>
-                    {auctionListFirst.map((cont, index) => (
+                    {
+                      auctionListAssigned.length < GET_CONTENTS_DEF && (
+                        auctionListFirst.forEach(element => {
+                          auctionListAssigned.push(element)
+                        }) 
+                      )
+                    }
+
+                    {auctionListAssigned.map((cont, index) => (
+                      index < GET_CONTENTS_DEF ?
                       <Fragment key={index}>
                         <AuctionItem0228
                           data={cont}
@@ -603,6 +638,9 @@ export default function Main() {
                           setLikeObj={setLikeObj}
                         />
                       </Fragment>
+                      : auctionListSecond.indexOf(cont) === -1 &&
+                        auctionListSecond.unshift(cont)
+                        
                     ))}
                   </ul>
                   <button
@@ -623,6 +661,7 @@ export default function Main() {
                 <div className="posBox">
                   <ul className="itemList" ref={secondAuctionRef}>
                     {auctionListSecond.map((cont, index) => (
+                      index < GET_CONTENTS_DEF &&
                       <Fragment key={index}>
                         <AuctionItem0228
                           data={cont}

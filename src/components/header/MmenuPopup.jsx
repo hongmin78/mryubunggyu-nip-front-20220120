@@ -61,10 +61,10 @@ export default function MmenuPopup({ off }) {
               <img src={I_market} alt="" />
               <p>Marketplece</p>
             </button>
-            <button className="faqBtn" onClick={() => {}}>
+            {/* <button className="faqBtn" onClick={() => {}}>
               <img src={I_book} alt="" />
               <p>FAQ</p>
-            </button>
+            </button> */}
             <button className="mypageBtn" onClick={() => navigate("/mypage")}>
               <img src={I_person} alt="" />
               <p>Mypage</p>
