@@ -478,7 +478,7 @@ export default function Main() {
                       <p className="nickname">{strDot(cont.username, 3, 15)}</p>
                     </div>
                     {/* <div className="timeBox">At__{cont.createdat.split("T")[0]}</div> */}
-                    <div className="timeBox">{moment(new Date()).diff(moment(cont.createdat), "days")} days ago</div>
+                    <div className="timeBox">{moment(new Date()).diff(moment(cont.createdat), "days")}days ago</div>
                   </div>
                   <p className="cont">
                     {cont.typestr === "PAY" ? "purchased" : ""} <u>{cont.actionname}</u> at {cont.price} USDT
