@@ -11,7 +11,7 @@ import SelectPopup from "../components/SelectPopup";
 import { useSelector } from "react-redux";
 import Header from "../components/header/Header";
 import axios from "axios";
-import { API} from '../configs/api'
+import { API } from "../configs/api";
 
 export default function Auction() {
   const searchBoxRef = useRef();
@@ -24,18 +24,21 @@ export default function Auction() {
   const [limit, setLimit] = useState(8);
   const [auctionList, setAuctionList] = useState([]);
 
-	const fetchdata=_=>{		//   	 axios.get("http://3.3 5.117.87:34705/auction/list").then((res) => {
-		axios.get(API.API_COMMONITEMS + `/items/group_/kong/0/32/id/DESC` ).then(resp=>{						console.log(resp.data);
-			let { status , list }=resp.data 
-			if ( status =='OK' ) {
-				setAuctionList( list )
-			}
-		});
-	}
-//  function getAuction() {		fetchdata()	}
-  useEffect(() => { 		// getAuction();
-		fetchdata()
-  }, [] )
+  const fetchdata = (_) => {
+    //   	 axios.get("http://3.3 5.117.87:34705/auction/list").then((res) => {
+    axios.get(API.API_COMMONITEMS + `/items/group_/kong/0/32/id/DESC`).then((resp) => {
+      console.log(resp.data);
+      let { status, list } = resp.data;
+      if (status == "OK") {
+        setAuctionList(list);
+      }
+    });
+  };
+  //  function getAuction() {		fetchdata()	}
+  useEffect(() => {
+    // getAuction();
+    fetchdata();
+  }, []);
 
   if (isMobile)
     return (
@@ -50,13 +53,11 @@ export default function Auction() {
                 <div className="searchBox" ref={searchBoxRef}>
                   <input
                     value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    onFocus={() =>
-                      (searchBoxRef.current.style.border = "3px solid #000")
-                    }
-                    onBlur={() =>
-                      (searchBoxRef.current.style.border = "1px solid #d9d9d9")
-                    }
+                    onChange={(e) => {
+                      setSearch(e.target.value);
+                    }}
+                    onFocus={() => (searchBoxRef.current.style.border = "3px solid #000")}
+                    onBlur={() => (searchBoxRef.current.style.border = "1px solid #d9d9d9")}
                     placeholder="Search"
                   />
 
@@ -67,12 +68,8 @@ export default function Auction() {
                   <button
                     className="sortBtn"
                     ref={sortBtnRef}
-                    onFocus={() =>
-                      (sortBtnRef.current.style.border = "3px solid #000")
-                    }
-                    onBlur={() =>
-                      (sortBtnRef.current.style.border = "1px solid #d9d9d9")
-                    }
+                    onFocus={() => (sortBtnRef.current.style.border = "3px solid #000")}
+                    onBlur={() => (sortBtnRef.current.style.border = "1px solid #d9d9d9")}
                     onClick={() => setSortPopup(true)}
                   >
                     <p>{sortOpt}</p>
@@ -81,12 +78,7 @@ export default function Auction() {
 
                   {sortPopup && (
                     <>
-                      <SelectPopup
-                        off={setSortPopup}
-                        dataList={D_sortList}
-                        select={sortOpt}
-                        setFunc={setSortOpt}
-                      />
+                      <SelectPopup off={setSortPopup} dataList={D_sortList} select={sortOpt} setFunc={setSortOpt} />
                       <PopupBg off={setSortPopup} />
                     </>
                   )}
@@ -95,20 +87,23 @@ export default function Auction() {
             </section>
 
             <ul className="itemList">
-              {auctionList.map((cont, index) => {
-                if (index < limit)
-                  return (
-                    <Fragment key={index}>
-                      <AuctionItem0228
-                        data={cont}
-                        index={index}
-                        likeObj={likeObj}
-                        setLikeObj={setLikeObj}
-                      />
-                    </Fragment>
-                  );
-                else return <Fragment key={index} />;
-              })}
+              {auctionList
+                .filter((cont) => {
+                  if (search === "") {
+                    return cont;
+                  } else if (cont.titlename.toLowerCase().includes(search.toLowerCase())) {
+                    return cont;
+                  }
+                })
+                .map((cont, index) => {
+                  if (index < limit)
+                    return (
+                      <Fragment key={index}>
+                        <AuctionItem0228 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
+                      </Fragment>
+                    );
+                  else return <Fragment key={index} />;
+                })}
             </ul>
 
             <button className="moreBtn" onClick={() => setLimit(limit + 4)}>
@@ -131,12 +126,8 @@ export default function Auction() {
               <div className="searchBox" ref={searchBoxRef}>
                 <input
                   value={search}
-                  onFocus={() =>
-                    (searchBoxRef.current.style.border = "3px solid #000")
-                  }
-                  onBlur={() =>
-                    (searchBoxRef.current.style.border = "1px solid #d9d9d9")
-                  }
+                  onFocus={() => (searchBoxRef.current.style.border = "3px solid #000")}
+                  onBlur={() => (searchBoxRef.current.style.border = "1px solid #d9d9d9")}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search"
                 />
@@ -150,12 +141,8 @@ export default function Auction() {
                 <button
                   ref={sortBtnRef}
                   className="sortBtn"
-                  onFocus={() =>
-                    (sortBtnRef.current.style.border = "3px solid #000")
-                  }
-                  onBlur={() =>
-                    (sortBtnRef.current.style.border = "1px solid #d9d9d9")
-                  }
+                  onFocus={() => (sortBtnRef.current.style.border = "3px solid #000")}
+                  onBlur={() => (sortBtnRef.current.style.border = "1px solid #d9d9d9")}
                   onClick={() => setSortPopup(true)}
                 >
                   <p>{sortOpt}</p>
@@ -164,12 +151,7 @@ export default function Auction() {
 
                 {sortPopup && (
                   <>
-                    <SelectPopup
-                      off={setSortPopup}
-                      dataList={D_sortList}
-                      select={sortOpt}
-                      setFunc={setSortOpt}
-                    />
+                    <SelectPopup off={setSortPopup} dataList={D_sortList} select={sortOpt} setFunc={setSortOpt} />
                     <PopupBg off={setSortPopup} />
                   </>
                 )}
@@ -178,20 +160,23 @@ export default function Auction() {
           </section>
 
           <ul className="itemList">
-            {auctionList.map((cont, index) => {
-              if (index < limit)
-                return (
-                  <Fragment key={index}>
-                    <AuctionItem0228
-                      data={cont}
-                      index={index}
-                      likeObj={likeObj}
-                      setLikeObj={setLikeObj}
-                    />
-                  </Fragment>
-                );
-              else return <Fragment key={index} />;
-            })}
+            {auctionList
+              .filter((cont) => {
+                if (search === "") {
+                  return cont;
+                } else if (cont.titlename.toLowerCase().includes(search.toLowerCase())) {
+                  return cont;
+                }
+              })
+              .map((cont, index) => {
+                if (index < limit)
+                  return (
+                    <Fragment key={index}>
+                      <AuctionItem0228 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
+                    </Fragment>
+                  );
+                else return <Fragment key={index} />;
+              })}
           </ul>
 
           <button className="moreBtn" onClick={() => setLimit(limit + 4)}>

@@ -16,7 +16,11 @@ import { TIME_PAGE_TRANSITION_DEF } from "../configs/configs";
 
 export default function SignUpPopup({ walletAddress }) {
   const referer = localStorage.getItem("referer");
-
+  var popupX = document.body.offsetWidth / 2 - 200 / 2;
+  //&nbsp;만들 팝업창 좌우 크기의 1/2 만큼 보정값으로 빼주었음
+  var popupY = window.screen.height / 2 - 300 / 2;
+  //&nbsp;만들 팝업창 상하 크기의 1/2 만큼 보정값으로 빼주었음yarn
+  console.log("sadfoijasodifjasdf", popupX, popupY);
   const navigate = useNavigate();
   const isAuthEmail = useSelector((state) => state.common.isAuthEmail);
   const isMobile = useSelector((state) => state.common.isMobile);
@@ -497,7 +501,6 @@ export default function SignUpPopup({ walletAddress }) {
             Sign up
           </button>
         </ul>
-        <div className="scrollPadding"></div>
       </PsignUpPopupBox>
     );
 }
@@ -651,23 +654,22 @@ const MsignUpBox = styled.section`
 `;
 
 const PsignUpPopupBox = styled.div`
+
   display: flex;
   flex-direction: column;
   gap: 44px;
-  width: 720px;
+  width: 800px;
   padding: 60px 50px 70px;
   border-radius: 20px;
   background: #fff;
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
-  top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  position: fixed;
+  top: 50%;
   z-index: 6;
-
-  .scrollPadding {
-    padding: 0 0 50px 0;
+  overflow-y: scroll;
+ 
   }
+  
 
   .title {
     font-size: 24px;

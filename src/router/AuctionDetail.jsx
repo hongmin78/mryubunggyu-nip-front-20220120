@@ -5,11 +5,13 @@ import I_heartO from "../img/icon/I_heartO.svg";
 import I_3dot from "../img/icon/I_3dot.svg";
 import I_rtArw from "../img/icon/I_rtArw.svg";
 import { Fragment, useEffect, useRef, useState } from "react";
-import { getStyle, putCommaAtPrice } from "../util/Util";
+import { getStyle, putCommaAtPrice, strDot } from "../util/Util";
 import { D_category, D_transactionHistory } from "../data/DauctionDetail";
 import Offer from "../components/itemDetail/Offer";
 import { autoAuctionList } from "../data/Dmain";
 // import AuctionItem from "../components/AuctionItem";
+import I_tagWhite from "../img/icon/I_tagWhite.svg";
+import I_arwCrossWhite from "../img/icon/I_arwCrossWhite.svg";
 import AuctionItem0228 from "../components/AuctionItem0228";
 import Details from "../components/itemDetail/Details";
 import Details0303 from "../components/itemDetail/Details0303";
@@ -23,6 +25,9 @@ import { LOGGER, getmyaddress, onclickcopy, PARSER, conv_jdata_arrkeyvalue } fro
 import { API } from "../configs/api";
 import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
+import { ITEM_PRICE_DEF } from "../configs/configs";
+import { GET_CONTENTS_DEF } from "../configs/configs";
+import moment from "moment";
 
 export default function AuctionDetail() {
   const params = useParams();
@@ -35,6 +40,8 @@ export default function AuctionDetail() {
   const [itemdata, setitemdata] = useState({});
   const [moreCollection, setMoreCollection] = useState([]);
   let [attributes, setattributes] = useState([]);
+  const [demoCollection, setDemoCollection] = useState([]);
+
   const onclicklike = (_) => {
     let myaddress = getmyaddress();
     if (myaddress) {
@@ -77,7 +84,7 @@ export default function AuctionDetail() {
     else setMoreIndex(0);
   }
   const getitem = (_) => {
-    axios.get(API.API_ITEMDETAIL + `/${params.itemid}`).then((resp) => {
+    axios.get(`https://nftinfinity.world:34825/items/item/${params.itemid}`).then((resp) => {
       LOGGER("7FzS4oxYPN", resp.data);
       let { status, respdata } = resp.data;
       if (status == "OK") {
@@ -94,18 +101,37 @@ export default function AuctionDetail() {
 
   // console.log("attributes");
   // console.log(attributes);
+
+  const setIcon = (param) => {
+    switch (param) {
+      case "TENTATIVE_ASSIGN":
+        return <img src={I_tagWhite} alt="" />;
+      case "PAY":
+        return <img src={I_arwCrossWhite} alt="" />;
+      default:
+        break;
+    }
+  };
+
   function getAuction() {
     axios //      .get("http://3.35.1 17.87:34705/auction/list", { params: { limit: 8 } })
-      .get(API.API_COMMONITEMS + `/items/group_/kong/0/128/id/DESC`)
+      .get(API.API_GET_CIRCULATIONS)
       .then((resp) => {
         LOGGER("", resp.data);
         let { status, list } = resp.data;
         if (status == "OK") {
-          setMoreCollection(list);
+          setMoreCollection(list.slice(0, list.length));
         }
         //        console.log(res.data);
         //      setMoreCollection(res.data);
       });
+    axios.get(API.API_COMMONITEMS + `/items/group_/kong/0/128/id/DESC`).then((resp) => {
+      LOGGER("", resp.data);
+      let { status, list } = resp.data;
+      if (status == "OK") {
+        setDemoCollection(list.slice(0, GET_CONTENTS_DEF));
+      }
+    });
   }
 
   useEffect((_) => {
@@ -189,18 +215,30 @@ export default function AuctionDetail() {
                     )}
                   </div>
 
-                  <strong className="title">Kingkong #112</strong>
+                  <strong className="title">
+                    Series {itemdata?.group_} {attributes.name}
+                  </strong>
                 </div>
 
                 <div className="ownedBox">
                   <p className="key">Owned by</p>
-                  <p className="value">@andyfeltham</p>
+                  {itemdata?.current_info ? (
+                    <p className="value">@ {strDot(itemdata?.current_info.username, 18, 4)}</p>
+                  ) : (
+                    <p className="value">@ - </p>
+                  )}
                 </div>
 
                 <div className="saleBox">
                   <div className="price">
                     <p className="key">Current price</p>
-                    <strong className="value">{putCommaAtPrice(372)} USDT</strong>
+                    {itemdata?.current_info ? (
+                      <strong className="price">
+                        {putCommaAtPrice(parseInt(itemdata.current_info.price))} {itemdata.current_info.priceunit}{" "}
+                      </strong>
+                    ) : (
+                      <strong className="price">{putCommaAtPrice(375)} USDT</strong>
+                    )}
                   </div>
 
                   <div className="time">
@@ -208,9 +246,9 @@ export default function AuctionDetail() {
 
                     <ul className="timeList">
                       <li>00</li>
-                      <li>12</li>
-                      <li>59</li>
-                      <li>09</li>
+                      <li>00</li>
+                      <li>00</li>
+                      <li>00</li>
                     </ul>
                   </div>
                 </div>
@@ -247,27 +285,26 @@ export default function AuctionDetail() {
             </article>
 
             <ul className="historyList">
-              {D_transactionHistory.map((cont, index) => (
-                <Fragment key={index}>
-                  {index ? (
-                    <div key={0} className="sideBarBox">
-                      <span className="sideBar" />
-                    </div>
-                  ) : (
-                    <></>
-                  )}
-                  <li key={index}>
-                    <span className="iconBox">
-                      <img src={cont.img} alt="" />
-                    </span>
+              {itemdata?.itemhistories &&
+                itemdata?.itemhistories.map((cont, index) => (
+                  <Fragment key={index}>
+                    {index ? (
+                      <div className="sideBarBox">
+                        <span className="sideBar" />
+                      </div>
+                    ) : (
+                      <></>
+                    )}
+                    <li>
+                      <span className="iconBox">{setIcon(cont.typestr)}</span>
 
-                    <div className="contBox">
-                      <p className="cont">{cont.cont}</p>
-                      <p className="time">{cont.time}</p>
-                    </div>
-                  </li>
-                </Fragment>
-              ))}
+                      <div className="contBox">
+                        <p className="cont">{cont.typestr}</p>
+                        <p className="time">{moment(cont.createdat).fromNow()}</p>
+                      </div>
+                    </li>
+                  </Fragment>
+                ))}
             </ul>
           </section>
 
@@ -277,11 +314,18 @@ export default function AuctionDetail() {
             <div className="listBox">
               <div className="posBox">
                 <ul className="itemList" ref={moreRef}>
-                  {moreCollection.map((cont, index) => (
-                    <Fragment key={index}>
-                      <AuctionItem0228 data={cont} index={index} />
-                    </Fragment>
-                  ))}
+                  {moreCollection.length < GET_CONTENTS_DEF &&
+                    demoCollection.forEach((element) => {
+                      moreCollection.push(element);
+                    })}
+                  {moreCollection.map(
+                    (cont, index) =>
+                      index < GET_CONTENTS_DEF && (
+                        <Fragment key={index}>
+                          <AuctionItem0228 data={cont} index={index} />
+                        </Fragment>
+                      )
+                  )}
                 </ul>
                 <button className="nextBtn" onClick={onClickAuctionNextBtn}>
                   <img src={I_rtArw} alt="" />
@@ -307,7 +351,9 @@ export default function AuctionDetail() {
             <article className="infoBox">
               <div className="itemInfoBox">
                 <div className="titleBox">
-                  <strong className="title">Series Kong {itemdata?.titlename}</strong>
+                  <strong className="title">
+                    Series {itemdata?.group_} {itemdata?.titlename}
+                  </strong>
 
                   <div className="btnBox">
                     <div className="posBox">
@@ -345,7 +391,11 @@ export default function AuctionDetail() {
 
                 <div className="ownedBox">
                   <p className="key">Owned by</p>
-                  <p className="value">@andyfeltham</p>
+                  {itemdata?.current_info ? (
+                    <p className="value">@ {itemdata?.current_info.username}</p>
+                  ) : (
+                    <p className="value">@ - </p>
+                  )}
                 </div>
 
                 <div className="saleBox">
@@ -355,13 +405,19 @@ export default function AuctionDetail() {
                   </div>
 
                   <div className="value">
-                    <strong className="price">{putCommaAtPrice(372)} USDT</strong>
+                    {itemdata?.current_info ? (
+                      <strong className="price">
+                        {putCommaAtPrice(parseInt(itemdata.current_info.price))} {itemdata.current_info.priceunit}{" "}
+                      </strong>
+                    ) : (
+                      <strong className="price">{putCommaAtPrice(ITEM_PRICE_DEF)} USDT</strong>
+                    )}
 
                     <ul className="timeList">
                       <li>00</li>
-                      <li>12</li>
-                      <li>59</li>
-                      <li>09</li>
+                      <li>00</li>
+                      <li>00</li>
+                      <li>00</li>
                     </ul>
                   </div>
                 </div>
@@ -400,27 +456,26 @@ export default function AuctionDetail() {
             </article>
 
             <ul className="historyList">
-              {D_transactionHistory.map((cont, index) => (
-                <Fragment key={index}>
-                  {index ? (
-                    <div className="sideBarBox">
-                      <span className="sideBar" />
-                    </div>
-                  ) : (
-                    <></>
-                  )}
-                  <li>
-                    <span className="iconBox">
-                      <img src={cont.img} alt="" />
-                    </span>
+              {itemdata?.itemhistories &&
+                itemdata?.itemhistories.map((cont, index) => (
+                  <Fragment key={index}>
+                    {index ? (
+                      <div className="sideBarBox">
+                        <span className="sideBar" />
+                      </div>
+                    ) : (
+                      <></>
+                    )}
+                    <li>
+                      <span className="iconBox">{setIcon(cont.typestr)}</span>
 
-                    <div className="contBox">
-                      <p className="cont">{cont.cont}</p>
-                      <p className="time">{cont.time}</p>
-                    </div>
-                  </li>
-                </Fragment>
-              ))}
+                      <div className="contBox">
+                        <p className="cont">{cont.typestr}</p>
+                        <p className="time">{moment(cont.createdat).fromNow()}</p>
+                      </div>
+                    </li>
+                  </Fragment>
+                ))}
             </ul>
           </section>
 
@@ -430,11 +485,18 @@ export default function AuctionDetail() {
             <div className="listBox">
               <div className="posBox">
                 <ul className="itemList" ref={moreRef}>
-                  {moreCollection.map((cont, index) => (
-                    <Fragment key={index}>
-                      <AuctionItem0228 data={cont} index={index} />
-                    </Fragment>
-                  ))}
+                  {moreCollection.length < GET_CONTENTS_DEF &&
+                    demoCollection.forEach((element) => {
+                      moreCollection.push(element);
+                    })}
+                  {moreCollection.map(
+                    (cont, index) =>
+                      index < GET_CONTENTS_DEF && (
+                        <Fragment key={index}>
+                          <AuctionItem0228 data={cont} index={index} />
+                        </Fragment>
+                      )
+                  )}
                 </ul>
                 <button className="nextBtn" onClick={onClickAuctionNextBtn}>
                   <img src={I_rtArw} alt="" />

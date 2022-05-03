@@ -29,6 +29,7 @@ const API = {
   API_KEY_TIME_STAMP: `${URL}/queries/singlerow/settings/key_/FRONT_END_LATEST_VER_TIMESTAMP`,
   API_GET_TICK_INFO: `${URL}/queries/singlerow/transactions/username`,
   API_GET_EMAILAUTH: `${URL}/queries/singlerow/emailverifycode/emailaddress`,
+  API_GET_CIRCULATIONS: `${URL}/queries/circulations`,
 };
 
 export { API };

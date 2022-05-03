@@ -227,7 +227,14 @@ function copy_to_clipboard() {
   document.execCommand("Copy");
   console.log("Copied!");
 }
+
+const strDot = (str, startNum, endNum = 0) => {
+  if (!str) return "";
+  return `${str.substr(0, startNum)}...${str.substr(str.length - endNum)}`;
+};
+
 export {
+  strDot,
   conv_jdata_arrkeyvalue,
   getobjtype,
   LOGGER,
