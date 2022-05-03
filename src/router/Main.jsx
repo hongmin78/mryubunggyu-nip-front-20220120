@@ -1,119 +1,114 @@
-import { Fragment, useEffect, useRef } from 'react'
-import { useState } from 'react'
-import { useDispatch } from 'react-redux'
-import styled from 'styled-components'
-import { D_faqList, D_issueList, marketPlaceList } from '../data/Dmain'
-import Footer from './Footer'
-import AuctionItem from '../components/AuctionItem'
-import AuctionItem0228 from '../components/AuctionItem0228'
-import MarketItem from '../components/MarketItem'
-import MarketItem0227 from '../components/MarketItem0227'
-import Header from '../components/header/Header'
-import { useSelector } from 'react-redux'
-import {
-  getStyle,
-  onClickNextBtn,
-  onClickPreBtn,
-  swiperListener,
-} from '../util/Util'
-import FaqItem from '../components/FaqCont'
-import { useNavigate } from 'react-router-dom'
-import SetErrorBar from '../util/SetErrorBar'
-import E_interview from '../img/main/E_interview.svg'
-import E_issueProf from '../img/main/E_issueProf.png'
-import I_rtArw from '../img/icon/I_rtArw.svg'
-import I_ltArwWhite from '../img/icon/I_ltArwWhite.svg'
-import I_rtArwWhite from '../img/icon/I_rtArwWhite.svg'
-import I_upArw3 from '../img/icon/I_upArw3.svg'
-import E_staking from '../img/common/E_staking.png'
-import B_tip1 from '../img/main/B_tip1.png'
-import B_tip2 from '../img/main/B_tip2.png'
-import B_tip3 from '../img/main/B_tip3.png'
-import axios from 'axios'
-import { API } from '../configs/api'
-import { LOGGER, getmyaddress } from '../util/common'
-import { setDelinquencyAmount } from '../util/store/commonSlice'
-import moment from 'moment'
+import { Fragment, useEffect, useRef } from "react";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import styled from "styled-components";
+import { D_faqList, D_issueList, marketPlaceList } from "../data/Dmain";
+import Footer from "./Footer";
+import AuctionItem from "../components/AuctionItem";
+import AuctionItem0228 from "../components/AuctionItem0228";
+import MarketItem from "../components/MarketItem";
+import MarketItem0227 from "../components/MarketItem0227";
+import Header from "../components/header/Header";
+import { useSelector } from "react-redux";
+import { getStyle, onClickNextBtn, onClickPreBtn, swiperListener } from "../util/Util";
+import FaqItem from "../components/FaqCont";
+import { useNavigate } from "react-router-dom";
+import SetErrorBar from "../util/SetErrorBar";
+import E_interview from "../img/main/E_interview.svg";
+import E_issueProf from "../img/main/E_issueProf.png";
+import I_rtArw from "../img/icon/I_rtArw.svg";
+import I_ltArwWhite from "../img/icon/I_ltArwWhite.svg";
+import I_rtArwWhite from "../img/icon/I_rtArwWhite.svg";
+import I_upArw3 from "../img/icon/I_upArw3.svg";
+import E_staking from "../img/common/E_staking.png";
+import B_tip1 from "../img/main/B_tip1.png";
+import B_tip2 from "../img/main/B_tip2.png";
+import B_tip3 from "../img/main/B_tip3.png";
+import axios from "axios";
+import { API } from "../configs/api";
+import { LOGGER, getmyaddress, strDot } from "../util/common";
+import { setDelinquencyAmount } from "../util/store/commonSlice";
+import moment from "moment";
 
 export default function Main() {
-  const navigate = useNavigate()
-  const headLineRef = useRef()
-  const issueRef = useRef()
-  const firstAuctionRef = useRef()
-  const secondAuctionRef = useRef()
-  const marketRef = useRef()
-  const ticketRef = useRef()
-  let premiumref = useRef()
-  const faqRef = useRef()
-  let issueIndex = 0
-  const isMobile = useSelector((state) => state.common.isMobile)
-  const [headLineIndex, setHeadLineIndex] = useState(0)
-  const [firstAuctionIndex, setFirstAuctionIndex] = useState(0)
-  const [secondAuctionIndex, setSecondAuctionIndex] = useState(0)
-  const [marketIndex, setMarketIndex] = useState(0)
-  const [premiumIndex, setPremiumIndex] = useState(0)
-  const [ticketIndex, setTicketIndex] = useState(0)
-  const [faqIndex, setFaqIndex] = useState(0)
-  const [auctionListFirst, setAuctionListFirst] = useState([])
-  const [auctionListSecond, setAuctionListSecond] = useState([])
-  const [likeObj, setLikeObj] = useState({})
-  let [premiumitemlist, setpremiumitemlist] = useState([])
-  const [typestrPay, setTypestrPay] = useState([])
+  const navigate = useNavigate();
+  const headLineRef = useRef();
+  const issueRef = useRef();
+  const firstAuctionRef = useRef();
+  const secondAuctionRef = useRef();
+  const marketRef = useRef();
+  const ticketRef = useRef();
+  let premiumref = useRef();
+  const faqRef = useRef();
+  let issueIndex = 0;
+  const isMobile = useSelector((state) => state.common.isMobile);
+  const [headLineIndex, setHeadLineIndex] = useState(0);
+  const [firstAuctionIndex, setFirstAuctionIndex] = useState(0);
+  const [secondAuctionIndex, setSecondAuctionIndex] = useState(0);
+  const [marketIndex, setMarketIndex] = useState(0);
+  const [premiumIndex, setPremiumIndex] = useState(0);
+  const [ticketIndex, setTicketIndex] = useState(0);
+  const [faqIndex, setFaqIndex] = useState(0);
+  const [auctionListFirst, setAuctionListFirst] = useState([]);
+  const [auctionListSecond, setAuctionListSecond] = useState([]);
+  const [likeObj, setLikeObj] = useState({});
+  let [premiumitemlist, setpremiumitemlist] = useState([]);
+  const [typestrPay, setTypestrPay] = useState([]);
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   function onClickTopBtn() {
     window.scrollTo({
       top: 0,
-      behavior: 'smooth',
-    })
+      behavior: "smooth",
+    });
   }
 
   useEffect(() => {
-    localStorage.removeItem('referer')
-  }, [])
+    localStorage.removeItem("referer");
+  }, []);
 
   useEffect(() => {
     setTimeout(() => {
-      let address = getmyaddress()
-      console.log('address', address)
+      let address = getmyaddress();
+      console.log("address", address);
       axios
         .get(`${API.API_DELINQUENCY}/${address}`)
         .then((res) => {
-          console.log('RES', res)
-          let { status } = res.data
+          console.log("RES", res);
+          let { status } = res.data;
 
-          if (status === 'OK') {
-            let { list } = res.data
+          if (status === "OK") {
+            let { list } = res.data;
             if (list && list?.length > 0) {
               // const amount = list.reduce((a, b) => a.amount + b.amount, 0);
-              let sum = 0
+              let sum = 0;
               list.forEach((item) => {
-                sum += +item.amount
-              })
-              dispatch(setDelinquencyAmount(sum.toFixed(2)))
-              localStorage.setItem('seller', list[0].seller)
-              SetErrorBar('Please pay delinquency fee')
-              navigate('/penalty')
+                sum += +item.amount;
+              });
+              dispatch(setDelinquencyAmount(sum.toFixed(2)));
+              localStorage.setItem("seller", list[0].seller);
+              SetErrorBar("Please pay delinquency fee");
+              navigate("/penalty");
             }
           }
         })
         .catch((err) => {
-          console.log(err)
-          alert(err.message)
-        })
+          console.log(err);
+          alert(err.message);
+        });
       axios
         .get(API.API_RECEIVABLES + `/${address}`)
         .then((res) => {
-          let { list } = res.data
-          LOGGER('receivables', list)
+          let { list } = res.data;
+          LOGGER("receivables", list);
           if (list?.length > 0) {
-            SetErrorBar('exists receivables')
+            SetErrorBar("exists receivables");
           }
         })
-        .catch((err) => console.log(err))
-    }, 1500)
-  }, [])
+        .catch((err) => console.log(err));
+    }, 1500);
+  }, []);
 
   function fetchitems() {
     axios
@@ -121,101 +116,97 @@ export default function Main() {
       .get(API.API_COMMONITEMS + `/items/group_/kong/0/128/id/DESC`)
       .then((res) => {
         // console.log(res.data);
-        let { status, list } = res.data
-        if (status == 'OK') {
-          setAuctionListFirst(list.slice(0, 64))
-          setAuctionListSecond(list.slice(64))
+        let { status, list } = res.data;
+        if (status == "OK") {
+          setAuctionListFirst(list.slice(0, 64));
+          setAuctionListSecond(list.slice(64));
         }
-      })
-    axios
-      .get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC`)
-      .then((resp) => {
-        LOGGER('De0Mlt93PT', resp.data)
-        let { status, list } = resp.data
-        if (status == 'OK') {
-          setpremiumitemlist(list)
-        }
-      })
-    axios.get(API.API_TYPESTR).then((resp) => {
-      LOGGER('API_TYPESTR', resp.data)
-      let { status, payload } = resp.data
-      if (status == 'OK') {
-        setTypestrPay(payload?.rowdata)
+      });
+    axios.get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC`).then((resp) => {
+      LOGGER("De0Mlt93PT", resp.data);
+      let { status, list } = resp.data;
+      if (status == "OK") {
+        setpremiumitemlist(list);
       }
-    })
+    });
+    axios.get(API.API_TYPESTR).then((resp) => {
+      LOGGER("API_TYPESTR", resp.data);
+      let { status, payload } = resp.data;
+      if (status == "OK") {
+        setTypestrPay(resp.data.list);
+      }
+    });
   }
 
   useEffect(() => {
-    fetchitems()
+    fetchitems();
     setInterval(() => {
-      if (!issueRef.current) return
+      if (!issueRef.current) return;
       if (issueRef.current?.children[0]) {
-        const contHeight = issueRef?.current?.children[0]?.offsetHeight
+        const contHeight = issueRef?.current?.children[0]?.offsetHeight;
 
-        issueIndex++
+        issueIndex++;
         if (issueRef.current?.scrollTo) {
           if (issueIndex < D_issueList.length) {
             issueRef.current.scrollTo({
-              top:
-                contHeight * issueIndex +
-                issueIndex * getStyle(issueRef, 'gap'),
-              behavior: 'smooth',
-            })
+              top: contHeight * issueIndex + issueIndex * getStyle(issueRef, "gap"),
+              behavior: "smooth",
+            });
           } else {
             issueRef.current.scrollTo({
               top: 0,
-              behavior: 'smooth',
-            })
+              behavior: "smooth",
+            });
           }
         }
       }
-    }, 5000)
-  }, [])
+    }, 5000);
+  }, []);
 
   useEffect(() => {
-    if (!headLineRef.current) return
-    const wrapWidth = headLineRef.current.offsetWidth
-    const contWidth = headLineRef.current.children[0].offsetWidth
-    const itemNumByPage = Math.floor(wrapWidth / contWidth)
+    if (!headLineRef.current) return;
+    const wrapWidth = headLineRef.current.offsetWidth;
+    const contWidth = headLineRef.current.children[0].offsetWidth;
+    const itemNumByPage = Math.floor(wrapWidth / contWidth);
 
     if (headLineRef.current?.scrollTo) {
       if (headLineIndex === 0) {
         headLineRef.current.scrollTo({
           left: 0,
-          behavior: 'smooth',
-        })
+          behavior: "smooth",
+        });
       } else {
         headLineRef.current.scrollTo({
           left: contWidth * itemNumByPage * headLineIndex,
-          behavior: 'smooth',
-        })
+          behavior: "smooth",
+        });
       }
     }
-  }, [headLineIndex])
+  }, [headLineIndex]);
 
   useEffect(() => {
-    swiperListener(firstAuctionRef, firstAuctionIndex)
-  }, [firstAuctionIndex])
+    swiperListener(firstAuctionRef, firstAuctionIndex);
+  }, [firstAuctionIndex]);
 
   useEffect(() => {
-    swiperListener(secondAuctionRef, secondAuctionIndex)
-  }, [secondAuctionIndex])
+    swiperListener(secondAuctionRef, secondAuctionIndex);
+  }, [secondAuctionIndex]);
 
   useEffect(() => {
-    swiperListener(marketRef, marketIndex)
-  }, [marketIndex])
+    swiperListener(marketRef, marketIndex);
+  }, [marketIndex]);
 
   useEffect(() => {
-    swiperListener(premiumref, premiumIndex)
-  }, [premiumIndex])
+    swiperListener(premiumref, premiumIndex);
+  }, [premiumIndex]);
 
   useEffect(() => {
-    swiperListener(ticketRef, ticketIndex)
-  }, [ticketIndex])
+    swiperListener(ticketRef, ticketIndex);
+  }, [ticketIndex]);
 
   useEffect(() => {
-    swiperListener(faqRef, faqIndex)
-  }, [faqIndex])
+    swiperListener(faqRef, faqIndex);
+  }, [faqIndex]);
 
   if (isMobile)
     return (
@@ -234,8 +225,8 @@ export default function Main() {
                     <p className="title">Pak on the frontier of NFTs.</p>
 
                     <p className="explain">
-                      The acclaimed anonymous art entity has been pioneering in
-                      digital spaces for decades. Here’s what’s next.
+                      The acclaimed anonymous art entity has been pioneering in digital spaces for decades. Here’s
+                      what’s next.
                     </p>
 
                     <p className="bottomText">ON THE FRONTIER OF NFTS.</p>
@@ -245,27 +236,13 @@ export default function Main() {
             </ul>
             <button
               className="preBtn indexBtn"
-              onClick={() =>
-                onClickPreBtn(
-                  headLineRef,
-                  headLineList,
-                  headLineIndex,
-                  setHeadLineIndex,
-                )
-              }
+              onClick={() => onClickPreBtn(headLineRef, headLineList, headLineIndex, setHeadLineIndex)}
             >
               <img src={I_ltArwWhite} alt="" />
             </button>
             <button
               className="nextBtn indexBtn"
-              onClick={() =>
-                onClickNextBtn(
-                  headLineRef,
-                  headLineList,
-                  headLineIndex,
-                  setHeadLineIndex,
-                )
-              }
+              onClick={() => onClickNextBtn(headLineRef, headLineList, headLineIndex, setHeadLineIndex)}
             >
               <img src={I_rtArwWhite} alt="" />
             </button>
@@ -299,24 +276,14 @@ export default function Main() {
                   <ul className="itemList" ref={firstAuctionRef}>
                     {auctionListFirst.map((cont, index) => (
                       <Fragment key={index}>
-                        <AuctionItem0228
-                          data={cont}
-                          index={index}
-                          likeObj={likeObj}
-                          setLikeObj={setLikeObj}
-                        />
+                        <AuctionItem0228 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
                       </Fragment>
                     ))}
                   </ul>
                   <button
                     className="nextBtn"
                     onClick={() =>
-                      onClickNextBtn(
-                        firstAuctionRef,
-                        auctionListFirst,
-                        firstAuctionIndex,
-                        setFirstAuctionIndex,
-                      )
+                      onClickNextBtn(firstAuctionRef, auctionListFirst, firstAuctionIndex, setFirstAuctionIndex)
                     }
                   >
                     <img src={I_rtArw} alt="" />
@@ -326,12 +293,7 @@ export default function Main() {
                   <ul className="itemList">
                     {auctionListSecond.map((cont, index) => (
                       <Fragment key={index}>
-                        <AuctionItem0228
-                          data={cont}
-                          index={index}
-                          likeObj={likeObj}
-                          setLikeObj={setLikeObj}
-                        />
+                        <AuctionItem0228 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
                       </Fragment>
                     ))}
                   </ul>
@@ -342,34 +304,19 @@ export default function Main() {
               </div>
             </article>
 
-            <article
-              className="marketplaceBox itemListBox"
-              style={{ display: 'none' }}
-            >
+            <article className="marketplaceBox itemListBox" style={{ display: "none" }}>
               <strong className="title">MarketPlace</strong>
               <div className="posBox">
                 <ul className="itemList" ref={marketRef}>
                   {marketPlaceList.map((cont, index) => (
                     <Fragment key={index}>
-                      <MarketItem
-                        data={cont}
-                        index={index}
-                        likeObj={likeObj}
-                        setLikeObj={setLikeObj}
-                      />
+                      <MarketItem data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
                     </Fragment>
                   ))}
                 </ul>
                 <button
                   className="nextBtn"
-                  onClick={() =>
-                    onClickNextBtn(
-                      marketRef,
-                      auctionListFirst,
-                      marketIndex,
-                      setMarketIndex,
-                    )
-                  }
+                  onClick={() => onClickNextBtn(marketRef, auctionListFirst, marketIndex, setMarketIndex)}
                 >
                   <img src={I_rtArw} alt="" />
                 </button>
@@ -382,25 +329,13 @@ export default function Main() {
                 <ul className="itemList" ref={premiumref}>
                   {premiumitemlist.map((cont, index) => (
                     <Fragment key={index}>
-                      <MarketItem0227
-                        data={cont}
-                        index={index}
-                        likeObj={likeObj}
-                        setLikeObj={setLikeObj}
-                      />
+                      <MarketItem0227 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
                     </Fragment>
                   ))}
                 </ul>
                 <button
                   className="nextBtn"
-                  onClick={() =>
-                    onClickNextBtn(
-                      premiumref,
-                      premiumitemlist,
-                      premiumIndex,
-                      setPremiumIndex,
-                    )
-                  }
+                  onClick={() => onClickNextBtn(premiumref, premiumitemlist, premiumIndex, setPremiumIndex)}
                 >
                   <img src={I_rtArw} alt="" />
                 </button>
@@ -416,15 +351,12 @@ export default function Main() {
                     <li key={index} className="item">
                       <div className="topBar">
                         <p className="key">LUCKY TICKET</p>
-                        <p className="value">#{`${index}`.padStart(5, '0')}</p>
+                        <p className="value">#{`${index}`.padStart(5, "0")}</p>
                       </div>
 
                       <img src={E_staking} alt="" />
 
-                      <button
-                        className="stakeBtn"
-                        onClick={() => navigate('/staking')}
-                      >
+                      <button className="stakeBtn" onClick={() => navigate("/staking")}>
                         Buy Now
                       </button>
                     </li>
@@ -432,14 +364,7 @@ export default function Main() {
                 </ul>
                 <button
                   className="nextBtn"
-                  onClick={() =>
-                    onClickNextBtn(
-                      ticketRef,
-                      ticketList,
-                      ticketIndex,
-                      setTicketIndex,
-                    )
-                  }
+                  onClick={() => onClickNextBtn(ticketRef, ticketList, ticketIndex, setTicketIndex)}
                 >
                   <img src={I_rtArw} alt="" />
                 </button>
@@ -481,20 +406,10 @@ export default function Main() {
                   ))}
                 </ul>
                 <div className="pageBtnBox">
-                  <button
-                    className="preBtn"
-                    onClick={() =>
-                      onClickPreBtn(faqRef, D_faqList, faqIndex, setFaqIndex)
-                    }
-                  >
+                  <button className="preBtn" onClick={() => onClickPreBtn(faqRef, D_faqList, faqIndex, setFaqIndex)}>
                     <img src={I_ltArwWhite} alt="" />
                   </button>
-                  <button
-                    className="nextBtn"
-                    onClick={() =>
-                      onClickNextBtn(faqRef, D_faqList, faqIndex, setFaqIndex)
-                    }
-                  >
+                  <button className="nextBtn" onClick={() => onClickNextBtn(faqRef, D_faqList, faqIndex, setFaqIndex)}>
                     <img src={I_rtArwWhite} alt="" />
                   </button>
                 </div>
@@ -508,7 +423,7 @@ export default function Main() {
         </MmainBox>
         <Footer />
       </>
-    )
+    );
   else
     return (
       <>
@@ -526,8 +441,8 @@ export default function Main() {
                     <div className="titleBox">
                       <p className="title">Pak on the frontier of NFTs.</p>
                       <p className="explain">
-                        The acclaimed anonymous art entity has been pioneering
-                        in digital spaces for decades. Here’s what’s next.
+                        The acclaimed anonymous art entity has been pioneering in digital spaces for decades. Here’s
+                        what’s next.
                       </p>
                     </div>
 
@@ -539,27 +454,13 @@ export default function Main() {
             </ul>
             <button
               className="preBtn indexBtn"
-              onClick={() =>
-                onClickPreBtn(
-                  headLineRef,
-                  headLineList,
-                  headLineIndex,
-                  setHeadLineIndex,
-                )
-              }
+              onClick={() => onClickPreBtn(headLineRef, headLineList, headLineIndex, setHeadLineIndex)}
             >
               <img src={I_ltArwWhite} alt="" />
             </button>
             <button
               className="nextBtn indexBtn"
-              onClick={() =>
-                onClickNextBtn(
-                  headLineRef,
-                  headLineList,
-                  headLineIndex,
-                  setHeadLineIndex,
-                )
-              }
+              onClick={() => onClickNextBtn(headLineRef, headLineList, headLineIndex, setHeadLineIndex)}
             >
               <img src={I_rtArwWhite} alt="" />
             </button>
@@ -572,15 +473,13 @@ export default function Main() {
                   <div className="infoBox">
                     <div className="profBox">
                       <img src={E_issueProf} alt="" />
-                      <p className="nickname">{cont.username}</p>
+                      <p className="nickname">{strDot(cont.username, 3, 15)}</p>
                     </div>
-                    <div className="timeBox">
-                      {moment(cont.updatedat).minutes()} mins ago
-                    </div>
+                    {/* <div className="timeBox">At__{cont.createdat.split("T")[0]}</div> */}
+                    <div className="timeBox">{moment(new Date()).diff(moment(cont.createdat), "days")}days ago</div>
                   </div>
                   <p className="cont">
-                    {cont.typestr === 'PAY' ? 'purchased' : ''}{' '}
-                    <u>{cont.actionname}</u> at {cont.price} USDT
+                    {cont.typestr === "PAY" ? "purchased" : ""} <u>{cont.actionname}</u> at {cont.price} USDT
                   </p>
                 </li>
               ))}
@@ -596,24 +495,14 @@ export default function Main() {
                   <ul className="itemList" ref={firstAuctionRef}>
                     {auctionListFirst.map((cont, index) => (
                       <Fragment key={index}>
-                        <AuctionItem0228
-                          data={cont}
-                          index={index}
-                          likeObj={likeObj}
-                          setLikeObj={setLikeObj}
-                        />
+                        <AuctionItem0228 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
                       </Fragment>
                     ))}
                   </ul>
                   <button
                     className="nextBtn"
                     onClick={() =>
-                      onClickNextBtn(
-                        firstAuctionRef,
-                        auctionListFirst,
-                        firstAuctionIndex,
-                        setFirstAuctionIndex,
-                      )
+                      onClickNextBtn(firstAuctionRef, auctionListFirst, firstAuctionIndex, setFirstAuctionIndex)
                     }
                   >
                     <img src={I_rtArw} alt="" />
@@ -624,24 +513,14 @@ export default function Main() {
                   <ul className="itemList" ref={secondAuctionRef}>
                     {auctionListSecond.map((cont, index) => (
                       <Fragment key={index}>
-                        <AuctionItem0228
-                          data={cont}
-                          index={index}
-                          likeObj={likeObj}
-                          setLikeObj={setLikeObj}
-                        />
+                        <AuctionItem0228 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
                       </Fragment>
                     ))}
                   </ul>
                   <button
                     className="nextBtn"
                     onClick={() =>
-                      onClickNextBtn(
-                        secondAuctionRef,
-                        auctionListSecond,
-                        secondAuctionIndex,
-                        setSecondAuctionIndex,
-                      )
+                      onClickNextBtn(secondAuctionRef, auctionListSecond, secondAuctionIndex, setSecondAuctionIndex)
                     }
                   >
                     <img src={I_rtArw} alt="" />
@@ -650,34 +529,19 @@ export default function Main() {
               </div>
             </article>
 
-            <article
-              className="marketplaceBox itemListBox"
-              style={{ display: 'none' }}
-            >
+            <article className="marketplaceBox itemListBox" style={{ display: "none" }}>
               <strong className="title">MarketPlace</strong>
               <div className="posBox">
                 <ul className="itemList" ref={marketRef}>
                   {marketPlaceList.map((cont, index) => (
                     <Fragment key={index}>
-                      <MarketItem
-                        data={cont}
-                        index={index}
-                        likeObj={likeObj}
-                        setLikeObj={setLikeObj}
-                      />
+                      <MarketItem data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
                     </Fragment>
                   ))}
                 </ul>
                 <button
                   className="nextBtn"
-                  onClick={() =>
-                    onClickNextBtn(
-                      marketRef,
-                      auctionListFirst,
-                      marketIndex,
-                      setMarketIndex,
-                    )
-                  }
+                  onClick={() => onClickNextBtn(marketRef, auctionListFirst, marketIndex, setMarketIndex)}
                 >
                   <img src={I_rtArw} alt="" />
                 </button>
@@ -690,25 +554,13 @@ export default function Main() {
                 <ul className="itemList" ref={premiumref}>
                   {premiumitemlist.map((cont, index) => (
                     <Fragment key={index}>
-                      <MarketItem0227
-                        data={cont}
-                        index={index}
-                        likeObj={likeObj}
-                        setLikeObj={setLikeObj}
-                      />
+                      <MarketItem0227 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
                     </Fragment>
                   ))}
                 </ul>
                 <button
                   className="nextBtn"
-                  onClick={() =>
-                    onClickNextBtn(
-                      premiumref,
-                      premiumitemlist,
-                      premiumIndex,
-                      setPremiumIndex,
-                    )
-                  }
+                  onClick={() => onClickNextBtn(premiumref, premiumitemlist, premiumIndex, setPremiumIndex)}
                 >
                   <img src={I_rtArw} alt="" />
                 </button>
@@ -724,15 +576,11 @@ export default function Main() {
                     <li key={index} className="item">
                       <div className="topBar">
                         <p className="key">LUCKY TICKET</p>
-                        <p className="value">#{`${index}`.padStart(5, '0')}</p>
                       </div>
 
                       <img src={E_staking} alt="" />
 
-                      <button
-                        className="stakeBtn"
-                        onClick={() => navigate('/staking')}
-                      >
+                      <button className="stakeBtn" onClick={() => navigate("/staking")}>
                         Buy Now
                       </button>
                     </li>
@@ -740,14 +588,7 @@ export default function Main() {
                 </ul>
                 <button
                   className="nextBtn"
-                  onClick={() =>
-                    onClickNextBtn(
-                      ticketRef,
-                      ticketList,
-                      ticketIndex,
-                      setTicketIndex,
-                    )
-                  }
+                  onClick={() => onClickNextBtn(ticketRef, ticketList, ticketIndex, setTicketIndex)}
                 >
                   <img src={I_rtArw} alt="" />
                 </button>
@@ -789,20 +630,10 @@ export default function Main() {
                   ))}
                 </ul>
                 <div className="pageBtnBox">
-                  <button
-                    className="preBtn"
-                    onClick={() =>
-                      onClickPreBtn(faqRef, D_faqList, faqIndex, setFaqIndex)
-                    }
-                  >
+                  <button className="preBtn" onClick={() => onClickPreBtn(faqRef, D_faqList, faqIndex, setFaqIndex)}>
                     <img src={I_ltArwWhite} alt="" />
                   </button>
-                  <button
-                    className="nextBtn"
-                    onClick={() =>
-                      onClickNextBtn(faqRef, D_faqList, faqIndex, setFaqIndex)
-                    }
-                  >
+                  <button className="nextBtn" onClick={() => onClickNextBtn(faqRef, D_faqList, faqIndex, setFaqIndex)}>
                     <img src={I_rtArwWhite} alt="" />
                   </button>
                 </div>
@@ -816,7 +647,7 @@ export default function Main() {
         </PmainBox>
         <Footer />
       </>
-    )
+    );
 }
 
 const MmainBox = styled.div`
@@ -926,7 +757,7 @@ const MmainBox = styled.div`
         box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.16);
 
         * {
-          font-family: 'Roboto', sans-serif;
+          font-family: "Roboto", sans-serif;
         }
 
         .infoBox {
@@ -1065,7 +896,7 @@ const MmainBox = styled.div`
             height: 15.55vw;
             font-size: 5vw;
             font-weight: 700;
-            font-family: 'Roboto', sans-serif;
+            font-family: "Roboto", sans-serif;
             color: #fff;
             background: #333;
             border-radius: 8.33vw;
@@ -1101,7 +932,7 @@ const MmainBox = styled.div`
               font-size: 4.44vw;
               font-weight: 500;
               text-align: center;
-              font-family: 'Roboto', sans-serif;
+              font-family: "Roboto", sans-serif;
             }
           }
         }
@@ -1155,7 +986,7 @@ const MmainBox = styled.div`
     bottom: 20px;
     position: fixed;
   }
-`
+`;
 
 const PmainBox = styled.div`
   display: flex;
@@ -1274,7 +1105,7 @@ const PmainBox = styled.div`
         box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.16);
 
         * {
-          font-family: 'Roboto', sans-serif;
+          font-family: "Roboto", sans-serif;
         }
 
         .infoBox {
@@ -1406,7 +1237,7 @@ const PmainBox = styled.div`
             height: 56px;
             font-size: 18px;
             font-weight: 700;
-            font-family: 'Roboto', sans-serif;
+            font-family: "Roboto", sans-serif;
             color: #fff;
             background: #333;
             border-radius: 30px;
@@ -1441,7 +1272,7 @@ const PmainBox = styled.div`
               font-size: 16px;
               font-weight: 500;
               text-align: center;
-              font-family: 'Roboto', sans-serif;
+              font-family: "Roboto", sans-serif;
             }
           }
         }
@@ -1492,7 +1323,7 @@ const PmainBox = styled.div`
     bottom: 20px;
     position: fixed;
   }
-`
+`;
 
-const headLineList = [1, 2, 3, 4]
-const ticketList = [1, 2, 3, 4, 5, 6, 7, 8]
+const headLineList = [1, 2, 3, 4];
+const ticketList = [1, 2, 3, 4, 5, 6, 7, 8];
