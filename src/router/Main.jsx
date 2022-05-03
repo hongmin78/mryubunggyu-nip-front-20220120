@@ -26,9 +26,16 @@ import B_tip2 from "../img/main/B_tip2.png";
 import B_tip3 from "../img/main/B_tip3.png";
 import axios from "axios";
 import { API } from "../configs/api";
+<<<<<<< HEAD
 import { LOGGER, getmyaddress, strDot } from "../util/common";
 import { setDelinquencyAmount } from "../util/store/commonSlice";
 import moment from "moment";
+=======
+import { LOGGER, getmyaddress } from "../util/common";
+import { setDelinquencyAmount } from "../util/store/commonSlice";
+import moment from "moment";
+import { strDot } from "../util/common.js";
+>>>>>>> 29d4b2f89b46aba0fb4c00dbcd9f948bfe63e0e6
 
 export default function Main() {
   const navigate = useNavigate();
@@ -54,6 +61,10 @@ export default function Main() {
   const [likeObj, setLikeObj] = useState({});
   let [premiumitemlist, setpremiumitemlist] = useState([]);
   const [typestrPay, setTypestrPay] = useState([]);
+<<<<<<< HEAD
+=======
+  console.log("typestrPay", typestrPay);
+>>>>>>> 29d4b2f89b46aba0fb4c00dbcd9f948bfe63e0e6
 
   const dispatch = useDispatch();
 
@@ -351,7 +362,7 @@ export default function Main() {
                     <li key={index} className="item">
                       <div className="topBar">
                         <p className="key">LUCKY TICKET</p>
-                        <p className="value">#{`${index}`.padStart(5, "0")}</p>
+                        {/* <p className="value">#{`${index}`.padStart(5, '0')}</p> */}
                       </div>
 
                       <img src={E_staking} alt="" />
@@ -576,6 +587,7 @@ export default function Main() {
                     <li key={index} className="item">
                       <div className="topBar">
                         <p className="key">LUCKY TICKET</p>
+                        {/* <p className="value">#{`${index}`.padStart(5, "0")}</p> */}
                       </div>
 
                       <img src={E_staking} alt="" />
@@ -1128,6 +1140,7 @@ const PmainBox = styled.div`
         }
 
         .timeBox {
+          margin-left: 15px;
           color: #7a7a7a;
         }
       }

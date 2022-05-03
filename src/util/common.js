@@ -233,6 +233,7 @@ const strDot = (str, startNum, endNum = 0) => {
   return `${str.substr(0, startNum)}...${str.substr(str.length - endNum)}`;
 };
 export {
+  strDot,
   conv_jdata_arrkeyvalue,
   getobjtype,
   strDot,

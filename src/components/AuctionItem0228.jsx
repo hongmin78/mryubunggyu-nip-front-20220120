@@ -2,7 +2,7 @@ import { strDot } from "../util/Util";
 import I_heart from "../img/icon/I_heart.svg";
 import I_heartO from "../img/icon/I_heartO.svg";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { autoAuctionList } from "../data/Dmain";
 
@@ -16,11 +16,19 @@ export default function AuctionItem0228({ data, index, likeObj, setLikeObj }) {
     setLikeObj({ ...dataObj });
   }
 
+<<<<<<< HEAD
   const contentsReload = (id) => {
     window.location.href = `/#/auction/detail/${id}`;
     window.location.reload();
     window.scrollTo(0, 0);
   };
+=======
+  function contentsReload(id) {
+    window.location.href = `/#/auction/detail/${id}`;
+    window.location.reload();
+    window.scrollTo(0, 0);
+  }
+>>>>>>> 29d4b2f89b46aba0fb4c00dbcd9f948bfe63e0e6
 
   if (isMobile)
     return (
@@ -33,8 +41,8 @@ export default function AuctionItem0228({ data, index, likeObj, setLikeObj }) {
       >
         <div className="topBar">
           <div className="profBox">
-            <img src={autoAuctionList[index]?.profImg} alt="" />
-            <p className="address">{strDot(autoAuctionList[index]?.address, 5, 4)}</p>
+            <img className="profImg" src={data?.profImg ? data?.profImg : data?.url} alt="" />
+            <p className="address">{strDot(data?.username, 5, 4)}</p>
           </div>
 
           {likeObj && (
@@ -46,7 +54,7 @@ export default function AuctionItem0228({ data, index, likeObj, setLikeObj }) {
                   color: likeObj[index] && "#ff5050",
                 }}
               >
-                0
+                {data?.like ? data?.like : 0}
               </p>
             </button>
           )}
@@ -59,7 +67,9 @@ export default function AuctionItem0228({ data, index, likeObj, setLikeObj }) {
 
           <ul className="detailList">
             <li>Last sold for</li>
-            <li>100&nbsp;USDT</li>
+            <li>
+              {data?.price}&nbsp;{data?.priceunit}
+            </li>
           </ul>
         </div>
       </Mitem>
@@ -75,8 +85,8 @@ export default function AuctionItem0228({ data, index, likeObj, setLikeObj }) {
       >
         <div className="topBar">
           <div className="profBox">
-            <img src={autoAuctionList[index]?.profImg} alt="" />
-            <p className="address">{strDot(autoAuctionList[index]?.address, 5, 4)}</p>
+            <img className="profImg" src={data?.profImg ? data?.profImg : data?.url} alt="" />
+            <p className="address">{strDot(data?.username, 5, 4)}</p>
           </div>
 
           {likeObj && (
@@ -88,7 +98,7 @@ export default function AuctionItem0228({ data, index, likeObj, setLikeObj }) {
                   color: likeObj[index] && "#ff5050",
                 }}
               >
-                {autoAuctionList[index]?.like}
+                {data?.like ? data?.like : 0}
               </p>
             </button>
           )}
@@ -101,7 +111,9 @@ export default function AuctionItem0228({ data, index, likeObj, setLikeObj }) {
 
           <ul className="detailList">
             <li>Last sold for</li>
-            <li>100&nbsp;USDT</li>
+            <li>
+              {data?.price}&nbsp;{data?.priceunit}
+            </li>
           </ul>
         </div>
       </Pitem>
@@ -213,6 +225,13 @@ const Pitem = styled.li`
       display: flex;
       align-items: center;
       gap: 10px;
+    }
+
+    .profImg {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      object-fit: cover;
     }
 
     .likeBtn {

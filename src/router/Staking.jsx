@@ -70,6 +70,7 @@ export default function Staking(props) {
                 <li key={index}>
                   <div className="topBar">
                     <p className="key">LUCKY TICKET</p>
+                    {/* <p className="value">#00001</p> */}
                   </div>
 
                   <div className="contBox">
@@ -102,6 +103,7 @@ export default function Staking(props) {
                 <li key={index}>
                   <div className="topBar">
                     <p className="key">LUCKY TICKET</p>
+                    {/* <p className="value">#{`${index}`.padStart(5, "0")}</p> */}
                   </div>
 
                   <div className="contBox">

@@ -51,7 +51,7 @@ export default function ConnectWallet() {
           }, TIME_PAGE_TRANSITION_DEF);
         } else {
           if (isMobile) {
-            navigate("/signup");
+            navigate("/connectwallet/:popup");
           } // navigate("signup");
           else {
             setSignUpPopup(true);

@@ -20,9 +20,9 @@ import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import Header from "../components/header/Header";
 import axios from "axios";
-import { API } from '../configs/api' // import API from "../api/API";
+import { API } from "../configs/api"; // import API from "../api/API";
 import { LOGGER, getmyaddress } from "../util/common";
-import { ITEM_PRICE_DEF } from '../configs/configs'
+import { ITEM_PRICE_DEF } from "../configs/configs";
 import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
 export default function MarketDetail() {
@@ -35,25 +35,32 @@ export default function MarketDetail() {
   const [moreIndex, setMoreIndex] = useState(0);
   const [bidPopup, setBidPopup] = useState(false);
   const [showCopyBtn, setShowCopyBtn] = useState(false);
-	let [ itemdata , setitemdata ] =useState ()
-	let [ marketPlaceList , setmarketPlaceList] =useState( [] )
-	const onclicklike=_=>{
-		let myaddress = getmyaddress()
-		if (myaddress){} else {SetErrorBar( messages.MSG_PLEASE_CONNECT_WALLET ) ; return }
-		axios.post ( API.API_TOGGLE_FAVORITE + `/${itemdata?.itemid}` , {username : myaddress } ).then(			resp=>{ LOGGER( '' , resp.data )
-			let { status , respdata }=resp.data
-			if ( status =='OK'){
-				setToggleLike ( respdata? true : false )
-				switch(+respdata ){
-					case 1 : SetErrorBar ( messages.MSG_DONE_LIKE )
-					break
-					default : SetErrorBar ( messages.MSG_DONE_UNLIKE)
-					break
-				}
-			}
-		}	)
-		setToggleLike(!toggleLike)
-	} 
+  let [itemdata, setitemdata] = useState();
+  let [marketPlaceList, setmarketPlaceList] = useState([]);
+  const onclicklike = (_) => {
+    let myaddress = getmyaddress();
+    if (myaddress) {
+    } else {
+      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+      return;
+    }
+    axios.post(API.API_TOGGLE_FAVORITE + `/${itemdata?.itemid}`, { username: myaddress }).then((resp) => {
+      LOGGER("", resp.data);
+      let { status, respdata } = resp.data;
+      if (status == "OK") {
+        setToggleLike(respdata ? true : false);
+        switch (+respdata) {
+          case 1:
+            SetErrorBar(messages.MSG_DONE_LIKE);
+            break;
+          default:
+            SetErrorBar(messages.MSG_DONE_UNLIKE);
+            break;
+        }
+      }
+    });
+    setToggleLike(!toggleLike);
+  };
   function onClickAuctionNextBtn() {
     const wrapWidth = moreRef.current.offsetWidth;
     const contWidth = moreRef.current.children[0].offsetWidth;
@@ -64,8 +71,10 @@ export default function MarketDetail() {
   }
 
   useEffect(() => {
-		if (moreRef && moreRef?.current?.children[0]?.offsetWidth ){}
-		else {return }
+    if (moreRef && moreRef?.current?.children[0]?.offsetWidth) {
+    } else {
+      return;
+    }
     const wrapWidth = moreRef.current.offsetWidth;
     const contWidth = moreRef.current.children[0].offsetWidth;
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
@@ -79,43 +88,42 @@ export default function MarketDetail() {
       } else {
         moreRef.current.scrollTo({
           left: isMobile
-            ? moreRef.current.scrollLeft +
-              moreRef.current.children[moreIndex].getBoundingClientRect().left -
-              20
+            ? moreRef.current.scrollLeft + moreRef.current.children[moreIndex].getBoundingClientRect().left - 20
             : contWidth * itemNumByPage * moreIndex + itemNumByPage * 40,
           behavior: "smooth",
-       });
+        });
       }
     }
   }, [moreIndex]);
-	const getitem=_=>{
-		axios.get( API.API_ITEMDETAIL + `/${params.itemid }`).then(resp=>{ LOGGER( 'BYLjMqzlfl' , resp.data )
-			let { status , respdata }=resp.data
-			if ( status == 'OK'){
-				setitemdata( respdata )
-			}
-		})
-	}
-	const getotheritems = _=>{
-		axios.get( API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC`)
-		.then(resp =>{ LOGGER( '' , resp.data )
-			let { status , list }=resp.data
-			if ( status == 'OK'){
-				setmarketPlaceList( list )
-			}
-		})
-	}
-	useEffect(_=>{
-		getitem()
-		getotheritems()
-	} , [] )
+  const getitem = (_) => {
+    axios.get(API.API_ITEMDETAIL + `/${params.itemid}`).then((resp) => {
+      LOGGER("BYLjMqzlfl", resp.data);
+      let { status, respdata } = resp.data;
+      if (status == "OK") {
+        setitemdata(respdata);
+      }
+    });
+  };
+  const getotheritems = (_) => {
+    axios.get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC`).then((resp) => {
+      LOGGER("", resp.data);
+      let { status, list } = resp.data;
+      if (status == "OK") {
+        setmarketPlaceList(list);
+      }
+    });
+  };
+  useEffect((_) => {
+    getitem();
+    getotheritems();
+  }, []);
   if (isMobile)
     return (
       <>
         <Header />
         <MmarketDetailBox>
           <section className="itemInfoContainer">
-            <img className="itemImg" src={itemdata?.url } alt="" /> 
+            <img className="itemImg" src={itemdata?.url} alt="" />
 
             <article className="infoBox">
               <div className="itemInfoBox">
@@ -124,27 +132,21 @@ export default function MarketDetail() {
                     <div className="btnBox">
                       <button
                         className="likeBtn hoverBtn"
-												onClick={() => { 
-													onclicklike()													
-												} }
+                        onClick={() => {
+                          onclicklike();
+                        }}
                       >
                         <img src={toggleLike ? I_heartO : I_heart} alt="" />
                       </button>
 
-                      <button
-                        className="moreBtn hoverBtn"
-                        onClick={() => setShowCopyBtn(true)}
-                      >
+                      <button className="moreBtn hoverBtn" onClick={() => setShowCopyBtn(true)}>
                         <img src={I_3dot} alt="" />
                       </button>
                     </div>
 
                     {showCopyBtn && (
                       <>
-                        <button
-                          className="copyBtn displayBtn"
-                          onClick={() => setShowCopyBtn(false)}
-                        >
+                        <button className="copyBtn displayBtn" onClick={() => setShowCopyBtn(false)}>
                           <img src={I_clip} alt="" />
                           Copy Link
                         </button>
@@ -164,9 +166,7 @@ export default function MarketDetail() {
                 <div className="saleBox">
                   <div className="price">
                     <p className="key">Current price</p>
-                    <strong className="value">
-                      { itemdata?.group_=='kong'? '100':ITEM_PRICE_DEF } USDT
-                    </strong>
+                    <strong className="value">{itemdata?.group_ == "kong" ? "100" : ITEM_PRICE_DEF} USDT</strong>
                   </div>
 
                   <div className="time">
@@ -275,38 +275,32 @@ export default function MarketDetail() {
         <Header />
         <PmarketDetailBox>
           <section className="itemInfoContainer">
-            <img className="itemImg" src={ itemdata?.url } alt="" />
+            <img className="itemImg" src={itemdata?.url} alt="" />
 
             <article className="infoBox">
               <div className="itemInfoBox">
                 <div className="titleBox">
-                  <strong className="title">King Kong { itemdata?.titlename }</strong>
+                  <strong className="title">King Kong {itemdata?.titlename}</strong>
 
                   <div className="btnBox">
                     <div className="posBox">
                       <button
                         className="likeBtn hoverBtn"
-												onClick={() => {
-													onclicklike()
-												} }
+                        onClick={() => {
+                          onclicklike();
+                        }}
                       >
                         <img src={toggleLike ? I_heartO : I_heart} alt="" />
                       </button>
                     </div>
 
                     <div className="posBox">
-                      <button
-                        className="moreBtn hoverBtn"
-                        onClick={() => setShowCopyBtn(true)}
-                      >
+                      <button className="moreBtn hoverBtn" onClick={() => setShowCopyBtn(true)}>
                         <img src={I_3dot} alt="" />
                       </button>
 
                       <div className="hoverBox">
-                        <button
-                          className="copyBtn displayBtn"
-                          onClick={() => setShowCopyBtn(false)}
-                        >
+                        <button className="copyBtn displayBtn" onClick={() => setShowCopyBtn(false)}>
                           <img src={I_clip} alt="" />
                           Copy Link
                         </button>
@@ -327,9 +321,7 @@ export default function MarketDetail() {
                   </div>
 
                   <div className="value">
-                    <strong className="price">                      
-											{ itemdata?.group_=='kong'? '100':ITEM_PRICE_DEF } USDT
-                    </strong>
+                    <strong className="price">{itemdata?.group_ == "kong" ? "100" : ITEM_PRICE_DEF} USDT</strong>
 
                     <ul className="timeList">
                       <li>00</li>
