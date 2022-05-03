@@ -13,8 +13,8 @@ export default function Details0303({ attributes }) {
     return (
       <MdetailsBox>
         {attributesMap.map((cont, index) =>
-          cont.attributes.map((item) => (
-            <li key={index}>
+          cont.attributes.map((item, i) => (
+            <li key={i}>
               <p className="part">{item.trait_type}</p>
               <p className="option">{item.value}</p>
             </li>
@@ -26,8 +26,8 @@ export default function Details0303({ attributes }) {
     return (
       <PdetailsBox>
         {attributesMap.map((cont, index) =>
-          cont.attributes.map((item) => (
-            <li key={index}>
+          cont.attributes.map((item, i) => (
+            <li key={i}>
               <p className="part">{item.trait_type}</p>
               <p className="option">{item.value}</p>
             </li>

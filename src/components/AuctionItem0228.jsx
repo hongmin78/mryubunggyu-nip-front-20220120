@@ -16,11 +16,19 @@ export default function AuctionItem0228({ data, index, likeObj, setLikeObj }) {
     setLikeObj({ ...dataObj });
   }
 
+  const contentsReload = (id) => {
+    window.location.href = `/#/auction/detail/${id}`;
+    window.location.reload();
+    window.scrollTo(0, 0);
+  };
+
   if (isMobile)
     return (
       <Mitem
         className="item"
-        onClick={() => navigate(`/auction/detail/${data.itemid}`)}
+        onClick={() => {
+          contentsReload(data.itemid);
+        }}
         // onClick={() => navigate(`/auction/detail/${data.dna}`)}
       >
         <div className="topBar">
@@ -61,7 +69,9 @@ export default function AuctionItem0228({ data, index, likeObj, setLikeObj }) {
       <Pitem
         className="item"
         //				onClick={() => navigate(`/auction/detail/${data.dna}`)}
-        onClick={() => navigate(`/auction/detail/${data.itemid}`)}
+        onClick={() => {
+          contentsReload(data.itemid);
+        }}
       >
         <div className="topBar">
           <div className="profBox">
