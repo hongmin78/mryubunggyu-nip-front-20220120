@@ -105,7 +105,7 @@ export default function Header() {
       <>
         <MheaderBox style={{ background: isStaking && "unset" }}>
           <button className="logoBox" onClick={() => navigate("/")}>
-            <img className="logoImg" src={I_headerLogoM} alt="" />
+            <img className="logoImg" src={isStaking ? I_headerLogoWhite : I_headerLogo} alt="" />
           </button>
 
           <button className="menuBtn" onClick={() => setMenuPopup(true)}>
