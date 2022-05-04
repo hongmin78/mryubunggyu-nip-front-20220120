@@ -157,8 +157,7 @@ function App() {
           <Route path="/term" element={<Term />} />
 
           <Route path="/connectwallet" element={<ConnectWallet />} />
-          <Route path="/connectwallet/:popup" element={<ConnectWallet />} />
-          <Route path="/connectwallet/:referer" element={<ConnectWallet />} />
+          <Route path="/connectwallet/:refere" element={<ConnectWallet />} />
           <Route path="/emailauth/:email/:authNum/:walletaddress" element={<EmailAuth />} />
           <Route path="/emailauth/:email/:authNum" element={<EmailAuth />} />
 

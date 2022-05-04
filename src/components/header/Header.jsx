@@ -113,7 +113,7 @@ export default function Header() {
           </button>
         </MheaderBox>
 
-        {menuPopup && <MmenuPopup off={setMenuPopup} />}
+        {menuPopup && <MmenuPopup off={setMenuPopup} mybalance={mybalance} />}
       </>
     );
   } else {

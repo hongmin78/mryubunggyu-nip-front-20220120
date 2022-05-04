@@ -23,13 +23,14 @@ const API = {
   API_ITEMBALANCES: `${URL}/queries/itembalances/username`,
   API_GETUSER: `${URL}/user/info`,
   API_GETTIME: `${URL}/queries/singlerow/settings/key_/BALLOT_NEXT_ROUND_START`,
-  API_TYPESTR: `${URL}/queries/logactions/typestr/PAY`,
+  API_TYPESTR: `${URL}/queries/logactions/typestr/STAKE`,
   API_LOGSTAKES: `${URL}/queries/singlerow/logstakes/username`,
   API_REFERER: `${URL}/queries/rows/users/referer`,
   API_KEY_TIME_STAMP: `${URL}/queries/singlerow/settings/key_/FRONT_END_LATEST_VER_TIMESTAMP`,
   API_GET_TICK_INFO: `${URL}/queries/singlerow/transactions/username`,
   API_GET_EMAILAUTH: `${URL}/queries/singlerow/emailverifycode/emailaddress`,
   API_GET_CIRCULATIONS: `${URL}/queries/circulations`,
+  API_PUT_USERS: `${URL}/users`,
 };
 
 export { API };

@@ -236,7 +236,6 @@ export {
   strDot,
   conv_jdata_arrkeyvalue,
   getobjtype,
-  strDot,
   LOGGER,
   ISFINITE,
   STRINGER,

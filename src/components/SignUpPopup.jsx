@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import styled from "styled-components";
 import I_x from "../img/icon/I_x.svg";
 import I_chkWhite from "../img/icon/I_chkWhite.svg";
@@ -15,13 +15,8 @@ import { API } from "../configs/api";
 import { TIME_PAGE_TRANSITION_DEF } from "../configs/configs";
 
 export default function SignUpPopup({ walletAddress }) {
-  const referer = localStorage.getItem("referer");
-  var popupX = document.body.offsetWidth / 2 - 200 / 2;
-  //&nbsp;만들 팝업창 좌우 크기의 1/2 만큼 보정값으로 빼주었음
-  var popupY = window.screen.height / 2 - 300 / 2;
-  //&nbsp;만들 팝업창 상하 크기의 1/2 만큼 보정값으로 빼주었음yarn
-  console.log("sadfoijasodifjasdf", popupX, popupY);
   const navigate = useNavigate();
+  const referer = useParams().refere;
   const isAuthEmail = useSelector((state) => state.common.isAuthEmail);
   const isMobile = useSelector((state) => state.common.isMobile);
   const [email, setEmail] = useState("");
@@ -39,10 +34,8 @@ export default function SignUpPopup({ walletAddress }) {
   let [myaddress, setmyaddress] = useState(getmyaddress());
   let [nickname, setnickname] = useState("");
   const [emailAuthNumber, setEmailAuthNumber] = useState("");
-  const emailAuth = localStorage.getItem("MAIL_CHECK");
-  console.log("isAuthEmail", emailAuthNumber);
-  console.log("emailCodeNumber", emailCodeNumber);
-  console.log(typeof emailAuthNumber);
+
+  console.log("asdasd", referer);
 
   function clickRegistrationBtn() {
     setPending(true);
@@ -154,63 +147,6 @@ export default function SignUpPopup({ walletAddress }) {
           return;
         }
       });
-
-    // let respreferer = await axios.get(API.API_QUERY_REFERER + `/users/myreferercode/${referral}`);
-    // LOGGER("", respreferer.data);
-    // let { status, respdata } = respreferer.data;
-    // if (status == "OK" && respdata && respdata?.myreferercode) {
-    // } else {
-    //   SetErrorBar(messages.MSG_REFERER_CODE_INVALID);
-    //   return;
-    // }
-    // axios.get(API.API_GET_EMAILAUTH).then((resp) => {
-    //   LOGGER("emailAddress", resp.data);
-    //   let { status, message } = resp.data;
-    //   if (status == "OK") {
-    //     axios
-    //       .post(API.API_SIGNUP, {
-    //         walletAddress,
-    //         email,
-    //         password: pw,
-    //         referral,
-    //         nickname,
-    //       })
-    //       .then((resp) => {
-    //         console.log("resp", resp.data.message);
-    //         LOGGER("VrPcFLisLA", resp.data);
-
-    //         let { status, message } = resp.data;
-    //         if (status == "OK") {
-    //           SetErrorBar(messages.MSG_DONE_REGISTERING);
-    //           setTimeout(() => {
-    //             navigate("/staking");
-    //           }, TIME_PAGE_TRANSITION_DEF);
-    //         } else if (message === "ERR_EMAIL_COUNTING") {
-    //           SetErrorBar("You can use a Email for only ten MetaMask addresses");
-    //           return;
-    //         } else {
-    //           SetErrorBar(messages.MSG_SERVER_ERR);
-    //           return;
-    //         }
-    //       });
-    //   } else if (message === "ERR_EMAIL_COUNTING") {
-    //     SetErrorBar("You can use a Email for only ten MetaMask addresses");
-    //     return;
-    //   } else {
-    //     SetErrorBar(messages.MSG_SERVER_ERR);
-    //     return;
-    //   }
-    // });
-
-    /** 		const res = await signup(walletAddress, email, pw, referral);
-    console.log(res);
-    if (res) {
-      dispatch(setLogin(walletAddress));
-			localStorage.setItem( "walletAddress" , walletAddress);
-			localStorage.setItem( "address" , walletAddress);
-      SetErrorBar(res.message);
-      navigate("/staking");
-    }*/
   }
 
   useEffect(() => {

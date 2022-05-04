@@ -9,7 +9,7 @@ import I_book from "../../img/icon/I_book.svg";
 import I_person from "../../img/icon/I_person.svg";
 import { strDot } from "../../util/Util";
 
-export default function MmenuPopup({ off }) {
+export default function MmenuPopup({ off, mybalance }) {
   const navigate = useNavigate();
 
   const isLogin = useSelector((state) => state.common.isLogin);
@@ -27,17 +27,14 @@ export default function MmenuPopup({ off }) {
           {isLogin ? (
             <button className="addressBtn">
               <span className="balanceBox">
-                <p className="price">0.0523456</p>
+                <p className="price">{mybalance}</p>
                 <p className="unit">USDT</p>
               </span>
 
               <span className="address">{strDot(isLogin, 4, 4)}</span>
             </button>
           ) : (
-            <button
-              className="connectBtn"
-              onClick={() => navigate("/connectwallet")}
-            >
+            <button className="connectBtn" onClick={() => navigate("/connectwallet")}>
               Connect Wallet
             </button>
           )}
@@ -45,7 +42,9 @@ export default function MmenuPopup({ off }) {
           <nav>
             <button
               className="stakingBtn"
-              onClick={() => navigate(`/staking/detail/${0}`)}
+              onClick={() => {
+                navigate("/staking");
+              }}
             >
               <img src={I_rocket} alt="" />
               <p>Lucky Ticket</p>
@@ -54,10 +53,7 @@ export default function MmenuPopup({ off }) {
               <img src={I_openBox} alt="" />
               <p>Subscription Auction</p>
             </button>
-            <button
-              className="marketPlaceBtn"
-              onClick={() => navigate("/market")}
-            >
+            <button className="marketPlaceBtn" onClick={() => navigate("/market")}>
               <img src={I_market} alt="" />
               <p>Marketplece</p>
             </button>

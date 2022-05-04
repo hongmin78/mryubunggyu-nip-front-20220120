@@ -38,9 +38,7 @@ export default function Staking(props) {
         }
       }
     };
-    setTimeout((_) => {
-      fetchdata();
-    }, 1500);
+    fetchdata();
   }, []);
   const checkIf = (a) => {
     navigate(`/staking/detail/${a}`);
@@ -76,7 +74,9 @@ export default function Staking(props) {
                   <div className="contBox">
                     <img className="mainImg" src={E_staking} alt="" />
                     {isstaked ? (
-                      <button className="buyBtn">Staked</button>
+                      <button className="buyBtn" disabled>
+                        Staked
+                      </button>
                     ) : (
                       <button className="buyBtn" onClick={(e) => checkIf(index)}>
                         Buy Now

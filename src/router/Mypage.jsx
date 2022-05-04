@@ -284,7 +284,7 @@ const MmypageBox = styled.section`
               height: 10.55vw;
               font-size: 3.88vw;
               font-weight: 500;
-              background: #fff;
+              background: red;
               box-shadow: 2px 0px 6px rgba(0, 0, 0, 0.1);
 
               &.moreBtn {

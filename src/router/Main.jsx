@@ -26,16 +26,9 @@ import B_tip2 from "../img/main/B_tip2.png";
 import B_tip3 from "../img/main/B_tip3.png";
 import axios from "axios";
 import { API } from "../configs/api";
-<<<<<<< HEAD
 import { LOGGER, getmyaddress, strDot } from "../util/common";
 import { setDelinquencyAmount } from "../util/store/commonSlice";
 import moment from "moment";
-=======
-import { LOGGER, getmyaddress } from "../util/common";
-import { setDelinquencyAmount } from "../util/store/commonSlice";
-import moment from "moment";
-import { strDot } from "../util/common.js";
->>>>>>> 29d4b2f89b46aba0fb4c00dbcd9f948bfe63e0e6
 
 export default function Main() {
   const navigate = useNavigate();
@@ -61,10 +54,6 @@ export default function Main() {
   const [likeObj, setLikeObj] = useState({});
   let [premiumitemlist, setpremiumitemlist] = useState([]);
   const [typestrPay, setTypestrPay] = useState([]);
-<<<<<<< HEAD
-=======
-  console.log("typestrPay", typestrPay);
->>>>>>> 29d4b2f89b46aba0fb4c00dbcd9f948bfe63e0e6
 
   const dispatch = useDispatch();
 
@@ -74,10 +63,6 @@ export default function Main() {
       behavior: "smooth",
     });
   }
-
-  useEffect(() => {
-    localStorage.removeItem("referer");
-  }, []);
 
   useEffect(() => {
     setTimeout(() => {
@@ -144,7 +129,7 @@ export default function Main() {
       LOGGER("API_TYPESTR", resp.data);
       let { status, payload } = resp.data;
       if (status == "OK") {
-        setTypestrPay(resp.data.list);
+        setTypestrPay(payload.rowdata);
       }
     });
   }
@@ -261,17 +246,17 @@ export default function Main() {
 
           <section className="issueContainer">
             <ul className="issueList" ref={issueRef}>
-              {[1, 2, 3, 4].map((cont, index) => (
+              {typestrPay?.map((cont, index) => (
                 <li className="issueBox" key={index}>
                   <div className="infoBox">
                     <div className="profBox">
                       <img src={E_issueProf} alt="" />
-                      <p className="nickname">@andyfeltham</p>
+                      <p className="nickname">{strDot(cont.username, 3, 15)}</p>
                     </div>
-                    <div className="timeBox">4 mins ago</div>
+                    <div className="timeBox">{moment(new Date()).diff(moment(cont.createdat), "days")}days ago</div>
                   </div>
                   <p className="cont">
-                    purchased <u>Kingkong #122</u> at 158 USDT
+                    {cont.typestr === "PAY" ? "purchased" : ""} <u>{cont.actionname}</u> at {cont.price} USDT
                   </p>
                 </li>
               ))}
@@ -798,6 +783,7 @@ const MmainBox = styled.div`
         }
 
         .cont {
+          text-align: center;
           font-size: 3.33vw;
         }
       }

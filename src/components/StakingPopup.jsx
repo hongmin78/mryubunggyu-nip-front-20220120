@@ -150,7 +150,6 @@ export default function StakingPopup({ off }) {
       to: addresses.contract_USDT, // ETH_TESTNET.
       data: abistr,
     }).then((resp) => {
-      setisloader_00(false);
       if (resp) {
       } else {
         setDone(false);
@@ -188,12 +187,12 @@ export default function StakingPopup({ off }) {
           let allowanceineth = getethrep(resp);
           LOGGER("gCwXF6Jjkh", resp, allowanceineth);
           setallowanceamount(allowanceineth); //				setallowanceamount ( 100 )
+          setisloader_00(false);
           if (allowanceineth > 0) {
             setisallowanceok(false);
           } else {
           }
         });
-        //					Setisloader(false);
       });
     });
   };
@@ -219,11 +218,11 @@ export default function StakingPopup({ off }) {
       methodname: "stake",
       aargs: [
         addresses.contract_USDT, // .ETH_TESTNET
-        getweirep("" + MIN_STAKE_AMOUNT),
+        getweirep("" + 100),
         myaddress,
       ],
     });
-    console.log("1");
+
     LOGGER("", abistr); //		return
     const callreqtx = async (_) => {
       let resp;
@@ -235,8 +234,7 @@ export default function StakingPopup({ off }) {
           data: abistr,
           //			, value : ''
         });
-        console.log("8");
-        setisloader_01(false);
+
         if (resp) {
         } else {
           setDone(false);
@@ -286,15 +284,15 @@ export default function StakingPopup({ off }) {
           });
           setDone(false);
           off(false);
-          console.log("3");
           LOGGER("uQJ2POHvP8", resp_balances);
           setstakedbalance(getethrep(resp_balances));
-          setDone(false);
-          off(false);
+          setisloader_01(false);
+          navigate("/");
         });
       } catch (err) {
         setisloader_01(false);
         setDone(false);
+        off(false);
         LOGGER();
         SetErrorBar(messages.MSG_USER_DENIED_TX);
       }
@@ -458,10 +456,8 @@ export default function StakingPopup({ off }) {
               </span>
 
               <ul className="priceList">
-                <li className="price">{MIN_STAKE_AMOUNT} USDT</li>
-                <li className="exchange">
-                  ${+MIN_STAKE_AMOUNT && tickerusdt ? putCommaAtPrice(+MIN_STAKE_AMOUNT * +tickerusdt) : null}
-                </li>
+                <li className="price">100 USDT</li>
+                <li className="exchange">100$</li>
               </ul>
             </div>
 

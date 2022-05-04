@@ -16,19 +16,11 @@ export default function AuctionItem0228({ data, index, likeObj, setLikeObj }) {
     setLikeObj({ ...dataObj });
   }
 
-<<<<<<< HEAD
-  const contentsReload = (id) => {
-    window.location.href = `/#/auction/detail/${id}`;
-    window.location.reload();
-    window.scrollTo(0, 0);
-  };
-=======
   function contentsReload(id) {
     window.location.href = `/#/auction/detail/${id}`;
     window.location.reload();
     window.scrollTo(0, 0);
   }
->>>>>>> 29d4b2f89b46aba0fb4c00dbcd9f948bfe63e0e6
 
   if (isMobile)
     return (

@@ -6,20 +6,73 @@ import { useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import Header from "../components/header/Header";
 import DetailHeader from "../components/header/DetailHeader";
+import axios from "axios";
+import { API } from "../configs/api";
+import { LOGGER, getmyaddress, getobjtype } from "../util/common.js";
+import SetErrorBar from "../util/SetErrorBar";
 
 export default function EditProf() {
   const navigate = useNavigate();
-  const profImgInputRef = useRef();
   const covImgInputRef = useRef();
-
   const isMobile = useSelector((state) => state.common.isMobile);
-
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [onClickChange, setOnClickChange] = useState(false);
+  const [imgBase64, setImgBase64] = useState([]); // 파일 base64
+  const [imgFile, setImgFile] = useState(null); //파일
 
-  function OnChangeProfImgFile(file) {}
-  function OnChangeCovImgFile(file) {}
+  const handleChangeFile = (event) => {
+    console.log(event.target.files);
+    setImgFile(event.target.files);
+    //fd.append("file", event.target.files)
+    setImgBase64([]);
+    for (var i = 0; i < event.target.files.length; i++) {
+      if (event.target.files[i]) {
+        let reader = new FileReader();
+        reader.readAsDataURL(event.target.files[i]); // 1. 파일을 읽어 버퍼에 저장합니다.
+        // 파일 상태 업데이트
+        reader.onloadend = () => {
+          // 2. 읽기가 완료되면 아래코드가 실행됩니다.
+          const base64 = reader.result;
+          console.log(base64);
+          if (base64) {
+            //  images.push(base64.toString())
+            var base64Sub = base64.toString();
+
+            setImgBase64((imgBase64) => [...imgBase64, base64Sub]);
+            //  setImgBase64(newObj);
+            // 파일 base64 상태 업데이트
+            //  console.log(images)
+          }
+        };
+      }
+    }
+  };
+
+  const onclick_submit = async () => {
+    let myaddress = getmyaddress();
+    const fd = new FormData();
+    Object.values(imgFile).forEach((file) => fd.append("file", file));
+    fd.append("email", email);
+    fd.append("pw", pw);
+    if (email && pw && imgBase64) {
+      await axios
+        .put(API.API_PUT_USERS + `/${myaddress}`, fd, {
+          email,
+          pw,
+          headers: {
+            "Content-Type": `multipart/form-data; `,
+          },
+        })
+        .then((res) => {
+          SetErrorBar("OK");
+          navigate("/mypage");
+        })
+        .catch((err) => console.log("err", err));
+    } else {
+      SetErrorBar("please incert all");
+    }
+  };
 
   if (isMobile)
     return (
@@ -27,34 +80,10 @@ export default function EditProf() {
         <DetailHeader title="Edit Profile" />
         <MeditProfBox>
           <ul className="setList">
-            <li className="profImgBox">
-              <p className="title">Upload a profile image</p>
-
-              <button
-                className="profImgBtn"
-                onClick={() => profImgInputRef.current.click()}
-              >
-                <div className="innerBox">
-                  <img src={I_img} alt="" />
-                </div>
-
-                <input
-                  ref={profImgInputRef}
-                  className="noSpace"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => OnChangeProfImgFile(e.target.files[0])}
-                />
-              </button>
-            </li>
-
             <li className="covImgBox">
               <p className="title">Upload a profile image</p>
 
-              <button
-                className="covImgBtn"
-                onClick={() => covImgInputRef.current.click()}
-              >
+              <button className="covImgBtn" onClick={() => covImgInputRef.current.click()}>
                 <div className="innerBox">
                   <p className="explain">
                     Recommended size: 1500x500px.
@@ -64,14 +93,14 @@ export default function EditProf() {
 
                   <button className="chooseBtn">Choose File</button>
                 </div>
-
+                {/* 
                 <input
                   ref={covImgInputRef}
                   className="noSpace"
                   type="file"
                   accept="image/*"
                   onChange={(e) => OnChangeCovImgFile(e.target.files[0])}
-                />
+                /> */}
               </button>
             </li>
 
@@ -79,11 +108,7 @@ export default function EditProf() {
               <p className="title">Email</p>
 
               <div className="inputBox">
-                <input
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="enter email"
-                />
+                <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="enter email" />
               </div>
               <button className="updateBtn" onClick={() => {}}>
                 Update email preferences
@@ -102,10 +127,7 @@ export default function EditProf() {
                 />
               </div>
 
-              <button
-                className="changeBtn"
-                onClick={() => setOnClickChange(true)}
-              >
+              <button className="changeBtn" onClick={() => setOnClickChange(true)}>
                 Change Password
               </button>
             </li>
@@ -149,50 +171,38 @@ export default function EditProf() {
           </article>
 
           <ul className="setList">
-            <li className="profImgBox">
-              <p className="title">Upload a profile image</p>
-
-              <button
-                className="profImgBtn"
-                onClick={() => profImgInputRef.current.click()}
-              >
-                <div className="innerBox">
-                  <img src={I_img} alt="" />
-                </div>
-
-                <input
-                  ref={profImgInputRef}
-                  className="noSpace"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => OnChangeProfImgFile(e.target.files[0])}
-                />
-              </button>
-            </li>
-
             <li className="covImgBox">
               <p className="title">Upload a profile image</p>
 
-              <button
-                className="covImgBtn"
-                onClick={() => covImgInputRef.current.click()}
-              >
-                <div className="innerBox">
-                  <p className="explain">
-                    Recommended size: 1500x500px.
-                    <br />
-                    JPG, PNG, or GIF. 10MB max size.
-                  </p>
+              <button className="covImgBtn" onClick={() => covImgInputRef.current.click()}>
+                {imgBase64.length > 0 ? (
+                  imgBase64.map((item, i) => {
+                    return (
+                      <div className="innerBox" key={i}>
+                        <img src={item} alt="First slide" style={{ width: "400px", height: "300px" }} />
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="innerBox">
+                    <p className="explain">
+                      Recommended size: 1500x500px.
+                      <br />
+                      JPG, PNG, or GIF. 10MB max size.
+                    </p>
 
-                  <button className="chooseBtn">Choose File</button>
-                </div>
+                    <button className="chooseBtn">Choose File</button>
+                  </div>
+                )}
 
                 <input
                   ref={covImgInputRef}
                   className="noSpace"
                   type="file"
                   accept="image/*"
-                  onChange={(e) => OnChangeCovImgFile(e.target.files[0])}
+                  onChange={(e) => {
+                    handleChangeFile(e);
+                  }}
                 />
               </button>
             </li>
@@ -201,11 +211,7 @@ export default function EditProf() {
               <p className="title">Email</p>
 
               <div className="inputBox">
-                <input
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="enter email"
-                />
+                <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="enter email" />
 
                 <button className="updateBtn" onClick={() => {}}>
                   Update email preferences
@@ -226,10 +232,7 @@ export default function EditProf() {
                   />
                 </div>
 
-                <button
-                  className="changeBtn"
-                  onClick={() => setOnClickChange(true)}
-                >
+                <button className="changeBtn" onClick={() => setOnClickChange(true)}>
                   Change Password
                 </button>
               </div>
@@ -254,7 +257,12 @@ export default function EditProf() {
               </li>
             )}
 
-            <button className="saveBtn" onClick={() => {}}>
+            <button
+              className="saveBtn"
+              onClick={() => {
+                onclick_submit();
+              }}
+            >
               Save Changes
             </button>
           </ul>

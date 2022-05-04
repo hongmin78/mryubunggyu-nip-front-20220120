@@ -207,7 +207,7 @@ export default function Recommend() {
               </ul>
 
               <ul className="dataList">
-                {myRefererList.map((cont, index) => (
+                {myRefererList?.map((cont, index) => (
                   <li key={index}>
                     <span>{cont.id}</span>
                     <span>{strDot(cont.username, 4, 4)}</span>
