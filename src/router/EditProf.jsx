@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import I_ltArw from "../img/icon/I_ltArw.svg";
 import I_img from "../img/icon/I_img.svg";
 import { useRef, useState } from "react";
@@ -12,11 +12,14 @@ import { LOGGER, getmyaddress, getobjtype } from "../util/common.js";
 import SetErrorBar from "../util/SetErrorBar";
 
 export default function EditProf() {
+  const location = useLocation().state;
+  console.log("asdasdasdasdasd", location);
   const navigate = useNavigate();
   const covImgInputRef = useRef();
   const isMobile = useSelector((state) => state.common.isMobile);
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(location?.email);
   const [pw, setPw] = useState("");
+  const [pwCheck, setPwCheck] = useState("");
   const [onClickChange, setOnClickChange] = useState(false);
   const [imgBase64, setImgBase64] = useState([]); // 파일 base64
   const [imgFile, setImgFile] = useState(null); //파일
@@ -55,22 +58,39 @@ export default function EditProf() {
     Object.values(imgFile).forEach((file) => fd.append("file", file));
     fd.append("email", email);
     fd.append("pw", pw);
+    fd.append("image64", imgBase64);
     if (email && pw && imgBase64) {
-      await axios
-        .put(API.API_PUT_USERS + `/${myaddress}`, fd, {
-          email,
-          pw,
-          headers: {
-            "Content-Type": `multipart/form-data; `,
-          },
-        })
-        .then((res) => {
-          SetErrorBar("OK");
-          navigate("/mypage");
-        })
-        .catch((err) => console.log("err", err));
+      if (pw === pwCheck) {
+        await axios
+          .put(API.API_PUT_USERS + `/${myaddress}`, fd, {
+            email,
+            pw,
+            headers: {
+              "Content-Type": `multipart/form-data; `,
+            },
+          })
+          .then((res) => {
+            SetErrorBar("OK");
+            console.log(res);
+            // navigate("/mypage");
+          })
+          .catch((err) => console.log("err", err));
+      } else {
+        SetErrorBar("Password and Confirm password are different");
+      }
     } else {
       SetErrorBar("please incert all");
+    }
+  };
+
+  const checkEmail = (e) => {
+    var regExp = /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+    // 형식에 맞는 경우 true 리턴
+    if (regExp.test(e.target.value)) {
+      setEmail(e.target.value);
+    } else {
+      setEmail("");
+      SetErrorBar("Check Email form please");
     }
   };
 
@@ -108,7 +128,12 @@ export default function EditProf() {
               <p className="title">Email</p>
 
               <div className="inputBox">
-                <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="enter email" />
+                <input
+                  type="email"
+                  defaultValue={email}
+                  onChange={(e) => checkEmail(e.target.value)}
+                  placeholder={location.eamil ? location : "insert a email"}
+                />
               </div>
               <button className="updateBtn" onClick={() => {}}>
                 Update email preferences
@@ -211,7 +236,12 @@ export default function EditProf() {
               <p className="title">Email</p>
 
               <div className="inputBox">
-                <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="enter email" />
+                <input
+                  type="email"
+                  defaultValue={email}
+                  onBlur={checkEmail}
+                  placeholder={location ? location.email : "insert a email"}
+                />
 
                 <button className="updateBtn" onClick={() => {}}>
                   Update email preferences
@@ -226,36 +256,28 @@ export default function EditProf() {
                 <div className="inputBox">
                   <input
                     type="password"
-                    value={pw}
+                    defaultChecked={pw}
                     onChange={(e) => setPw(e.target.value)}
                     placeholder="enter password"
                   />
                 </div>
-
-                <button className="changeBtn" onClick={() => setOnClickChange(true)}>
-                  Change Password
-                </button>
               </div>
             </li>
 
-            {onClickChange && (
-              <li className="chkPwBox">
-                <p className="title">Confirm password</p>
+            <li className="chkPwBox">
+              <p className="title">Confirm password</p>
 
-                <div className="inputCont">
-                  <div className="inputBox">
-                    <input
-                      type="password"
-                      value={pw}
-                      onChange={(e) => setPw(e.target.value)}
-                      placeholder="enter confirm password"
-                    />
-                  </div>
-
-                  <p className="alarm">Passwords are not matching.</p>
+              <div className="inputCont">
+                <div className="inputBox">
+                  <input
+                    type="password"
+                    defaultChecked={pw}
+                    onChange={(e) => setPwCheck(e.target.value)}
+                    placeholder="enter confirm password"
+                  />
                 </div>
-              </li>
-            )}
+              </div>
+            </li>
 
             <button
               className="saveBtn"

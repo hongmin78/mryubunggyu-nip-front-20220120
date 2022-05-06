@@ -49,9 +49,7 @@ export default function Mypage() {
     }
   };
   useEffect((_) => {
-    setTimeout((_) => {
-      fetchdata();
-    }, TIME_FETCH_MYADDRESS_DEF);
+    fetchdata();
   }, []);
 
   if (isMobile)
@@ -142,7 +140,7 @@ export default function Mypage() {
             <div className="contBox">
               <div className="leftBox">
                 <span className="profImg">
-                  <img src={E_prof} alt="" />
+                  <img src={userinfo?.profileimageurl} alt="" />
                 </span>
 
                 <span className="adressContainer">
@@ -161,7 +159,7 @@ export default function Mypage() {
                   </button>
 
                   <div className="hoverBox">
-                    <button className="editBtn displayBtn" onClick={() => navigate("/editprof")}>
+                    <button className="editBtn displayBtn" onClick={() => navigate("/editprof", { state: userinfo })}>
                       <p>Edit Profile</p>
                     </button>
                   </div>

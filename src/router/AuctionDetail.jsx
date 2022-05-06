@@ -41,6 +41,7 @@ export default function AuctionDetail() {
   const [moreCollection, setMoreCollection] = useState([]);
   let [attributes, setattributes] = useState([]);
   const [demoCollection, setDemoCollection] = useState([]);
+  const [offers, setOffers] = useState([]);
 
   const onclicklike = (_) => {
     let myaddress = getmyaddress();
@@ -67,13 +68,6 @@ export default function AuctionDetail() {
     setToggleLike(!toggleLike);
   };
 
-  const onclickfavorite = (_) => {
-    axios.post(API.API_TOGGLE_FAVORITE).then((resp) => {
-      LOGGER("xMYQNYFa9d", resp.data);
-    });
-    setToggleLike(!toggleLike);
-    LOGGER("8FCYJgzDZX");
-  };
   function onClickAuctionNextBtn() {
     if (!moreRef.current.children[0]) return;
     const wrapWidth = moreRef.current.offsetWidth;
@@ -98,9 +92,6 @@ export default function AuctionDetail() {
       }
     });
   };
-
-  // console.log("attributes");
-  // console.log(attributes);
 
   const setIcon = (param) => {
     switch (param) {
@@ -138,15 +129,6 @@ export default function AuctionDetail() {
     getitem();
     getAuction();
   }, []);
-  /**   useEffect(() => {
-    axios
-      .ge t(`http://3.35.117.87:34705/auction/item/${params.dna}`)
-      .then((res) => {
-        console.log(res.data[0]);
-        setItemD ata(res.data[0]);
-      });
-    getAuction();
-  }, []); */
 
   useEffect(() => {
     if (!moreRef.current.children[0]) return;
@@ -271,7 +253,7 @@ export default function AuctionDetail() {
                 </ul>
 
                 <div className="contBox">
-                  {category === 0 && <Offer />}
+                  {category === 0 && <Offer params={params} />}
                   {category === 1 && <Details0303 attributes={attributes} />}
                   {category === 2 && <Properties itemdata={itemdata} />}
                 </div>
@@ -442,7 +424,7 @@ export default function AuctionDetail() {
                 </ul>
 
                 <div className="contBox">
-                  {category === 0 && <Offer />}
+                  {category === 0 && <Offer params={params} />}
                   {category === 1 && <Details0303 attributes={attributes} />}
                   {category === 2 && <Properties itemdata={itemdata} />}
                 </div>

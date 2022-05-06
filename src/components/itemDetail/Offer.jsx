@@ -2,37 +2,59 @@ import { useSelector } from "react-redux";
 import styled from "styled-components";
 import { D_offer } from "../../data/DauctionDetail";
 import { strDot } from "../../util/Util";
+import axios from "axios";
+import { API } from "../../configs/api";
+import { useEffect, useState } from "react";
 
-export default function Offer() {
+export default function Offer(params) {
   const isMobile = useSelector((state) => state.common.isMobile);
+  const [offersInfo, setOffersInfo] = useState([]);
+
+  console.log("params", params.params.itemid);
+
+  const fetchdata = () => {
+    axios
+      .get(API.API_GET_OFFERS + `/${params.params.itemid}`)
+      .then((resp) => {
+        if (resp.data.status === "OK") {
+          console.log(resp.data.list);
+          setOffersInfo(resp.data.list);
+        }
+      })
+      .catch((error) => console.log(error));
+  };
+  useEffect(() => {
+    fetchdata();
+  }, []);
 
   if (isMobile)
     return (
       <MofferBox>
-        {D_offer.map((cont, index) => (
-          <li key={index}>
-            <img src={cont.prfoImg} alt="" />
-            <div className="infoBox">
-              <p className="info">{`${cont.price} ${cont.unit} ${strDot(cont.address, 11, 4)}`}</p>
-              <p className="time">{cont.time}</p>
-            </div>
-          </li>
-        ))}
+        {offersInfo &&
+          offersInfo?.map((cont, index) => (
+            <li key={index}>
+              <img src={cont.prfoImg} alt="" />
+              <div className="infoBox">
+                <p className="info">{`${cont.price} ${cont.priceunit} ${strDot(cont.address, 11, 4)}`}</p>
+                <p className="time">{cont.createdat}</p>
+              </div>
+            </li>
+          ))}
       </MofferBox>
     );
   else
     return (
       <PofferBox>
-        {D_offer.map((cont, index) => (
-          <li key={index}>
-            <img src={cont.prfoImg} alt="" />
-
-            <div className="infoBox">
-              <p className="info">{`${cont.price} ${cont.unit} ${strDot(cont.address, 11, 4)}`}</p>
-              <p className="time">{cont.time}</p>
-            </div>
-          </li>
-        ))}
+        {offersInfo &&
+          offersInfo?.map((cont, index) => (
+            <li key={index}>
+              <img src={cont.prfoImg} alt="" />
+              <div className="infoBox">
+                <p className="info">{`${cont.price} ${cont.priceunit} ${strDot(cont.address, 11, 4)}`}</p>
+                <p className="time">{strDot(cont.createdat, 10)}</p>
+              </div>
+            </li>
+          ))}
       </PofferBox>
     );
 }
