@@ -89,6 +89,16 @@ const abi = [
         name: "_itemid",
         type: "string",
       },
+      {
+        internalType: "address",
+        name: "_referer",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_refererfeerate",
+        type: "uint256",
+      },
     ],
     name: "pay",
     outputs: [],

@@ -259,7 +259,7 @@ export default function MarketDetail() {
 
           {params.popup && (
             <>
-              <BidPopup off={setBidPopup} />
+              < off={setBidPopup} />
               <PopupBg blur off={setBidPopup} />
             </>
           )}

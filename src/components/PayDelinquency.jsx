@@ -187,6 +187,7 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
           auxdata: {
             erc20: addresses.contract_USDT, // .ETH_TESTNET
             target: addresses.payment_for_delinquency, // .ETH_TESTNET
+            nettype: net,
           },
           nettype: net,
         })

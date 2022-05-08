@@ -7,39 +7,48 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import { LOGGER , getmyaddress, onclickcopy, PARSER
-	, conv_jdata_arrkeyvalue
+import {
+  LOGGER,
+  getmyaddress,
+  onclickcopy,
+  PARSER,
+  conv_jdata_arrkeyvalue,
 } from "../util/common";
 import { API } from "../configs/api";
-import SetErrorBar from '../util/SetErrorBar'
-import { messages } from '../configs/messages'
+import SetErrorBar from "../util/SetErrorBar";
+import { messages } from "../configs/messages";
 import { net } from "../configs/net";
 
 export default function BidPopup({ off }) {
-	const params = useParams();
+  const params = useParams();
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
   const [price, setPrice] = useState("");
-	let [ itemdata , setitemdata ] = useState()
-	let [ attributes , setattributes ] = useState ( [] )
+  let [itemdata, setitemdata] = useState();
+  let [attributes, setattributes] = useState([]);
 
-	const getitem=_=>{
-		axios.get( API.API_ITEMDETAIL + `/${params.itemid}?nettype=${net}`).then ( resp => { LOGGER ('7FzS4oxYPN' , resp.data )
-		let { status , respdata}=resp.data
-		if (status == 'OK'){
-			setitemdata( respdata )
-			let { metadata}=respdata
-			if ( metadata ) {
-				let jmetadata= PARSER( metadata )
-				LOGGER ( 'oXhffF8eTM' , conv_jdata_arrkeyvalue ( jmetadata ) )
-				setattributes ( conv_jdata_arrkeyvalue ( jmetadata ) )
-			}
-		}
-	})
-	}
-	useEffect (_=>{
-		getitem() //		getAuction()
-	} , [] )
+  const onclickbid = () => {};
+
+  const getitem = (_) => {
+    axios
+      .get(API.API_ITEMDETAIL + `/${params.itemid}?nettype=${net}`)
+      .then((resp) => {
+        LOGGER("7FzS4oxYPN", resp.data);
+        let { status, respdata } = resp.data;
+        if (status == "OK") {
+          setitemdata(respdata);
+          let { metadata } = respdata;
+          if (metadata) {
+            let jmetadata = PARSER(metadata);
+            LOGGER("oXhffF8eTM", conv_jdata_arrkeyvalue(jmetadata));
+            setattributes(conv_jdata_arrkeyvalue(jmetadata));
+          }
+        }
+      });
+  };
+  useEffect((_) => {
+    getitem(); //		getAuction()
+  }, []);
 
   if (isMobile)
     return (
@@ -54,7 +63,7 @@ export default function BidPopup({ off }) {
 
         <article className="contBox">
           <div className="itemBox">
-            <img src={itemdata?.url } alt="" />
+            <img src={itemdata?.url} alt="" />
             <p>You are about to purchase a Kingkong #12</p>
           </div>
 
@@ -110,7 +119,7 @@ export default function BidPopup({ off }) {
 
         <article className="contBox">
           <div className="itemBox">
-            <img src={ itemdata?.url } alt="" />
+            <img src={itemdata?.url} alt="" />
             <p>You are about to purchase a Kingkong #12</p>
           </div>
 

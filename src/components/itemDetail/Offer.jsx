@@ -11,11 +11,11 @@ export default function Offer(params) {
   const isMobile = useSelector((state) => state.common.isMobile);
   const [offersInfo, setOffersInfo] = useState([]);
 
-  console.log("params", params.params.itemid);
+  console.log("params", params.params?.itemid);
 
   const fetchdata = () => {
     axios
-      .get(API.API_GET_OFFERS + `/${params.params.itemid}?nettype=${net}`)
+      .get(API.API_GET_OFFERS + `/${params.params?.itemid}?nettype=${net}`)
       .then((resp) => {
         if (resp.data.status === "OK") {
           console.log(resp.data.list);

@@ -77,15 +77,16 @@ export default function EditProf() {
           })
           .catch((err) => console.log("err", err));
       } else {
-        SetErrorBar("Password and Confirm password are different");
+        SetErrorBar("Passwords did not match!");
       }
     } else {
-      SetErrorBar("please incert all");
+      SetErrorBar("please insert all");
     }
   };
 
   const checkEmail = (e) => {
-    var regExp = /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+    var regExp =
+      /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
     // 형식에 맞는 경우 true 리턴
     if (regExp.test(e.target.value)) {
       setEmail(e.target.value);
@@ -104,7 +105,10 @@ export default function EditProf() {
             <li className="covImgBox">
               <p className="title">Upload a profile image</p>
 
-              <button className="covImgBtn" onClick={() => covImgInputRef.current.click()}>
+              <button
+                className="covImgBtn"
+                onClick={() => covImgInputRef.current.click()}
+              >
                 <div className="innerBox">
                   <p className="explain">
                     Recommended size: 1500x500px.
@@ -153,7 +157,10 @@ export default function EditProf() {
                 />
               </div>
 
-              <button className="changeBtn" onClick={() => setOnClickChange(true)}>
+              <button
+                className="changeBtn"
+                onClick={() => setOnClickChange(true)}
+              >
                 Change Password
               </button>
             </li>
@@ -200,12 +207,19 @@ export default function EditProf() {
             <li className="covImgBox">
               <p className="title">Upload a profile image</p>
 
-              <button className="covImgBtn" onClick={() => covImgInputRef.current.click()}>
+              <button
+                className="covImgBtn"
+                onClick={() => covImgInputRef.current.click()}
+              >
                 {imgBase64.length > 0 ? (
                   imgBase64.map((item, i) => {
                     return (
                       <div className="innerBox" key={i}>
-                        <img src={item} alt="First slide" style={{ width: "400px", height: "300px" }} />
+                        <img
+                          src={item}
+                          alt="First slide"
+                          style={{ width: "400px", height: "300px" }}
+                        />
                       </div>
                     );
                   })

@@ -183,6 +183,7 @@ export default function StakingPopup({ off }) {
           auxdata: {
             erc20: addresses.contract_USDT, // .ETH_TESTNET
             target: addresses.contract_stake, // .ETH_TESTNET
+            nettype: net,
           },
           nettype: NETTYPE,
         })
@@ -226,11 +227,6 @@ export default function StakingPopup({ off }) {
       setDone(false);
       return;
     }
-    /** 		if (myaddress){}
-		else { 
-			SetErrorBar( messages.MSG_PLEASE_ CONNECT_WALLET )
-			return 
-		} */
     let abistr = getabistr_forfunction({
       contractaddress: addresses.contract_stake, // .ETH_TESTNET
       abikind: "STAKE",
@@ -251,7 +247,6 @@ export default function StakingPopup({ off }) {
           from: myaddress,
           to: addresses.contract_stake, // .ETH_TESTNET
           data: abistr,
-          //			, value : ''
         });
 
         if (resp) {
@@ -260,17 +255,9 @@ export default function StakingPopup({ off }) {
           SetErrorBar(messages.MSG_USER_DENIED_TX);
           return;
         }
-        let resptype = getobjtype(resp);
-        let txhash;
         // eslint-disable-next-line default-case
-        switch (resptype) {
-          case "String":
-            txhash = resp;
-            break;
-          case "Object":
-            txhash = resp.txHash;
-            break;
-        }
+        let txhash = resp;
+
         axios
           .post(API.API_TXS + `/${txhash}?nettype=${net}`, {
             txhash,
@@ -282,6 +269,7 @@ export default function StakingPopup({ off }) {
               currencyaddress: addresses.contract_USDT, // ETH_TESTNET.
               nettype: NETTYPE,
             },
+            nettype: net,
           })
           .then((resp) => {
             LOGGER("", resp);
@@ -320,7 +308,6 @@ export default function StakingPopup({ off }) {
       console.log("4");
     };
     callreqtx();
-    //		.then(resp=>{ LOGGER( '' , resp )		})
   };
 
   if (isMobile)

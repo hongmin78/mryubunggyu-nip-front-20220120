@@ -64,17 +64,21 @@ export default function MyItems() {
     let myaddress = getmyaddress();
     setmyaddress(myaddress);
     LOGGER("myaddress", myaddress);
-    axios.get(API.API_USERINFO + `/${myaddress}?nettype=${net}`).then((resp) => {
-      LOGGER("myticket", resp.data);
-      let { status, respdata } = resp.data;
-      if (status == "OK") {
-        setuserinfo(respdata);
-      }
-    });
-    axios.get(API.API_GETTIME+`?nettype=${net}`).then((resp) => {
+    axios
+      .get(API.API_USERINFO + `/${myaddress}?nettype=${net}`)
+      .then((resp) => {
+        if (resp.data && resp.data.respdata) {
+          let { respdata } = resp.data;
+          LOGGER("myticket", resp.data);
+          setuserinfo(respdata);
+        }
+      });
+    axios.get(API.API_GETTIME + `?nettype=${net}`).then((resp) => {
       // LOGGER("getTime", resp.data);
-      let { status, respdata } = resp.data;
-      setGetTimeMoment(respdata.value_);
+      if (resp.data && resp.data.respdata) {
+        let { status, respdata } = resp.data;
+        setGetTimeMoment(respdata.value_);
+      }
     });
 
     axios
@@ -90,36 +94,43 @@ export default function MyItems() {
       })
       .catch((err) => console.log(err));
 
-    axios.get(API.API_ITEMBALANCES + `/${myaddress}?nettype=${net}`).then((res) => {
-      let { list, status } = res.data;
-      LOGGER("getTime", res.data);
-      if (status === "OK" && list?.length) {
-        setItemBalData(list);
-        LOGGER("ITEMBALANCES", list);
-        list.forEach((el) => {
-          let { duetimeunix } = el;
-        });
-      }
-    });
-
-    false &&
-      axios.get(API.API_QUERY_SINGLEROW + `/transactions/username/${myaddress}?typestr=STAKE&status=1&nettype=${net}`).then((resp) => {
-        LOGGER("", resp.data);
-        let { status, respdata } = resp.data;
-        if (status == "OK") {
-          let { txhash } = respdata;
-          setstakedata(respdata);
-          settxhash(strDot(txhash, 16, 0));
-          settxscanurl(MAP_NETTYPE_SCAN[respdata.nettype] + `/tx/${txhash}`);
-          let buydatetime = moment(respdata.createdat);
-          setbuydate([
-            buydatetime.year().toString().substr(2),
-            (1 + buydatetime.month()).toString().padStart(2, "0"),
-            buydatetime.day().toString().padStart(2, "0"),
-            buydatetime.hour().toString().padStart(2, "0"),
-          ]);
+    axios
+      .get(API.API_ITEMBALANCES + `/${myaddress}?nettype=${net}`)
+      .then((res) => {
+        let { list, status } = res.data;
+        LOGGER("getTime", res.data);
+        if (status === "OK" && list?.length) {
+          setItemBalData(list);
+          LOGGER("ITEMBALANCES", list);
+          list.forEach((el) => {
+            let { duetimeunix } = el;
+          });
         }
       });
+
+    false &&
+      axios
+        .get(
+          API.API_QUERY_SINGLEROW +
+            `/transactions/username/${myaddress}?typestr=STAKE&status=1&nettype=${net}`
+        )
+        .then((resp) => {
+          LOGGER("", resp.data);
+          let { status, respdata } = resp.data;
+          if (status == "OK") {
+            let { txhash } = respdata;
+            setstakedata(respdata);
+            settxhash(strDot(txhash, 16, 0));
+            settxscanurl(MAP_NETTYPE_SCAN[respdata.nettype] + `/tx/${txhash}`);
+            let buydatetime = moment(respdata.createdat);
+            setbuydate([
+              buydatetime.year().toString().substr(2),
+              (1 + buydatetime.month()).toString().padStart(2, "0"),
+              buydatetime.day().toString().padStart(2, "0"),
+              buydatetime.hour().toString().padStart(2, "0"),
+            ]);
+          }
+        });
     //true
     true &&
       query_with_arg({
@@ -150,13 +161,15 @@ export default function MyItems() {
 
   useEffect(() => {
     setInterval(() => {
-      getTimeMoment && setTimeMoment(moment(moment.unix(getTimeMoment) - moment()));
+      getTimeMoment &&
+        setTimeMoment(moment(moment.unix(getTimeMoment) - moment()));
     }, 1000);
   }, [getTimeMoment]);
 
   useEffect(() => {
     setInterval(() => {
-      gettimeReceivables && setTimeReceivables(moment(moment.unix(gettimeReceivables) - moment()));
+      gettimeReceivables &&
+        setTimeReceivables(moment(moment.unix(gettimeReceivables) - moment()));
     }, 1000);
   }, [gettimeReceivables]);
 
@@ -186,17 +199,20 @@ export default function MyItems() {
 
   useEffect(() => {
     let myaddress = getmyaddress();
-    axios.get(API.API_LOGSTAKES + `/${myaddress}?nettype=${net}`).then((resp) => {
-      LOGGER("API_LOGSTAKES", resp.data);
-      let { status, respdata } = resp.data;
-      if (status == "OK") {
-        setlogstakes(respdata);
-        setGetTickTimer(respdata?.createdat);
-      }
-    });
+    axios
+      .get(API.API_LOGSTAKES + `/${myaddress}?nettype=${net}`)
+      .then((resp) => {
+        LOGGER("API_LOGSTAKES", resp.data);
+        let { status, respdata } = resp.data;
+        if (status == "OK") {
+          setlogstakes(respdata);
+          setGetTickTimer(respdata?.createdat);
+        }
+      });
 
     setInterval(() => {
-      getTickTimer && setTickTimer(moment(getTickTimer).add(90, "days") - moment());
+      getTickTimer &&
+        setTickTimer(moment(getTickTimer).add(90, "days") - moment());
     }, 1000);
   }, [getTickTimer]);
   useEffect((_) => {
@@ -208,19 +224,6 @@ export default function MyItems() {
 
   // 더한 값이 1657164482 이다 안더한값이 1649906882 dete 값 1649923113 // 뺀값 7241
 
-  useEffect((_) => {
-    setTimeout((_) => {
-      fetchdata();
-    }, TIME_FETCH_MYADDRESS_DEF);
-  }, []);
-  useEffect((_) => {
-    setTimeout((_) => {
-      fetchdata();
-
-      // console.log("moment", moment().toDate());
-    }, TIME_FETCH_MYADDRESS_DEF);
-  }, []);
-
   // console.log("asodiasdoiasjd");
   // // // console.log(getTickTimer);
   // console.log(moment(moment(getTickTimer).add(90, "days") - moment(getTickTimer)).format("yyyy-MM-DD"));
@@ -231,14 +234,16 @@ export default function MyItems() {
 
   useEffect(() => {
     let myaddress = getmyaddress();
-    axios.get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`).then((resp) => {
-      LOGGER("API_ticketInfo", resp.data);
+    axios
+      .get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`)
+      .then((resp) => {
+        LOGGER("API_ticketInfo", resp.data);
 
-      let { status, respdata } = resp.data;
-      if (status == "OK" && respdata !== null) {
-        setTickInfo(respdata);
-      }
-    });
+        let { status, respdata } = resp.data;
+        if (status == "OK" && respdata !== null) {
+          setTickInfo(respdata);
+        }
+      });
   }, []);
 
   if (isMobile)
@@ -249,8 +254,12 @@ export default function MyItems() {
             <button
               className="sortBtn"
               ref={sortBtnRef}
-              onFocus={() => (sortBtnRef.current.style.border = "3px solid #000")}
-              onBlur={() => (sortBtnRef.current.style.border = "1px solid #d9d9d9")}
+              onFocus={() =>
+                (sortBtnRef.current.style.border = "3px solid #000")
+              }
+              onBlur={() =>
+                (sortBtnRef.current.style.border = "1px solid #d9d9d9")
+              }
               onClick={() => setSortPopup(true)}
             >
               <p>{sortOpt}</p>
@@ -259,7 +268,12 @@ export default function MyItems() {
 
             {sortPopup && (
               <>
-                <SelectPopup off={setSortPopup} dataList={D_sortList} select={sortOpt} setFunc={setSortOpt} />
+                <SelectPopup
+                  off={setSortPopup}
+                  dataList={D_sortList}
+                  select={sortOpt}
+                  setFunc={setSortOpt}
+                />
 
                 <PopupBg off={setSortPopup} />
               </>
@@ -268,7 +282,11 @@ export default function MyItems() {
 
           <ul className="filterList">
             {filterList.map((cont, index) => (
-              <li key={index} className={filter === index ? "on" : ""} onClick={() => setFilter(index)}>
+              <li
+                key={index}
+                className={filter === index ? "on" : ""}
+                onClick={() => setFilter(index)}
+              >
                 {cont}
               </li>
             ))}
@@ -276,7 +294,10 @@ export default function MyItems() {
         </div>
 
         <ul className="itemList">
-          <li className="stakingBox" style={isstaked ? {} : { display: "none" }}>
+          <li
+            className="stakingBox"
+            style={isstaked ? {} : { display: "none" }}
+          >
             <div className="imgBox">
               <div className="topBar">
                 <img className="itemImg" src={E_staking} alt="" />
@@ -299,23 +320,30 @@ export default function MyItems() {
                 </div>
                 <div className="saleBox"></div>
 
-                <button className="actionBtn" onClick={() => navigate("/staking")}>
+                <button
+                  className="actionBtn"
+                  onClick={() => navigate("/staking")}
+                >
                   Buy
                 </button>
 
                 <p className="description">
-                  The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days
-                  and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
-                  completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all transactions
-                  in your account will be suspended. It operates normally after applying a penalty of 10% of the winning
-                  bid amount.
+                  The NFT purchased by participating in the subscription auction
+                  generates 12% of profits after 3 days and is sold random. In
+                  addition, the results are announced at 9:00 AM, and the
+                  transaction is completed from 9:00 AM to 21:00 PM. If the
+                  transaction is not completed within time, all transactions in
+                  your account will be suspended. It operates normally after
+                  applying a penalty of 10% of the winning bid amount.
                 </p>
               </div>
             )}
             {ticketInfo && (
               <div className="infoBox">
                 <div className="titleBox">
-                  <strong className="title">Lucky Ticket #{ticketInfo.id}</strong>
+                  <strong className="title">
+                    Lucky Ticket #{ticketInfo.id}
+                  </strong>
                 </div>
 
                 <div className="ownedBox">
@@ -367,11 +395,13 @@ export default function MyItems() {
                 </button>
 
                 <p className="description">
-                  The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days
-                  and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
-                  completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all transactions
-                  in your account will be suspended. It operates normally after applying a penalty of 10% of the winning
-                  bid amount.
+                  The NFT purchased by participating in the subscription auction
+                  generates 12% of profits after 3 days and is sold random. In
+                  addition, the results are announced at 9:00 AM, and the
+                  transaction is completed from 9:00 AM to 21:00 PM. If the
+                  transaction is not completed within time, all transactions in
+                  your account will be suspended. It operates normally after
+                  applying a penalty of 10% of the winning bid amount.
                 </p>
               </div>
             )}
@@ -394,7 +424,9 @@ export default function MyItems() {
 
                   <div className="infoBox">
                     <div className="titleBox">
-                      <strong className="title">{item.itemdata.titlename}</strong>
+                      <strong className="title">
+                        {item.itemdata.titlename}
+                      </strong>
                     </div>
 
                     <div className="ownedBox">
@@ -415,9 +447,15 @@ export default function MyItems() {
                         <p className="key">Ending in</p>
                         <ul className="timeList">
                           <li>{timeReceivables && timeReceivables.days()}일</li>
-                          <li>{timeReceivables && timeReceivables.hour()}시간</li>
-                          <li>{timeReceivables && timeReceivables.minutes()}분</li>
-                          <li>{timeReceivables && timeReceivables.second()}초</li>
+                          <li>
+                            {timeReceivables && timeReceivables.hour()}시간
+                          </li>
+                          <li>
+                            {timeReceivables && timeReceivables.minutes()}분
+                          </li>
+                          <li>
+                            {timeReceivables && timeReceivables.second()}초
+                          </li>
                         </ul>
                       </div>
                     </div>
@@ -425,7 +463,9 @@ export default function MyItems() {
                     <ul className="priceBox">
                       <li>
                         <p className="key">Current price</p>
-                        <p className="value">{putCommaAtPrice(item.amount)} USDT</p>
+                        <p className="value">
+                          {putCommaAtPrice(item.amount)} USDT
+                        </p>
                       </li>
                     </ul>
 
@@ -440,11 +480,14 @@ export default function MyItems() {
                     </button>
 
                     <p className="description">
-                      The NFT purchased by participating in the subscription auction generates 12% of profits after 3
-                      days and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
-                      completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all
-                      transactions in your account will be suspended. It operates normally after applying a penalty of
-                      10% of the winning bid amount.
+                      The NFT purchased by participating in the subscription
+                      auction generates 12% of profits after 3 days and is sold
+                      random. In addition, the results are announced at 9:00 AM,
+                      and the transaction is completed from 9:00 AM to 21:00 PM.
+                      If the transaction is not completed within time, all
+                      transactions in your account will be suspended. It
+                      operates normally after applying a penalty of 10% of the
+                      winning bid amount.
                     </p>
                   </div>
                 </li>
@@ -478,7 +521,9 @@ export default function MyItems() {
                     <div className="price">
                       <p className="key">Current price</p>
 
-                      <strong className="value">{putCommaAtPrice(item.buyprice)} USDT</strong>
+                      <strong className="value">
+                        {putCommaAtPrice(item.buyprice)} USDT
+                      </strong>
                     </div>
                     <div className="time">
                       <p className="key">Ending in</p>
@@ -498,8 +543,9 @@ export default function MyItems() {
                     </li>
                   </ul>
                   <p className="description">
-                    King Kong NFT can be staking or sold to Marketplace at a price of up to 25%. If you steaking, you
-                    will get 30% annual NIP COIN reward.
+                    King Kong NFT can be staking or sold to Marketplace at a
+                    price of up to 25%. If you steaking, you will get 30% annual
+                    NIP COIN reward.
                   </p>
                 </div>
               </li>
@@ -514,7 +560,11 @@ export default function MyItems() {
         <div className="topBar">
           <ul className="filterList">
             {filterList.map((cont, index) => (
-              <li key={index} className={filter === index ? "on" : ""} onClick={() => setFilter(index)}>
+              <li
+                key={index}
+                className={filter === index ? "on" : ""}
+                onClick={() => setFilter(index)}
+              >
                 {cont}
               </li>
             ))}
@@ -524,8 +574,12 @@ export default function MyItems() {
             <button
               className="sortBtn"
               ref={sortBtnRef}
-              onFocus={() => (sortBtnRef.current.style.border = "3px solid #000")}
-              onBlur={() => (sortBtnRef.current.style.border = "1px solid #d9d9d9")}
+              onFocus={() =>
+                (sortBtnRef.current.style.border = "3px solid #000")
+              }
+              onBlur={() =>
+                (sortBtnRef.current.style.border = "1px solid #d9d9d9")
+              }
               onClick={() => setSortPopup(true)}
             >
               <p>{sortOpt}</p>
@@ -534,7 +588,12 @@ export default function MyItems() {
 
             {sortPopup && (
               <>
-                <SelectPopup off={setSortPopup} dataList={D_sortList} select={sortOpt} setFunc={setSortOpt} />
+                <SelectPopup
+                  off={setSortPopup}
+                  dataList={D_sortList}
+                  select={sortOpt}
+                  setFunc={setSortOpt}
+                />
 
                 <PopupBg off={setSortPopup} />
               </>
@@ -543,7 +602,10 @@ export default function MyItems() {
         </div>
 
         <ul className="itemList">
-          <li className="stakingBox" style={isstaked ? {} : { display: "none" }}>
+          <li
+            className="stakingBox"
+            style={isstaked ? {} : { display: "none" }}
+          >
             <div className="imgBox">
               <div className="topBar">
                 <img className="itemImg" src={E_staking} alt="" />
@@ -566,16 +628,21 @@ export default function MyItems() {
                 </div>
                 <div className="saleBox"></div>
 
-                <button className="actionBtn" onClick={() => navigate("/staking")}>
+                <button
+                  className="actionBtn"
+                  onClick={() => navigate("/staking")}
+                >
                   Buy
                 </button>
 
                 <p className="description">
-                  The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days
-                  and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
-                  completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all transactions
-                  in your account will be suspended. It operates normally after applying a penalty of 10% of the winning
-                  bid amount.
+                  The NFT purchased by participating in the subscription auction
+                  generates 12% of profits after 3 days and is sold random. In
+                  addition, the results are announced at 9:00 AM, and the
+                  transaction is completed from 9:00 AM to 21:00 PM. If the
+                  transaction is not completed within time, all transactions in
+                  your account will be suspended. It operates normally after
+                  applying a penalty of 10% of the winning bid amount.
                 </p>
               </div>
             )}
@@ -583,7 +650,9 @@ export default function MyItems() {
             {ticketInfo && (
               <div className="infoBox">
                 <div className="titleBox">
-                  <strong className="title">Lucky Ticket #{ticketInfo.id}</strong>
+                  <strong className="title">
+                    Lucky Ticket #{ticketInfo.id}
+                  </strong>
                 </div>
 
                 <div className="ownedBox">
@@ -637,11 +706,13 @@ export default function MyItems() {
                 </button>
 
                 <p className="description">
-                  The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days
-                  and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
-                  completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all transactions
-                  in your account will be suspended. It operates normally after applying a penalty of 10% of the winning
-                  bid amount.
+                  The NFT purchased by participating in the subscription auction
+                  generates 12% of profits after 3 days and is sold random. In
+                  addition, the results are announced at 9:00 AM, and the
+                  transaction is completed from 9:00 AM to 21:00 PM. If the
+                  transaction is not completed within time, all transactions in
+                  your account will be suspended. It operates normally after
+                  applying a penalty of 10% of the winning bid amount.
                 </p>
               </div>
             )}
@@ -665,7 +736,9 @@ export default function MyItems() {
 
                   <div className="infoBox">
                     <div className="titleBox">
-                      <strong className="title">{item.itemdata.titlename}</strong>
+                      <strong className="title">
+                        {item.itemdata.titlename}
+                      </strong>
                     </div>
 
                     <div className="ownedBox">
@@ -684,20 +757,30 @@ export default function MyItems() {
                       </div>
 
                       <div className="value">
-                        <strong className="price">{putCommaAtPrice(item.amount)} USDT</strong>
+                        <strong className="price">
+                          {putCommaAtPrice(item.amount)} USDT
+                        </strong>
 
                         <ul className="timeList">
                           <li>{timeReceivables && timeReceivables.days()}일</li>
-                          <li>{timeReceivables && timeReceivables.hour()}시간</li>
-                          <li>{timeReceivables && timeReceivables.minutes()}분</li>
-                          <li>{timeReceivables && timeReceivables.second()}초</li>
+                          <li>
+                            {timeReceivables && timeReceivables.hour()}시간
+                          </li>
+                          <li>
+                            {timeReceivables && timeReceivables.minutes()}분
+                          </li>
+                          <li>
+                            {timeReceivables && timeReceivables.second()}초
+                          </li>
                         </ul>
                       </div>
 
                       <ul className="priceBox">
                         <li>
                           <p className="key">Current price</p>
-                          <p className="value">{putCommaAtPrice(item.amount)} USDT</p>
+                          <p className="value">
+                            {putCommaAtPrice(item.amount)} USDT
+                          </p>
                         </li>
                       </ul>
                     </div>
@@ -713,11 +796,14 @@ export default function MyItems() {
                     </button>
 
                     <p className="description">
-                      The NFT purchased by participating in the subscription auction generates 12% of profits after 3
-                      days and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
-                      completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all
-                      transactions in your account will be suspended. It operates normally after applying a penalty of
-                      10% of the winning bid amount.
+                      The NFT purchased by participating in the subscription
+                      auction generates 12% of profits after 3 days and is sold
+                      random. In addition, the results are announced at 9:00 AM,
+                      and the transaction is completed from 9:00 AM to 21:00 PM.
+                      If the transaction is not completed within time, all
+                      transactions in your account will be suspended. It
+                      operates normally after applying a penalty of 10% of the
+                      winning bid amount.
                     </p>
                   </div>
                 </li>
@@ -750,7 +836,9 @@ export default function MyItems() {
                   <div className="saleBox">
                     <div className="key">
                       <p className="price">Current price</p>
-                      <strong className="value">{putCommaAtPrice(item.buyprice)} USDT</strong>
+                      <strong className="value">
+                        {putCommaAtPrice(item.buyprice)} USDT
+                      </strong>
                     </div>
                     <div className="value">
                       <ul className="timeList">
@@ -770,11 +858,14 @@ export default function MyItems() {
                   </div>
 
                   <p className="description">
-                    The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days
-                    and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
-                    completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all
-                    transactions in your account will be suspended. It operates normally after applying a penalty of 10%
-                    of the winning bid amount.
+                    The NFT purchased by participating in the subscription
+                    auction generates 12% of profits after 3 days and is sold
+                    random. In addition, the results are announced at 9:00 AM,
+                    and the transaction is completed from 9:00 AM to 21:00 PM.
+                    If the transaction is not completed within time, all
+                    transactions in your account will be suspended. It operates
+                    normally after applying a penalty of 10% of the winning bid
+                    amount.
                   </p>
                 </div>
               </li>
@@ -919,7 +1010,8 @@ const MmyItemsBox = styled.section`
         overflow: hidden;
         border-radius: 12px;
         border: 20px solid transparent;
-        background-image: linear-gradient(to right, red 0%, orange 100%), linear-gradient(to right, red 0%, orange 100%);
+        background-image: linear-gradient(to right, red 0%, orange 100%),
+          linear-gradient(to right, red 0%, orange 100%);
         background-origin: border-box;
         background-clip: content-box, border-box;
 
@@ -1225,7 +1317,8 @@ const PmyItemsBox = styled.section`
         overflow: hidden;
         border-radius: 12px;
         border: 20px solid transparent;
-        background-image: linear-gradient(red, red), linear-gradient(to right, red 0%, orange 100%);
+        background-image: linear-gradient(red, red),
+          linear-gradient(to right, red 0%, orange 100%);
         background-origin: border-box;
         background-clip: content-box, border-box;
         @media screen and (max-width: 1440px) {
@@ -1508,7 +1601,8 @@ const PmyItemsBox = styled.section`
         overflow: hidden;
         border-radius: 12px;
         border: 20px solid transparent;
-        background-image: linear-gradient(to right, red 0%, orange 100%), linear-gradient(to right, red 0%, orange 100%);
+        background-image: linear-gradient(to right, red 0%, orange 100%),
+          linear-gradient(to right, red 0%, orange 100%);
         background-origin: border-box;
         background-clip: content-box, border-box;
         @media screen and (max-width: 1440px) {
