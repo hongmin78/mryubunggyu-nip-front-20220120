@@ -36,21 +36,33 @@ export default function Header() {
   const [ticketInfo, setTickInfo] = useState();
 
   useEffect(() => {
-    let myaddress = getmyaddress();
-    axios
-      .get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`)
-      .then((resp) => {
-        LOGGER("API_ticketInfo", resp.data);
+    setTimeout(() => {
+      let myaddress = getmyaddress();
+      if (myaddress) {
+      } else {
+        SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+        return;
+      }
+      axios
+        .get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`)
+        .then((resp) => {
+          LOGGER("API_ticketInfo", resp.data);
 
-        let { status, respdata } = resp.data;
-        if (status == "OK" && respdata !== null) {
-          setTickInfo(respdata);
-        }
-      });
+          let { status, respdata } = resp.data;
+          if (status == "OK" && respdata !== null) {
+            setTickInfo(respdata);
+          }
+        });
+    }, 1000);
   }, []);
 
   const fetchdataStaked = async () => {
     let myaddress = getmyaddress();
+    if (myaddress) {
+    } else {
+      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+      return;
+    }
     LOGGER("", myaddress);
     let resp = await axios.get(
       API.API_USERINFO + `/${myaddress}?nettype=${net}`
@@ -64,6 +76,11 @@ export default function Header() {
   };
   const fetchdata = (_) => {
     let myaddress = getmyaddress();
+    if (myaddress) {
+    } else {
+      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+      return;
+    }
     LOGGER("MXZfykw8Mw", myaddress);
     setmyaddress(myaddress);
     if (myaddress) {
@@ -89,8 +106,10 @@ export default function Header() {
 
   useEffect(
     (_) => {
-      fetchdataStaked();
-      fetchdata();
+      setTimeout(() => {
+        fetchdataStaked();
+        fetchdata();
+      }, 1000);
     },
     [isLogin, address]
   );
