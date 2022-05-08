@@ -29,6 +29,7 @@ import { API } from "../configs/api";
 import { LOGGER, getmyaddress, strDot } from "../util/common";
 import { setDelinquencyAmount } from "../util/store/commonSlice";
 import moment from "moment";
+import { net } from "../configs/net";
 
 export default function Main() {
   const navigate = useNavigate();
@@ -69,7 +70,7 @@ export default function Main() {
       let address = getmyaddress();
       console.log("address", address);
       axios
-        .get(`${API.API_DELINQUENCY}/${address}`)
+        .get(`${API.API_DELINQUENCY}/${address}?nettype=${net}`)
         .then((res) => {
           console.log("RES", res);
           let { status } = res.data;
@@ -94,7 +95,7 @@ export default function Main() {
           alert(err.message);
         });
       axios
-        .get(API.API_RECEIVABLES + `/${address}`)
+        .get(API.API_RECEIVABLES + `/${address}?nettype=${net}`)
         .then((res) => {
           let { list } = res.data;
           LOGGER("receivables", list);
@@ -109,7 +110,7 @@ export default function Main() {
   function fetchitems() {
     axios
       //      .get(  "http://3.35.117.87:34705/auction/list", { params: { limit: 16 } })
-      .get(API.API_COMMONITEMS + `/items/group_/kong/0/128/id/DESC`)
+      .get(API.API_COMMONITEMS + `/items/group_/kong/0/128/id/DESC?nettype=${net}`)
       .then((res) => {
         // console.log(res.data);
         let { status, list } = res.data;
@@ -118,14 +119,14 @@ export default function Main() {
           setAuctionListSecond(list.slice(64));
         }
       });
-    axios.get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC`).then((resp) => {
+    axios.get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC?nettype=${net}`).then((resp) => {
       LOGGER("De0Mlt93PT", resp.data);
       let { status, list } = resp.data;
       if (status == "OK") {
         setpremiumitemlist(list);
       }
     });
-    axios.get(API.API_TYPESTR).then((resp) => {
+    axios.get(API.API_TYPESTR+`?nettype=${net}`).then((resp) => {
       LOGGER("API_TYPESTR", resp.data);
       let { status, payload } = resp.data;
       if (status == "OK") {

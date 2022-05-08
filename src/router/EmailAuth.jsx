@@ -1,6 +1,11 @@
 import axios from "axios";
 import { useEffect } from "react";
-import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  Navigate,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import styled from "styled-components";
 import { authEmail } from "../api/Signup";
 import { messages } from "../configs/messages";
@@ -10,6 +15,7 @@ import { TIME_PAGE_TRANSITION_DEF } from "../configs/configs";
 import { API } from "../configs/api";
 import { setisAuthEmail } from "../util/store/commonSlice";
 import { useDispatch } from "react-redux";
+import { net } from "../configs/net";
 
 export default function EmailAuth() {
   const navigate = useNavigate();
@@ -22,7 +28,11 @@ export default function EmailAuth() {
     console.log(email, authNum, walletaddress);
     const postemailauth = (_) => {
       axios
-        .post(API.API_EMAIL_VERIFY, { email, authNum, walletaddress })
+        .post(API.API_EMAIL_VERIFY + `?nettype=${net}`, {
+          email,
+          authNum,
+          walletaddress,
+        })
         .then((resp) => {
           LOGGER("", resp.data);
           let { status } = resp.data;

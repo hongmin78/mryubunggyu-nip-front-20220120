@@ -14,6 +14,7 @@ import axios from "axios";
 import { API } from "../configs/api";
 import { messages } from "../configs/messages";
 import { TIME_PAGE_TRANSITION_DEF } from "../configs/configs";
+import { net } from "../configs/net";
 
 export default function ConnectWallet() {
   const navigate = useNavigate();
@@ -39,7 +40,10 @@ export default function ConnectWallet() {
       let address = res[0];
       setWalletAddress(address);
       try {
-        const resp = await axios.post(API.API_LOGIN, { address, cryptotype: "ETH" }); // login( address )
+        const resp = await axios.post(API.API_LOGIN + `?nettype=${net}`, {
+          address,
+          cryptotype: "ETH",
+        }); // login( address )
         console.log("", resp.data); // walletAddress
         let { status } = resp.data;
         if (status == "OK") {

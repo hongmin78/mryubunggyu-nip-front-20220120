@@ -27,8 +27,16 @@ import { LOGGER } from "./util/common";
 import { strDot } from "./util/Util";
 import axios from "axios";
 import { API } from "./configs/api";
-import { browserName, browserVersion, isChrome, isFirefox, isSafari, isEdge } from "react-device-detect";
+import {
+  browserName,
+  browserVersion,
+  isChrome,
+  isFirefox,
+  isSafari,
+  isEdge,
+} from "react-device-detect";
 import { CURRENT_TIME } from "./configs/configs";
+import { net } from "./configs/net";
 
 function App() {
   const dispatch = useDispatch();
@@ -40,30 +48,36 @@ function App() {
 
   useEffect(
     (_) => {
-      axios.get(API.API_KEY_TIME_STAMP).then((resp) => {
+      axios.get(API.API_KEY_TIME_STAMP + `?nettype=${net}`).then((resp) => {
         LOGGER("asdasdasdasds", resp.data);
         let { status, respdata } = resp.data;
         if (status == "OK") {
-          if (parseInt(respdata.value) > CURRENT_TIME) window.location.reload("/");
+          if (parseInt(respdata.value) > CURRENT_TIME)
+            window.location.reload("/");
         } else {
           return;
         }
       });
 
       const queryuseraddress = (address) => {
-        axios.get(API.API_QUERY_USERADDRESS + `/users/username/${address}`).then((resp) => {
-          LOGGER("QlzCkJ0KYu", resp.data);
-          let { status, respdata } = resp.data;
-          if (status == "OK") {
-            if (respdata?.id) {
-              dispatch(setaddress(address));
-              dispatch(setLogin(address));
-              setaddress(address);
+        axios
+          .get(
+            API.API_QUERY_USERADDRESS +
+              `/users/username/${address}?nettype=${net}`
+          )
+          .then((resp) => {
+            LOGGER("QlzCkJ0KYu", resp.data);
+            let { status, respdata } = resp.data;
+            if (status == "OK") {
+              if (respdata?.id) {
+                dispatch(setaddress(address));
+                dispatch(setLogin(address));
+                setaddress(address);
+              }
+            } else {
+              LOGGER("user not found");
             }
-          } else {
-            LOGGER("user not found");
-          }
-        });
+          });
       };
       let { ethereum } = window;
       if (ethereum) {
@@ -139,13 +153,23 @@ function App() {
   return (
     <AppBox>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
+      <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossOrigin="true"
+      />
       <link
         href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
         rel="stylesheet"
       />
-      <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
-      <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Mono:wght@500&display=swap" rel="stylesheet" />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap"
+        rel="stylesheet"
+      />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Red+Hat+Mono:wght@500&display=swap"
+        rel="stylesheet"
+      />
 
       <GlobalStyle />
       <HashRouter>
@@ -158,7 +182,10 @@ function App() {
 
           <Route path="/connectwallet" element={<ConnectWallet />} />
           <Route path="/connectwallet/:refere" element={<ConnectWallet />} />
-          <Route path="/emailauth/:email/:authNum/:walletaddress" element={<EmailAuth />} />
+          <Route
+            path="/emailauth/:email/:authNum/:walletaddress"
+            element={<EmailAuth />}
+          />
           <Route path="/emailauth/:email/:authNum" element={<EmailAuth />} />
 
           <Route path="/staking" element={<Staking />} />
@@ -170,7 +197,10 @@ function App() {
 
           <Route path="/market" element={<Market />} />
           <Route path="/market/detail/:itemid" element={<MarketDetail />} />
-          <Route path="/market/detail/:itemid/:popup" element={<MarketDetail />} />
+          <Route
+            path="/market/detail/:itemid/:popup"
+            element={<MarketDetail />}
+          />
 
           <Route path="/mypage" element={<Mypage />} />
           <Route path="/editprof" element={<EditProf />} />

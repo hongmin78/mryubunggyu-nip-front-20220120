@@ -13,6 +13,7 @@ import { LOGGER , getmyaddress, onclickcopy, PARSER
 import { API } from "../configs/api";
 import SetErrorBar from '../util/SetErrorBar'
 import { messages } from '../configs/messages'
+import { net } from "../configs/net";
 
 export default function BidPopup({ off }) {
 	const params = useParams();
@@ -23,7 +24,7 @@ export default function BidPopup({ off }) {
 	let [ attributes , setattributes ] = useState ( [] )
 
 	const getitem=_=>{
-		axios.get( API.API_ITEMDETAIL + `/${params.itemid }`).then ( resp => { LOGGER ('7FzS4oxYPN' , resp.data )
+		axios.get( API.API_ITEMDETAIL + `/${params.itemid}?nettype=${net}`).then ( resp => { LOGGER ('7FzS4oxYPN' , resp.data )
 		let { status , respdata}=resp.data
 		if (status == 'OK'){
 			setitemdata( respdata )

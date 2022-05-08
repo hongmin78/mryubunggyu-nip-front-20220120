@@ -25,6 +25,7 @@ import { LOGGER, getmyaddress } from "../util/common";
 import { ITEM_PRICE_DEF } from "../configs/configs";
 import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
+import { net } from "../configs/net";
 export default function MarketDetail() {
   const navigate = useNavigate();
   const params = useParams();
@@ -44,7 +45,7 @@ export default function MarketDetail() {
       SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
       return;
     }
-    axios.post(API.API_TOGGLE_FAVORITE + `/${itemdata?.itemid}`, { username: myaddress }).then((resp) => {
+    axios.post(API.API_TOGGLE_FAVORITE + `/${itemdata?.itemid}?nettype=${net}`, { username: myaddress }).then((resp) => {
       LOGGER("", resp.data);
       let { status, respdata } = resp.data;
       if (status == "OK") {
@@ -96,7 +97,7 @@ export default function MarketDetail() {
     }
   }, [moreIndex]);
   const getitem = (_) => {
-    axios.get(API.API_ITEMDETAIL + `/${params.itemid}`).then((resp) => {
+    axios.get(API.API_ITEMDETAIL + `/${params.itemid}?nettype=${net}`).then((resp) => {
       LOGGER("BYLjMqzlfl", resp.data);
       let { status, respdata } = resp.data;
       if (status == "OK") {
@@ -105,7 +106,7 @@ export default function MarketDetail() {
     });
   };
   const getotheritems = (_) => {
-    axios.get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC`).then((resp) => {
+    axios.get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC?nettype=${net}`).then((resp) => {
       LOGGER("", resp.data);
       let { status, list } = resp.data;
       if (status == "OK") {

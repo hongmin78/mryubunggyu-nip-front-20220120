@@ -12,6 +12,7 @@ import { API } from "../configs/api";
 import { getmyaddress, LOGGER } from "../util/common";
 import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
+import { net } from "../configs/net";
 
 export default function Staking(props) {
   const navigate = useNavigate();
@@ -26,7 +27,9 @@ export default function Staking(props) {
     const fetchdata = async (_) => {
       let myaddress = getmyaddress();
       LOGGER("", myaddress);
-      let resp = await axios.get(API.API_USERINFO + `/${myaddress}`);
+      let resp = await axios.get(
+        API.API_USERINFO + `/${myaddress}?nettype=${net}`
+      );
       LOGGER("rBojncz0CD", resp.data);
       let { status, respdata } = resp.data;
       if (status == "OK") {
@@ -78,7 +81,10 @@ export default function Staking(props) {
                         Staked
                       </button>
                     ) : (
-                      <button className="buyBtn" onClick={(e) => checkIf(index)}>
+                      <button
+                        className="buyBtn"
+                        onClick={(e) => checkIf(index)}
+                      >
                         Buy Now
                       </button>
                     )}
@@ -97,7 +103,9 @@ export default function Staking(props) {
         <Header />
         <PstakingDetailBox>
           <div className="innerBox">
-            <strong className="title">Stake to participate in the auction!</strong>
+            <strong className="title">
+              Stake to participate in the auction!
+            </strong>
             <ul className="ticketList">
               {[1, 2, 3, 4].map((cont, index) => (
                 <li key={index}>

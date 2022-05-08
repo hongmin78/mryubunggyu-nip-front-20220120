@@ -28,6 +28,7 @@ import { messages } from "../configs/messages";
 import { ITEM_PRICE_DEF } from "../configs/configs";
 import { GET_CONTENTS_DEF } from "../configs/configs";
 import moment from "moment";
+import { net } from "../configs/net";
 
 export default function AuctionDetail() {
   const params = useParams();
@@ -50,7 +51,7 @@ export default function AuctionDetail() {
       SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
       return;
     }
-    axios.post(API.API_TOGGLE_FAVORITE + `/${itemdata?.itemid}`, { username: myaddress }).then((resp) => {
+    axios.post(API.API_TOGGLE_FAVORITE + `/${itemdata?.itemid}?nettype=${net}`, { username: myaddress }).then((resp) => {
       LOGGER("", resp.data);
       let { status, respdata } = resp.data;
       if (status == "OK") {
@@ -106,7 +107,7 @@ export default function AuctionDetail() {
 
   function getAuction() {
     axios //      .get("http://3.35.1 17.87:34705/auction/list", { params: { limit: 8 } })
-      .get(API.API_GET_CIRCULATIONS)
+      .get(API.API_GET_CIRCULATIONS+`?nettype=${net}`)
       .then((resp) => {
         LOGGER("", resp.data);
         let { status, list } = resp.data;
@@ -116,7 +117,7 @@ export default function AuctionDetail() {
         //        console.log(res.data);
         //      setMoreCollection(res.data);
       });
-    axios.get(API.API_COMMONITEMS + `/items/group_/kong/0/128/id/DESC`).then((resp) => {
+    axios.get(API.API_COMMONITEMS + `/items/group_/kong/0/128/id/DESC?nettype=${net}`).then((resp) => {
       LOGGER("", resp.data);
       let { status, list } = resp.data;
       if (status == "OK") {

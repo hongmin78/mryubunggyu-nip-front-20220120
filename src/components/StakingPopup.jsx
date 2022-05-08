@@ -8,7 +8,12 @@ import { useSelector } from "react-redux";
 import PopupBg from "./PopupBg";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { getabistr_forfunction, query_with_arg, query_noarg, query_eth_balance } from "../util/contract-calls";
+import {
+  getabistr_forfunction,
+  query_with_arg,
+  query_noarg,
+  query_eth_balance,
+} from "../util/contract-calls";
 import { addresses } from "../configs/addresses";
 import { DECIMALS_DISP_DEF } from "../configs/configs"; // MIN_STAKE_AMOUNT,
 import { LOGGER, getmyaddress, getobjtype } from "../util/common";
@@ -18,10 +23,16 @@ import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
 import { API } from "../configs/api";
 import awaitTransactionMined from "await-transaction-mined";
-import { web3, BASE_CURRENCY, STAKE_CURRENCY, NETTYPE } from "../configs/configweb3";
+import {
+  web3,
+  BASE_CURRENCY,
+  STAKE_CURRENCY,
+  NETTYPE,
+} from "../configs/configweb3";
 import { TX_POLL_OPTIONS } from "../configs/configs";
 import I_spinner from "../img/icon/I_spinner.svg";
 import { strDot } from "../util/Util";
+import { net } from "../configs/net";
 const MODE_DEV_PROD = "PROD";
 export default function StakingPopup({ off }) {
   const navigate = useNavigate();
@@ -43,17 +54,23 @@ export default function StakingPopup({ off }) {
   let [MIN_STAKE_AMOUNT, setMIN_STAKE_AMOUNT] = useState("100");
   useEffect((_) => {
     const spinner = spinnerHref.current; // document.querySelector("Spinner");
-    spinner.animate([{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], {
-      duration: 1000,
-      iterations: Infinity,
-    });
+    spinner.animate(
+      [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
+      {
+        duration: 1000,
+        iterations: Infinity,
+      }
+    );
     const spinner_approve = spinnerHref_approve.current; // document.querySelector("Spinner");
-    spinner_approve.animate([{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], {
-      duration: 1000,
-      iterations: Infinity,
-    });
+    spinner_approve.animate(
+      [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
+      {
+        duration: 1000,
+        iterations: Infinity,
+      }
+    );
     const fetchdata = async (_) => {
-      axios.get(API.API_TICKERS).then((resp) => {
+      axios.get(API.API_TICKERS + `?nettype=${net}`).then((resp) => {
         LOGGER("MDmEMQ5xde", resp.data);
         let { status, payload, list } = resp;
         //				let { USDT } = payload.list
@@ -159,7 +176,7 @@ export default function StakingPopup({ off }) {
       let txhash = resp;
       SetErrorBar(messages.MSG_TX_REQUEST_SENT);
       axios
-        .post(API.API_TXS + `/${txhash}`, {
+        .post(API.API_TXS + `/${txhash}?nettype=${net}`, {
           txhash,
           username: myaddress,
           typestr: "APPROVE",
@@ -174,26 +191,28 @@ export default function StakingPopup({ off }) {
           SetErrorBar(messages.MSG_TX_REQUEST_SENT);
         });
 
-      awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then((minedtxreceipt) => {
-        LOGGER("asdasdasd", minedtxreceipt);
-        SetErrorBar(messages.MSG_TX_FINALIZED);
+      awaitTransactionMined
+        .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+        .then((minedtxreceipt) => {
+          LOGGER("asdasdasd", minedtxreceipt);
+          SetErrorBar(messages.MSG_TX_FINALIZED);
 
-        query_with_arg({
-          contractaddress: addresses.contract_USDT, // .ETH_TESTNET
-          abikind: "ERC20",
-          methodname: "allowance",
-          aargs: [myaddress, addresses.contract_stake], // ETH_TESTNET.
-        }).then((resp) => {
-          let allowanceineth = getethrep(resp);
-          LOGGER("gCwXF6Jjkh", resp, allowanceineth);
-          setallowanceamount(allowanceineth); //				setallowanceamount ( 100 )
-          setisloader_00(false);
-          if (allowanceineth > 0) {
-            setisallowanceok(false);
-          } else {
-          }
+          query_with_arg({
+            contractaddress: addresses.contract_USDT, // .ETH_TESTNET
+            abikind: "ERC20",
+            methodname: "allowance",
+            aargs: [myaddress, addresses.contract_stake], // ETH_TESTNET.
+          }).then((resp) => {
+            let allowanceineth = getethrep(resp);
+            LOGGER("gCwXF6Jjkh", resp, allowanceineth);
+            setallowanceamount(allowanceineth); //				setallowanceamount ( 100 )
+            setisloader_00(false);
+            if (allowanceineth > 0) {
+              setisallowanceok(false);
+            } else {
+            }
+          });
         });
-      });
     });
   };
   const onclick_buy = async (_) => {
@@ -253,7 +272,7 @@ export default function StakingPopup({ off }) {
             break;
         }
         axios
-          .post(API.API_TXS + `/${txhash}`, {
+          .post(API.API_TXS + `/${txhash}?nettype=${net}`, {
             txhash,
             username: myaddress,
             typestr: "STAKE",
@@ -271,24 +290,26 @@ export default function StakingPopup({ off }) {
           });
         /***** */
 
-        awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
-          LOGGER("", minedtxreceipt);
-          console.log("2");
-          SetErrorBar(messages.MSG_TX_FINALIZED);
-          setisloader_01(true);
-          let resp_balances = await query_with_arg({
-            contractaddress: addresses.contract_stake,
-            abikind: "STAKE",
-            methodname: "_balances",
-            aargs: [myaddress],
+        awaitTransactionMined
+          .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+          .then(async (minedtxreceipt) => {
+            LOGGER("", minedtxreceipt);
+            console.log("2");
+            SetErrorBar(messages.MSG_TX_FINALIZED);
+            setisloader_01(true);
+            let resp_balances = await query_with_arg({
+              contractaddress: addresses.contract_stake,
+              abikind: "STAKE",
+              methodname: "_balances",
+              aargs: [myaddress],
+            });
+            setDone(false);
+            off(false);
+            LOGGER("uQJ2POHvP8", resp_balances);
+            setstakedbalance(getethrep(resp_balances));
+            setisloader_01(false);
+            navigate("/");
           });
-          setDone(false);
-          off(false);
-          LOGGER("uQJ2POHvP8", resp_balances);
-          setstakedbalance(getethrep(resp_balances));
-          setisloader_01(false);
-          navigate("/");
-        });
       } catch (err) {
         setisloader_01(false);
         setDone(false);
@@ -324,7 +345,10 @@ export default function StakingPopup({ off }) {
                 <ul className="priceList">
                   <li className="price">{MIN_STAKE_AMOUNT} USDT</li>
                   <li className="exchange">
-                    ${+MIN_STAKE_AMOUNT && tickerusdt ? putCommaAtPrice(+MIN_STAKE_AMOUNT * +tickerusdt) : null}
+                    $
+                    {+MIN_STAKE_AMOUNT && tickerusdt
+                      ? putCommaAtPrice(+MIN_STAKE_AMOUNT * +tickerusdt)
+                      : null}
                   </li>
                 </ul>
               </div>
@@ -403,7 +427,11 @@ export default function StakingPopup({ off }) {
                   onclick_approve();
                   false && navigate(-1);
                 }}
-                style={+allowanceamount > 0 ? { visibility: "hidden" } : { display: "block" }}
+                style={
+                  +allowanceamount > 0
+                    ? { visibility: "hidden" }
+                    : { display: "block" }
+                }
               >
                 Approve!
                 <img
@@ -539,7 +567,11 @@ export default function StakingPopup({ off }) {
               onClick={() => {
                 onclick_approve();
               }}
-              style={+allowanceamount > 0 ? { visibility: "hidden" } : { display: "inline" }}
+              style={
+                +allowanceamount > 0
+                  ? { visibility: "hidden" }
+                  : { display: "inline" }
+              }
             >
               {" "}
               Approve

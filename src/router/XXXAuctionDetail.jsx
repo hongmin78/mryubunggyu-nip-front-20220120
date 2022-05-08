@@ -19,6 +19,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import { LOGGER } from "../util/common";
 import { API } from "../configs/api";
+import { net } from "../configs/net";
 
 export default function AuctionDetail() {
   const params = useParams();
@@ -32,7 +33,7 @@ export default function AuctionDetail() {
   const [moreCollection, setMoreCollection] = useState([]);
 
   const onclickfavorite = (_) => {
-    axios.post(API.API_TOGGLE_FAVORITE).then((resp) => {
+    axios.post(API.API_TOGGLE_FAVORITE + `?nettype=${net}`).then((resp) => {
       LOGGER("xMYQNYFa9d", resp.data);
     });
     setToggleLike(!toggleLike);
@@ -51,7 +52,7 @@ export default function AuctionDetail() {
 
   function getAuction() {
     axios //      .get("http://3.35.1 17.87:34705/auction/list", { params: { limit: 8 } })
-      .get(API.API_COMMONITEMS)
+      .get(API.API_COMMONITEMS + `?nettype=${net}`)
       .then((res) => {
         console.log(res.data);
         setMoreCollection(res.data);
@@ -59,10 +60,12 @@ export default function AuctionDetail() {
   }
 
   useEffect(() => {
-    axios.get(`http://3.35.117.87:34705/auction/item/${params.dna}`).then((res) => {
-      console.log(res.data[0]);
-      setItemData(res.data[0]);
-    });
+    axios
+      .get(`http://3.35.117.87:34705/auction/item/${params.dna}`)
+      .then((res) => {
+        console.log(res.data[0]);
+        setItemData(res.data[0]);
+      });
 
     getAuction();
   }, []);
@@ -82,7 +85,9 @@ export default function AuctionDetail() {
         });
       } else {
         moreRef.current.scrollTo({
-          left: contWidth * itemNumByPage * moreIndex + moreIndex * getStyle(moreRef, "gap") * itemNumByPage,
+          left:
+            contWidth * itemNumByPage * moreIndex +
+            moreIndex * getStyle(moreRef, "gap") * itemNumByPage,
           behavior: "smooth",
         });
       }
@@ -114,14 +119,20 @@ export default function AuctionDetail() {
                         <img src={toggleLike ? I_heartO : I_heart} alt="" />
                       </button>
 
-                      <button className="moreBtn hoverBtn" onClick={() => setShowCopyBtn(true)}>
+                      <button
+                        className="moreBtn hoverBtn"
+                        onClick={() => setShowCopyBtn(true)}
+                      >
                         <img src={I_3dot} alt="" />
                       </button>
                     </div>
 
                     {showCopyBtn && (
                       <>
-                        <button className="copyBtn displayBtn" onClick={() => {}}>
+                        <button
+                          className="copyBtn displayBtn"
+                          onClick={() => {}}
+                        >
                           <img src={I_clip} alt="" />
                           Copy Link
                         </button>
@@ -141,7 +152,9 @@ export default function AuctionDetail() {
                 <div className="saleBox">
                   <div className="price">
                     <p className="key">Current price</p>
-                    <strong className="value">{putCommaAtPrice(100)} USDT</strong>
+                    <strong className="value">
+                      {putCommaAtPrice(100)} USDT
+                    </strong>
                   </div>
 
                   <div className="time">
@@ -248,7 +261,9 @@ export default function AuctionDetail() {
             <article className="infoBox">
               <div className="itemInfoBox">
                 <div className="titleBox">
-                  <strong className="title">Series Kong {itemData?.name}</strong>
+                  <strong className="title">
+                    Series Kong {itemData?.name}
+                  </strong>
 
                   <div className="btnBox">
                     <div className="posBox">
@@ -263,12 +278,18 @@ export default function AuctionDetail() {
                     </div>
 
                     <div className="posBox">
-                      <button className="moreBtn hoverBtn" onClick={() => setShowCopyBtn(true)}>
+                      <button
+                        className="moreBtn hoverBtn"
+                        onClick={() => setShowCopyBtn(true)}
+                      >
                         <img src={I_3dot} alt="" />
                       </button>
 
                       <div className="hoverBox">
-                        <button className="copyBtn displayBtn" onClick={() => setShowCopyBtn(false)}>
+                        <button
+                          className="copyBtn displayBtn"
+                          onClick={() => setShowCopyBtn(false)}
+                        >
                           <img src={I_clip} alt="" />
                           Copy Link
                         </button>
@@ -289,7 +310,9 @@ export default function AuctionDetail() {
                   </div>
 
                   <div className="value">
-                    <strong className="price">{putCommaAtPrice(100)} USDT</strong>
+                    <strong className="price">
+                      {putCommaAtPrice(100)} USDT
+                    </strong>
 
                     <ul className="timeList">
                       <li>00</li>

@@ -13,6 +13,7 @@ import { generaterandomstr_charset, LOGGER, getmyaddress } from "../util/common"
 import axios from "axios";
 import { API } from "../configs/api";
 import { TIME_PAGE_TRANSITION_DEF } from "../configs/configs";
+import { net } from "../configs/net";
 
 export default function SignUpPopup({ walletAddress }) {
   const navigate = useNavigate();
@@ -42,7 +43,7 @@ export default function SignUpPopup({ walletAddress }) {
     localStorage.setItem("MAIL_CHECK", false);
     let myaddress = getmyaddress();
     axios
-      .post(API.API_EMAIL_REQUEST, { email, walletAddress: myaddress })
+      .post(API.API_EMAIL_REQUEST+"?nettype="+net, { email, walletAddress: myaddress })
       .then((resp) => {
         // SetErrorBar(res.data);
         LOGGER("", resp.data);
@@ -123,7 +124,7 @@ export default function SignUpPopup({ walletAddress }) {
       return;
     }
     await axios
-      .post(API.API_SIGNUP, {
+      .post(API.API_SIGNUP+`?nettype=${net}`, {
         walletAddress,
         email,
         password: pw,

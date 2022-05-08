@@ -5,6 +5,7 @@ import { strDot } from "../../util/Util";
 import axios from "axios";
 import { API } from "../../configs/api";
 import { useEffect, useState } from "react";
+import { net } from "../../configs/net";
 
 export default function Offer(params) {
   const isMobile = useSelector((state) => state.common.isMobile);
@@ -14,7 +15,7 @@ export default function Offer(params) {
 
   const fetchdata = () => {
     axios
-      .get(API.API_GET_OFFERS + `/${params.params.itemid}`)
+      .get(API.API_GET_OFFERS + `/${params.params.itemid}?nettype=${net}`)
       .then((resp) => {
         if (resp.data.status === "OK") {
           console.log(resp.data.list);
@@ -35,7 +36,11 @@ export default function Offer(params) {
             <li key={index}>
               <img src={cont.prfoImg} alt="" />
               <div className="infoBox">
-                <p className="info">{`${cont.price} ${cont.priceunit} ${strDot(cont.address, 11, 4)}`}</p>
+                <p className="info">{`${cont.price} ${cont.priceunit} ${strDot(
+                  cont.address,
+                  11,
+                  4
+                )}`}</p>
                 <p className="time">{cont.createdat}</p>
               </div>
             </li>
@@ -50,7 +55,11 @@ export default function Offer(params) {
             <li key={index}>
               <img src={cont.prfoImg} alt="" />
               <div className="infoBox">
-                <p className="info">{`${cont.price} ${cont.priceunit} ${strDot(cont.address, 11, 4)}`}</p>
+                <p className="info">{`${cont.price} ${cont.priceunit} ${strDot(
+                  cont.address,
+                  11,
+                  4
+                )}`}</p>
                 <p className="time">{strDot(cont.createdat, 10)}</p>
               </div>
             </li>

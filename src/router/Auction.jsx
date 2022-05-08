@@ -12,6 +12,7 @@ import { useSelector } from "react-redux";
 import Header from "../components/header/Header";
 import axios from "axios";
 import { API } from "../configs/api";
+import { net } from "../configs/net";
 
 export default function Auction() {
   const searchBoxRef = useRef();
@@ -26,7 +27,7 @@ export default function Auction() {
 
   const fetchdata = (_) => {
     //   	 axios.get("http://3.3 5.117.87:34705/auction/list").then((res) => {
-    axios.get(API.API_COMMONITEMS + `/items/group_/kong/0/32/id/DESC`).then((resp) => {
+    axios.get(API.API_COMMONITEMS + `/items/group_/kong/0/32/id/DESC?nettype=${net}`).then((resp) => {
       console.log(resp.data);
       let { status, list } = resp.data;
       if (status == "OK") {

@@ -10,6 +10,7 @@ import axios from "axios";
 import { API } from "../configs/api";
 import { LOGGER, getmyaddress, getobjtype } from "../util/common.js";
 import SetErrorBar from "../util/SetErrorBar";
+import { net } from "../configs/net";
 
 export default function EditProf() {
   const location = useLocation().state;
@@ -62,7 +63,7 @@ export default function EditProf() {
     if (email && pw && imgBase64) {
       if (pw === pwCheck) {
         await axios
-          .put(API.API_PUT_USERS + `/${myaddress}`, fd, {
+          .put(API.API_PUT_USERS + `/${myaddress}?nettype=${net}`, fd, {
             email,
             pw,
             headers: {

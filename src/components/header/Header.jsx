@@ -18,6 +18,7 @@ import { getethrep } from "../../util/eth";
 import { API } from "../../configs/api";
 import SetErrorBar from "../../util/SetErrorBar.js";
 import { messages } from "../../configs/messages";
+import { net } from "../../configs/net";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -36,20 +37,24 @@ export default function Header() {
 
   useEffect(() => {
     let myaddress = getmyaddress();
-    axios.get(API.API_GET_TICK_INFO + `/${myaddress}`).then((resp) => {
-      LOGGER("API_ticketInfo", resp.data);
+    axios
+      .get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`)
+      .then((resp) => {
+        LOGGER("API_ticketInfo", resp.data);
 
-      let { status, respdata } = resp.data;
-      if (status == "OK" && respdata !== null) {
-        setTickInfo(respdata);
-      }
-    });
+        let { status, respdata } = resp.data;
+        if (status == "OK" && respdata !== null) {
+          setTickInfo(respdata);
+        }
+      });
   }, []);
 
   const fetchdataStaked = async () => {
     let myaddress = getmyaddress();
     LOGGER("", myaddress);
-    let resp = await axios.get(API.API_USERINFO + `/${myaddress}`);
+    let resp = await axios.get(
+      API.API_USERINFO + `/${myaddress}?nettype=${net}`
+    );
     LOGGER("rBojncz0CD", resp.data);
     let { status, respdata } = resp.data;
     if (status == "OK") {
@@ -105,7 +110,11 @@ export default function Header() {
       <>
         <MheaderBox style={{ background: isStaking && "unset" }}>
           <button className="logoBox" onClick={() => navigate("/")}>
-            <img className="logoImg" src={isStaking ? I_headerLogoWhite : I_headerLogo} alt="" />
+            <img
+              className="logoImg"
+              src={isStaking ? I_headerLogoWhite : I_headerLogo}
+              alt=""
+            />
           </button>
 
           <button className="menuBtn" onClick={() => setMenuPopup(true)}>
@@ -121,7 +130,11 @@ export default function Header() {
       <PheaderBox style={{ background: isStaking && "unset" }}>
         <section className="innerBox">
           <button className="logoBox" onClick={() => navigate("/")}>
-            <img className="logoImg" src={isStaking ? I_headerLogoWhite : I_headerLogo} alt="" />
+            <img
+              className="logoImg"
+              src={isStaking ? I_headerLogoWhite : I_headerLogo}
+              alt=""
+            />
           </button>
 
           <article className="rightBox">

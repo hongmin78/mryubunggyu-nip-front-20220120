@@ -5,12 +5,18 @@ import { D_recommendList } from "../../data/DmyPage";
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { strDot } from "../../util/Util";
-import { D_rewardHeader, D_rewardList, D_vaultHeader, D_vaultList } from "../../data/Dstaking";
+import {
+  D_rewardHeader,
+  D_rewardList,
+  D_vaultHeader,
+  D_vaultList,
+} from "../../data/Dstaking";
 import { getmyaddress, LOGGER } from "../../util/common";
 import axios from "axios";
 import moment from "moment";
 import { API } from "../../configs/api";
 import ticketImg from "../../img/staking/E_prof1.png";
+import { net } from "../../configs/net";
 
 export default function Staking() {
   const isMobile = useSelector((state) => state.common.isMobile);
@@ -21,14 +27,16 @@ export default function Staking() {
 
   const fatchData = () => {
     let myaddress = getmyaddress();
-    axios.get(API.API_GET_TICK_INFO + `/${myaddress}`).then((resp) => {
-      LOGGER("API_ticketInfo", resp.data);
+    axios
+      .get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`)
+      .then((resp) => {
+        LOGGER("API_ticketInfo", resp.data);
 
-      let { status, respdata } = resp.data;
-      if (status == "OK" && respdata !== null) {
-        setItckInfo([respdata]);
-      }
-    });
+        let { status, respdata } = resp.data;
+        if (status == "OK" && respdata !== null) {
+          setItckInfo([respdata]);
+        }
+      });
   };
 
   useEffect(() => {
@@ -51,7 +59,11 @@ export default function Staking() {
                     <li key={index}>
                       <div className="topBar">
                         <img src={ticketImg} alt="" />
-                        <p>{cont.active && cont.active === 1 ? "ACTIVE" : "UNACTIVE"}</p>
+                        <p>
+                          {cont.active && cont.active === 1
+                            ? "ACTIVE"
+                            : "UNACTIVE"}
+                        </p>
                       </div>
 
                       <ul className="dataList">
@@ -61,11 +73,19 @@ export default function Staking() {
                         </li>
                         <li>
                           <p className="key">Start</p>
-                          <p className="value">{moment(cont.createdat).format("YYYY-MM-DD hh:mm:ss")}</p>
+                          <p className="value">
+                            {moment(cont.createdat).format(
+                              "YYYY-MM-DD hh:mm:ss"
+                            )}
+                          </p>
                         </li>
                         <li>
                           <p className="key">Ended</p>
-                          <p className="value">{moment(cont.createdat).add(90, "day").format("YYYY-MM-DD hh:mm:ss")}</p>
+                          <p className="value">
+                            {moment(cont.createdat)
+                              .add(90, "day")
+                              .format("YYYY-MM-DD hh:mm:ss")}
+                          </p>
                         </li>
                       </ul>
 
@@ -137,16 +157,26 @@ export default function Staking() {
                     <li key={index}>
                       <span>
                         <img src={ticketImg} alt="" />
-                        <p>{cont.active && cont.active === 1 ? "ACTIVE" : "UNACTIVE"}</p>
+                        <p>
+                          {cont.active && cont.active === 1
+                            ? "ACTIVE"
+                            : "UNACTIVE"}
+                        </p>
                       </span>
 
                       <span>
                         <p>{cont.amount}&nbsp;USDT</p>
                       </span>
 
-                      <span>{moment(cont.createdat).format("YYYY-MM-DD hh:mm:ss")}</span>
+                      <span>
+                        {moment(cont.createdat).format("YYYY-MM-DD hh:mm:ss")}
+                      </span>
 
-                      <span>{moment(cont.createdat).add(90, "day").format("YYYY-MM-DD hh:mm:ss")}</span>
+                      <span>
+                        {moment(cont.createdat)
+                          .add(90, "day")
+                          .format("YYYY-MM-DD hh:mm:ss")}
+                      </span>
 
                       <span>
                         <button className="unstakeBtn" onClick={() => {}}>

@@ -24,6 +24,8 @@ import { abi } from "../../contracts/abi-staker-20220414";
 import StakingPopup from "../StakingPopup";
 import moment from "moment";
 import PayPopup from "../PayPopup";
+import { net } from "../../configs/net";
+import { nettype } from "../../configs/configweb3-ropsten";
 
 const MAP_NETTYPE_SCAN = {
   ETH_TESTNET: "https://etherscan.io",
@@ -62,21 +64,21 @@ export default function MyItems() {
     let myaddress = getmyaddress();
     setmyaddress(myaddress);
     LOGGER("myaddress", myaddress);
-    axios.get(API.API_USERINFO + `/${myaddress}`).then((resp) => {
+    axios.get(API.API_USERINFO + `/${myaddress}?nettype=${net}`).then((resp) => {
       LOGGER("myticket", resp.data);
       let { status, respdata } = resp.data;
       if (status == "OK") {
         setuserinfo(respdata);
       }
     });
-    axios.get(API.API_GETTIME).then((resp) => {
+    axios.get(API.API_GETTIME+`?nettype=${net}`).then((resp) => {
       // LOGGER("getTime", resp.data);
       let { status, respdata } = resp.data;
       setGetTimeMoment(respdata.value_);
     });
 
     axios
-      .get(API.API_RECEIVABLES + `/${myaddress}`)
+      .get(API.API_RECEIVABLES + `/${myaddress}?nettype=${nettype}`)
       .then((res) => {
         let { list } = res.data;
         setItemData(list);
@@ -88,7 +90,7 @@ export default function MyItems() {
       })
       .catch((err) => console.log(err));
 
-    axios.get(API.API_ITEMBALANCES + `/${myaddress}`).then((res) => {
+    axios.get(API.API_ITEMBALANCES + `/${myaddress}?nettype=${net}`).then((res) => {
       let { list, status } = res.data;
       LOGGER("getTime", res.data);
       if (status === "OK" && list?.length) {
@@ -101,7 +103,7 @@ export default function MyItems() {
     });
 
     false &&
-      axios.get(API.API_QUERY_SINGLEROW + `/transactions/username/${myaddress}?typestr=STAKE&status=1`).then((resp) => {
+      axios.get(API.API_QUERY_SINGLEROW + `/transactions/username/${myaddress}?typestr=STAKE&status=1&nettype=${net}`).then((resp) => {
         LOGGER("", resp.data);
         let { status, respdata } = resp.data;
         if (status == "OK") {
@@ -160,7 +162,7 @@ export default function MyItems() {
 
   // useEffect(() => {
   //   let myaddress = getmyaddress()
-  //   axios.get(API.API_LOGSTAKES + `/${myaddress}`).then((resp) => {
+  //   axios.get(API.API_LOGSTAKES + `/${myaddress}?nettype=${net}`).then((resp) => {
   //     LOGGER('API_LOGSTAKES', resp.data)
   //     let { status, respdata } = resp.data
   //     if (status == 'OK') {
@@ -184,7 +186,7 @@ export default function MyItems() {
 
   useEffect(() => {
     let myaddress = getmyaddress();
-    axios.get(API.API_LOGSTAKES + `/${myaddress}`).then((resp) => {
+    axios.get(API.API_LOGSTAKES + `/${myaddress}?nettype=${net}`).then((resp) => {
       LOGGER("API_LOGSTAKES", resp.data);
       let { status, respdata } = resp.data;
       if (status == "OK") {
@@ -229,7 +231,7 @@ export default function MyItems() {
 
   useEffect(() => {
     let myaddress = getmyaddress();
-    axios.get(API.API_GET_TICK_INFO + `/${myaddress}`).then((resp) => {
+    axios.get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`).then((resp) => {
       LOGGER("API_ticketInfo", resp.data);
 
       let { status, respdata } = resp.data;
