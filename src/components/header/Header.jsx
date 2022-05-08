@@ -180,7 +180,7 @@ export default function Header() {
                   onclick_staked_val_btn("/market");
                 }}
               >
-                Marketplece
+                Marketplace
               </button>
             </nav>
 
