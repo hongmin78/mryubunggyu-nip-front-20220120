@@ -34,7 +34,7 @@ import I_spinner from "../img/icon/I_spinner.svg";
 import { strDot } from "../util/Util";
 import { net } from "../configs/net";
 const MODE_DEV_PROD = "PROD";
-export default function PayPopup({ off, receivables }) {
+export default function PayPopup({ off, userInfo, receivables }) {
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
   const [termChk, setTermChk] = useState(false);
@@ -52,6 +52,7 @@ export default function PayPopup({ off, receivables }) {
   let [isloader_00, setisloader_00] = useState(false);
   let [isloader_01, setisloader_01] = useState(false);
   let [DueAmount, setDueAmount] = useState(receivables.amount);
+  let [refererFeeRate, setRefererFeeRate] = useState("");
   useEffect((_) => {
     const spinner = spinnerHref.current; // document.querySelector("Spinner");
     spinner.animate(
@@ -69,6 +70,16 @@ export default function PayPopup({ off, receivables }) {
         iterations: Infinity,
       }
     );
+    axios
+      .get(API.API_QUERY_STRING("SALE_REFERER_FEE_RATE"))
+      .then((res) => {
+        if (res.data && res.data.respdata) {
+          console.log("$fee_rate", res);
+          let { value_ } = res.data.respdata;
+          setRefererFeeRate(value_);
+        }
+      })
+      .catch((err) => console.log(err));
     const fetchdata = async (_) => {
       axios.get(API.API_TICKERS + `?nettype=${net}`).then((resp) => {
         LOGGER("MDmEMQ5xde", resp.data);
@@ -245,6 +256,9 @@ export default function PayPopup({ off, receivables }) {
           addresses.contract_USDT, // .ETH_TESTNET
           getweirep("" + receivables.amount),
           receivables.seller,
+          receivables.itemid,
+          userInfo?.refereraddress,
+          refererFeeRate,
         ],
       });
       LOGGER("abistr", abistr); //		return
@@ -263,29 +277,21 @@ export default function PayPopup({ off, receivables }) {
             SetErrorBar(messages.MSG_USER_DENIED_TX);
             return;
           }
-          let resptype = getobjtype(resp);
-          let txhash;
-          switch (resptype) {
-            case "String":
-              txhash = resp;
-              break;
-            case "Object":
-              txhash = resp.txHash;
-              break;
-          }
+          let txhash = resp;
           axios
             .post(API.API_TXS + `/${txhash}?nettype=${net}`, {
               txhash,
               username: myaddress,
               typestr: "PAY",
+              itemid: receivables.itemid,
+              nettype: net,
               auxdata: {
-                amount: receivables.amount,
-                currency: PAY_CURRENCY,
+                referfeeamount: receivables.amount,
+                feerate: refererFeeRate,
+                currency: PAY_CURRENCY || "USDT",
                 currencyaddress: addresses.contract_USDT, // ETH_TESTNET.
                 nettype: NETTYPE,
               },
-              itemid: receivables.itemid,
-              nettype: net,
             })
             .then((resp) => {
               LOGGER("", resp);

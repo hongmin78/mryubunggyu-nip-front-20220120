@@ -27,8 +27,6 @@ export default function BidPopup({ off }) {
   let [itemdata, setitemdata] = useState();
   let [attributes, setattributes] = useState([]);
 
-  const onclickbid = () => {};
-
   const getitem = (_) => {
     axios
       .get(API.API_ITEMDETAIL + `/${params.itemid}?nettype=${net}`)

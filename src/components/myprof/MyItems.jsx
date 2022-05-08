@@ -871,7 +871,13 @@ export default function MyItems() {
               </li>
             ))}
 
-          {isOpen && <PayPopup off={openModal} receivables={receivables} />}
+          {isOpen && (
+            <PayPopup
+              off={openModal}
+              userInfo={userinfo}
+              receivables={receivables}
+            />
+          )}
 
           {/* <li className="sellBox">
             <div className="imgBox">
