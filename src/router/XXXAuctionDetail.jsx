@@ -33,9 +33,11 @@ export default function AuctionDetail() {
   const [moreCollection, setMoreCollection] = useState([]);
 
   const onclickfavorite = (_) => {
-    axios.post(API.API_TOGGLE_FAVORITE + `?nettype=${net}`).then((resp) => {
-      LOGGER("xMYQNYFa9d", resp.data);
-    });
+    axios
+      .post(API.API_TOGGLE_FAVORITE + `?nettype=${net}`, { nettype: net })
+      .then((resp) => {
+        LOGGER("xMYQNYFa9d", resp.data);
+      });
     setToggleLike(!toggleLike);
     LOGGER("8FCYJgzDZX");
   };

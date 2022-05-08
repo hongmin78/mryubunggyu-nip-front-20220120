@@ -188,7 +188,7 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
             erc20: addresses.contract_USDT, // .ETH_TESTNET
             target: addresses.payment_for_delinquency, // .ETH_TESTNET
           },
-          nettype: NETTYPE,
+          nettype: net,
         })
         .then((resp) => {
           LOGGER("APPROVE RESP", resp);
@@ -286,7 +286,7 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
               currencyaddress: addresses.contract_USDT, // ETH_TESTNET.
               nettype: NETTYPE,
             },
-            nettype: NETTYPE,
+            nettype: net,
           })
           .then((resp) => {
             LOGGER("", resp);

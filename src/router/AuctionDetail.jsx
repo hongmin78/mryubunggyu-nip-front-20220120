@@ -51,7 +51,7 @@ export default function AuctionDetail() {
       SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
       return;
     }
-    axios.post(API.API_TOGGLE_FAVORITE + `/${itemdata?.itemid}?nettype=${net}`, { username: myaddress }).then((resp) => {
+    axios.post(API.API_TOGGLE_FAVORITE + `/${itemdata?.itemid}?nettype=${net}`, { username: myaddress, nettype: net }).then((resp) => {
       LOGGER("", resp.data);
       let { status, respdata } = resp.data;
       if (status == "OK") {

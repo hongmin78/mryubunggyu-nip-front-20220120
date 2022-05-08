@@ -43,7 +43,8 @@ export default function SignUpPopup({ walletAddress }) {
     localStorage.setItem("MAIL_CHECK", false);
     let myaddress = getmyaddress();
     axios
-      .post(API.API_EMAIL_REQUEST+"?nettype="+net, { email, walletAddress: myaddress })
+      .post(API.API_EMAIL_REQUEST+"?nettype="+net, { email, walletAddress: myaddress,
+        nettype: net, })
       .then((resp) => {
         // SetErrorBar(res.data);
         LOGGER("", resp.data);
@@ -130,6 +131,7 @@ export default function SignUpPopup({ walletAddress }) {
         password: pw,
         referral,
         nickname,
+        nettype: net,
       })
       .then((resp) => {
         console.log("resp", resp.data.message);

@@ -43,6 +43,7 @@ export default function ConnectWallet() {
         const resp = await axios.post(API.API_LOGIN + `?nettype=${net}`, {
           address,
           cryptotype: "ETH",
+          nettype: net,
         }); // login( address )
         console.log("", resp.data); // walletAddress
         let { status } = resp.data;

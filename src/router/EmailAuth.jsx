@@ -32,6 +32,7 @@ export default function EmailAuth() {
           email,
           authNum,
           walletaddress,
+          nettype: net,
         })
         .then((resp) => {
           LOGGER("", resp.data);
