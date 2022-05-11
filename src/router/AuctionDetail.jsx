@@ -91,7 +91,7 @@ export default function AuctionDetail() {
   }
   const getitem = (_) => {
     axios
-      .get(`https://nftinfinity.world:34825/items/item/${params.itemid}`)
+      .get(`https://nftinfinity.world:34825/items/item/${params.itemid}?nettype=${net}`)
       .then((resp) => {
         LOGGER("7FzS4oxYPN", resp.data);
         let { status, respdata } = resp.data;

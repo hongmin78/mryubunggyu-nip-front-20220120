@@ -71,7 +71,7 @@ export default function PayPopup({ off, userInfo, receivables }) {
       }
     );
     axios
-      .get(API.API_QUERY_STRING("SALE_REFERER_FEE_RATE"))
+      .get(API.API_QUERY_STRING("SALE_REFERER_FEE_RATE") + `?nettype=${net}`)
       .then((res) => {
         if (res.data && res.data.respdata) {
           console.log("$fee_rate", res);

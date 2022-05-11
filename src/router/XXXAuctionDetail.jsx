@@ -63,7 +63,7 @@ export default function AuctionDetail() {
 
   useEffect(() => {
     axios
-      .get(`http://3.35.117.87:34705/auction/item/${params.dna}`)
+      .get(`http://3.35.117.87:34705/auction/item/${params.dna}?nettype=${net}`)
       .then((res) => {
         console.log(res.data[0]);
         setItemData(res.data[0]);

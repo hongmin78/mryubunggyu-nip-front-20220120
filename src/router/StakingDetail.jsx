@@ -17,7 +17,10 @@ import { query_with_arg, getabistr_forfunction } from "../util/contract-calls";
 import { getmyaddress } from "../util/common";
 import { messages } from "../configs/messages";
 import SetErrorBar from "../util/SetErrorBar";
-import { TIME_PAGE_TRANSITION_DEF, TIME_FETCH_MYADDRESS_DEF } from "../configs/configs";
+import {
+  TIME_PAGE_TRANSITION_DEF,
+  TIME_FETCH_MYADDRESS_DEF,
+} from "../configs/configs";
 import { getethrep } from "../util/eth";
 // import { useSelector } from "react-redux";
 // const MODE_DEV_PROD='DEV'
@@ -105,7 +108,7 @@ export default function StakingDetail() {
     // }
     //    LOGGER(API.API_MAX + `/tickets/serialnumber`)
     //    return
-    /**     false && axios.get ( API.API_MAX + `/tickets/serialnumber`).then(resp=>{ LOGGER('' , resp.data )
+    /**     false && axios.get ( API.API_MAX + `/tickets/serialnumber?nettype=${net}`).then(resp=>{ LOGGER('' , resp.data )
       let { status , payload } =resp.data
       if ( status == 'OK' ){
 //        setcurrentserialnumber ( payload.max ? payload.max : 0 )
@@ -165,7 +168,8 @@ export default function StakingDetail() {
               </button>
               <span style={{ color: "#fff" }}>
                 <br />
-                You can participate in Subscription Auction by staking the LUCKY TICKET
+                You can participate in Subscription Auction by staking the LUCKY
+                TICKET
               </span>
             </div>
           </article>
@@ -221,7 +225,8 @@ export default function StakingDetail() {
               </button>
               <span style={{ color: "#fff" }}>
                 <br />
-                You can participate in Subscription Auction by staking the LUCKY TICKET
+                You can participate in Subscription Auction by staking the LUCKY
+                TICKET
               </span>
             </div>
           </article>
