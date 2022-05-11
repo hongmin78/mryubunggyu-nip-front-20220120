@@ -37,7 +37,14 @@ export const todoSlice = createSlice({
   },
 });
 
-export const { setisAuthEmail, setAllPopupOff, setLogin, setPathName, setMobile, setaddress, setDelinquencyAmount } =
-  todoSlice.actions;
+export const {
+  setisAuthEmail,
+  setAllPopupOff,
+  setLogin,
+  setPathName,
+  setMobile,
+  setaddress,
+  setDelinquencyAmount,
+} = todoSlice.actions;
 
 export default todoSlice.reducer;

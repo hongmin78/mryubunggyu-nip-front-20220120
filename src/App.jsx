@@ -23,7 +23,7 @@ import GlobalStyle from "./util/GlobalStyle";
 import { setLogin, setMobile, setaddress } from "./util/store/commonSlice";
 import { messages } from "./configs/messages";
 import SetErrorBar from "./util/SetErrorBar";
-import { LOGGER } from "./util/common";
+import { getmyaddress, LOGGER } from "./util/common";
 import { strDot } from "./util/Util";
 import axios from "axios";
 import { API } from "./configs/api";
@@ -39,93 +39,99 @@ function App() {
     else dispatch(setMobile(true));
   }
 
-  useEffect(
-    (_) => {
-      axios.get(API.API_KEY_TIME_STAMP + `?nettype=${net}`).then((resp) => {
-        LOGGER("", resp.data);
-        let { status, respdata } = resp.data;
-        if (status == "OK") {
-          if (parseInt(respdata.value) > CURRENT_TIME) window.location.reload("/");
-        } else {
-          return;
-        }
-      });
-
-      const queryuseraddress = (address) => {
-        axios.get(API.API_QUERY_USERADDRESS + `/users/username/${address}?nettype=${net}`).then((resp) => {
-          LOGGER("QlzCkJ0KYu", resp.data);
-          let { status, respdata } = resp.data;
-          if (status == "OK") {
-            if (respdata?.id) {
-              dispatch(setaddress(address));
-              dispatch(setLogin(address));
-              setaddress(address);
-            }
-          } else {
-            LOGGER("user not found");
-          }
-        });
-      };
-      let { ethereum } = window;
-      if (ethereum) {
-        let { selectedAddress: address } = ethereum;
-        ethereum.on("accountsChanged", (resp) => {
-          LOGGER("GsnRPWi8Zg@accountsChanged", resp);
-          window.location.replace("/");
-          SetErrorBar(messages.MSG_ACCOUNTS_CHANGED);
-          if (resp[0]) {
-            let address = resp[0];
-            dispatch(setaddress(address));
-            dispatch(setLogin(address));
-            setaddress(address);
-            dispatch(setLogin(address));
-          } else {
-            dispatch(setaddress(null));
-            dispatch(setLogin(null));
-            dispatch(setLogin(null));
-            setaddress(null);
-          }
-        });
-        ethereum.on("networkChanged", function (networkId) {
-          LOGGER(networkId);
-          // Time to reload your interface with the new networkId
-        });
-        ethereum.on("chainChanged", (chainId) => {
-          LOGGER("@chainChanged", chainId);
-        });
-
-        if (address) {
-          queryuseraddress(address);
-
-          //		dispatch( setaddress(  ) )  // strDot(ethereum.selectedAddress , 8 , 0 ) )
+  const queryuseraddress = (address) => {
+    axios.get(API.API_QUERY_USERADDRESS + `/users/username/${address}?nettype=${net}`).then((resp) => {
+      LOGGER("QlzCkJ0KYu", resp.data);
+      let { status, respdata } = resp.data;
+      if (status == "OK") {
+        if (respdata?.id) {
+          dispatch(setaddress(address));
+          dispatch(setLogin(address));
+          setaddress(address);
         }
       } else {
-        SetErrorBar("Please Install MetaMask");
-        if (isChrome) {
-          window.open(
-            "https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en",
-            "_blank"
-          );
-        }
-        if (isSafari) {
-          alert("No supported MetaMask on safari,Please running on chrome");
-        }
-        if (isEdge) {
-          window.open(
-            "https://microsoftedge.microsoft.com/addons/detail/metamask/ejbalbakoplchlghecdalmeeeajnimhm?hl=en-US",
-            "_blank"
-          );
-        }
+        LOGGER("user not found");
       }
-    },
-    [window.ethereum]
-  );
-  useLayoutEffect(async () => {
-    //    const walletAddress = localStorage.getItem("walletAddress");
-    //	console.log("walletAddress", walletAddress);
-    setLogin(null);
-    //    if (walletAddress) dispatch(setLogin(walletAddress));
-  });
+    });
+  };
+
+  useEffect(() => {
+    setTimeout(() => {
+      let myaddress = getmyaddress();
+      if (myaddress) {
+      } else {
+        SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+        return;
+      }
+      queryuseraddress(myaddress);
+    }, 1500);
+  }, []);
+
+  useEffect(() => {
+    axios.get(API.API_KEY_TIME_STAMP + `?nettype=${net}`).then((resp) => {
+      LOGGER("asdasdasdasds", resp.data);
+      let { status, respdata } = resp.data;
+      if (status == "OK") {
+        if (parseInt(respdata.value) > CURRENT_TIME) window.location.reload("/");
+      } else {
+        return;
+      }
+    });
+    let { ethereum } = window;
+    if (ethereum) {
+      let { selectedAddress: address } = ethereum;
+      ethereum.on("accountsChanged", (resp) => {
+        LOGGER("GsnRPWi8Zg@accountsChanged", resp);
+        window.location.replace("/");
+        SetErrorBar(messages.MSG_ACCOUNTS_CHANGED);
+        if (resp[0]) {
+          let address = resp[0];
+          dispatch(setaddress(address));
+          dispatch(setLogin(address));
+          setaddress(address);
+          dispatch(setLogin(address));
+        } else {
+          dispatch(setaddress(null));
+          dispatch(setLogin(null));
+          dispatch(setLogin(null));
+          setaddress(null);
+        }
+      });
+      ethereum.on("networkChanged", function (networkId) {
+        LOGGER(networkId);
+        // Time to reload your interface with the new networkId
+      });
+      ethereum.on("chainChanged", (chainId) => {
+        LOGGER("@chainChanged", chainId);
+      });
+
+      setTimeout(() => {
+        if (address) {
+        } else {
+          SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+          return;
+        }
+        queryuseraddress(address);
+      }, 1500);
+    } else {
+      SetErrorBar("Please Install MetaMask");
+      if (isChrome) {
+        window.open(
+          "https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en",
+          "_blank"
+        );
+      }
+      if (isSafari) {
+        alert("Metamask is not supported on Safari, please use a different browser!");
+      }
+      if (isEdge) {
+        window.open(
+          "https://microsoftedge.microsoft.com/addons/detail/metamask/ejbalbakoplchlghecdalmeeeajnimhm?hl=en-US",
+          "_blank"
+        );
+      }
+    }
+  }, [window.ethereum]);
 
   useEffect(() => {
     if (window.innerWidth > 1024) dispatch(setMobile(false));
