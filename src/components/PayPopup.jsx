@@ -242,11 +242,16 @@ export default function PayPopup({ off, userInfo, receivables }) {
       setDone(false);
       return;
     }
-    /** 		if (myaddress){}
-		else { 
-			SetErrorBar( messages.MSG_PLEASE_ CONNECT_WALLET )
-			return 
-		} */
+    console.log(
+      "$INPUTS",
+      addresses.contract_USDT, // .ETH_TESTNET
+      getweirep("" + receivables.amount),
+      receivables.seller,
+      receivables.itemid,
+      userInfo?.refereraddress,
+      "$refererFeerate",
+      refererFeeRate
+    );
     if (receivables.seller) {
       let abistr = getabistr_forfunction({
         contractaddress: addresses.contract_pay_for_assigned_item, // .ETH_TESTNET

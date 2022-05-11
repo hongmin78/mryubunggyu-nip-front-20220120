@@ -10,7 +10,12 @@ import MarketItem from "../components/MarketItem";
 import MarketItem0227 from "../components/MarketItem0227";
 import Header from "../components/header/Header";
 import { useSelector } from "react-redux";
-import { getStyle, onClickNextBtn, onClickPreBtn, swiperListener } from "../util/Util";
+import {
+  getStyle,
+  onClickNextBtn,
+  onClickPreBtn,
+  swiperListener,
+} from "../util/Util";
 import FaqItem from "../components/FaqCont";
 import { useNavigate } from "react-router-dom";
 import SetErrorBar from "../util/SetErrorBar";
@@ -110,23 +115,32 @@ export default function Main() {
   function fetchitems() {
     axios
       //      .get(  "http://3.35.117.87:34705/auction/list", { params: { limit: 16 } })
-      .get(API.API_COMMONITEMS + `/items/group_/kong/0/128/id/DESC?nettype=${net}`)
+      .get(
+        API.API_COMMONITEMS +
+          `/items/group_/kong/0/128/roundnumber/DESC?nettype=${net}`
+      )
       .then((res) => {
         // console.log(res.data);
         let { status, list } = res.data;
         if (status == "OK") {
-          setAuctionListFirst(list.slice(0, 64));
-          setAuctionListSecond(list.slice(64));
+          let roundNumber1 = list.filter((item) => item.roundnumber > 0);
+          setAuctionListFirst(roundNumber1.slice(0, 64));
+          setAuctionListSecond(roundNumber1.slice(64));
         }
       });
-    axios.get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC?nettype=${net}`).then((resp) => {
-      LOGGER("De0Mlt93PT", resp.data);
-      let { status, list } = resp.data;
-      if (status == "OK") {
-        setpremiumitemlist(list);
-      }
-    });
-    axios.get(API.API_TYPESTR+`?nettype=${net}`).then((resp) => {
+    axios
+      .get(
+        API.API_PREMIUMITEMS +
+          `/items/group_/kingkong/0/128/id/DESC?nettype=${net}`
+      )
+      .then((resp) => {
+        LOGGER("De0Mlt93PT", resp.data);
+        let { status, list } = resp.data;
+        if (status == "OK") {
+          setpremiumitemlist(list);
+        }
+      });
+    axios.get(API.API_TYPESTR + `?nettype=${net}`).then((resp) => {
       LOGGER("API_TYPESTR", resp.data);
       let { status, payload } = resp.data;
       if (status == "OK") {
@@ -146,7 +160,9 @@ export default function Main() {
         if (issueRef.current?.scrollTo) {
           if (issueIndex < D_issueList.length) {
             issueRef.current.scrollTo({
-              top: contHeight * issueIndex + issueIndex * getStyle(issueRef, "gap"),
+              top:
+                contHeight * issueIndex +
+                issueIndex * getStyle(issueRef, "gap"),
               behavior: "smooth",
             });
           } else {
@@ -222,8 +238,8 @@ export default function Main() {
                     <p className="title">Pak on the frontier of NFTs.</p>
 
                     <p className="explain">
-                      The acclaimed anonymous art entity has been pioneering in digital spaces for decades. Here’s
-                      what’s next.
+                      The acclaimed anonymous art entity has been pioneering in
+                      digital spaces for decades. Here’s what’s next.
                     </p>
 
                     <p className="bottomText">ON THE FRONTIER OF NFTS.</p>
@@ -233,13 +249,27 @@ export default function Main() {
             </ul>
             <button
               className="preBtn indexBtn"
-              onClick={() => onClickPreBtn(headLineRef, headLineList, headLineIndex, setHeadLineIndex)}
+              onClick={() =>
+                onClickPreBtn(
+                  headLineRef,
+                  headLineList,
+                  headLineIndex,
+                  setHeadLineIndex
+                )
+              }
             >
               <img src={I_ltArwWhite} alt="" />
             </button>
             <button
               className="nextBtn indexBtn"
-              onClick={() => onClickNextBtn(headLineRef, headLineList, headLineIndex, setHeadLineIndex)}
+              onClick={() =>
+                onClickNextBtn(
+                  headLineRef,
+                  headLineList,
+                  headLineIndex,
+                  setHeadLineIndex
+                )
+              }
             >
               <img src={I_rtArwWhite} alt="" />
             </button>
@@ -254,10 +284,14 @@ export default function Main() {
                       <img src={E_issueProf} alt="" />
                       <p className="nickname">{strDot(cont.username, 3, 15)}</p>
                     </div>
-                    <div className="timeBox">{moment(new Date()).diff(moment(cont.createdat), "days")}days ago</div>
+                    <div className="timeBox">
+                      {moment(new Date()).diff(moment(cont.createdat), "days")}
+                      days ago
+                    </div>
                   </div>
                   <p className="cont">
-                    {cont.typestr === "PAY" ? "purchased" : ""} <u>{cont.actionname}</u> at {cont.price} USDT
+                    {cont.typestr === "PAY" ? "purchased" : ""}{" "}
+                    <u>{cont.actionname}</u> at {cont.price} USDT
                   </p>
                 </li>
               ))}
@@ -273,14 +307,24 @@ export default function Main() {
                   <ul className="itemList" ref={firstAuctionRef}>
                     {auctionListFirst.map((cont, index) => (
                       <Fragment key={index}>
-                        <AuctionItem0228 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
+                        <AuctionItem0228
+                          data={cont}
+                          index={index}
+                          likeObj={likeObj}
+                          setLikeObj={setLikeObj}
+                        />
                       </Fragment>
                     ))}
                   </ul>
                   <button
                     className="nextBtn"
                     onClick={() =>
-                      onClickNextBtn(firstAuctionRef, auctionListFirst, firstAuctionIndex, setFirstAuctionIndex)
+                      onClickNextBtn(
+                        firstAuctionRef,
+                        auctionListFirst,
+                        firstAuctionIndex,
+                        setFirstAuctionIndex
+                      )
                     }
                   >
                     <img src={I_rtArw} alt="" />
@@ -290,7 +334,12 @@ export default function Main() {
                   <ul className="itemList">
                     {auctionListSecond.map((cont, index) => (
                       <Fragment key={index}>
-                        <AuctionItem0228 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
+                        <AuctionItem0228
+                          data={cont}
+                          index={index}
+                          likeObj={likeObj}
+                          setLikeObj={setLikeObj}
+                        />
                       </Fragment>
                     ))}
                   </ul>
@@ -301,19 +350,34 @@ export default function Main() {
               </div>
             </article>
 
-            <article className="marketplaceBox itemListBox" style={{ display: "none" }}>
+            <article
+              className="marketplaceBox itemListBox"
+              style={{ display: "none" }}
+            >
               <strong className="title">MarketPlace</strong>
               <div className="posBox">
                 <ul className="itemList" ref={marketRef}>
                   {marketPlaceList.map((cont, index) => (
                     <Fragment key={index}>
-                      <MarketItem data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
+                      <MarketItem
+                        data={cont}
+                        index={index}
+                        likeObj={likeObj}
+                        setLikeObj={setLikeObj}
+                      />
                     </Fragment>
                   ))}
                 </ul>
                 <button
                   className="nextBtn"
-                  onClick={() => onClickNextBtn(marketRef, auctionListFirst, marketIndex, setMarketIndex)}
+                  onClick={() =>
+                    onClickNextBtn(
+                      marketRef,
+                      auctionListFirst,
+                      marketIndex,
+                      setMarketIndex
+                    )
+                  }
                 >
                   <img src={I_rtArw} alt="" />
                 </button>
@@ -326,13 +390,25 @@ export default function Main() {
                 <ul className="itemList" ref={premiumref}>
                   {premiumitemlist.map((cont, index) => (
                     <Fragment key={index}>
-                      <MarketItem0227 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
+                      <MarketItem0227
+                        data={cont}
+                        index={index}
+                        likeObj={likeObj}
+                        setLikeObj={setLikeObj}
+                      />
                     </Fragment>
                   ))}
                 </ul>
                 <button
                   className="nextBtn"
-                  onClick={() => onClickNextBtn(premiumref, premiumitemlist, premiumIndex, setPremiumIndex)}
+                  onClick={() =>
+                    onClickNextBtn(
+                      premiumref,
+                      premiumitemlist,
+                      premiumIndex,
+                      setPremiumIndex
+                    )
+                  }
                 >
                   <img src={I_rtArw} alt="" />
                 </button>
@@ -353,7 +429,10 @@ export default function Main() {
 
                       <img src={E_staking} alt="" />
 
-                      <button className="stakeBtn" onClick={() => navigate("/staking")}>
+                      <button
+                        className="stakeBtn"
+                        onClick={() => navigate("/staking")}
+                      >
                         Buy Now
                       </button>
                     </li>
@@ -361,7 +440,14 @@ export default function Main() {
                 </ul>
                 <button
                   className="nextBtn"
-                  onClick={() => onClickNextBtn(ticketRef, ticketList, ticketIndex, setTicketIndex)}
+                  onClick={() =>
+                    onClickNextBtn(
+                      ticketRef,
+                      ticketList,
+                      ticketIndex,
+                      setTicketIndex
+                    )
+                  }
                 >
                   <img src={I_rtArw} alt="" />
                 </button>
@@ -403,10 +489,20 @@ export default function Main() {
                   ))}
                 </ul>
                 <div className="pageBtnBox">
-                  <button className="preBtn" onClick={() => onClickPreBtn(faqRef, D_faqList, faqIndex, setFaqIndex)}>
+                  <button
+                    className="preBtn"
+                    onClick={() =>
+                      onClickPreBtn(faqRef, D_faqList, faqIndex, setFaqIndex)
+                    }
+                  >
                     <img src={I_ltArwWhite} alt="" />
                   </button>
-                  <button className="nextBtn" onClick={() => onClickNextBtn(faqRef, D_faqList, faqIndex, setFaqIndex)}>
+                  <button
+                    className="nextBtn"
+                    onClick={() =>
+                      onClickNextBtn(faqRef, D_faqList, faqIndex, setFaqIndex)
+                    }
+                  >
                     <img src={I_rtArwWhite} alt="" />
                   </button>
                 </div>
@@ -438,8 +534,8 @@ export default function Main() {
                     <div className="titleBox">
                       <p className="title">Pak on the frontier of NFTs.</p>
                       <p className="explain">
-                        The acclaimed anonymous art entity has been pioneering in digital spaces for decades. Here’s
-                        what’s next.
+                        The acclaimed anonymous art entity has been pioneering
+                        in digital spaces for decades. Here’s what’s next.
                       </p>
                     </div>
 
@@ -451,13 +547,27 @@ export default function Main() {
             </ul>
             <button
               className="preBtn indexBtn"
-              onClick={() => onClickPreBtn(headLineRef, headLineList, headLineIndex, setHeadLineIndex)}
+              onClick={() =>
+                onClickPreBtn(
+                  headLineRef,
+                  headLineList,
+                  headLineIndex,
+                  setHeadLineIndex
+                )
+              }
             >
               <img src={I_ltArwWhite} alt="" />
             </button>
             <button
               className="nextBtn indexBtn"
-              onClick={() => onClickNextBtn(headLineRef, headLineList, headLineIndex, setHeadLineIndex)}
+              onClick={() =>
+                onClickNextBtn(
+                  headLineRef,
+                  headLineList,
+                  headLineIndex,
+                  setHeadLineIndex
+                )
+              }
             >
               <img src={I_rtArwWhite} alt="" />
             </button>
@@ -473,10 +583,14 @@ export default function Main() {
                       <p className="nickname">{strDot(cont.username, 3, 15)}</p>
                     </div>
                     {/* <div className="timeBox">At__{cont.createdat.split("T")[0]}</div> */}
-                    <div className="timeBox">{moment(new Date()).diff(moment(cont.createdat), "days")}days ago</div>
+                    <div className="timeBox">
+                      {moment(new Date()).diff(moment(cont.createdat), "days")}
+                      days ago
+                    </div>
                   </div>
                   <p className="cont">
-                    {cont.typestr === "PAY" ? "purchased" : ""} <u>{cont.actionname}</u> at {cont.price} USDT
+                    {cont.typestr === "PAY" ? "purchased" : ""}{" "}
+                    <u>{cont.actionname}</u> at {cont.price} USDT
                   </p>
                 </li>
               ))}
@@ -492,14 +606,24 @@ export default function Main() {
                   <ul className="itemList" ref={firstAuctionRef}>
                     {auctionListFirst.map((cont, index) => (
                       <Fragment key={index}>
-                        <AuctionItem0228 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
+                        <AuctionItem0228
+                          data={cont}
+                          index={index}
+                          likeObj={likeObj}
+                          setLikeObj={setLikeObj}
+                        />
                       </Fragment>
                     ))}
                   </ul>
                   <button
                     className="nextBtn"
                     onClick={() =>
-                      onClickNextBtn(firstAuctionRef, auctionListFirst, firstAuctionIndex, setFirstAuctionIndex)
+                      onClickNextBtn(
+                        firstAuctionRef,
+                        auctionListFirst,
+                        firstAuctionIndex,
+                        setFirstAuctionIndex
+                      )
                     }
                   >
                     <img src={I_rtArw} alt="" />
@@ -510,14 +634,24 @@ export default function Main() {
                   <ul className="itemList" ref={secondAuctionRef}>
                     {auctionListSecond.map((cont, index) => (
                       <Fragment key={index}>
-                        <AuctionItem0228 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
+                        <AuctionItem0228
+                          data={cont}
+                          index={index}
+                          likeObj={likeObj}
+                          setLikeObj={setLikeObj}
+                        />
                       </Fragment>
                     ))}
                   </ul>
                   <button
                     className="nextBtn"
                     onClick={() =>
-                      onClickNextBtn(secondAuctionRef, auctionListSecond, secondAuctionIndex, setSecondAuctionIndex)
+                      onClickNextBtn(
+                        secondAuctionRef,
+                        auctionListSecond,
+                        secondAuctionIndex,
+                        setSecondAuctionIndex
+                      )
                     }
                   >
                     <img src={I_rtArw} alt="" />
@@ -526,19 +660,34 @@ export default function Main() {
               </div>
             </article>
 
-            <article className="marketplaceBox itemListBox" style={{ display: "none" }}>
+            <article
+              className="marketplaceBox itemListBox"
+              style={{ display: "none" }}
+            >
               <strong className="title">MarketPlace</strong>
               <div className="posBox">
                 <ul className="itemList" ref={marketRef}>
                   {marketPlaceList.map((cont, index) => (
                     <Fragment key={index}>
-                      <MarketItem data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
+                      <MarketItem
+                        data={cont}
+                        index={index}
+                        likeObj={likeObj}
+                        setLikeObj={setLikeObj}
+                      />
                     </Fragment>
                   ))}
                 </ul>
                 <button
                   className="nextBtn"
-                  onClick={() => onClickNextBtn(marketRef, auctionListFirst, marketIndex, setMarketIndex)}
+                  onClick={() =>
+                    onClickNextBtn(
+                      marketRef,
+                      auctionListFirst,
+                      marketIndex,
+                      setMarketIndex
+                    )
+                  }
                 >
                   <img src={I_rtArw} alt="" />
                 </button>
@@ -551,13 +700,25 @@ export default function Main() {
                 <ul className="itemList" ref={premiumref}>
                   {premiumitemlist.map((cont, index) => (
                     <Fragment key={index}>
-                      <MarketItem0227 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
+                      <MarketItem0227
+                        data={cont}
+                        index={index}
+                        likeObj={likeObj}
+                        setLikeObj={setLikeObj}
+                      />
                     </Fragment>
                   ))}
                 </ul>
                 <button
                   className="nextBtn"
-                  onClick={() => onClickNextBtn(premiumref, premiumitemlist, premiumIndex, setPremiumIndex)}
+                  onClick={() =>
+                    onClickNextBtn(
+                      premiumref,
+                      premiumitemlist,
+                      premiumIndex,
+                      setPremiumIndex
+                    )
+                  }
                 >
                   <img src={I_rtArw} alt="" />
                 </button>
@@ -578,7 +739,10 @@ export default function Main() {
 
                       <img src={E_staking} alt="" />
 
-                      <button className="stakeBtn" onClick={() => navigate("/staking")}>
+                      <button
+                        className="stakeBtn"
+                        onClick={() => navigate("/staking")}
+                      >
                         Buy Now
                       </button>
                     </li>
@@ -586,7 +750,14 @@ export default function Main() {
                 </ul>
                 <button
                   className="nextBtn"
-                  onClick={() => onClickNextBtn(ticketRef, ticketList, ticketIndex, setTicketIndex)}
+                  onClick={() =>
+                    onClickNextBtn(
+                      ticketRef,
+                      ticketList,
+                      ticketIndex,
+                      setTicketIndex
+                    )
+                  }
                 >
                   <img src={I_rtArw} alt="" />
                 </button>
@@ -628,10 +799,20 @@ export default function Main() {
                   ))}
                 </ul>
                 <div className="pageBtnBox">
-                  <button className="preBtn" onClick={() => onClickPreBtn(faqRef, D_faqList, faqIndex, setFaqIndex)}>
+                  <button
+                    className="preBtn"
+                    onClick={() =>
+                      onClickPreBtn(faqRef, D_faqList, faqIndex, setFaqIndex)
+                    }
+                  >
                     <img src={I_ltArwWhite} alt="" />
                   </button>
-                  <button className="nextBtn" onClick={() => onClickNextBtn(faqRef, D_faqList, faqIndex, setFaqIndex)}>
+                  <button
+                    className="nextBtn"
+                    onClick={() =>
+                      onClickNextBtn(faqRef, D_faqList, faqIndex, setFaqIndex)
+                    }
+                  >
                     <img src={I_rtArwWhite} alt="" />
                   </button>
                 </div>
