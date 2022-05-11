@@ -715,10 +715,7 @@ export default function MyItems() {
                   </div>
 
                   <div className="saleBox">
-                    <div className="key">
-                      <p className="price">Current price</p>
-                      <strong className="value">{putCommaAtPrice(item.buyprice)} USDT</strong>
-                    </div>
+                    <div className="key"></div>
                     {/* <div className="value">
                       <ul className="timeList">
                         <li>{timeMoment && timeMoment.day()}일</li>
@@ -731,7 +728,7 @@ export default function MyItems() {
                     <ul className="priceBox">
                       <li>
                         <p className="key">Current price</p>
-                        <p className="value">{item.buyprice} USDT</p>
+                        <p className="value">{item.buyprice ? putCommaAtPrice(item.buyprice) : "100"} USDT</p>
                       </li>
                     </ul>
                   </div>

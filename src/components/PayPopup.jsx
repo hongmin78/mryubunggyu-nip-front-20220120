@@ -275,6 +275,7 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
               LOGGER("", resp);
               SetErrorBar(messages.MSG_TX_REQUEST_SENT);
               off();
+              window.location.reload();
             });
           /***** */
           awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
@@ -290,7 +291,6 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
             LOGGER("uQJ2POHvP8", resp_balances);
             // setst akedbalance(getethrep(resp_balances));
             off();
-            window.location.reload();
           });
         } catch (err) {
           setisloader_01(false);
