@@ -217,7 +217,7 @@ export default function Header() {
               >
                 <span className="balanceBox">
                   <p className="price">{mybalance ? mybalance : "..."}</p>
-                  <p className="unit">USDT</p>
+                  <p className="unit">{mybalance && "USDT"}</p>
                 </span>
 
                 <span
