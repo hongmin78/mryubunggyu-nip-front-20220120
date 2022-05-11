@@ -29,7 +29,7 @@ import { API } from "../configs/api";
 import { LOGGER, getmyaddress } from "../util/common";
 import { setDelinquencyAmount } from "../util/store/commonSlice";
 import moment from "moment";
-
+import { net } from "../configs/net";
 export default function Main() {
   const navigate = useNavigate();
   const headLineRef = useRef();
@@ -113,23 +113,24 @@ export default function Main() {
   function fetchitems() {
     axios
       //      .get(  "http://3.35.117.87:34705/auction/list", { params: { limit: 16 } })
-      .get(API.API_COMMONITEMS + `/items/group_/kong/0/128/id/DESC`)
+      .get(API.API_COMMONITEMS + `/items/group_/kong/0/128/roundnumber/DESC?nettype=${net}`)
       .then((res) => {
         // console.log(res.data);
         let { status, list } = res.data;
         if (status == "OK") {
-          setAuctionListFirst(list.slice(0, 64));
-          setAuctionListSecond(list.slice(64));
+          let roundNumber1 = list.filter((item) => item.roundnumber > 0);
+          setAuctionListFirst(roundNumber1.slice(0, 64));
+          setAuctionListSecond(roundNumber1.slice(64));
         }
       });
-    axios.get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC`).then((resp) => {
+    axios.get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC?nettype=${net}`).then((resp) => {
       LOGGER("De0Mlt93PT", resp.data);
       let { status, list } = resp.data;
       if (status == "OK") {
         setpremiumitemlist(list);
       }
     });
-    axios.get(API.API_TYPESTR).then((resp) => {
+    axios.get(API.API_TYPESTR + `?nettype=${net}`).then((resp) => {
       LOGGER("API_TYPESTR", resp.data);
       let { status, payload } = resp.data;
       if (status == "OK") {
@@ -257,10 +258,13 @@ export default function Main() {
                       <img src={E_issueProf} alt="" />
                       <p className="nickname">@andyfeltham</p>
                     </div>
-                    <div className="timeBox">4 mins ago</div>
+                    <div className="timeBox">
+                      {moment(new Date()).diff(moment(cont.createdat), "days")}
+                      days ago
+                    </div>
                   </div>
                   <p className="cont">
-                    purchased <u>Kingkong #122</u> at 158 USDT
+                    {cont.typestr === "PAY" ? "purchased" : ""} <u>{cont.actionname}</u> at {cont.price} USDT
                   </p>
                 </li>
               ))}
@@ -475,7 +479,11 @@ export default function Main() {
                       <img src={E_issueProf} alt="" />
                       <p className="nickname">{cont.username}</p>
                     </div>
-                    <div className="timeBox">{moment(cont.updatedat).minutes()} mins ago</div>
+                    {/* <div className="timeBox">At__{cont.createdat.split("T")[0]}</div> */}
+                    <div className="timeBox">
+                      {moment(new Date()).diff(moment(cont.createdat), "days")}
+                      days ago
+                    </div>
                   </div>
                   <p className="cont">
                     {cont.typestr === "PAY" ? "purchased" : ""} <u>{cont.actionname}</u> at {cont.price} USDT

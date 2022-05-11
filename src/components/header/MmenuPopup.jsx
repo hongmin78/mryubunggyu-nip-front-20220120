@@ -34,7 +34,10 @@ export default function MmenuPopup({ off, mybalance }) {
               <span className="address">{strDot(isLogin, 4, 4)}</span>
             </button>
           ) : (
-            <button className="connectBtn" onClick={() => navigate("/connectwallet")}>
+            <button
+              className="connectBtn"
+              onClick={() => navigate("/connectwallet")}
+            >
               Connect Wallet
             </button>
           )}
@@ -53,7 +56,10 @@ export default function MmenuPopup({ off, mybalance }) {
               <img src={I_openBox} alt="" />
               <p>Subscription Auction</p>
             </button>
-            <button className="marketPlaceBtn" onClick={() => navigate("/market")}>
+            <button
+              className="marketPlaceBtn"
+              onClick={() => navigate("/market")}
+            >
               <img src={I_market} alt="" />
               <p>Marketplece</p>
             </button>
