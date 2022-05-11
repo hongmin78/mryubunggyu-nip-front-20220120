@@ -112,21 +112,20 @@ export default function Main() {
       //      .get(  "http://3.35.117.87:34705/auction/list", { params: { limit: 16 } })
       .get(API.API_COMMONITEMS + `/items/group_/kong/0/128/id/DESC?nettype=${net}`)
       .then((res) => {
-        // console.log(res.data);
         let { status, list } = res.data;
         if (status == "OK") {
-          setAuctionListFirst(list.slice(0, 64));
-          setAuctionListSecond(list.slice(64));
+          setAuctionListFirst(list.filter((item) => item.roundnumber));
+          setAuctionListSecond(list.filter((item) => item.roundnumber));
         }
       });
-    axios.get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC?nettype=${net}`).then((resp) => {
+    axios.get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/roundnumber/DESC?nettype=${net}`).then((resp) => {
       LOGGER("De0Mlt93PT", resp.data);
       let { status, list } = resp.data;
       if (status == "OK") {
         setpremiumitemlist(list);
       }
     });
-    axios.get(API.API_TYPESTR+`?nettype=${net}`).then((resp) => {
+    axios.get(API.API_TYPESTR + `?nettype=${net}`).then((resp) => {
       LOGGER("API_TYPESTR", resp.data);
       let { status, payload } = resp.data;
       if (status == "OK") {
@@ -134,6 +133,8 @@ export default function Main() {
       }
     });
   }
+
+  console.log("asdasdasd", auctionListFirst);
 
   useEffect(() => {
     fetchitems();

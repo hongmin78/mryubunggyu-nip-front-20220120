@@ -59,6 +59,8 @@ export default function MyItems() {
   const [getTickTimer, setGetTickTimer] = useState();
   const [tickTimer, setTickTimer] = useState();
   const [ticketInfo, setTickInfo] = useState();
+  const [itemDataInfo, setItemDataInfo] = useState();
+  console.log("itemDataInfo", itemDataInfo);
 
   const fetchdata = async (_) => {
     let myaddress = getmyaddress();
@@ -71,13 +73,13 @@ export default function MyItems() {
         setuserinfo(respdata);
       }
     });
-    axios.get(API.API_GETTIME + `?nettype=${net}`).then((resp) => {
-      // LOGGER("getTime", resp.data);
-      if (resp.data && resp.data.respdata) {
-        let { status, respdata } = resp.data;
-        setGetTimeMoment(respdata.value_);
-      }
-    });
+    // axios.get(API.API_GETTIME + `?nettype=${net}`).then((resp) => {
+    //   // LOGGER("getTime", resp.data);
+    //   if (resp.data && resp.data.respdata) {
+    //     let { status, respdata } = resp.data;
+    //     setGetTimeMoment(respdata.value_);
+    //   }
+    // });
 
     axios
       .get(API.API_RECEIVABLES + `/${myaddress}?nettype=${nettype}`)
@@ -94,7 +96,7 @@ export default function MyItems() {
 
     axios.get(API.API_ITEMBALANCES + `/${myaddress}?nettype=${net}`).then((res) => {
       let { list, status } = res.data;
-      LOGGER("getTime", res.data);
+      LOGGER("getITEmBALANCES", res.data);
       if (status === "OK" && list?.length) {
         setItemBalData(list);
         LOGGER("ITEMBALANCES", list);
@@ -152,17 +154,19 @@ export default function MyItems() {
       });
   };
 
-  useEffect(() => {
-    setInterval(() => {
-      getTimeMoment && setTimeMoment(moment(moment.unix(getTimeMoment) - moment()));
-    }, 1000);
-  }, [getTimeMoment]);
+  console.log("asdiofjaosdijfasdf", itemData);
 
-  useEffect(() => {
-    setInterval(() => {
-      gettimeReceivables && setTimeReceivables(moment(moment.unix(gettimeReceivables) - moment()));
-    }, 1000);
-  }, [gettimeReceivables]);
+  // useEffect(() => {
+  //   setInterval(() => {
+  //     getTimeMoment && setTimeMoment(moment(moment.unix(getTimeMoment) - moment()));
+  //   }, 1000);
+  // }, [getTimeMoment]);
+
+  // useEffect(() => {
+  //   setInterval(() => {
+  //     gettimeReceivables && setTimeReceivables(moment(moment.unix(gettimeReceivables) - moment()));
+  //   }, 1000);
+  // }, [gettimeReceivables]);
 
   useEffect(() => {
     let myaddress = getmyaddress();
@@ -175,10 +179,11 @@ export default function MyItems() {
       }
     });
 
-    setInterval(() => {
-      getTickTimer && setTickTimer(moment(getTickTimer).add(90, "days") - moment());
-    }, 1000);
+    // setInterval(() => {
+    //   getTickTimer && setTickTimer(moment(getTickTimer).add(90, "days") - moment());
+    // }, 1000);
   }, [getTickTimer]);
+
   useEffect((_) => {
     setTimeout((_) => {
       fetchdata();
@@ -372,7 +377,7 @@ export default function MyItems() {
                         <p className="key">Current price</p>
                       </div>
 
-                      <div className="time">
+                      {/* <div className="time">
                         <p className="key">Ending in</p>
                         <ul className="timeList">
                           <li>{timeReceivables && timeReceivables.days()}일</li>
@@ -380,7 +385,7 @@ export default function MyItems() {
                           <li>{timeReceivables && timeReceivables.minutes()}분</li>
                           <li>{timeReceivables && timeReceivables.second()}초</li>
                         </ul>
-                      </div>
+                      </div> */}
                     </div>
 
                     <ul className="priceBox">
@@ -441,7 +446,7 @@ export default function MyItems() {
 
                       <strong className="value">{putCommaAtPrice(item.buyprice)} USDT</strong>
                     </div>
-                    <div className="time">
+                    {/* <div className="time">
                       <p className="key">Ending in</p>
                       <ul className="timeList">
                         <li>{timeMoment && timeMoment.day()}일</li>
@@ -449,7 +454,7 @@ export default function MyItems() {
                         <li>{timeMoment && timeMoment.minutes()}분</li>
                         <li>{timeMoment && timeMoment.second()}초</li>
                       </ul>
-                    </div>
+                    </div> */}
                   </div>
 
                   <ul className="priceBox">
@@ -640,19 +645,19 @@ export default function MyItems() {
 
                     <div className="saleBox">
                       <div className="key">
-                        <p className="price">Current price</p>
-                        <p className="time">Ending in</p>
+                        {/* <p className="price">Current price</p> */}
+                        {/* <p className="time">Ending in</p> */}
                       </div>
 
                       <div className="value">
                         <strong className="price">{putCommaAtPrice(item.amount)} USDT</strong>
 
-                        <ul className="timeList">
+                        {/* <ul className="timeList">
                           <li>{timeReceivables && timeReceivables.days()}일</li>
                           <li>{timeReceivables && timeReceivables.hour()}시간</li>
                           <li>{timeReceivables && timeReceivables.minutes()}분</li>
                           <li>{timeReceivables && timeReceivables.second()}초</li>
-                        </ul>
+                        </ul> */}
                       </div>
 
                       <ul className="priceBox">
@@ -668,6 +673,7 @@ export default function MyItems() {
                       onClick={() => {
                         setReceivables(item);
                         openModal();
+                        setItemDataInfo(item.itemdata);
                       }}
                     >
                       Pay
@@ -713,14 +719,14 @@ export default function MyItems() {
                       <p className="price">Current price</p>
                       <strong className="value">{putCommaAtPrice(item.buyprice)} USDT</strong>
                     </div>
-                    <div className="value">
+                    {/* <div className="value">
                       <ul className="timeList">
                         <li>{timeMoment && timeMoment.day()}일</li>
                         <li>{timeMoment && timeMoment.hour()}시간</li>
                         <li>{timeMoment && timeMoment.minutes()}분</li>
                         <li>{timeMoment && timeMoment.second()}초</li>
                       </ul>
-                    </div>
+                    </div> */}
 
                     <ul className="priceBox">
                       <li>
