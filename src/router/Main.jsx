@@ -30,6 +30,7 @@ import { LOGGER, getmyaddress } from "../util/common";
 import { setDelinquencyAmount } from "../util/store/commonSlice";
 import moment from "moment";
 import { net } from "../configs/net";
+
 export default function Main() {
   const navigate = useNavigate();
   const headLineRef = useRef();
