@@ -34,6 +34,7 @@ export default function Header() {
   let [mybalance, setmybalance] = useState();
   let [myaddress, setmyaddress] = useState();
   const [ticketInfo, setTickInfo] = useState();
+  const [walletStatus, setWalletStatus] = useState("");
 
   useEffect(() => {
     setTimeout(() => {
@@ -51,10 +52,23 @@ export default function Header() {
           let { status, respdata } = resp.data;
           if (status == "OK" && respdata !== null) {
             setTickInfo(respdata);
+            awaitWallet();
           }
         });
     }, 1000);
   }, []);
+
+  const awaitWallet = () => {
+    let myaddress = getmyaddress();
+    setTimeout(() => {
+      if (myaddress) {
+        return;
+      } else {
+        setWalletStatus("Connect Wallet");
+      }
+    }, 1600);
+    setWalletStatus("Connecting...");
+  };
 
   const fetchdataStaked = async () => {
     let myaddress = getmyaddress();
@@ -106,10 +120,10 @@ export default function Header() {
 
   useEffect(
     (_) => {
-      setTimeout(() => {
-        fetchdataStaked();
-        fetchdata();
-      }, 1000);
+      console.log("$ISLOGIN", isLogin);
+      fetchdataStaked();
+      fetchdata();
+      awaitWallet();
     },
     [isLogin, address]
   );
@@ -185,9 +199,9 @@ export default function Header() {
             </nav>
 
             {/**  <button className='menuBtn' >
-		<span className='balanceBox'>Switch network</span></button>*/}
+		      <span className='balanceBox'>Switch network</span></button>*/}
             {isLogin ? (
-              <button
+              <div
                 className="menuBtn"
                 style={{
                   color: isStaking && "#000",
@@ -202,7 +216,7 @@ export default function Header() {
                 }}
               >
                 <span className="balanceBox">
-                  <p className="price">{mybalance}</p>
+                  <p className="price">{mybalance ? mybalance : "..."}</p>
                   <p className="unit">USDT</p>
                 </span>
 
@@ -216,16 +230,16 @@ export default function Header() {
                 </span>
 
                 {headerPopup && <HeaderPopup />}
-              </button>
+              </div>
             ) : (
-              <button
+              <div
                 className="connectBtn"
                 onClick={() => {
                   navigate("/connectwallet");
                 }}
               >
-                {myaddress ? strDot(myaddress, 8, 0) : "Connect Wallet"}
-              </button>
+                {myaddress ? strDot(myaddress, 8, 0) : walletStatus}
+              </div>
             )}
           </article>
         </section>
@@ -301,7 +315,7 @@ const PheaderBox = styled.header`
         justify-content: space-between;
         align-items: center;
         gap: 14px;
-        width: 280px;
+        width: 290px;
         height: 54px;
         padding: 6px 6px 6px 24px;
         font-size: 18px;
@@ -313,12 +327,12 @@ const PheaderBox = styled.header`
         position: relative;
 
         .balanceBox {
-          flex: 1;
           display: flex;
           overflow: hidden;
+          align-items: center;
+          gap: 10px;
 
           .price {
-            flex: 1;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
