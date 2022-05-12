@@ -254,7 +254,6 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
             to: addresses.contract_pay_for_assigned_item, // .ETH_TESTNET
             data: abistr,
           });
-          setisloader_01(false);
           if (resp) {
           } else {
             SetErrorBar(messages.MSG_USER_DENIED_TX);
@@ -279,8 +278,6 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
             .then((resp) => {
               LOGGER("", resp);
               SetErrorBar(messages.MSG_TX_REQUEST_SENT);
-              off();
-              window.location.reload();
             });
           /***** */
           awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
@@ -294,8 +291,9 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
               aargs: [myaddress],
             });
             LOGGER("uQJ2POHvP8", resp_balances);
-            // setst akedbalance(getethrep(resp_balances));
             off();
+            window.location.reload();
+            setisloader_01(false);
           });
         } catch (err) {
           setisloader_01(false);

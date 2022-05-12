@@ -60,6 +60,7 @@ export default function MyItems() {
   const [tickTimer, setTickTimer] = useState();
   const [ticketInfo, setTickInfo] = useState();
   const [itemDataInfo, setItemDataInfo] = useState();
+  const [circulations, setCirculations] = useState([]);
   console.log("itemDataInfo", itemDataInfo);
 
   const fetchdata = async (_) => {
@@ -73,16 +74,9 @@ export default function MyItems() {
         setuserinfo(respdata);
       }
     });
-    // axios.get(API.API_GETTIME + `?nettype=${net}`).then((resp) => {
-    //   // LOGGER("getTime", resp.data);
-    //   if (resp.data && resp.data.respdata) {
-    //     let { status, respdata } = resp.data;
-    //     setGetTimeMoment(respdata.value_);
-    //   }
-    // });
 
     axios
-      .get(API.API_RECEIVABLES + `/${myaddress}?nettype=${nettype}`)
+      .get(API.API_RECEIVABLES + `/${myaddress}?nettype=${net}`)
       .then((res) => {
         let { list } = res.data;
         setItemData(list);
@@ -104,28 +98,19 @@ export default function MyItems() {
           let { duetimeunix } = el;
         });
       }
+      axios //      .get("http://3.35.1 17.87:34705/auction/list", { params: { limit: 8 } })
+        .get(API.API_GET_CIRCULATIONS + `?nettype=${net}`)
+        .then((resp) => {
+          LOGGER("circulations", resp.data);
+          let { status, list } = resp.data;
+          if (status == "OK") {
+            setCirculations(resp.data.list);
+          }
+          //        console.log(res.data);
+          //      setMoreCollection(res.data);
+        });
     });
 
-    false &&
-      axios
-        .get(API.API_QUERY_SINGLEROW + `/transactions/username/${myaddress}?typestr=STAKE&status=1&nettype=${net}`)
-        .then((resp) => {
-          LOGGER("", resp.data);
-          let { status, respdata } = resp.data;
-          if (status == "OK") {
-            let { txhash } = respdata;
-            setstakedata(respdata);
-            settxhash(strDot(txhash, 16, 0));
-            settxscanurl(MAP_NETTYPE_SCAN[respdata.nettype] + `/tx/${txhash}`);
-            let buydatetime = moment(respdata.createdat);
-            setbuydate([
-              buydatetime.year().toString().substr(2),
-              (1 + buydatetime.month()).toString().padStart(2, "0"),
-              buydatetime.day().toString().padStart(2, "0"),
-              buydatetime.hour().toString().padStart(2, "0"),
-            ]);
-          }
-        });
     //true
     true &&
       query_with_arg({
@@ -417,36 +402,40 @@ export default function MyItems() {
               );
             })}
           {itemBalData.length !== 0 &&
-            itemBalData.map((item, index) => (
-              <li className="sellBox">
-                <div className="imgBoxBal">
-                  <img className="itemImgBal" src={item.itemdata.url} alt="" />
+            itemBalData.map((item, index) =>
+              circulations.map((itm, i) => (
+                <li className="sellBox">
+                  <div className="imgBoxBal">
+                    <img className="itemImgBal" src={item.itemdata.url} alt="" />
 
-                  <div className="topBarBal">
-                    <button className="likeBtnBal" onClick={() => {}}>
-                      <img src={I_heartO} alt="" />
-                      <p>22</p>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="infoBox">
-                  <div className="titleBox">
-                    <strong className="title">{item.itemdata.titlename}</strong>
-                  </div>
-
-                  <div className="ownedBox">
-                    <p className="key">Owned by</p>
-                    <p className="value">@{item.username}</p>
-                  </div>
-
-                  <div className="saleBox">
-                    <div className="price">
-                      <p className="key">Current price</p>
-
-                      <strong className="value">{putCommaAtPrice(item.buyprice)} USDT</strong>
+                    <div className="topBarBal">
+                      <button className="likeBtnBal" onClick={() => {}}>
+                        <img src={I_heartO} alt="" />
+                        <p>22</p>
+                      </button>
                     </div>
-                    {/* <div className="time">
+                  </div>
+
+                  <div className="infoBox">
+                    <div className="titleBox">
+                      <strong className="title">{item.itemdata.titlename}</strong>
+                    </div>
+
+                    <div className="ownedBox">
+                      <p className="key">Owned by</p>
+                      <p className="value">@{item.username}</p>
+                    </div>
+
+                    <div className="saleBox">
+                      <div className="price">
+                        <p className="key">Current price</p>
+                        {/* 
+                        <strong className="value">{putCommaAtPrice(item.buyprice)} USDT</strong> */}
+                        <strong className="value">
+                          {(item.itemid === itm.itemid) & putCommaAtPrice(itm.price)} USDT
+                        </strong>
+                      </div>
+                      {/* <div className="time">
                       <p className="key">Ending in</p>
                       <ul className="timeList">
                         <li>{timeMoment && timeMoment.day()}일</li>
@@ -455,21 +444,22 @@ export default function MyItems() {
                         <li>{timeMoment && timeMoment.second()}초</li>
                       </ul>
                     </div> */}
-                  </div>
+                    </div>
 
-                  <ul className="priceBox">
-                    <li>
-                      <p className="key">Current price</p>
-                      <p className="value">{item.buyprice} USDT</p>
-                    </li>
-                  </ul>
-                  <p className="description">
-                    King Kong NFT can be staking or sold to Marketplace at a price of up to 25%. If you steaking, you
-                    will get 30% annual NIP COIN reward.
-                  </p>
-                </div>
-              </li>
-            ))}
+                    <ul className="priceBox">
+                      <li>
+                        <p className="key">Current price</p>
+                        <p className="value">{item.buyprice} USDT</p>
+                      </li>
+                    </ul>
+                    <p className="description">
+                      King Kong NFT can be staking or sold to Marketplace at a price of up to 25%. If you steaking, you
+                      will get 30% annual NIP COIN reward.
+                    </p>
+                  </div>
+                </li>
+              ))
+            )}
           {isOpen && <PayPopup off={openModal} receivables={receivables} />}
         </ul>
       </MmyItemsBox>
@@ -713,6 +703,10 @@ export default function MyItems() {
                     <p className="key">Owned by</p>
                     <p className="value">@{item.username}</p>
                   </div>
+                  <div className="ownedBox">
+                    <p className="key">Sold Date</p>
+                    <p className="value">{item.createdat.split("T")[0]}</p>
+                  </div>
 
                   <div className="saleBox">
                     <div className="key"></div>
@@ -728,7 +722,10 @@ export default function MyItems() {
                     <ul className="priceBox">
                       <li>
                         <p className="key">Current price</p>
-                        <p className="value">{item.buyprice ? putCommaAtPrice(item.buyprice) : "100"} USDT</p>
+                        {circulations.map((itm, i) => {
+                          if (item.itemid === itm.itemid)
+                            return <p className="value"> {putCommaAtPrice(itm.price)} USDT</p>;
+                        })}
                       </li>
                     </ul>
                   </div>
