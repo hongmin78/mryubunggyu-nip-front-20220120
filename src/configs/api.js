@@ -31,7 +31,8 @@ const API = {
   API_GET_EMAILAUTH: `${URL}/queries/singlerow/emailverifycode/emailaddress`,
   API_GET_CIRCULATIONS: `${URL}/queries/circulations`,
   API_PUT_USERS: `${URL}/users`,
-  API_GET_OFFERS: `${URL}/queries/itemhistory/itemid`,
+  API_GET_OFFERS: `${URL}/queries/itembalances/itemid`,
+  API_GET_TRANSACTIONS: `${URL}/queries/transactionstotrack/itemid`,
   API_QUERY_STRING: (_value) => `${URL}/queries/singlerow/settings/key_/${_value}`,
 };
 

@@ -71,11 +71,11 @@ export default function Main() {
 
   useEffect(() => {
     setTimeout(() => {
-			let address = getmyaddress(); 
-			let myaddress = address
+      let address = getmyaddress();
+      let myaddress = address;
       console.log("address", address);
       axios
-        .get(`${API.API_DELINQUENCY}/${address}` + `?nettype=${net}` )
+        .get(`${API.API_DELINQUENCY}/${address}` + `?nettype=${net}`)
         .then((res) => {
           console.log("RES", res);
           let { status } = res.data;
@@ -297,11 +297,12 @@ export default function Main() {
                 </div>
                 <div className="posBox">
                   <ul className="itemList">
-                    {auctionListSecond.map((cont, index) => (
-                      <Fragment key={index}>
-                        <AuctionItem0228 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
-                      </Fragment>
-                    ))}
+                    {auctionListSecond.length > 0 &&
+                      auctionListSecond.map((cont, index) => (
+                        <Fragment key={index}>
+                          <AuctionItem0228 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
+                        </Fragment>
+                      ))}
                   </ul>
                   <button className="nextBtn">
                     <img src={I_rtArw} alt="" />
@@ -520,20 +521,23 @@ export default function Main() {
 
                 <div className="posBox">
                   <ul className="itemList" ref={secondAuctionRef}>
-                    {auctionListSecond.map((cont, index) => (
-                      <Fragment key={index}>
-                        <AuctionItem0228 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
-                      </Fragment>
-                    ))}
+                    {auctionListSecond.length > 0 &&
+                      auctionListSecond.map((cont, index) => (
+                        <Fragment key={index}>
+                          <AuctionItem0228 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
+                        </Fragment>
+                      ))}
                   </ul>
-                  <button
-                    className="nextBtn"
-                    onClick={() =>
-                      onClickNextBtn(secondAuctionRef, auctionListSecond, secondAuctionIndex, setSecondAuctionIndex)
-                    }
-                  >
-                    <img src={I_rtArw} alt="" />
-                  </button>
+                  {auctionListSecond.length > 0 && (
+                    <button
+                      className="nextBtn"
+                      onClick={() =>
+                        onClickNextBtn(secondAuctionRef, auctionListSecond, secondAuctionIndex, setSecondAuctionIndex)
+                      }
+                    >
+                      <img src={I_rtArw} alt="" />
+                    </button>
+                  )}
                 </div>
               </div>
             </article>
