@@ -171,7 +171,7 @@ export default function Penalty() {
                       the same day, the account will be locked and a 10% penalty
                       will be charged
                     </p> */}
-                    <p className="cong">Please pay {delinquencyAmount}</p>
+                    <p className="cong">Please pay {delinquencyAmount} USDT</p>
                     {/* <p className="pay">Pay 688 USDT for your NFT transfer</p> */}
                   </div>
                 </div>
