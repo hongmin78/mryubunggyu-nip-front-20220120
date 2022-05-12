@@ -71,10 +71,11 @@ export default function Main() {
 
   useEffect(() => {
     setTimeout(() => {
-      let address = getmyaddress();
+			let address = getmyaddress(); 
+			let myaddress = address
       console.log("address", address);
       axios
-        .get(`${API.API_DELINQUENCY}/${address}`)
+        .get(`${API.API_DELINQUENCY}/${address}` + `?nettype=${net}` )
         .then((res) => {
           console.log("RES", res);
           let { status } = res.data;
@@ -99,7 +100,7 @@ export default function Main() {
           alert(err.message);
         });
       axios
-        .get(API.API_RECEIVABLES + `/${address}`)
+        .get(API.API_RECEIVABLES + `/${address}` + `?nettype=${net}`)
         .then((res) => {
           let { list } = res.data;
           LOGGER("receivables", list);
