@@ -75,7 +75,7 @@ export default function Main() {
       let myaddress = address;
       console.log("address", address);
       axios
-        .get(`${API.API_DELINQUENCY}/${address}` + `?nettype=${net}`)
+        .get(`${API.API_DELINQUENCY}/${address}/0/10/id/DESC` + `?nettype=${net}&itemdetail=1`)
         .then((res) => {
           console.log("RES", res);
           let { status } = res.data;

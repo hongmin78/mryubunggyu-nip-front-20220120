@@ -19,7 +19,7 @@ const API = {
   API_ITEMDETAIL: URL + "/items/item", // /:itemid
   API_EMAIL_VERIFY: `${URL}/signup/email/auth`,
   API_RECEIVABLES: `${URL}/queries/receivables/username`,
-  API_DELINQUENCY: `${URL}/queries/delinquencies/username`,
+  API_DELINQUENCY: `${URL}/queries/rows/delinquencies/username`,
   API_ITEMBALANCES: `${URL}/queries/itembalances/username`,
   API_GETUSER: `${URL}/user/info`,
   API_GETTIME: `${URL}/queries/singlerow/settings/key_/BALLOT_NEXT_ROUND_START`,
