@@ -470,7 +470,6 @@ const PpenaltyBox = styled.div`
             font-weight: 500;
             line-height: 19px;
             background: #000;
-            border-radius: 30px;
 
             li {
               display: flex;

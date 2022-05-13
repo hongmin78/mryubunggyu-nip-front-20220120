@@ -29,6 +29,7 @@ import { API } from "../configs/api";
 import { LOGGER, getmyaddress } from "../util/common";
 import { setDelinquencyAmount } from "../util/store/commonSlice";
 import moment from "moment";
+import { strDot } from "../util/Util";
 import { net } from "../configs/net";
 
 export default function Main() {
@@ -133,10 +134,10 @@ export default function Main() {
       }
     });
     axios.get(API.API_TYPESTR + `?nettype=${net}`).then((resp) => {
-      LOGGER("API_TYPESTR", resp.data);
+      LOGGER("itemBalance", resp.data);
       let { status, payload } = resp.data;
       if (status == "OK") {
-        setTypestrPay(payload?.rowdata);
+        setTypestrPay(resp.data.list);
       }
     });
   }
@@ -258,16 +259,14 @@ export default function Main() {
                   <div className="infoBox">
                     <div className="profBox">
                       <img src={E_issueProf} alt="" />
-                      <p className="nickname">@andyfeltham</p>
+                      <p className="nickname">{strDot(cont.username, 4, 10)}</p>
                     </div>
                     <div className="timeBox">
                       {moment(new Date()).diff(moment(cont.createdat), "days")}
                       days ago
                     </div>
                   </div>
-                  <p className="cont">
-                    {cont.typestr === "PAY" ? "purchased" : ""} <u>{cont.actionname}</u> at {cont.price} USDT
-                  </p>
+                  <p className="cont">at {cont.price} USDT</p>
                 </li>
               ))}
             </ul>
@@ -480,7 +479,7 @@ export default function Main() {
                   <div className="infoBox">
                     <div className="profBox">
                       <img src={E_issueProf} alt="" />
-                      <p className="nickname">{cont.username}</p>
+                      <p className="nickname">{strDot(cont.username, 4, 10)}</p>
                     </div>
                     {/* <div className="timeBox">At__{cont.createdat.split("T")[0]}</div> */}
                     <div className="timeBox">
@@ -488,9 +487,7 @@ export default function Main() {
                       days ago
                     </div>
                   </div>
-                  <p className="cont">
-                    {cont.typestr === "PAY" ? "purchased" : ""} <u>{cont.actionname}</u> at {cont.price} USDT
-                  </p>
+                  <p className="cont">at {cont.price} USDT</p>
                 </li>
               ))}
             </ul>

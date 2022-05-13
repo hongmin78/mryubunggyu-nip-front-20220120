@@ -99,7 +99,7 @@ export default function MyItems() {
         });
       }
       axios //      .get("http://3.35.1 17.87:34705/auction/list", { params: { limit: 8 } })
-        .get(API.API_GET_CIRCULATIONS + `?nettype=${net}`)
+        .get(API.API_GET_CIRCULATIONS_ITEM + `?nettype=${net}`)
         .then((resp) => {
           LOGGER("circulations", resp.data);
           let { status, list } = resp.data;
@@ -630,7 +630,7 @@ export default function MyItems() {
                     </div>
                     <div className="ownedBox">
                       <p className="key">Round Number</p>
-                      <p className="value">{item.roundnumber}Round</p>
+                      <p className="value">{item.itemdata.roundnumber} Round</p>
                     </div>
 
                     <div className="saleBox">
@@ -640,7 +640,7 @@ export default function MyItems() {
                       </div>
 
                       <div className="value">
-                        <strong className="price">{putCommaAtPrice(item.amount)} USDT</strong>
+                        <strong className="price">{Math.floor(putCommaAtPrice(item.amount))} USDT</strong>
 
                         {/* <ul className="timeList">
                           <li>{timeReceivables && timeReceivables.days()}일</li>
@@ -653,7 +653,7 @@ export default function MyItems() {
                       <ul className="priceBox">
                         <li>
                           <p className="key">Current price</p>
-                          <p className="value">{putCommaAtPrice(item.amount)} USDT</p>
+                          <p className="value">{Math.floor(putCommaAtPrice(item.amount))} USDT</p>
                         </li>
                       </ul>
                     </div>
@@ -742,76 +742,6 @@ export default function MyItems() {
             ))}
 
           {isOpen && <PayPopup off={openModal} userInfo={userinfo} receivables={receivables} />}
-
-          {/* <li className="sellBox">
-            <div className="imgBox">
-              <img className="itemImg" src={E_item3} alt="" />
-              <div className="topBar">
-                <button className="likeBtn" onClick={() => {}}>
-                  <img src={I_heartO} alt="" />
-                  <p>22</p>
-                </button>
-              </div>
-            </div>
-            <div className="infoBox">
-              <div className="titleBox">
-                <strong className="title">King Kong #010000</strong>
-              </div>
-              <div className="ownedBox">
-                <p className="key">Owned by</p>
-                <p className="value">@andyfeltham</p>
-              </div>
-              <div className="saleBox">
-                <div className="key">
-                  <p className="price">Current price</p>
-                  <p className="time">Ending in</p>
-                </div>
-                <div className="value">
-                  <strong className="price">
-                    {putCommaAtPrice(686.6)} USDT
-                  </strong>
-                  <ul className="timeList">
-                    <li>00</li>
-                    <li>12</li>
-                    <li>59</li>
-                    <li>09</li>
-                  </ul>
-                </div>
-                <ul className="priceBox">
-                  <li>
-                    <p className="key">Current price</p>
-                    <p className="value">10 USDT</p>
-                  </li>
-                  <li>
-                    <p className="key">Transaction price</p>
-                    <p className="value">15 USDT</p>
-                  </li>
-                  <li
-                    onClick={evt => {
-                      window.open(txscanurl);
-                    }}
-                  >
-                    <p className="key">TxHash</p>
-                    <p className="value">{txhash}</p>
-                  </li>
-                </ul>
-              </div>
-              <div className="btnBox">
-                <button
-                  className="actionBtn"
-                  onClick={() => navigate("/resell")}
-                >
-                  Sell
-                </button>
-                <button className="actionBtn">Staking</button>
-              </div>
-              <p className="description">
-                King Kong NFT can be staking or sold to Marketplace at a price
-                of up to 25%. If you steaking, you will get 30% annual NIP COIN
-                reward.
-              </p>
-            </div>
-          </li> */}
         </ul>
       </PmyItemsBox>
     );

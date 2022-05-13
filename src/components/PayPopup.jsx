@@ -336,14 +336,6 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
               </div>
 
               <ul className="dataList">
-                <li>
-                  <p className="key">Calculation</p>
-                  <p className="value">2022-01-11 00:00 UTC</p>
-                </li>
-                <li>
-                  <p className="key">Distribution</p>
-                  <p className="value">2022-03-12 00:00 UTC</p>
-                </li>
                 <li style={MODE_DEV_PROD == "DEV" ? {} : { display: "none" }}>
                   <p className="key">Total Staked</p>
                   <p className="value">{tvl} USDT</p>
@@ -375,33 +367,7 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
             </div>
 
             <div className="confirmBox">
-              <div className="termBox">
-                <p className="key">Would you like to stake long term?</p>
-                <span className="value">
-                  <button className="yesBtn" onClick={() => setTermChk(true)}>
-                    <span
-                      className="chkBtn"
-                      style={{
-                        background: termChk && "#000",
-                      }}
-                    >
-                      <img src={I_chkWhite} alt="" />
-                    </span>
-                    yes
-                  </button>
-                  <button className="noBtn" onClick={() => setTermChk(false)}>
-                    <span
-                      className="chkBtn"
-                      style={{
-                        background: !termChk && "#000",
-                      }}
-                    >
-                      <img src={I_chkWhite} alt="" />
-                    </span>
-                    no
-                  </button>
-                </span>
-              </div>
+              <div className="termBox"></div>
 
               <button
                 className="confirmBtn"
@@ -470,14 +436,6 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
             </div>
 
             <ul className="dataList">
-              <li>
-                <p className="key">Calculation</p>
-                <p className="value">2022-01-11 00:00 UTC</p>
-              </li>
-              <li>
-                <p className="key">Distribution</p>
-                <p className="value">2022-03-12 00:00 UTC</p>
-              </li>
               <li style={MODE_DEV_PROD == "DEV" ? {} : { display: "none" }}>
                 <p className="key">Total Staked</p>
                 <p className="value">{tvl} USDT</p>
@@ -491,7 +449,7 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
                 <p className="value">{mybalance} USDT</p>
               </li>
               <li style={allowanceamount ? { display: "block" } : {}}>
-                <p className="key">Allowance</p>
+                <p className="key">Allowance:</p>
                 <p className="value">{allowanceamount} USDT</p>
               </li>
               <li>
@@ -505,36 +463,7 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
 
           <div className="confirmBox">
             <div className="termBox">
-              <p className="key">Would you like to stake long term?</p>
-              <span className="value">
-                <button
-                  className="yesBtn"
-                  onClick={() => {
-                    setTermChk(true);
-                  }}
-                >
-                  <span
-                    className="chkBtn"
-                    style={{
-                      background: termChk && "#000",
-                    }}
-                  >
-                    <img src={I_chkWhite} alt="" />
-                  </span>
-                  yes
-                </button>
-                <button className="noBtn" onClick={() => setTermChk(false)}>
-                  <span
-                    className="chkBtn"
-                    style={{
-                      background: !termChk && "#000",
-                    }}
-                  >
-                    <img src={I_chkWhite} alt="" />
-                  </span>
-                  no
-                </button>
-              </span>
+              <span className="value"></span>
             </div>
 
             <button

@@ -28,14 +28,13 @@ export default function Auction() {
   const fetchdata = (_) => {
     //   	 axios.get("http://3.3 5.117.87:34705/auction/list").then((res) => {
     axios
-      .get(
-        API.API_COMMONITEMS + `/items/group_/kong/0/32/id/DESC?nettype=${net}`
-      )
+      .get(API.API_COMMONITEMS + `/items/group_/kong/0/${limit}/roundnumber/DESC?nettype=${net}&itemdetail=1`)
       .then((resp) => {
-        console.log(resp.data);
+        console.log("De0Mlt93PT", resp.data);
         let { status, list } = resp.data;
         if (status == "OK") {
-          setAuctionList(list);
+          let roundNumber1 = list.filter((item) => item.roundnumber > 0);
+          setAuctionList(roundNumber1);
         }
       });
   };
@@ -43,7 +42,7 @@ export default function Auction() {
   useEffect(() => {
     // getAuction();
     fetchdata();
-  }, []);
+  }, [limit]);
 
   if (isMobile)
     return (
@@ -61,12 +60,8 @@ export default function Auction() {
                     onChange={(e) => {
                       setSearch(e.target.value);
                     }}
-                    onFocus={() =>
-                      (searchBoxRef.current.style.border = "3px solid #000")
-                    }
-                    onBlur={() =>
-                      (searchBoxRef.current.style.border = "1px solid #d9d9d9")
-                    }
+                    onFocus={() => (searchBoxRef.current.style.border = "3px solid #000")}
+                    onBlur={() => (searchBoxRef.current.style.border = "1px solid #d9d9d9")}
                     placeholder="Search"
                   />
 
@@ -77,12 +72,8 @@ export default function Auction() {
                   <button
                     className="sortBtn"
                     ref={sortBtnRef}
-                    onFocus={() =>
-                      (sortBtnRef.current.style.border = "3px solid #000")
-                    }
-                    onBlur={() =>
-                      (sortBtnRef.current.style.border = "1px solid #d9d9d9")
-                    }
+                    onFocus={() => (sortBtnRef.current.style.border = "3px solid #000")}
+                    onBlur={() => (sortBtnRef.current.style.border = "1px solid #d9d9d9")}
                     onClick={() => setSortPopup(true)}
                   >
                     <p>{sortOpt}</p>
@@ -91,12 +82,7 @@ export default function Auction() {
 
                   {sortPopup && (
                     <>
-                      <SelectPopup
-                        off={setSortPopup}
-                        dataList={D_sortList}
-                        select={sortOpt}
-                        setFunc={setSortOpt}
-                      />
+                      <SelectPopup off={setSortPopup} dataList={D_sortList} select={sortOpt} setFunc={setSortOpt} />
                       <PopupBg off={setSortPopup} />
                     </>
                   )}
@@ -109,9 +95,7 @@ export default function Auction() {
                 .filter((cont) => {
                   if (search === "") {
                     return cont;
-                  } else if (
-                    cont.titlename.toLowerCase().includes(search.toLowerCase())
-                  ) {
+                  } else if (cont.titlename.toLowerCase().includes(search.toLowerCase())) {
                     return cont;
                   }
                 })
@@ -119,21 +103,17 @@ export default function Auction() {
                   if (index < limit)
                     return (
                       <Fragment key={index}>
-                        <AuctionItem0228
-                          data={cont}
-                          index={index}
-                          likeObj={likeObj}
-                          setLikeObj={setLikeObj}
-                        />
+                        <AuctionItem0228 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
                       </Fragment>
                     );
                   else return <Fragment key={index} />;
                 })}
             </ul>
-
-            <button className="moreBtn" onClick={() => setLimit(limit + 4)}>
-              Load more
-            </button>
+            {
+              <button className="moreBtn" onClick={() => setLimit(limit + 4)}>
+                Load more
+              </button>
+            }
           </div>
         </MauctionBox>
         <Footer />
@@ -151,12 +131,8 @@ export default function Auction() {
               <div className="searchBox" ref={searchBoxRef}>
                 <input
                   value={search}
-                  onFocus={() =>
-                    (searchBoxRef.current.style.border = "3px solid #000")
-                  }
-                  onBlur={() =>
-                    (searchBoxRef.current.style.border = "1px solid #d9d9d9")
-                  }
+                  onFocus={() => (searchBoxRef.current.style.border = "3px solid #000")}
+                  onBlur={() => (searchBoxRef.current.style.border = "1px solid #d9d9d9")}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search"
                 />
@@ -170,12 +146,8 @@ export default function Auction() {
                 <button
                   ref={sortBtnRef}
                   className="sortBtn"
-                  onFocus={() =>
-                    (sortBtnRef.current.style.border = "3px solid #000")
-                  }
-                  onBlur={() =>
-                    (sortBtnRef.current.style.border = "1px solid #d9d9d9")
-                  }
+                  onFocus={() => (sortBtnRef.current.style.border = "3px solid #000")}
+                  onBlur={() => (sortBtnRef.current.style.border = "1px solid #d9d9d9")}
                   onClick={() => setSortPopup(true)}
                 >
                   <p>{sortOpt}</p>
@@ -184,12 +156,7 @@ export default function Auction() {
 
                 {sortPopup && (
                   <>
-                    <SelectPopup
-                      off={setSortPopup}
-                      dataList={D_sortList}
-                      select={sortOpt}
-                      setFunc={setSortOpt}
-                    />
+                    <SelectPopup off={setSortPopup} dataList={D_sortList} select={sortOpt} setFunc={setSortOpt} />
                     <PopupBg off={setSortPopup} />
                   </>
                 )}
@@ -202,9 +169,7 @@ export default function Auction() {
               .filter((cont) => {
                 if (search === "") {
                   return cont;
-                } else if (
-                  cont.titlename.toLowerCase().includes(search.toLowerCase())
-                ) {
+                } else if (cont.titlename.toLowerCase().includes(search.toLowerCase())) {
                   return cont;
                 }
               })
@@ -212,12 +177,7 @@ export default function Auction() {
                 if (index < limit)
                   return (
                     <Fragment key={index}>
-                      <AuctionItem0228
-                        data={cont}
-                        index={index}
-                        likeObj={likeObj}
-                        setLikeObj={setLikeObj}
-                      />
+                      <AuctionItem0228 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
                     </Fragment>
                   );
                 else return <Fragment key={index} />;
