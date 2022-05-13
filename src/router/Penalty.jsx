@@ -93,7 +93,7 @@ export default function Penalty() {
               <div className="infoBox">
                 {payList &&
                   payList.map((item, i) => (
-                    <ul className="detailList">
+                    <ul className="detailList" key={i}>
                       <li className="time">
                         <p>Series Kong #{item.item.id}</p>
                       </li>
@@ -153,7 +153,7 @@ export default function Penalty() {
                 <div className="infoBox">
                   {payList &&
                     payList.map((item, i) => (
-                      <ul className="detailList">
+                      <ul className="detailList" key={i}>
                         <li className="time">
                           <p>Series Kong #{item.item.id}</p>
                         </li>
@@ -178,7 +178,6 @@ export default function Penalty() {
                   <div className="explain">
                     <p className="pay">Your profile is blocked temporarily. Please pay for your delinquency.</p>
                     <p className="cong">Please pay Total {delinquencyAmount} USDT</p>
-                    {/* <p className="pay">Pay 688 USDT for your NFT transfer</p> */}
                   </div>
                 </div>
 

@@ -60,7 +60,7 @@ export default function AuctionItem0228({ data, index, likeObj, setLikeObj }) {
           <ul className="detailList">
             <li>Last sold for</li>
             <li>
-              {data?.price}&nbsp;{data?.priceunit}
+              {data?.circulations?.price || '100'}&nbsp;{data?.circulations?.priceunit}
             </li>
           </ul>
         </div>
@@ -104,7 +104,7 @@ export default function AuctionItem0228({ data, index, likeObj, setLikeObj }) {
           <ul className="detailList">
             <li>Last sold for</li>
             <li>
-              {data?.price}&nbsp;{data?.priceunit}
+              {data?.circulations?.price}&nbsp;{data?.circulations?.priceunit}
             </li>
           </ul>
         </div>
