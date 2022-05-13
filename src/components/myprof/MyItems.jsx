@@ -275,10 +275,6 @@ export default function MyItems() {
                 </div>
 
                 <div className="saleBox">
-                  <div className="price">
-                    <p className="key">Current price</p>
-                  </div>
-
                   <div className="time">
                     <p className="key">Bought</p>
                     {/* <ul className="timeList">
@@ -354,14 +350,10 @@ export default function MyItems() {
                     </div>
                     <div className="ownedBox">
                       <p className="key">Round Number</p>
-                      <p className="value">{item.roundnumber}Round</p>
+                      <p className="value">{item.itemdata.roundnumber} Round</p>
                     </div>
 
                     <div className="saleBox">
-                      <div className="price">
-                        <p className="key">Current price</p>
-                      </div>
-
                       {/* <div className="time">
                         <p className="key">Ending in</p>
                         <ul className="timeList">
@@ -376,7 +368,7 @@ export default function MyItems() {
                     <ul className="priceBox">
                       <li>
                         <p className="key">Current price</p>
-                        <p className="value">{putCommaAtPrice(item.amount)} USDT</p>
+                        <p className="value">{Math.ceil(item.amount * 100) / 100} USDT</p>
                       </li>
                     </ul>
 
@@ -402,40 +394,36 @@ export default function MyItems() {
               );
             })}
           {itemBalData.length !== 0 &&
-            itemBalData.map((item, index) =>
-              circulations.map((itm, i) => (
-                <li className="sellBox">
-                  <div className="imgBoxBal">
-                    <img className="itemImgBal" src={item.itemdata.url} alt="" />
+            itemBalData.map((item, index) => (
+              <li className="sellBox">
+                <div className="imgBoxBal">
+                  <img className="itemImgBal" src={item.itemdata.url} alt="" />
 
-                    <div className="topBarBal">
-                      <button className="likeBtnBal" onClick={() => {}}>
-                        <img src={I_heartO} alt="" />
-                        <p>22</p>
-                      </button>
-                    </div>
+                  <div className="topBarBal">
+                    <button className="likeBtnBal" onClick={() => {}}>
+                      <img src={I_heartO} alt="" />
+                      <p>22</p>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="infoBox">
+                  <div className="titleBox">
+                    <strong className="title">{item.itemdata.titlename}</strong>
                   </div>
 
-                  <div className="infoBox">
-                    <div className="titleBox">
-                      <strong className="title">{item.itemdata.titlename}</strong>
-                    </div>
+                  <div className="ownedBox">
+                    <p className="key">Owned by</p>
+                    <p className="value">@{item.username}</p>
+                  </div>
 
-                    <div className="ownedBox">
-                      <p className="key">Owned by</p>
-                      <p className="value">@{item.username}</p>
-                    </div>
-
-                    <div className="saleBox">
-                      <div className="price">
-                        <p className="key">Current price</p>
-                        {/* 
+                  <div className="saleBox">
+                    <div className="price">
+                      {/* 
                         <strong className="value">{putCommaAtPrice(item.buyprice)} USDT</strong> */}
-                        <strong className="value">
-                          {(item.itemid === itm.itemid) & putCommaAtPrice(itm.price)} USDT
-                        </strong>
-                      </div>
-                      {/* <div className="time">
+                      <strong className="value"></strong>
+                    </div>
+                    {/* <div className="time">
                       <p className="key">Ending in</p>
                       <ul className="timeList">
                         <li>{timeMoment && timeMoment.day()}일</li>
@@ -444,22 +432,24 @@ export default function MyItems() {
                         <li>{timeMoment && timeMoment.second()}초</li>
                       </ul>
                     </div> */}
-                    </div>
-
-                    <ul className="priceBox">
-                      <li>
-                        <p className="key">Current price</p>
-                        <p className="value">{item.buyprice} USDT</p>
-                      </li>
-                    </ul>
-                    <p className="description">
-                      King Kong NFT can be staking or sold to Marketplace at a price of up to 25%. If you steaking, you
-                      will get 30% annual NIP COIN reward.
-                    </p>
                   </div>
-                </li>
-              ))
-            )}
+
+                  <ul className="priceBox">
+                    <li>
+                      <p className="key">Current price</p>
+                      {circulations.map((itm, i) => {
+                        if (item.itemid === itm.itemid)
+                          return <p className="value"> {Math.ceil(itm.price * 100) / 100} USDT</p>;
+                      })}
+                    </li>
+                  </ul>
+                  <p className="description">
+                    King Kong NFT can be staking or sold to Marketplace at a price of up to 25%. If you steaking, you
+                    will get 30% annual NIP COIN reward.
+                  </p>
+                </div>
+              </li>
+            ))}
           {isOpen && <PayPopup off={openModal} receivables={receivables} />}
         </ul>
       </MmyItemsBox>
@@ -640,7 +630,7 @@ export default function MyItems() {
                       </div>
 
                       <div className="value">
-                        <strong className="price">{Math.floor(putCommaAtPrice(item.amount))} USDT</strong>
+                        <strong className="price">{Math.ceil(item.amount * 100) / 100} USDT</strong>
 
                         {/* <ul className="timeList">
                           <li>{timeReceivables && timeReceivables.days()}일</li>
@@ -653,7 +643,7 @@ export default function MyItems() {
                       <ul className="priceBox">
                         <li>
                           <p className="key">Current price</p>
-                          <p className="value">{Math.floor(putCommaAtPrice(item.amount))} USDT</p>
+                          <p className="value">{Math.ceil(item.amount * 100) / 100} USDT</p>
                         </li>
                       </ul>
                     </div>
@@ -704,8 +694,10 @@ export default function MyItems() {
                     <p className="value">@{item.username}</p>
                   </div>
                   <div className="ownedBox">
+                    <p className="key">Bought Date</p>
+                    <p className="value">{moment(item.createdat).format("YYYY-MM-DD")}</p>
                     <p className="key">Sold Date</p>
-                    <p className="value">{item.createdat.split("T")[0]}</p>
+                    <p className="value">{moment(item.createdat).add(3, "days").format("YYYY-MM-DD")}</p>
                   </div>
 
                   <div className="saleBox">
@@ -724,7 +716,7 @@ export default function MyItems() {
                         <p className="key">Current price</p>
                         {circulations.map((itm, i) => {
                           if (item.itemid === itm.itemid)
-                            return <p className="value"> {putCommaAtPrice(itm.price)} USDT</p>;
+                            return <p className="value"> {Math.ceil(itm.price * 100) / 100} USDT</p>;
                         })}
                       </li>
                     </ul>
