@@ -1,7 +1,7 @@
 import { useLayoutEffect } from "react";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { HashRouter, Route, Routes, useNavigate } from "react-router-dom";
+import { HashRouter, Route, Routes, useNavigate, Navigate } from "react-router-dom";
 import styled from "styled-components";
 import Auction from "./router/Auction";
 import AuctionDetail from "./router/AuctionDetail";
@@ -157,6 +157,7 @@ function App() {
       <GlobalStyle />
       <HashRouter>
         <Routes>
+          {/* <Route path="*" element={<Navigate to="/" />} /> */}
           <Route path="/" element={<Main />} />
           <Route path="/winning" element={<Winning />} />
           <Route path="/penalty" element={<Penalty />} />

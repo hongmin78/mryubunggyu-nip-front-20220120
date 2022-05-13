@@ -119,31 +119,32 @@ export default function AuctionDetail() {
   };
 
   function getAuction() {
-    axios //      .get("http://3.35.1 17.87:34705/auction/list", { params: { limit: 8 } })
-//      .get( API.API_GET_CIRCULATIONS + `?nettype=${net}`)
-			.get ( API.API_GET_CIRCULATIONS +  `?nettype=${net}&itemdetail=1&random=1`)
-      .then((resp) => {
-        LOGGER("@circulations", resp.data);
-        let { status, list } = resp.data;
-        if (status == "OK") {
-          setMoreCollection(list.slice(0, list.length));
-        }
-        //        console.log(res.data);
-        //      setMoreCollection(res.data;)
-      });
-    axios.get(API.API_COMMONITEMS + `/items/group_/kong/0/32/id/DESC?nettype=${net}&itemdetail=1&random=1`).then((resp) => {
-      LOGGER("", resp.data);
+    axios.get(API.API_GET_CIRCULATIONS + `?nettype=${net}&itemdetail=1&random=1`).then((resp) => {
+      LOGGER("@circulations", resp.data);
       let { status, list } = resp.data;
       if (status == "OK") {
-        setDemoCollection(list.slice(0, GET_CONTENTS_DEF));
+        setMoreCollection(list.slice(0, list.length));
       }
     });
+    axios
+      .get(API.API_COMMONITEMS + `/items/group_/kong/0/128/roundnumber/DESC?nettype=${net}` + `&itemdetail=1`)
+      .then((resp) => {
+        LOGGER("", resp.data);
+        let { status, list } = resp.data;
+        if (status == "OK") {
+          let roundNumber1 = list.filter((item) => item.roundnumber > 0);
+          setDemoCollection(roundNumber1);
+        }
+      });
   }
 
-  useEffect((_) => {
-    getitem();
-    getAuction();
-  }, []);
+  useEffect(
+    (_) => {
+      getitem();
+      getAuction();
+    },
+    [params]
+  );
 
   useEffect(() => {
     if (!moreRef.current.children[0]) return;
