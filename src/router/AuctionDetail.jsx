@@ -141,10 +141,13 @@ export default function AuctionDetail() {
   useEffect(
     (_) => {
       getitem();
-      getAuction();
     },
     [params]
   );
+
+  useEffect(() => {
+    getAuction();
+  }, []);
 
   useEffect(() => {
     if (!moreRef.current.children[0]) return;
