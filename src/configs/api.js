@@ -25,7 +25,7 @@ const API = {
   API_GETTIME: `${URL}/queries/singlerow/settings/key_/BALLOT_NEXT_ROUND_START`,
   API_TYPESTR: `${URL}/queries/circulations`,
   API_LOGSTAKES: `${URL}/queries/singlerow/logstakes/username`,
-  API_REFERER: `${URL}/queries/rows/users/referer`,
+  API_REFERER: `${URL}/queries/rows/refererfeepayments/referercode`,
   API_KEY_TIME_STAMP: `${URL}/queries/singlerow/settings/key_/FRONT_END_LATEST_VER_TIMESTAMP`,
   API_GET_TICK_INFO: `${URL}/queries/singlerow/transactions/username`,
   API_GET_EMAILAUTH: `${URL}/queries/singlerow/emailverifycode/emailaddress`,

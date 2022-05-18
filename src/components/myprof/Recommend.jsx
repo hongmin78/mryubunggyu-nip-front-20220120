@@ -129,7 +129,7 @@ export default function Recommend() {
                     <span>{cont.symbol ? cont.symbol : "-"}</span>
                     <span>{cont.referer}</span>
                     <span>{cont.createdat.substring(0, 10)}</span>
-                    <span>{cont.hasreceivables} USDT</span>
+                    <span>{cont.amount} USDT</span>
                   </li>
                 ))}
               </ul>
@@ -216,7 +216,7 @@ export default function Recommend() {
                     <span>{cont.symbol ? cont.symbol : "-"}</span>
                     <span>{cont.referer}</span>
                     <span>{cont.createdat.substring(0, 10)}</span>
-                    <span>{cont.hasreceivables} USDT</span>
+                    <span>{cont.amount} USDT</span>
                   </li>
                 ))}
               </ul>

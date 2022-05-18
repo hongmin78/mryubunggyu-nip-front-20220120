@@ -26,8 +26,6 @@ import { net } from "../configs/net";
 const MODE_DEV_PROD = "PROD";
 export default function PayDelinquency({ off, delinquencyAmount }) {
   const seller = localStorage.getItem("seller");
-  console.log("seller");
-  console.log(seller);
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
   const [termChk, setTermChk] = useState(false);
@@ -155,7 +153,6 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
       to: addresses.contract_USDT, // ETH_TESTNET.
       data: abistr,
     }).then((resp) => {
-      setisloader_00(false);
       if (resp) {
       } else {
         SetErrorBar(messages.MSG_USER_DENIED_TX);
@@ -193,6 +190,7 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
           let allowanceineth = getethrep(resp);
           LOGGER("gCwXF6Jjkh", resp, allowanceineth);
           setallowanceamount(allowanceineth); //				setallowanceamount ( 100 )
+          setisloader_00(false);
           if (allowanceineth > 0) {
             setisallowanceok(false);
           } else {
@@ -242,7 +240,6 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
           data: abistr,
           //			, value : ''
         });
-        setisloader_01(false);
         if (resp) {
         } else {
           SetErrorBar(messages.MSG_USER_DENIED_TX);
@@ -274,7 +271,6 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
           .then((resp) => {
             LOGGER("", resp);
             SetErrorBar(messages.MSG_TX_REQUEST_SENT);
-            off();
           });
         /***** */
         awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
@@ -282,14 +278,7 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
           SetErrorBar(messages.MSG_TX_FINALIZED);
           setDone(false);
           window.location.replace("/");
-          // let resp_balances = await query_with_arg({
-          //   contractaddress: addresses.payment_for_delinquency,
-          //   abikind: "PAY",
-          //   methodname: "pay",
-          //   aargs: [myaddress],
-          // });
-          // LOGGER("uQJ2POHvP8", resp_balances);
-          // setstakedbalance(getethrep(resp_balances));
+          setisloader_01(false);
           off();
         });
       } catch (err) {
