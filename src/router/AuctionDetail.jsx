@@ -223,34 +223,17 @@ export default function AuctionDetail() {
 
                 <div className="ownedBox">
                   <p className="key">Owned by</p>
-                  {itemdata?.current_info ? (
-                    <p className="value">@ {strDot(itemdata?.current_info.username, 18, 4)}</p>
-                  ) : (
-                    <p className="value">@ - </p>
-                  )}
+                  {itemdata && <p className="value">@ {itemdata?.circulations?.username}</p>}
                 </div>
 
                 <div className="saleBox">
                   <div className="price">
                     <p className="key">Current price</p>
-                    {itemdata?.current_info ? (
+                    {itemdata && (
                       <strong className="price">
-                        {putCommaAtPrice(parseInt(itemdata.current_info.price))} {itemdata.current_info.priceunit}{" "}
+                        {putCommaAtPrice(parseInt(itemdata?.circulations?.price))} {itemdata?.circulations?.priceunit}{" "}
                       </strong>
-                    ) : (
-                      <strong className="price">{putCommaAtPrice(375)} USDT</strong>
                     )}
-                  </div>
-
-                  <div className="time">
-                    <p className="key">Ending in</p>
-
-                    <ul className="timeList">
-                      <li>00</li>
-                      <li>00</li>
-                      <li>00</li>
-                      <li>00</li>
-                    </ul>
                   </div>
                 </div>
               </div>
@@ -285,28 +268,17 @@ export default function AuctionDetail() {
               <strong className="title">Transaction History</strong>
             </article>
 
-            <ul className="historyList">
-              {itemdata?.itemhistories &&
-                itemdata?.itemhistories.map((cont, index) => (
-                  <Fragment key={index}>
-                    {index ? (
-                      <div className="sideBarBox">
-                        <span className="sideBar" />
-                      </div>
-                    ) : (
-                      <></>
-                    )}
-                    <li>
-                      <span className="iconBox">{setIcon(cont.typestr)}</span>
-
-                      <div className="contBox">
-                        <p className="cont">{cont.typestr}</p>
-                        <p className="time">{moment(cont.createdat).fromNow()}</p>
-                      </div>
-                    </li>
-                  </Fragment>
-                ))}
-            </ul>
+            {transaction &&
+              transaction?.map((itm, i) => (
+                <ul key={i} style={{ fontSize: "3vw", marginTop: "2vw" }}>
+                  <list>
+                    <img style={{ width: "8vw", paddingRight: "1vw", paddingLeft: "1vw" }} src={person} />
+                  </list>
+                  <list>{strDot(itm.username, 4, 10)}/</list>
+                  <list>{itm.createdat?.split("T")[0]}/</list>
+                  <list>{putCommaAtPrice(parseInt(itemdata?.circulations?.price))} USDT</list>
+                </ul>
+              ))}
           </section>
 
           <section className="moreBox">
@@ -319,7 +291,30 @@ export default function AuctionDetail() {
                     demoCollection.forEach((element) => {
                       moreCollection.push(element);
                     })}
-                  {moreCollection.map(
+
+                  <ul className="historyList">
+                    {itemdata?.itemhistories &&
+                      itemdata?.itemhistories.map((cont, index) => (
+                        <Fragment key={index}>
+                          {index ? (
+                            <div className="sideBarBox">
+                              <span className="sideBar" />
+                            </div>
+                          ) : (
+                            <></>
+                          )}
+                          <li>
+                            <span className="iconBox">{setIcon(cont.typestr)}</span>
+
+                            <div className="contBox">
+                              <p className="cont">{cont.typestr}</p>
+                              <p className="time">{moment(cont.createdat).fromNow()}</p>
+                            </div>
+                          </li>
+                        </Fragment>
+                      ))}
+                  </ul>
+                  {moreCollection?.map(
                     (cont, index) =>
                       index < GET_CONTENTS_DEF && (
                         <Fragment key={index}>
@@ -392,7 +387,7 @@ export default function AuctionDetail() {
 
                 <div className="ownedBox">
                   <p className="key">Owned by</p>
-                  {itemdata && <p className="value">@ {itemdata?.circulations.username}</p>}
+                  {itemdata && <p className="value">@ {itemdata?.circulations?.username}</p>}
                 </div>
 
                 <div className="saleBox">
@@ -403,7 +398,7 @@ export default function AuctionDetail() {
                   <div className="value">
                     {itemdata && (
                       <strong className="price">
-                        {putCommaAtPrice(parseInt(itemdata.circulations.price))} {itemdata.circulations.priceunit}{" "}
+                        {putCommaAtPrice(parseInt(itemdata?.circulations?.price))} {itemdata?.circulations?.priceunit}{" "}
                       </strong>
                     )}
                   </div>
@@ -602,7 +597,7 @@ const MauctionDetailBox = styled.div`
           display: flex;
           gap: 2.22vw;
           margin: 2.22vw 0 0 0;
-          font-size: 4.44vw;
+          font-size: 3vw;
           font-weight: 500;
 
           .key {

@@ -630,7 +630,7 @@ export default function MyItems() {
                       </div>
 
                       <div className="value">
-                        <strong className="price">{Math.ceil(item.amount * 100) / 100} USDT</strong>
+                        <strong className="price">{parseInt(item.amount).toFixed(2)} USDT</strong>
 
                         {/* <ul className="timeList">
                           <li>{timeReceivables && timeReceivables.days()}일</li>
@@ -643,7 +643,7 @@ export default function MyItems() {
                       <ul className="priceBox">
                         <li>
                           <p className="key">Current price</p>
-                          <p className="value">{Math.ceil(item.amount * 100) / 100} USDT</p>
+                          <p className="value">{parseInt(item.amount).toFixed(2)} USDT</p>
                         </li>
                       </ul>
                     </div>
@@ -714,9 +714,9 @@ export default function MyItems() {
                     <ul className="priceBox">
                       <li>
                         <p className="key">Current price</p>
-                        {circulations.map((itm, i) => {
+                        {circulations?.map((itm, i) => {
                           if (item.itemid === itm.itemid)
-                            return <p className="value"> {Math.ceil(itm.price * 100) / 100} USDT</p>;
+                            return <p className="value"> {parseInt(itm.price).toFixed(2)} USDT</p>;
                         })}
                       </li>
                     </ul>
