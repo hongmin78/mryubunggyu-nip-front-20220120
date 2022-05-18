@@ -437,7 +437,7 @@ export default function Main() {
         <PmainBox>
           <section className="headLineContainer">
             <ul ref={headLineRef}>
-              {headLineList.map((value, index) => (
+              {headLineList?.map((value, index) => (
                 <li key={index}>
                   <article className="leftBox">
                     <span className="interview">
@@ -483,8 +483,9 @@ export default function Main() {
                     </div>
                     {/* <div className="timeBox">At__{cont.createdat.split("T")[0]}</div> */}
                     <div className="timeBox">
-                      {moment(new Date()).diff(moment(cont.createdat), "days")}
-                      days ago
+                      {moment(new Date()).diff(moment(cont.createdat), "days") === 0
+                        ? "Today"
+                        : `${moment(new Date()).diff(moment(cont.createdat), "days")} days ago`}
                     </div>
                   </div>
                   <p className="cont">at {cont.price} USDT</p>

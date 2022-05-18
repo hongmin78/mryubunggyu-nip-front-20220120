@@ -442,7 +442,7 @@ export default function AuctionDetail() {
               <strong className="title">Transaction History</strong>
             </article>
 
-            {transaction.map((itm, i) => (
+            {transaction?.map((itm, i) => (
               <ul key={i} style={{ fontSize: "1.5vw", marginTop: "2vw" }}>
                 <list>
                   <img style={{ width: "4vw", paddingRight: "1vw" }} src={person} />
