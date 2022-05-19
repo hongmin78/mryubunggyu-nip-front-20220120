@@ -146,7 +146,7 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
       methodname: "approve",
       aargs: [addresses.payment_for_delinquency, getweirep("" + 10 ** 10)], // .ETH_TESTNET
     });
-    LOGGER("", abistr);
+    LOGGER("ㅁㄴㅇㅁㄴㅇㅁㄴㅇㅁㄴㅇㅁㄴㅇㄴㅇ", abistr);
     setisloader_00(true);
     requesttransaction({
       from: myaddress,
@@ -156,6 +156,7 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
       if (resp) {
       } else {
         SetErrorBar(messages.MSG_USER_DENIED_TX);
+        setisloader_00(false);
         return;
       }
       let txhash = resp;
@@ -521,7 +522,8 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
                 style={{
                   display: isloader_00 ? "block" : "none",
                   width: "18px",
-                  right: "160px",
+                  right: "155px",
+                  top: "20px",
                   position: "absolute",
                 }}
               />

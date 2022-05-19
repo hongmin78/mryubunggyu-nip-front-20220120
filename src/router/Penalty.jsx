@@ -158,10 +158,10 @@ export default function Penalty() {
                           <p>Series Kong #{item.item.id}</p>
                         </li>
                         <li className="price">
-                          <p>Price : {item.circulations.price} USDT</p>
+                          <p>Price : {parseInt(item.circulations.price).toFixed(2)} USDT</p>
                         </li>
                         <li className="price">
-                          <p>Penalty : {item.amount} USDT</p>
+                          <p>Penalty : {parseInt(item.amount).toFixed(2)} USDT</p>
                         </li>
                       </ul>
                     ))}

@@ -483,6 +483,7 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
                   width: "18px",
                   top: "20px",
                   right: "150px",
+                  top: "20px",
                   position: "absolute",
                 }}
               />
