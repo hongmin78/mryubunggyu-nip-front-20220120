@@ -263,7 +263,7 @@ export default function Main() {
                       days ago
                     </div>
                   </div>
-                  <p className="cont">at {parseInt(cont.price).toFixed(2)} USDT</p>
+                  <p className="cont">at {parseInt(cont.buyprice).toFixed(2)} USDT</p>
                 </li>
               ))}
             </ul>
@@ -485,7 +485,7 @@ export default function Main() {
                         : `${moment(new Date()).diff(moment(cont.createdat), "days")} days ago`}
                     </div>
                   </div>
-                  <p className="cont">at {parseInt(cont.price).toFixed(2)} USDT</p>
+                  <p className="cont">at {parseInt(cont.buyprice).toFixed(2)} USDT</p>
                 </li>
               ))}
             </ul>
