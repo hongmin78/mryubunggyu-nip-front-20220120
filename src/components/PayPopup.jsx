@@ -211,6 +211,7 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
 
   const onclick_buy = async (_) => {
     setDone(true);
+    setisloader_01(true);
     LOGGER("YFVGAF0sBJ");
     let myaddress = getmyaddress();
     // LOGGER("eYJAgMYkR5", myaddress);
@@ -218,6 +219,7 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
     } else {
       SetErrorBar(messages.MSG_BALANCE_NOT_ENOUGH);
       setDone(false);
+      setisloader_01(false);
       return;
     }
     console.log(
@@ -248,7 +250,6 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
       const callreqtx = async (_) => {
         let resp;
         try {
-          setisloader_01(true);
           resp = await requesttransaction({
             from: myaddress,
             to: addresses.contract_pay_for_assigned_item, // .ETH_TESTNET
@@ -257,6 +258,8 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
           if (resp) {
           } else {
             SetErrorBar(messages.MSG_USER_DENIED_TX);
+            setDone(false);
+            setisloader_01(false);
             return;
           }
           let txhash = resp;
@@ -267,12 +270,14 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
               typestr: "PAY",
               itemid: receivables.itemid,
               nettype: net,
+
               auxdata: {
                 referfeeamount: receivables.amount,
                 feerate: refererFeeRate,
                 currency: PAY_CURRENCY || "USDT",
                 currencyaddress: addresses.contract_USDT, // ETH_TESTNET.
                 nettype: net,
+                amount: receivables.amount,
               },
             })
             .then((resp) => {
@@ -284,21 +289,15 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
             LOGGER("minedtxreceipt", minedtxreceipt);
             SetErrorBar(messages.MSG_TX_FINALIZED);
             setDone(false);
-            let resp_balances = await query_with_arg({
-              contractaddress: addresses.contract_pay_for_assigned_iteme,
-              abikind: "PAY",
-              methodname: "pay",
-              aargs: [myaddress],
-            });
-            LOGGER("uQJ2POHvP8", resp_balances);
+            setisloader_01(false);
             off();
             window.location.reload();
-            setisloader_01(false);
           });
         } catch (err) {
+          SetErrorBar(messages.MSG_USER_DENIED_TX);
+          setDone(false);
           setisloader_01(false);
           LOGGER();
-          SetErrorBar(messages.MSG_USER_DENIED_TX);
         }
       };
       callreqtx();

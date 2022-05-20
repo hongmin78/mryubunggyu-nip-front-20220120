@@ -5,7 +5,7 @@ import I_heartO from "../img/icon/I_heartO.svg";
 import I_3dot from "../img/icon/I_3dot.svg";
 import I_rtArw from "../img/icon/I_rtArw.svg";
 import { Fragment, useEffect, useRef, useState } from "react";
-import { getStyle, putCommaAtPrice, strDot } from "../util/Util";
+import { getStyle, putCommaAtPrice, strDot, onClickNextBtn, onClickPreBtn } from "../util/Util";
 import { D_category, D_transactionHistory } from "../data/DauctionDetail";
 import Offer from "../components/itemDetail/Offer";
 import { autoAuctionList } from "../data/Dmain";
@@ -38,11 +38,12 @@ export default function AuctionDetail() {
   const [toggleLike, setToggleLike] = useState(false);
   const [category, setCategory] = useState(0);
   const [moreIndex, setMoreIndex] = useState(0);
+  const [moreAutcionIndex, setMoreAuctionIndex] = useState(0);
   const [showCopyBtn, setShowCopyBtn] = useState(false);
   const [itemdata, setitemdata] = useState();
   const [moreCollection, setMoreCollection] = useState([]);
   let [attributes, setattributes] = useState([]);
-  const [demoCollection, setDemoCollection] = useState([]);
+
   const [transaction, setTranSaction] = useState([]);
 
   const onclicklike = (_) => {
@@ -80,7 +81,7 @@ export default function AuctionDetail() {
     const wrapWidth = moreRef.current.offsetWidth;
     const contWidth = moreRef.current.children[0].offsetWidth;
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
-    const pageNum = Math.ceil(autoAuctionList.length / itemNumByPage);
+    const pageNum = Math.ceil(moreCollection.length / itemNumByPage);
     if (moreIndex < pageNum - 1) setMoreIndex(moreIndex + 1);
     else setMoreIndex(0);
   }
@@ -119,21 +120,14 @@ export default function AuctionDetail() {
   };
 
   function getAuction() {
-    axios.get(API.API_GET_CIRCULATIONS + `?nettype=${net}&itemdetail=1&random=1`).then((resp) => {
-      LOGGER("@circulations", resp.data);
-      let { status, list } = resp.data;
-      if (status == "OK") {
-        setMoreCollection(list.slice(0, list.length));
-      }
-    });
     axios
       .get(API.API_COMMONITEMS + `/items/group_/kong/0/128/roundnumber/DESC?nettype=${net}` + `&itemdetail=1`)
       .then((resp) => {
-        LOGGER("", resp.data);
+        LOGGER("@circulations", resp.data);
         let { status, list } = resp.data;
         if (status == "OK") {
           let roundNumber1 = list.filter((item) => item.roundnumber > 0);
-          setDemoCollection(roundNumber1);
+          setMoreCollection(roundNumber1);
         }
       });
   }
@@ -287,33 +281,6 @@ export default function AuctionDetail() {
             <div className="listBox">
               <div className="posBox">
                 <ul className="itemList" ref={moreRef}>
-                  {moreCollection.length < GET_CONTENTS_DEF &&
-                    demoCollection.forEach((element) => {
-                      moreCollection.push(element);
-                    })}
-
-                  <ul className="historyList">
-                    {itemdata?.itemhistories &&
-                      itemdata?.itemhistories.map((cont, index) => (
-                        <Fragment key={index}>
-                          {index ? (
-                            <div className="sideBarBox">
-                              <span className="sideBar" />
-                            </div>
-                          ) : (
-                            <></>
-                          )}
-                          <li>
-                            <span className="iconBox">{setIcon(cont.typestr)}</span>
-
-                            <div className="contBox">
-                              <p className="cont">{cont.typestr}</p>
-                              <p className="time">{moment(cont.createdat).fromNow()}</p>
-                            </div>
-                          </li>
-                        </Fragment>
-                      ))}
-                  </ul>
                   {moreCollection?.map(
                     (cont, index) =>
                       index < GET_CONTENTS_DEF && (
@@ -323,7 +290,7 @@ export default function AuctionDetail() {
                       )
                   )}
                 </ul>
-                <button className="nextBtn" onClick={onClickAuctionNextBtn}>
+                <button className="nextBtn" onClick={onClickAuctionNextBtn(moreRef, moreCollection, moreIndex)}>
                   <img src={I_rtArw} alt="" />
                 </button>
               </div>
@@ -438,11 +405,11 @@ export default function AuctionDetail() {
             </article>
 
             {transaction?.map((itm, i) => (
-              <ul key={i} style={{ fontSize: "1.5vw", marginTop: "2vw" }}>
+              <ul key={i} style={{ fontSize: "23px", marginTop: "30px" }}>
                 <list>
-                  <img style={{ width: "4vw", paddingRight: "1vw" }} src={person} />
+                  <img style={{ width: "70px", paddingRight: "30px" }} src={person} />
                 </list>
-                <list>{strDot(itm.username, 4, 10)}/</list>
+                <list>{strDot(itm.username, 15)}/</list>
                 <list>{itm.createdat?.split("T")[0]}/</list>
                 <list>{putCommaAtPrice(parseInt(itemdata?.circulations?.price))} USDT</list>
               </ul>
@@ -478,20 +445,18 @@ export default function AuctionDetail() {
             <div className="listBox">
               <div className="posBox">
                 <ul className="itemList" ref={moreRef}>
-                  {moreCollection.length < GET_CONTENTS_DEF &&
-                    demoCollection.forEach((element) => {
-                      moreCollection.push(element);
-                    })}
-                  {moreCollection.map(
-                    (cont, index) =>
-                      index < GET_CONTENTS_DEF && (
-                        <Fragment key={index}>
-                          <AuctionItem0228 data={cont} index={index} />
-                        </Fragment>
-                      )
-                  )}
+                  {moreCollection.map((cont, index) => (
+                    <Fragment key={index}>
+                      <AuctionItem0228 data={cont} index={index} />
+                    </Fragment>
+                  ))}
                 </ul>
-                <button className="nextBtn" onClick={onClickAuctionNextBtn}>
+                <button
+                  className="nextBtn"
+                  onClick={() => {
+                    onClickAuctionNextBtn();
+                  }}
+                >
                   <img src={I_rtArw} alt="" />
                 </button>
               </div>

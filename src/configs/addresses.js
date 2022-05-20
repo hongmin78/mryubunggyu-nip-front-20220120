@@ -7,7 +7,8 @@ const jaddresses = {
     contract_stake: "0xc964f791b8e92336abfb3fde5fd4738700110379",
     contract_admin: "0x005b38d678753f211abae8dbb38c45a9d159ecee", // 0xd24ff65996e94d79d3cd8a22e8f95c42fbec0e0f'
     // contract_pay_for_assigned_item: "0xaf9764ef97102951f9339d515e4c41099e8fc992",
-    contract_pay_for_assigned_item: "0x70D2764D702d90c1E068a5DB6006410dDa1A1D32", // 2022.05.08 3:57pm release latest
+    // contract_pay_for_assigned_item: "0x70D2764D702d90c1E068a5DB6006410dDa1A1D32", // 2022.05.08 3:57pm release latest
+    contract_pay_for_assigned_item: "0xF86bd52D8e34A4c8080C5d4Ed87D2d37d3E59Ee2", // 2022.05.020 12:19am release latest
     // payment_for_delinquency: "0x2cdb6d037cc0a9e5480f9071b4a00f20055057a7",
     payment_for_delinquency: "0x3a21780372d2bf9be278906295984a9799bea2a8",
     contract_ticketnft: "0x60123597c04bB08655e027B3398D0BD336ad68C6",
@@ -17,7 +18,8 @@ const jaddresses = {
     contract_stake: "0x53caf649502a39c1a6d360d77e12676425f74860",
     contract_admin: "0x59e84ece084a0e2cabc1e344320b71d8be117ea9",
     contract_ticketnft: "0x6208803CC8FAfdeCEA589666c96d40836daccB46",
-    contract_pay_for_assigned_item: "0xda90f3b82c531f32af791fa3a3e7a67b36aa0844",
+    // contract_pay_for_assigned_item: "0xda90f3b82c531f32af791fa3a3e7a67b36aa0844",
+    contract_pay_for_assigned_item: "0x966C6627Ae93F01C4CE4bed607348690645F251D", //release 0520
     payment_for_delinquency: "0xc7b12c6b2c0214ed60cfc1e2f3efdd6d83b58f29",
   },
 };

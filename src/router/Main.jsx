@@ -59,16 +59,13 @@ export default function Main() {
 
   const dispatch = useDispatch();
 
+  console.log("auctionListFirst", auctionListFirst);
   function onClickTopBtn() {
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
   }
-
-  useEffect(() => {
-    localStorage.removeItem("referer");
-  }, []);
 
   useEffect(() => {
     setTimeout(() => {
@@ -479,7 +476,7 @@ export default function Main() {
                   <div className="infoBox">
                     <div className="profBox">
                       <img src={E_issueProf} alt="" />
-                      <p className="nickname">{strDot(cont.username, 4, 10)}</p>
+                      <p className="nickname">{strDot(cont.username, 15)}</p>
                     </div>
                     {/* <div className="timeBox">At__{cont.createdat.split("T")[0]}</div> */}
                     <div className="timeBox">

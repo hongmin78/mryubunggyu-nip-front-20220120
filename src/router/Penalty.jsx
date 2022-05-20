@@ -95,7 +95,7 @@ export default function Penalty() {
                   payList.map((item, i) => (
                     <ul className="detailList" key={i}>
                       <li className="time">
-                        <p>Series Kong #{item.item.id}</p>
+                        <p>Series Kong #{item.item.titlename}</p>
                       </li>
                       <li className="price">
                         <p>Price : {item.circulations.price} USDT</p>
@@ -155,7 +155,7 @@ export default function Penalty() {
                     payList.map((item, i) => (
                       <ul className="detailList" key={i}>
                         <li className="time">
-                          <p>Series Kong #{item.item.id}</p>
+                          <p>Series Kong {item.item.titlename}</p>
                         </li>
                         <li className="price">
                           <p>Price : {parseInt(item.circulations.price).toFixed(2)} USDT</p>

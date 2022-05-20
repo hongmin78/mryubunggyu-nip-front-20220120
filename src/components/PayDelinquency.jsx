@@ -298,7 +298,7 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
         <MstakingPopupBox>
           <article className="topBar">
             <span className="blank" />
-            <p className="title">Pay</p>
+            <p className="title">Penalty Pay</p>
             <button className="exitBtn" onClick={() => navigate(-1)}>
               <img src={I_x} alt="" />
             </button>
@@ -432,7 +432,7 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
       <PstakingPopupBox>
         <article className="topBar">
           <span className="blank" />
-          <p className="title">Pay</p>
+          <p className="title">Penalty Pay</p>
           <button className="exitBtn" onClick={() => off()}>
             <img src={I_x} alt="" />
           </button>
@@ -473,39 +473,6 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
           </div>
 
           <div className="confirmBox">
-            <div className="termBox">
-              <p className="key">Would you like to stake long term?</p>
-              <span className="value">
-                <button
-                  className="yesBtn"
-                  onClick={() => {
-                    setTermChk(true);
-                  }}
-                >
-                  <span
-                    className="chkBtn"
-                    style={{
-                      background: termChk && "#000",
-                    }}
-                  >
-                    <img src={I_chkWhite} alt="" />
-                  </span>
-                  yes
-                </button>
-                <button className="noBtn" onClick={() => setTermChk(false)}>
-                  <span
-                    className="chkBtn"
-                    style={{
-                      background: !termChk && "#000",
-                    }}
-                  >
-                    <img src={I_chkWhite} alt="" />
-                  </span>
-                  no
-                </button>
-              </span>
-            </div>
-
             <button
               className="confirmBtn"
               onClick={() => {
