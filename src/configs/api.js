@@ -34,6 +34,7 @@ const API = {
   API_PUT_USERS: `${URL}/users`,
   API_GET_OFFERS: `${URL}/queries/itembalances/itemid`,
   API_GET_TRANSACTIONS: `${URL}/queries/transactionstotrack/itemid`,
+  API_GET_ITEMS_DETAIL: `${URL}/items/item`,
   API_QUERY_STRING: (_value) => `${URL}/queries/singlerow/settings/key_/${_value}`,
 };
 

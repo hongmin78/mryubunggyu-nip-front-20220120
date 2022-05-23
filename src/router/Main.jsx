@@ -504,14 +504,16 @@ export default function Main() {
                       </Fragment>
                     ))}
                   </ul>
-                  <button
-                    className="nextBtn"
-                    onClick={() =>
-                      onClickNextBtn(firstAuctionRef, auctionListFirst, firstAuctionIndex, setFirstAuctionIndex)
-                    }
-                  >
-                    <img src={I_rtArw} alt="" />
-                  </button>
+                  {auctionListFirst.length > 0 && (
+                    <button
+                      className="nextBtn"
+                      onClick={() =>
+                        onClickNextBtn(firstAuctionRef, auctionListFirst, firstAuctionIndex, setFirstAuctionIndex)
+                      }
+                    >
+                      <img src={I_rtArw} alt="" />
+                    </button>
+                  )}
                 </div>
 
                 <div className="posBox">

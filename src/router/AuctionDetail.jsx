@@ -86,7 +86,7 @@ export default function AuctionDetail() {
     else setMoreIndex(0);
   }
   const getitem = (_) => {
-    axios.get(`https://nftinfinity.world:34825/items/item/${params.itemid}?nettype=${net}`).then((resp) => {
+    axios.get(API.API_GET_ITEMS_DETAIL + `/${params.itemid}?nettype=${net}`).then((resp) => {
       LOGGER("7FzS4oxYPN", resp.data);
       let { status, respdata } = resp.data;
       if (status == "OK") {
