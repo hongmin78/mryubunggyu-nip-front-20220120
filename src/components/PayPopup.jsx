@@ -25,6 +25,7 @@ import { strDot } from "../util/Util";
 import { net } from "../configs/net";
 const MODE_DEV_PROD = "PROD";
 export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
+  console.log("userInfo", userInfo);
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
   const [termChk, setTermChk] = useState(false);

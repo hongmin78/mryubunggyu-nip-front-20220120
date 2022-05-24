@@ -30,44 +30,6 @@ const abi = [
     type: "event",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_pay_token",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "_amountdue",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "_seller",
-        type: "address",
-      },
-      {
-        internalType: "string",
-        name: "_itemid",
-        type: "string",
-      },
-      {
-        internalType: "address",
-        name: "_referer",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "_referer_feerate",
-        type: "uint256",
-      },
-    ],
-    name: "pay",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
     anonymous: false,
     inputs: [
       {
@@ -109,6 +71,83 @@ const abi = [
     ],
     name: "Pay",
     type: "event",
+  },
+  {
+    inputs: [],
+    name: "_feecollector",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "_owner",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "owner",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_pay_token",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_amountdue",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_seller",
+        type: "address",
+      },
+      {
+        internalType: "string",
+        name: "_itemid",
+        type: "string",
+      },
+      {
+        internalType: "address",
+        name: "_referer",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_referer_feerate",
+        type: "uint256",
+      },
+    ],
+    name: "pay",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
     inputs: [],
@@ -185,45 +224,6 @@ const abi = [
     name: "transferOwnership",
     outputs: [],
     stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "_feecollector",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "_owner",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "owner",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
     type: "function",
   },
 ];
