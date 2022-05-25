@@ -19,7 +19,8 @@ const jaddresses = {
     contract_admin: "0x59e84ece084a0e2cabc1e344320b71d8be117ea9",
     contract_ticketnft: "0x6208803CC8FAfdeCEA589666c96d40836daccB46",
     // contract_pay_for_assigned_item: "0xda90f3b82c531f32af791fa3a3e7a67b36aa0844",
-    contract_pay_for_assigned_item: "0x966C6627Ae93F01C4CE4bed607348690645F251D", //release 0520
+    // contract_pay_for_assigned_item: "0x966C6627Ae93F01C4CE4bed607348690645F251D", //release 0520
+    contract_pay_for_assigned_item: "0x5388aAc4FA1ecaF8826Bc4957847AdE295974289", //release 0525
     payment_for_delinquency: "0xc7b12c6b2c0214ed60cfc1e2f3efdd6d83b58f29",
   },
 };
