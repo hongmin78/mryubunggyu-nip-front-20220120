@@ -1,6 +1,6 @@
 // const URL='http://nip s1.net:348 15'
 // const URL='http://3.35. 117.87:34 815'
-const URL = "https://nftinfinity.world:34825";
+const URL = "https://nftinfinity.world:34925";
 
 const API = {
   API_MAX: URL + `/queries/max`, // /:tablename/:fieldname
