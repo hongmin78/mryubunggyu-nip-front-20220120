@@ -1,6 +1,14 @@
 // const URL='http://nip s1.net:348 15'
 // const URL='http://3.35. 117.87:34 815'
-const URL = "https://nftinfinity.world:34925";
+import { net } from "./net";
+
+let URL;
+const url = {
+  ETH_TESTNET: "https://nftinfinity.world:34825",
+  BSC_MAINNET: "https://nftinfinity.world:34925",
+};
+
+URL = url[net];
 
 const API = {
   API_MAX: URL + `/queries/max`, // /:tablename/:fieldname
@@ -35,7 +43,9 @@ const API = {
   API_GET_OFFERS: `${URL}/queries/itembalances/itemid`,
   API_GET_TRANSACTIONS: `${URL}/queries/transactionstotrack/itemid`,
   API_GET_ITEMS_DETAIL: `${URL}/items/item`,
-  API_QUERY_STRING: (_value) => `${URL}/queries/singlerow/settings/key_/${_value}`,
+  API_QUERY_STRING: (_value) =>
+    `${URL}/queries/singlerow/settings/key_/${_value}`,
+  API_POST_SALE: `${URL}/orders`,
 };
 
 export { API };
