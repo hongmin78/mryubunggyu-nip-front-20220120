@@ -114,7 +114,7 @@ export default function Main() {
 
   function fetchitems() {
     axios
-      //      .get(  "http://3.35.117.87:34705/auction/list", { params: { limit: 16 } })
+
       .get(
         API.API_COMMONITEMS +
           `/items/group_/kong/0/128/roundnumber/DESC?nettype=${net}`
