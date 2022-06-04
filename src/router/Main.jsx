@@ -31,9 +31,10 @@ import B_tip2 from "../img/main/B_tip2.png";
 import B_tip3 from "../img/main/B_tip3.png";
 import axios from "axios";
 import { API } from "../configs/api";
-import { LOGGER, getmyaddress, strDot } from "../util/common";
+import { LOGGER, getmyaddress } from "../util/common";
 import { setDelinquencyAmount } from "../util/store/commonSlice";
 import moment from "moment";
+import { strDot } from "../util/Util";
 import { net } from "../configs/net";
 
 export default function Main() {
@@ -63,6 +64,7 @@ export default function Main() {
 
   const dispatch = useDispatch();
 
+  console.log("auctionListFirst", auctionListFirst);
   function onClickTopBtn() {
     window.scrollTo({
       top: 0,
@@ -73,9 +75,13 @@ export default function Main() {
   useEffect(() => {
     setTimeout(() => {
       let address = getmyaddress();
+      let myaddress = address;
       console.log("address", address);
       axios
-        .get(`${API.API_DELINQUENCY}/${address}?nettype=${net}`)
+        .get(
+          `${API.API_DELINQUENCY}/${address}/0/10/id/DESC` +
+            `?nettype=${net}&itemdetail=1`
+        )
         .then((res) => {
           console.log("RES", res);
           let { status } = res.data;
@@ -100,7 +106,7 @@ export default function Main() {
           alert(err.message);
         });
       axios
-        .get(API.API_RECEIVABLES + `/${address}?nettype=${net}`)
+        .get(API.API_RECEIVABLES + `/${address}` + `?nettype=${net}`)
         .then((res) => {
           let { list } = res.data;
           LOGGER("receivables", list);
@@ -117,10 +123,11 @@ export default function Main() {
 
       .get(
         API.API_COMMONITEMS +
-          `/items/group_/kong/0/128/roundnumber/DESC?nettype=${net}`
+          `/items/group_/kong/0/128/roundnumber/DESC?nettype=${net}` +
+          `&itemdetail=1`
       )
       .then((res) => {
-        // console.log(res.data);
+        console.log("@query kong: ", res.data);
         let { status, list } = res.data;
         if (status == "OK") {
           let roundNumber1 = list.filter((item) => item.roundnumber > 0);
@@ -141,10 +148,10 @@ export default function Main() {
         }
       });
     axios.get(API.API_TYPESTR + `?nettype=${net}`).then((resp) => {
-      LOGGER("API_TYPESTR", resp.data);
+      LOGGER("itemBalance", resp.data);
       let { status, payload } = resp.data;
       if (status == "OK") {
-        setTypestrPay(payload.rowdata);
+        setTypestrPay(resp.data.list);
       }
     });
   }
@@ -277,12 +284,12 @@ export default function Main() {
 
           <section className="issueContainer">
             <ul className="issueList" ref={issueRef}>
-              {typestrPay?.map((cont, index) => (
+              {[1, 2, 3, 4].map((cont, index) => (
                 <li className="issueBox" key={index}>
                   <div className="infoBox">
                     <div className="profBox">
                       <img src={E_issueProf} alt="" />
-                      <p className="nickname">{strDot(cont.username, 3, 15)}</p>
+                      <p className="nickname">{strDot(cont.username, 4, 10)}</p>
                     </div>
                     <div className="timeBox">
                       {moment(new Date()).diff(moment(cont.createdat), "days")}
@@ -290,8 +297,7 @@ export default function Main() {
                     </div>
                   </div>
                   <p className="cont">
-                    {cont.typestr === "PAY" ? "purchased" : ""}{" "}
-                    <u>{cont.actionname}</u> at {cont.price} USDT
+                    at {parseInt(cont.buyprice).toFixed(2)} USDT
                   </p>
                 </li>
               ))}
@@ -332,16 +338,17 @@ export default function Main() {
                 </div>
                 <div className="posBox">
                   <ul className="itemList">
-                    {auctionListSecond.map((cont, index) => (
-                      <Fragment key={index}>
-                        <AuctionItem0228
-                          data={cont}
-                          index={index}
-                          likeObj={likeObj}
-                          setLikeObj={setLikeObj}
-                        />
-                      </Fragment>
-                    ))}
+                    {auctionListSecond.length > 0 &&
+                      auctionListSecond.map((cont, index) => (
+                        <Fragment key={index}>
+                          <AuctionItem0228
+                            data={cont}
+                            index={index}
+                            likeObj={likeObj}
+                            setLikeObj={setLikeObj}
+                          />
+                        </Fragment>
+                      ))}
                   </ul>
                   <button className="nextBtn">
                     <img src={I_rtArw} alt="" />
@@ -424,7 +431,7 @@ export default function Main() {
                     <li key={index} className="item">
                       <div className="topBar">
                         <p className="key">LUCKY TICKET</p>
-                        {/* <p className="value">#{`${index}`.padStart(5, '0')}</p> */}
+                        <p className="value">#{`${index}`.padStart(5, "0")}</p>
                       </div>
 
                       <img src={E_staking} alt="" />
@@ -524,7 +531,7 @@ export default function Main() {
         <PmainBox>
           <section className="headLineContainer">
             <ul ref={headLineRef}>
-              {headLineList.map((value, index) => (
+              {headLineList?.map((value, index) => (
                 <li key={index}>
                   <article className="leftBox">
                     <span className="interview">
@@ -580,17 +587,23 @@ export default function Main() {
                   <div className="infoBox">
                     <div className="profBox">
                       <img src={E_issueProf} alt="" />
-                      <p className="nickname">{strDot(cont.username, 3, 15)}</p>
+                      <p className="nickname">{strDot(cont.username, 15)}</p>
                     </div>
                     {/* <div className="timeBox">At__{cont.createdat.split("T")[0]}</div> */}
                     <div className="timeBox">
-                      {moment(new Date()).diff(moment(cont.createdat), "days")}
-                      days ago
+                      {moment(new Date()).diff(
+                        moment(cont.createdat),
+                        "days"
+                      ) === 0
+                        ? "Today"
+                        : `${moment(new Date()).diff(
+                            moment(cont.createdat),
+                            "days"
+                          )} days ago`}
                     </div>
                   </div>
                   <p className="cont">
-                    {cont.typestr === "PAY" ? "purchased" : ""}{" "}
-                    <u>{cont.actionname}</u> at {cont.price} USDT
+                    at {parseInt(cont.buyprice).toFixed(2)} USDT
                   </p>
                 </li>
               ))}
@@ -615,47 +628,52 @@ export default function Main() {
                       </Fragment>
                     ))}
                   </ul>
-                  <button
-                    className="nextBtn"
-                    onClick={() =>
-                      onClickNextBtn(
-                        firstAuctionRef,
-                        auctionListFirst,
-                        firstAuctionIndex,
-                        setFirstAuctionIndex
-                      )
-                    }
-                  >
-                    <img src={I_rtArw} alt="" />
-                  </button>
+                  {auctionListFirst.length > 0 && (
+                    <button
+                      className="nextBtn"
+                      onClick={() =>
+                        onClickNextBtn(
+                          firstAuctionRef,
+                          auctionListFirst,
+                          firstAuctionIndex,
+                          setFirstAuctionIndex
+                        )
+                      }
+                    >
+                      <img src={I_rtArw} alt="" />
+                    </button>
+                  )}
                 </div>
 
                 <div className="posBox">
                   <ul className="itemList" ref={secondAuctionRef}>
-                    {auctionListSecond.map((cont, index) => (
-                      <Fragment key={index}>
-                        <AuctionItem0228
-                          data={cont}
-                          index={index}
-                          likeObj={likeObj}
-                          setLikeObj={setLikeObj}
-                        />
-                      </Fragment>
-                    ))}
+                    {auctionListSecond.length > 0 &&
+                      auctionListSecond.map((cont, index) => (
+                        <Fragment key={index}>
+                          <AuctionItem0228
+                            data={cont}
+                            index={index}
+                            likeObj={likeObj}
+                            setLikeObj={setLikeObj}
+                          />
+                        </Fragment>
+                      ))}
                   </ul>
-                  <button
-                    className="nextBtn"
-                    onClick={() =>
-                      onClickNextBtn(
-                        secondAuctionRef,
-                        auctionListSecond,
-                        secondAuctionIndex,
-                        setSecondAuctionIndex
-                      )
-                    }
-                  >
-                    <img src={I_rtArw} alt="" />
-                  </button>
+                  {auctionListSecond.length > 0 && (
+                    <button
+                      className="nextBtn"
+                      onClick={() =>
+                        onClickNextBtn(
+                          secondAuctionRef,
+                          auctionListSecond,
+                          secondAuctionIndex,
+                          setSecondAuctionIndex
+                        )
+                      }
+                    >
+                      <img src={I_rtArw} alt="" />
+                    </button>
+                  )}
                 </div>
               </div>
             </article>
@@ -734,7 +752,7 @@ export default function Main() {
                     <li key={index} className="item">
                       <div className="topBar">
                         <p className="key">LUCKY TICKET</p>
-                        {/* <p className="value">#{`${index}`.padStart(5, "0")}</p> */}
+                        <p className="value">#{`${index}`.padStart(5, "0")}</p>
                       </div>
 
                       <img src={E_staking} alt="" />
@@ -965,7 +983,6 @@ const MmainBox = styled.div`
         }
 
         .cont {
-          text-align: center;
           font-size: 3.33vw;
         }
       }
@@ -1308,7 +1325,6 @@ const PmainBox = styled.div`
         }
 
         .timeBox {
-          margin-left: 15px;
           color: #7a7a7a;
         }
       }

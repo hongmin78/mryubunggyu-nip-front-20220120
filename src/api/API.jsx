@@ -5,7 +5,7 @@ import axios from "axios";
 // const SERVER_URL = "http://3.3 5.117.87:34805/";
 // const SERVER_URL = "http://3.3 5.117.87:34705/";
 // const SERVER_URL = "http://3.35.1 17.87:34705/";
-const SERVER_URL = "https://nftinfinity.world:34705/";
+const SERVER_URL = "https://nftinfinity.world:34925/";
 
 export const URL = SERVER_URL;
 

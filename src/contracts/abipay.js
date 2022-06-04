@@ -14,58 +14,20 @@ const abi = [
     anonymous: false,
     inputs: [
       {
-        indexed: false,
+        indexed: true,
         internalType: "address",
-        name: "_pay_token",
+        name: "previousOwner",
         type: "address",
       },
       {
-        indexed: false,
-        internalType: "uint256",
-        name: "_amountdue",
-        type: "uint256",
-      },
-      {
-        indexed: false,
+        indexed: true,
         internalType: "address",
-        name: "_seller",
+        name: "newOwner",
         type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "string",
-        name: "_itemid",
-        type: "string",
       },
     ],
-    name: "Pay",
+    name: "OwnershipTransferred",
     type: "event",
-  },
-  {
-    inputs: [],
-    name: "_feecollector",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "_owner",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
   },
   {
     inputs: [
@@ -96,11 +58,79 @@ const abi = [
       },
       {
         internalType: "uint256",
-        name: "_refererfeerate",
+        name: "_referer_feerate",
         type: "uint256",
       },
     ],
     name: "pay",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "_pay_token",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "_amountdue",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "_seller",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "string",
+        name: "_itemid",
+        type: "string",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "_referer",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "_referer_feerate",
+        type: "uint256",
+      },
+    ],
+    name: "Pay",
+    type: "event",
+  },
+  {
+    inputs: [],
+    name: "renounceOwnership",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_address",
+        type: "address",
+      },
+      {
+        internalType: "bool",
+        name: "_status",
+        type: "bool",
+      },
+    ],
+    name: "set_admin",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -116,6 +146,84 @@ const abi = [
     name: "set_feecollector",
     outputs: [],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_fraction",
+        type: "uint256",
+      },
+    ],
+    name: "set_fraction_adminfee",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_fraction",
+        type: "uint256",
+      },
+    ],
+    name: "set_fraction_sellerprofit",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "newOwner",
+        type: "address",
+      },
+    ],
+    name: "transferOwnership",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "_feecollector",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "_owner",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "owner",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
     type: "function",
   },
 ];

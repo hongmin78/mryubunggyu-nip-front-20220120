@@ -27,28 +27,21 @@ export default function Recommend() {
   const fetchdataUserInfo = async (_) => {
     let myaddress = getmyaddress();
     if (myaddress) {
-      axios
-        .get(API.API_USERINFO + `/${myaddress}?nettype=${net}`)
-        .then((resp) => {
-          let { status, respdata } = resp.data;
-          LOGGER("userInfo", respdata);
-          if (status == "OK") {
-            setUserinfoProp(respdata);
-            respdata.myreferercode &&
-              axios
-                .get(
-                  API.API_REFERER +
-                    `/${respdata.myreferercode}/0/10/id/DESC?nettype=${net}`
-                )
-                .then((resp) => {
-                  console.log("myRefererList", resp.data);
-                  let { status, list } = resp.data;
-                  if (status == "OK") {
-                    setMyRefererList(list);
-                  }
-                });
-          }
-        });
+      axios.get(API.API_USERINFO + `/${myaddress}?nettype=${net}`).then((resp) => {
+        let { status, respdata } = resp.data;
+        LOGGER("userInfo", respdata);
+        if (status == "OK") {
+          setUserinfoProp(respdata);
+          respdata.myreferercode &&
+            axios.get(API.API_REFERER + `/${respdata.myreferercode}/0/120/id/DESC?nettype=${net}`).then((resp) => {
+              console.log("myRefererList", resp.data);
+              let { status, list } = resp.data;
+              if (status == "OK") {
+                setMyRefererList(list);
+              }
+            });
+        }
+      });
     } else {
       SetErrorBar(messages.MSG_CONNECTWALET);
     }
@@ -68,11 +61,9 @@ export default function Recommend() {
             <strong className="contTitle">Friend Recommendation</strong>
 
             <p className="explain">
-              Share your referral link! When a new user who accesses this link
-              purchases a product,
+              Share your referral link! When a new user who accesses this link purchases a product,
               <br />
-              an additional 4% of the sales amount is paid. Referral rewards are
-              paid in lump sum every month.
+              an additional 4% of the sales amount is paid. Referral rewards are paid in lump sum every month.
             </p>
           </li>
 
@@ -110,9 +101,7 @@ export default function Recommend() {
                     className="copyBtn"
                     onClick={() => {
                       setToggleLink(true);
-                      onclickcopy(
-                        `https://nftinfinity.world/#/connectwallet/${userinfoProp?.myreferercode}`
-                      );
+                      onclickcopy(`https://nftinfinity.world/#/connectwallet/${userinfoProp?.myreferercode}`);
                     }}
                   >
                     <img src={toggleLink ? I_circleChk : I_copy} alt="" />
@@ -140,7 +129,7 @@ export default function Recommend() {
                     <span>{cont.symbol ? cont.symbol : "-"}</span>
                     <span>{cont.referer}</span>
                     <span>{cont.createdat.substring(0, 10)}</span>
-                    <span>{cont.hasreceivables} USDT</span>
+                    <span>{cont.amount} USDT</span>
                   </li>
                 ))}
               </ul>
@@ -159,11 +148,9 @@ export default function Recommend() {
             <strong className="contTitle">Friend Recommendation</strong>
 
             <p className="explain">
-              Share your referral link! When a new user who accesses this link
-              purchases a product,
+              Share your referral link! When a new user who accesses this link purchases a product,
               <br />
-              an additional 4% of the sales amount is paid. Referral rewards are
-              paid in lump sum every month.
+              an additional 4% of the sales amount is paid. Referral rewards are paid in lump sum every month.
             </p>
           </li>
 
@@ -201,9 +188,7 @@ export default function Recommend() {
                     className="copyBtn"
                     onClick={() => {
                       setToggleLink(true);
-                      onclickcopy(
-                        `https://nftinfinity.world/#/connectwallet/${userinfoProp?.myreferercode}`
-                      );
+                      onclickcopy(`https://nftinfinity.world/#/connectwallet/${userinfoProp?.myreferercode}`);
                     }}
                   >
                     <img src={toggleLink ? I_circleChk : I_copy} alt="" />
@@ -231,7 +216,7 @@ export default function Recommend() {
                     <span>{cont.symbol ? cont.symbol : "-"}</span>
                     <span>{cont.referer}</span>
                     <span>{cont.createdat.substring(0, 10)}</span>
-                    <span>{cont.hasreceivables} USDT</span>
+                    <span>{cont.amount} USDT</span>
                   </li>
                 ))}
               </ul>
@@ -518,11 +503,4 @@ const PrecommendBox = styled.section`
   }
 `;
 
-const headerList = [
-  "No",
-  "Account",
-  "Symbol",
-  "Recommender",
-  "Date of subscription	",
-  "Points Received",
-];
+const headerList = ["No", "Account", "Symbol", "Recommender", "Date of subscription	", "Points Received"];

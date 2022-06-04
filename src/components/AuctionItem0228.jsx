@@ -17,8 +17,7 @@ export default function AuctionItem0228({ data, index, likeObj, setLikeObj }) {
   }
 
   function contentsReload(id) {
-    window.location.href = `/#/auction/detail/${id}`;
-    window.location.reload();
+    window.location.reload(`/#/auction/detail/${id}`);
     window.scrollTo(0, 0);
   }
 
@@ -27,7 +26,9 @@ export default function AuctionItem0228({ data, index, likeObj, setLikeObj }) {
       <Mitem
         className="item"
         onClick={() => {
-          contentsReload(data.itemid);
+          navigate(`/auction/detail/${data.itemid}`);
+          window.scrollTo(0, 0);
+          // contentsReload(data.itemid);
         }}
         // onClick={() => navigate(`/auction/detail/${data.dna}`)}
       >
@@ -60,7 +61,7 @@ export default function AuctionItem0228({ data, index, likeObj, setLikeObj }) {
           <ul className="detailList">
             <li>Last sold for</li>
             <li>
-              {data?.price}&nbsp;{data?.priceunit}
+              {data?.circulations?.price || "100"}&nbsp;{data?.circulations?.priceunit}
             </li>
           </ul>
         </div>
@@ -72,7 +73,8 @@ export default function AuctionItem0228({ data, index, likeObj, setLikeObj }) {
         className="item"
         //				onClick={() => navigate(`/auction/detail/${data.dna}`)}
         onClick={() => {
-          contentsReload(data.itemid);
+          navigate(`/auction/detail/${data.itemid}`);
+          window.scrollTo(0, 0);
         }}
       >
         <div className="topBar">
@@ -104,7 +106,7 @@ export default function AuctionItem0228({ data, index, likeObj, setLikeObj }) {
           <ul className="detailList">
             <li>Last sold for</li>
             <li>
-              {data?.price}&nbsp;{data?.priceunit}
+              {parseInt(data?.circulations?.price).toFixed(2)}&nbsp;{data?.circulations?.priceunit}
             </li>
           </ul>
         </div>
