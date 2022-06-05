@@ -18,35 +18,109 @@ import { API } from "../configs/api";
 import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
 import { net } from "../configs/net";
+import { getabistr_forfunction } from "../util/contract-calls";
+import { addresses } from "../configs/addresses";
+import { getweirep } from "../util/eth";
+import { requesttransaction } from "../services/metamask";
 
-export default function BidPopup({ off }) {
+export default function BidPopup({ off, itemdata }) {
   const params = useParams();
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
   const [price, setPrice] = useState("");
-  let [itemdata, setitemdata] = useState();
-  let [attributes, setattributes] = useState([]);
+  const [saleStatus] = useState(1);
 
-  const getitem = (_) => {
-    axios
-      .get(API.API_ITEMDETAIL + `/${params.itemid}?nettype=${net}`)
-      .then((resp) => {
-        LOGGER("7FzS4oxYPN", resp.data);
-        let { status, respdata } = resp.data;
-        if (status == "OK") {
-          setitemdata(respdata);
-          let { metadata } = respdata;
-          if (metadata) {
-            let jmetadata = PARSER(metadata);
-            LOGGER("oXhffF8eTM", conv_jdata_arrkeyvalue(jmetadata));
-            setattributes(conv_jdata_arrkeyvalue(jmetadata));
-          }
-        }
-      });
+  const onClickBuy = async () => {
+    let myaddress = getmyaddress();
+    if (myaddress) {
+    } else {
+      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+      return;
+    }
+
+    console.log(
+      "$abistr_forfunction",
+      addresses.contract_erc1155, // target contractaddress
+      itemdata.itembalances?.itemid, // itemid
+      "1", // amounttomint
+      "0", // decimals
+      "0x0114469cac96290dBBe042535B6AAB4d9C44b60D", // authoraddress
+      "1",
+      getweirep("" + itemdata.itembalances?.buyprice),
+      itemdata.itembalances?.paymeansaddress, // paymeansaddress
+      "" + itemdata.id, // "" + tokenid,
+      itemdata.itembalances?.username,
+      myaddress,
+      "1"
+    );
+
+    let abistr = await getabistr_forfunction({
+      contractaddress: addresses.contract_erc1155,
+      abikind: "ERC1155Sale",
+      methodname: "mint_and_match_single_simple_legacy",
+      // eslint-disable-next-line no-sparse-arrays
+      aargs: [
+        addresses.contract_erc1155, // target contractaddress
+        itemdata.itembalances?.itemid, // itemid
+        "1", // amounttomint
+        "0", // decimals
+        "250", // authorroyalty
+        "0x0114469cac96290dBBe042535B6AAB4d9C44b60D", // authoraddress
+        "1", // amounttobuy
+        getweirep("" + itemdata.itembalances?.buyprice), // amounttopay
+        itemdata.itembalances?.paymeansaddress, // paymeansaddress
+        itemdata.itembalances?.username, // sellersaddress
+      ],
+    });
+    console.log("", abistr);
+    requesttransaction({
+      from: myaddress,
+      to: addresses.contract_erc1155_sales,
+      data: abistr,
+      value: "0x00",
+    }).then((resp) => {
+      console.log("asdofijdf", resp);
+      if (resp) {
+      } else {
+        console.log("USER DENIED TX");
+        SetErrorBar(messages.MSG_USER_DENIED_TX);
+        off();
+        return;
+      }
+      SetErrorBar(messages.MSG_DONE_SENDING_TX_REQ);
+      let txhash;
+
+      // console.log("txhash", txhash);
+      // axios
+      //   .post(API.API_TXS + `/${txhash}`, {
+      //     txhash,
+      //     username: myaddress,
+      //     typestr: "MARKET_BUY_NFT",
+      //     amount: itemPrice,
+      //     auxdata: {
+      //       user_action: "MARKET_BUY_NFT",
+      //       contract_type: "MATCHER_NFT", // .ETH_TESTNET
+      //       contract_address: contractaddress, // .ETH_TESTNET
+      //       my_address: myaddress,
+      //       authorRoyalty,
+      //       itemid: item?.item?.itemid,
+      //       tokenid,
+      //       author,
+      //       paymeansaddress,
+      //       itemPrice,
+      //       orderinfo: item.orders_sellside.seller,
+      //       uuid: item.orders_sellside.uuid,
+      //       paymeansname: "AKD",
+      //       nettype: net,
+      //     },
+      //   })
+      //   .then((res) => {
+      //     LOGGER("APPROVE RESP", resp);
+      //     off();
+      //   })
+      //   .catch((err) => console.log(err));
+    });
   };
-  useEffect((_) => {
-    getitem(); //		getAuction()
-  }, []);
 
   if (isMobile)
     return (
@@ -109,7 +183,7 @@ export default function BidPopup({ off }) {
       <PbidPopupBox>
         <article className="topBar">
           <span className="blank" />
-          <p className="title">Place a bid</p>
+          <p className="title">{saleStatus == 1 ? "Buy now" : "Place bid"}</p>
           <button className="exitBtn" onClick={() => off()}>
             <img src={I_x} alt="" />
           </button>
@@ -118,7 +192,7 @@ export default function BidPopup({ off }) {
         <article className="contBox">
           <div className="itemBox">
             <img src={itemdata?.url} alt="" />
-            <p>You are about to purchase a Kingkong #12</p>
+            <p>You are about to purchase a King Kong {itemdata?.titlename}</p>
           </div>
 
           <div className="priceBox">
@@ -148,15 +222,23 @@ export default function BidPopup({ off }) {
             </ul>
           </div>
 
-          <div className="confrimBox">
-            <p className="explain">
-              Placing this bid will start a 24 hour auction for the artwork.
-              Once a bid is placed, it cannot be withdrawn.
-            </p>
-            <button className="confirmBtn" onClick={() => off()}>
-              Bid amount is required
-            </button>
-          </div>
+          {saleStatus == 1 ? (
+            <div className="confrimBox">
+              <button className="confirmBtn" onClick={() => onClickBuy()}>
+                Buy
+              </button>
+            </div>
+          ) : (
+            <div className="confrimBox">
+              <p className="explain">
+                Placing this bid will start a 24 hour auction for the artwork.
+                Once a bid is placed, it cannot be withdrawn.
+              </p>
+              <button className="confirmBtn" onClick={() => off()}>
+                Bid amount is required
+              </button>
+            </div>
+          )}
         </article>
       </PbidPopupBox>
     );

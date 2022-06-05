@@ -115,13 +115,11 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
 
           <ul className="detailList">
             <li>
-              <p>Current bid</p>
+              <p>{data.saletype == 1 ? "Price" : "Current bid"}</p>
               <p>Ending in</p>
             </li>
             <li style={{ color: "#fff" }}>
-              <p>
-                {data.price}&nbsp;{data.unit}
-              </p>
+              <p>{data.price} USDT</p>
 
               <p>{moment(data.createdat).fromNow()}</p>
             </li>

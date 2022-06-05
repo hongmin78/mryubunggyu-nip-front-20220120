@@ -60,7 +60,7 @@ export default function Market() {
         <MmarketBox>
           <div className="innerBox">
             <section className="topBar">
-              <p className="title">Marketplece All NFTs</p>
+              <p className="title">Marketplace All NFTs</p>
 
               <article className="rightBox">
                 <div className="searchBox" ref={searchBoxRef}>
@@ -141,7 +141,7 @@ export default function Market() {
         <Header />
         <PmarketBox>
           <section className="topBar">
-            <p className="title">Marketplece All NFTs</p>
+            <p className="title">Marketplace All NFTs</p>
 
             <article className="rightBox">
               <div className="searchBox" ref={searchBoxRef}>
