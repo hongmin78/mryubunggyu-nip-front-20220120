@@ -18,10 +18,13 @@ import { API } from "../configs/api";
 import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
 import { net } from "../configs/net";
-import { getabistr_forfunction } from "../util/contract-calls";
+import { getabistr_forfunction, query_with_arg } from "../util/contract-calls";
 import { addresses } from "../configs/addresses";
-import { getweirep } from "../util/eth";
+import { getethrep, getweirep } from "../util/eth";
 import { requesttransaction } from "../services/metamask";
+import awaitTransactionMined from "await-transaction-mined";
+import { web3 } from "../configs/configweb3-ropsten";
+import { TX_POLL_OPTIONS } from "../configs/configs";
 
 export default function BidPopup({ off, itemdata }) {
   const params = useParams();
@@ -29,14 +32,83 @@ export default function BidPopup({ off, itemdata }) {
   const isMobile = useSelector((state) => state.common.isMobile);
   const [price, setPrice] = useState("");
   const [saleStatus] = useState(1);
+  const [allowance, setAllowance] = useState(0);
+  let [spinner, setSpinner] = useState(false);
+
+  const queryAllowance = () => {
+    let myaddress = getmyaddress();
+    if (myaddress) {
+    } else {
+      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+      setSpinner(false);
+      return;
+    }
+
+    query_with_arg({
+      contractaddress: addresses.contract_USDT,
+      abikind: "ERC20",
+      methodname: "allowance",
+      aargs: [myaddress, addresses.contract_erc1155_sales],
+    }).then((resp) => {
+      console.log("$allowance_usdt: ", resp);
+      setAllowance(getethrep("" + resp));
+      SetErrorBar(`Allowance: ${getethrep("" + resp)}`);
+      setSpinner(false);
+    });
+  };
+
+  const approve = async () => {
+    let myaddress = getmyaddress();
+    if (myaddress) {
+    } else {
+      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+      setSpinner(false);
+      return;
+    }
+    setSpinner(true);
+
+    let abistr = getabistr_forfunction({
+      contractaddress: addresses.contract_USDT,
+      abikind: "ERC20",
+      methodname: "approve",
+      aargs: [addresses.contract_erc1155_sales, getweirep("" + 10000_0000)],
+    });
+
+    requesttransaction({
+      from: myaddress,
+      to: addresses.contract_USDT,
+      data: abistr,
+      value: "0x00",
+    }).then((resp) => {
+      if (resp) {
+      } else {
+        SetErrorBar(messages.MSG_USER_DENIED_TX);
+        return;
+      }
+
+      let txhash = resp;
+
+      awaitTransactionMined
+        .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+        .then(async (minedtxreceipt) => {
+          console.log(minedtxreceipt);
+          SetErrorBar(messages.MSG_TX_FINALIZED);
+          queryAllowance();
+          setSpinner(false);
+        });
+      console.log("txhash", txhash);
+    });
+  };
 
   const onClickBuy = async () => {
     let myaddress = getmyaddress();
     if (myaddress) {
     } else {
       SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+      setSpinner(false);
       return;
     }
+    setSpinner(true);
 
     console.log(
       "$abistr_forfunction",
@@ -84,10 +156,12 @@ export default function BidPopup({ off, itemdata }) {
       } else {
         console.log("USER DENIED TX");
         SetErrorBar(messages.MSG_USER_DENIED_TX);
+        setSpinner(false);
         off();
         return;
       }
       SetErrorBar(messages.MSG_DONE_SENDING_TX_REQ);
+      setSpinner(false);
       let txhash;
 
       // console.log("txhash", txhash);
@@ -121,6 +195,13 @@ export default function BidPopup({ off, itemdata }) {
       //   .catch((err) => console.log(err));
     });
   };
+
+  useEffect(() => {
+    setSpinner(true);
+    setTimeout(() => {
+      queryAllowance();
+    }, 1200);
+  }, []);
 
   if (isMobile)
     return (
@@ -223,10 +304,18 @@ export default function BidPopup({ off, itemdata }) {
           </div>
 
           {saleStatus == 1 ? (
-            <div className="confrimBox">
-              <button className="confirmBtn" onClick={() => onClickBuy()}>
-                Buy
-              </button>
+            <div>
+              <div className="confrimBox">
+                {allowance > 0 ? (
+                  <button className="confirmBtn" onClick={() => onClickBuy()}>
+                    {spinner ? <div id="loading"></div> : "Buy"}
+                  </button>
+                ) : (
+                  <button className="confirmBtn" onClick={() => approve()}>
+                    {spinner ? <div id="loading"></div> : "Approve"}
+                  </button>
+                )}
+              </div>
             </div>
           ) : (
             <div className="confrimBox">
@@ -510,6 +599,28 @@ const PbidPopupBox = styled.section`
         color: #fff;
         background: #000;
         border-radius: 12px;
+
+        #loading {
+          display: inline-block;
+          width: 38px;
+          height: 38px;
+          border: 3px solid rgba(255, 255, 255, 0.3);
+          border-radius: 50%;
+          border-top-color: #fff;
+          animation: spin 1s ease-in-out infinite;
+          -webkit-animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+          to {
+            -webkit-transform: rotate(360deg);
+          }
+        }
+        @-webkit-keyframes spin {
+          to {
+            -webkit-transform: rotate(360deg);
+          }
+        }
 
         &:disabled {
           color: #7a7a7a;

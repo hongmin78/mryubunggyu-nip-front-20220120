@@ -95,7 +95,8 @@ const generaterandomstr_charset = (length, charsetcode) => {
   } else if (charsetcode == "notconfusing") {
     characters = "2345679BCDEGHKLQSUZadehiopqstu";
   } else {
-    characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    characters =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   }
   var charactersLength = characters.length;
   let result = "";
@@ -171,8 +172,44 @@ const getmyaddress = (_) => {
   if (walletConnector.connected) {
     return walletConnector._accounts[0];
   } else { */
-  window.ethereum && window.ethereum.selectedAddress && LOGGER(window.ethereum.selectedAddress);
+
+  window.ethereum &&
+    window.ethereum.selectedAddress &&
+    LOGGER(window.ethereum.selectedAddress);
   return window.ethereum ? window.ethereum.selectedAddress : null;
+  //  }
+};
+const getmyaddress_async = async (_) => {
+  /**  const walletConnector = new NodeWalletConnect(
+    {
+      bridge: "https://bridge.walletconnect.org", // Required
+    },
+    {
+      clientMeta: {
+        description: "WalletConnect NodeJS Client",
+        url: "https://nodejs.org/en/",
+        icons: ["https://nodejs.org/static/images/logo.svg"],
+        name: "WalletConnect",
+      },
+    }
+  );
+
+  if (walletConnector.connected) {
+    return walletConnector._accounts[0];
+  } else { */
+  return new Promise(async (resolve, reject) => {
+    const myaddress = await window.ethereum.selectedAddress;
+    if (myaddress) {
+      LOGGER(myaddress);
+      resolve(myaddress);
+    } else {
+      resolve(null);
+    }
+  });
+  // window.ethereum &&
+  //   window.ethereum.selectedAddress &&
+  //   LOGGER(window.ethereum.selectedAddress);
+  // return window.ethereum ? window.ethereum.selectedAddress : null;
   //  }
 };
 const MAP_TIME_FORMAT = {
@@ -196,7 +233,9 @@ const getdiffindays = (time1, time0) => {
     return diffindays == 1 ? `${diffindays} day ago` : `${diffindays} days ago`;
   } else {
     let diffinhours = time1.diff(time0, "hours");
-    return diffinhours == 1 ? `${diffinhours} hour ago` : `${diffinhours} hours ago`;
+    return diffinhours == 1
+      ? `${diffinhours} hour ago`
+      : `${diffinhours} hours ago`;
   }
 };
 const get_lasttoken_url = (_) => {
@@ -250,6 +289,7 @@ export {
   getRandomElementsFromArray,
   getrandomwords,
   getmyaddress, // getuseraddress,
+  getmyaddress_async,
   gettimestr,
   getdiffindays,
   getqueriesspeckey,

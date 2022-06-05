@@ -20,6 +20,8 @@ import { messages } from "../configs/messages";
 import SetErrorBar from "../util/SetErrorBar";
 import moment from "moment";
 import { addresses } from "../configs/addresses";
+import { getabistr_forfunction, query_with_arg } from "../util/contract-calls";
+import { requesttransaction } from "../services/metamask";
 
 export default function Resell() {
   const navigate = useNavigate();
@@ -35,6 +37,7 @@ export default function Resell() {
   let [itemDetail, setItemDetail] = useState({});
   const { id } = useParams();
   const [saleType, setSaleType] = useState("COMMON");
+  const [isApprovedForAll, setApprovalForAll] = useState(false);
 
   const getUserInfo = async () => {
     try {
@@ -55,6 +58,73 @@ export default function Resell() {
     } catch (err) {
       console.log(err);
     }
+  };
+
+  const queryApprovalForAll = async () => {
+    try {
+      let myaddress = getmyaddress();
+      if (myaddress) {
+      } else {
+        SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+        return;
+      }
+      query_with_arg({
+        contractaddress: addresses.contract_erc1155,
+        abikind: "ERC1155",
+        methodname: "isApprovedForAll",
+        aargs: [myaddress, addresses.contract_erc1155_sales],
+      }).then((resp) => {
+        console.log("$sell-isApprovedForAll?", resp);
+        setApprovalForAll(resp);
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const approveForAll = () => {
+    let myaddress = getmyaddress();
+    if (myaddress) {
+    } else {
+      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+      return;
+    }
+    let abistr = getabistr_forfunction({
+      contractaddress: addresses.contract_erc1155,
+      abikind: "ERC1155",
+      methodname: "setApprovalForAll",
+      aargs: [addresses.contract_erc1155_sales, true],
+    });
+    requesttransaction({
+      from: myaddress,
+      to: addresses.contract_erc1155,
+      data: abistr,
+      value: "0x00",
+    }).then((resp) => {
+      if (resp) {
+      } else {
+        SetErrorBar(messages.MSG_USER_DENIED_TX);
+        return;
+      }
+      let txhash;
+
+      // axios
+      //   .post(API.API_TXS + `/${txhash}`, {
+      //     txhash,
+      //     username: myaddress,
+      //     typestr: typestr,
+      //     auxdata: {
+      //       contract_type: "ERC721",
+      //       myaddress: myaddress,
+      //       fromcontract: data.contractaddress,
+      //       tocontract: operator,
+      //     },
+      //   })
+      //   .then((resp) => {
+      //     LOGGER("", resp.data);
+      //   })
+      //   .catch(LOGGER);
+    });
   };
 
   const queryItemDetail = async () => {
@@ -123,6 +193,7 @@ export default function Resell() {
   useEffect(() => {
     queryItemDetail();
     setTimeout(() => {
+      queryApprovalForAll();
       getUserInfo();
     }, 1500);
   }, []);
@@ -429,10 +500,15 @@ export default function Resell() {
                   </ul>
                 </div>
               </li>
-
-              <button className="actionBtn" onClick={() => postSell()}>
-                Sales start
-              </button>
+              {isApprovedForAll ? (
+                <button className="actionBtn" onClick={() => postSell()}>
+                  Sell
+                </button>
+              ) : (
+                <button className="actionBtn" onClick={() => approveForAll()}>
+                  Approve for all
+                </button>
+              )}
             </ul>
           </article>
 
