@@ -65,6 +65,7 @@ export default function BidPopup({ off, itemdata }) {
       setSpinner(false);
       return;
     }
+
     setSpinner(true);
 
     let abistr = getabistr_forfunction({
@@ -108,6 +109,7 @@ export default function BidPopup({ off, itemdata }) {
       setSpinner(false);
       return;
     }
+
     setSpinner(true);
 
     console.log(
@@ -116,14 +118,12 @@ export default function BidPopup({ off, itemdata }) {
       itemdata.itembalances?.itemid, // itemid
       "1", // amounttomint
       "0", // decimals
-      "0x0114469cac96290dBBe042535B6AAB4d9C44b60D", // authoraddress
-      "1",
-      getweirep("" + itemdata.itembalances?.buyprice),
+      "250", // authorroyalty
+      itemdata.itembalances?.username, // authoraddress
+      "1", // amounttobuy
+      getweirep("" + itemdata.itembalances?.buyprice), // amounttopay
       itemdata.itembalances?.paymeansaddress, // paymeansaddress
-      "" + itemdata.id, // "" + tokenid,
-      itemdata.itembalances?.username,
-      myaddress,
-      "1"
+      itemdata.itembalances?.username // sellersaddress
     );
 
     let abistr = await getabistr_forfunction({
@@ -137,7 +137,7 @@ export default function BidPopup({ off, itemdata }) {
         "1", // amounttomint
         "0", // decimals
         "250", // authorroyalty
-        "0x0114469cac96290dBBe042535B6AAB4d9C44b60D", // authoraddress
+        itemdata.itembalances?.username, // authoraddress
         "1", // amounttobuy
         getweirep("" + itemdata.itembalances?.buyprice), // amounttopay
         itemdata.itembalances?.paymeansaddress, // paymeansaddress
@@ -162,41 +162,41 @@ export default function BidPopup({ off, itemdata }) {
       }
       SetErrorBar(messages.MSG_DONE_SENDING_TX_REQ);
       setSpinner(false);
-      let txhash;
+      let txhash = resp;
 
-      // console.log("txhash", txhash);
-      // axios
-      //   .post(API.API_TXS + `/${txhash}`, {
-      //     txhash,
-      //     username: myaddress,
-      //     typestr: "MARKET_BUY_NFT",
-      //     amount: itemPrice,
-      //     auxdata: {
-      //       user_action: "MARKET_BUY_NFT",
-      //       contract_type: "MATCHER_NFT", // .ETH_TESTNET
-      //       contract_address: contractaddress, // .ETH_TESTNET
-      //       my_address: myaddress,
-      //       authorRoyalty,
-      //       itemid: item?.item?.itemid,
-      //       tokenid,
-      //       author,
-      //       paymeansaddress,
-      //       itemPrice,
-      //       orderinfo: item.orders_sellside.seller,
-      //       uuid: item.orders_sellside.uuid,
-      //       paymeansname: "AKD",
-      //       nettype: net,
-      //     },
-      //   })
-      //   .then((res) => {
-      //     LOGGER("APPROVE RESP", resp);
-      //     off();
-      //   })
-      //   .catch((err) => console.log(err));
+      console.log("txhash", txhash);
+      axios
+        .post(API.API_TXS + `/${txhash}`, {
+          txhash,
+          username: myaddress,
+          typestr: "BUY_NFT_ITEM",
+          amount: itemdata.itembalances?.buyprice,
+          auxdata: {
+            user_action: "BUY_NFT_ITEM",
+            contract_type: "ERC1155Sale", // .ETH_TESTNET
+            contractaddress: addresses.contract_erc1155_sales, // .ETH_TESTNET
+            my_address: myaddress,
+            authorRoyalty: "250",
+            itemid: itemdata.itembalances?.itemid,
+            tokenid: itemdata.itembalances?.id,
+            author: "",
+            paymeansaddress: itemdata.itembalances?.paymeansaddress,
+            amount: itemdata.itembalances?.buyprice,
+            uuid: itemdata.order_detail?.uuid,
+            paymeansname: itemdata.itembalances?.paymeans,
+            nettype: net,
+          },
+        })
+        .then((res) => {
+          LOGGER("BUY_NFT_ITEM", resp);
+          off();
+        })
+        .catch((err) => console.log(err));
     });
   };
 
   useEffect(() => {
+    console.log("$itemdata", itemdata);
     setSpinner(true);
     setTimeout(() => {
       queryAllowance();
@@ -307,11 +307,19 @@ export default function BidPopup({ off, itemdata }) {
             <div>
               <div className="confrimBox">
                 {allowance > 0 ? (
-                  <button className="confirmBtn" onClick={() => onClickBuy()}>
+                  <button
+                    disabled={spinner}
+                    className="confirmBtn"
+                    onClick={() => onClickBuy()}
+                  >
                     {spinner ? <div id="loading"></div> : "Buy"}
                   </button>
                 ) : (
-                  <button className="confirmBtn" onClick={() => approve()}>
+                  <button
+                    disabled={spinner}
+                    className="confirmBtn"
+                    onClick={() => approve()}
+                  >
                     {spinner ? <div id="loading"></div> : "Approve"}
                   </button>
                 )}
@@ -467,10 +475,10 @@ const MbidPopupBox = styled.section`
         background: #000;
         border-radius: 3.33vw;
 
-        &:disabled {
+        /* &:disabled {
           color: #7a7a7a;
           background: #e1e1e1;
-        }
+        } */
       }
     }
   }
@@ -622,10 +630,10 @@ const PbidPopupBox = styled.section`
           }
         }
 
-        &:disabled {
+        /* &:disabled {
           color: #7a7a7a;
           background: #e1e1e1;
-        }
+        } */
       }
     }
   }

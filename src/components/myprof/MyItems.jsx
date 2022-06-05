@@ -807,25 +807,21 @@ export default function MyItems() {
                               </p>
                             );
                         })} */}
-                      {itemBalData?.map((itm, i) => {
-                        return (
-                          <div key={i}>
-                            <li>
-                              <p className="key">Current price</p>
-                              <p className="value">
-                                {" "}
-                                {parseInt(itm.buyprice).toFixed(2)} USDT
-                              </p>
-                            </li>
-                            <button
-                              className="actionBtn"
-                              onClick={() => navigate("/resell/" + itm.itemid)}
-                            >
-                              Sell
-                            </button>
-                          </div>
-                        );
-                      })}
+
+                      <li key={index}>
+                        <p className="key">Current price</p>
+                        <p className="value">
+                          {" "}
+                          {parseInt(item.buyprice).toFixed(2)} USDT
+                        </p>
+                      </li>
+
+                      <button
+                        className="actionBtn"
+                        onClick={() => navigate("/resell/" + item.itemid)}
+                      >
+                        Sell
+                      </button>
                     </ul>
                   </div>
 
