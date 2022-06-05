@@ -26,17 +26,32 @@ export default function Market() {
   const [likeObj, setLikeObj] = useState({});
   const [limit, setLimit] = useState(8);
   let [D_marketItemList, setD_marketItemList] = useState([]);
-  const fetchdata = () => {
-    axios.get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC?nettype=${net}`).then((resp) => {
-      LOGGER("", resp.data);
-      let { status, list } = resp.data;
-      if (status == "OK") {
+  // const fetchdata = () => {
+  //   axios.get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC?nettype=${net}`).then((resp) => {
+  //     LOGGER("", resp.data);
+  //     let { status, list } = resp.data;
+  //     if (status == "OK") {
+  //       setD_marketItemList(list);
+  //     }
+  //   });
+  // };
+  const fetchData = async () => {
+    try {
+      const res = await axios.get(
+        API.API_ALL_ITEMS_MARKET + `/active/1/0/100/id/DESC?nettype=${net}`
+      );
+      if (res.data && res.data.list) {
+        let { list } = res.data;
+        console.log("$market_items", res);
         setD_marketItemList(list);
       }
-    });
+    } catch (err) {
+      console.log(err);
+    }
   };
+
   useEffect(() => {
-    fetchdata();
+    fetchData();
   }, []);
   if (isMobile)
     return (
@@ -45,14 +60,18 @@ export default function Market() {
         <MmarketBox>
           <div className="innerBox">
             <section className="topBar">
-              <p className="title">Marketplece All NFTs</p>
+              <p className="title">Marketplace All NFTs</p>
 
               <article className="rightBox">
                 <div className="searchBox" ref={searchBoxRef}>
                   <input
                     value={search}
-                    onFocus={() => (searchBoxRef.current.style.border = "3px solid #000")}
-                    onBlur={() => (searchBoxRef.current.style.border = "1px solid #d9d9d9")}
+                    onFocus={() =>
+                      (searchBoxRef.current.style.border = "3px solid #000")
+                    }
+                    onBlur={() =>
+                      (searchBoxRef.current.style.border = "1px solid #d9d9d9")
+                    }
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="Search"
                   />
@@ -64,8 +83,12 @@ export default function Market() {
                   <button
                     ref={sortBtnRef}
                     className="sortBtn"
-                    onFocus={() => (sortBtnRef.current.style.border = "3px solid #000")}
-                    onBlur={() => (sortBtnRef.current.style.border = "1px solid #d9d9d9")}
+                    onFocus={() =>
+                      (sortBtnRef.current.style.border = "3px solid #000")
+                    }
+                    onBlur={() =>
+                      (sortBtnRef.current.style.border = "1px solid #d9d9d9")
+                    }
                     onClick={() => setSortPopup(true)}
                   >
                     <p>{sortOpt}</p>
@@ -74,7 +97,12 @@ export default function Market() {
 
                   {sortPopup && (
                     <>
-                      <SelectPopup off={setSortPopup} dataList={D_sortList} select={sortOpt} setFunc={setSortOpt} />
+                      <SelectPopup
+                        off={setSortPopup}
+                        dataList={D_sortList}
+                        select={sortOpt}
+                        setFunc={setSortOpt}
+                      />
                       <PopupBg off={setSortPopup} />
                     </>
                   )}
@@ -87,7 +115,12 @@ export default function Market() {
                 if (index < limit)
                   return (
                     <Fragment key={index}>
-                      <MarketItem0227 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
+                      <MarketItem0227
+                        data={cont}
+                        index={index}
+                        likeObj={likeObj}
+                        setLikeObj={setLikeObj}
+                      />
                     </Fragment>
                   );
                 else return <Fragment key={index} />;
@@ -108,14 +141,18 @@ export default function Market() {
         <Header />
         <PmarketBox>
           <section className="topBar">
-            <p className="title">Marketplece All NFTs</p>
+            <p className="title">Marketplace All NFTs</p>
 
             <article className="rightBox">
               <div className="searchBox" ref={searchBoxRef}>
                 <input
                   value={search}
-                  onFocus={() => (searchBoxRef.current.style.border = "3px solid #000000")}
-                  onBlur={() => (searchBoxRef.current.style.border = "1px solid #d9d9d9")}
+                  onFocus={() =>
+                    (searchBoxRef.current.style.border = "3px solid #000000")
+                  }
+                  onBlur={() =>
+                    (searchBoxRef.current.style.border = "1px solid #d9d9d9")
+                  }
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search"
                 />
@@ -127,8 +164,12 @@ export default function Market() {
                 <button
                   ref={sortBtnRef}
                   className="sortBtn"
-                  onFocus={() => (sortBtnRef.current.style.border = "3px solid #000000")}
-                  onBlur={() => (sortBtnRef.current.style.border = "1px solid #d9d9d9")}
+                  onFocus={() =>
+                    (sortBtnRef.current.style.border = "3px solid #000000")
+                  }
+                  onBlur={() =>
+                    (sortBtnRef.current.style.border = "1px solid #d9d9d9")
+                  }
                   onClick={() => setSortPopup(true)}
                 >
                   <p>{sortOpt}</p>
@@ -137,7 +178,12 @@ export default function Market() {
 
                 {sortPopup && (
                   <>
-                    <SelectPopup off={setSortPopup} dataList={D_sortList} select={sortOpt} setFunc={setSortOpt} />
+                    <SelectPopup
+                      off={setSortPopup}
+                      dataList={D_sortList}
+                      select={sortOpt}
+                      setFunc={setSortOpt}
+                    />
                     <PopupBg off={setSortPopup} />
                   </>
                 )}
@@ -150,7 +196,12 @@ export default function Market() {
               if (index < limit)
                 return (
                   <Fragment key={index}>
-                    <MarketItem0227 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
+                    <MarketItem0227
+                      data={cont}
+                      index={index}
+                      likeObj={likeObj}
+                      setLikeObj={setLikeObj}
+                    />
                   </Fragment>
                 );
               else return <Fragment key={index} />;

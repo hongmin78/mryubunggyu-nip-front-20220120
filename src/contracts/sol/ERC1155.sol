@@ -9,7 +9,7 @@ pragma solidity ^0.8.0;
 // XXX import "../../utils/introspection/ERC165.sol";
 // ??? import "./ERC1155AllowanceWrapper.sol";
 // XXX import "./Interfaces/IProxyRegistry.sol" ; 
-// XXX import "./Interfaces/IAdmin_nft.sol"; 
+// XXX import "./Interfaces/IA dmin_nft.sol"; 
 // XXX import "./openzeppelin/access/Ownable.sol" ;
 // XXX import "./Interfaces/IUserBlackWhiteList";
 interface IUserBlackWhiteList {
@@ -38,12 +38,12 @@ interface IERC1155 is IERC165 {
 		bytes calldata data
 	) external;
 	function mint (
-		address to, //		uint256 id,
-		string memory _itemhash ,
-		uint256 amount,
-		uint256 __author_royalty ,
-		uint256 __decimals ,
-		bytes memory data
+		address to, //	0	uint256 id,
+		string memory _itemhash , // 1
+		uint256 amount, // 2
+		uint256 __author_royalty , // 3
+		uint256 __decimals , // 4
+		bytes memory data // 5
 	) external returns ( uint256 );
 	function mintBatch (
 		address to, //			uint256[] memory ids,
@@ -77,15 +77,14 @@ interface IERC1155 is IERC165 {
 		uint256[] ids,
 		uint256[] values
   );
-	function _token_id_global () external view returns ( uint256 ) ;
-	function _author_royalty ( uint256 ) external view returns ( uint );
+	function _token_id_global () external returns ( uint256 ) ;
+	function _author_royalty ( uint256 ) external returns ( uint );
 	event ApprovalForAll(address indexed account, address indexed operator, bool approved); /**     * @dev Emitted when `account` grants or revokes permission to `operator` to tran sfer their tokens, according to     * `approved`.     */
 	event URI(string value, uint256 indexed id);     /**     * @dev Emitted when the URI for token type `id` changes to `value`, if it is a non-programmatic URI.     *     * If an {URI} ev ent was emitted for `id`, the standard     * https://eips.ethereum.org/EIPS/eip-1155#metadata-extensions[guarantees] that `value` will equal the value     * returned by {IERC1155MetadataURI-uri}.     */    
   function balanceOf(address account, uint256 id) external view returns (uint256); /**     * @dev Returns the amount of tokens of token type `id` owned by `account`.     *     * Requirements:     *     * - `account` cannot be the zero address.     */    
-  function balanceOfBatch(address[] calldata accounts, uint256[] calldata ids) external view        returns (uint256[] memory); /**     * @dev xref:ROOT:erc1155.adoc#batch-operations[Batched] version of {balanceOf}.     *     * Requirements:     *     * - `accounts` and `ids` must have the same length.     */    
+  function balanceOfBatch(address[] calldata accounts, uint256[] calldata ids)        external        view        returns (uint256[] memory); /**     * @dev xref:ROOT:erc1155.adoc#batch-operations[Batched] version of {balan ceOf}.     *     * Requirements:     *     * - `accounts` and `ids` must have the same length.     */    
   function setApprovalForAll(address operator, bool approved) external; /**     * @dev Grants or revokes permission to `operator` to tr ansfer the caller's tokens, according to `approved`,     *     * Emits an {ApprovalForAll} ev ent.     *     * Requirements:     *     * - `operator` cannot be the caller.     */    
-    function get_itemhash_tokenid ( string memory ) external view returns ( uint256) ;
-//  function isApprovedForAll(address account, address operator) external view returns (bool);		/**     * @dev Returns true if `operator` is approved to transfer ``account``'s tokens.     *     * See {setApprovalForAll}.     */
+  function isApprovedForAll(address account, address operator) external view returns (bool);		/**     * @dev Returns true if `operator` is approved to transfer ``account``'s tokens.     *     * See {setApprovalForAll}.     */
 }
 abstract contract Context {
     function _msgSender() internal view virtual returns (address) {
@@ -136,7 +135,7 @@ interface IAdmin_nft {
 	function set_action_str_fee ( string memory _action_str ) external ;
 	function _action_str_fees ( string memory _action_str ) external returns ( uint ) ;
 
-	// function _author_royalty_max () external returns (uint256 );
+	// function _author_roy alty_max () external returns (uint256 );
 	// function _referer_fee_max () external returns (uint256) ;
 
 	function _vault () external returns (address );
@@ -269,13 +268,13 @@ interface IERC1155Receiver is IERC165 {
 }
  // uint256 : 115792089237316195423570985008687907853269984665640564039457584007913129639935
  //  an id		34933046909214840971720565469667075475484107771494388163319263788272235577345
- contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI
+ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI 
 //	, ERC1155AllowanceWrapper 
 	, Ownable
 {  using Address for address ;
 	address public _admincontract ;
 	address public _contractowner ; // Mapping from token ID to account balances
-//	address public _user_proxy_registry ;
+	address public _user_proxy_registry ;
 	address public _user_black_white_list_registry ;
   mapping ( uint256 => mapping( address => uint256 ) ) public _balances ; // priv ate
 	mapping ( string => mapping (address => uint256 ) ) public _balances_by_itemid ;
@@ -284,22 +283,21 @@ interface IERC1155Receiver is IERC165 {
   // Mapping from account to operator approvals
   mapping(address => mapping(address => bool)) public _operatorApprovals; // priv ate
   // Used as the URI for all token types by relying on ID substitution, e.g. https://token-cdn-domain/{id}.json
-	string public _uri; // priv ate
+	string public _uri; // priv ate 	
 	mapping ( string => uint256 ) public _itemhash_tokenid ; // content id
-	mapping ( uint256 => string ) public _tokenid_itemhash ;
-	mapping ( address => bool ) public _acting_contracts ;
-	mapping ( uint256 => uint) public override _author_royalty ; // token id =>
+	mapping (uint256 => string ) public _tokenid_itemhash ;
+	mapping (address => bool ) public _acting_contracts ;
+	mapping (uint256 => uint) public override _author_royalty ; // token id =>
 	mapping ( string => uint) public _itemhash_copycount ;
 	// _author_royalty
 	mapping ( uint256=> address ) public _author ; // do struct if more than two
-	uint256 public _INVALID_TOKEN_ID_ = 0 ;
+	uint256 public _INVALID_TOKEN_ID_ = 0;
 	uint256 public override _token_id_global ;
 	mapping ( uint256 => string ) _tokenid_metadataurl ; // ipfs | http
 	mapping ( uint256 => string ) _tokenid_rawfileurl ;  // ipfs
-    mapping ( uint256 => address ) public _owners ;
-	mapping ( address => uint256 ) public _balance_by_user ; // user => balance
-	mapping ( address => string ) public _balance_user_itemhash ;
 	string public _version ;
+	string public name = "NFTINFINITY";
+	string public symbol = "NFTi";
   /**     * @dev See {_setURI}.
   */
 /**  	function _beforeTokenTransfer 
@@ -313,19 +311,23 @@ interface IERC1155Receiver is IERC165 {
   constructor ( string memory uri_ 
 		, address __admincontract 
 //		, address __user_proxy_registry
-		, address __user_black_white_list_registry
+//		, address __user_black_white_list_registry
 		, string memory __version
 	) {
-    	_setURI( uri_ );
+    _setURI( uri_ );
 		_contractowner = msg.sender ;
 		_admincontract = __admincontract;
 //		_user_proxy_registry = __user_proxy_registry;
 		_owner = msg.sender ;
 		_token_id_global = 1; // so as to avoid evm null resolution
-		_user_black_white_list_registry = __user_black_white_list_registry ;
+//		_user_black_white_list_registry = __user_black_white_list_registry ;
 		_version = __version ;
   }
 	/**   * @dev See {IERC165-supportsInterface}.  */
+    function set_admincontract ( address _address ) public {
+        require ( _address != _admincontract , "ERR() redundant call");
+        _admincontract = _address ;
+    }
   function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
 		return
 			interfaceId == type(IERC1155).interfaceId ||
@@ -335,8 +337,10 @@ interface IERC1155Receiver is IERC165 {
   function uri(uint256) public view virtual override returns (string memory) {
 		return _uri;
   }
-
-	function balanceOf ( address _address , string  memory _itemid ) public view returns ( uint256 ){
+	function _owners( uint256 _tokenid ) public view returns (address ) {
+		
+	}
+	function balanceOfByItemid ( address _address , string  memory _itemid ) public view returns ( uint256 ){
 		return _balances_by_itemid [ _itemid][ _address] ;
 	}
 	function balanceOf(address account, uint256 id) public view virtual override returns (uint256) {
@@ -351,19 +355,22 @@ interface IERC1155Receiver is IERC165 {
         returns (uint256[] memory)
   {
         require(accounts.length == ids.length, "ERC1155: accounts and ids length mismatch");
+
         uint256[] memory batchBalances = new uint256[](accounts.length);
+
         for (uint256 i = 0; i < accounts.length; ++i) {
             batchBalances[i] = balanceOf(accounts[i], ids[i]);
         }
+
         return batchBalances;
     }
     function setApprovalForAll(address operator, bool approved) public virtual override {
         _setApprovalForAll(_msgSender(), operator, approved);
     }
-/**    function isApprovedForAll(address account, address operator) public view virtual override returns (bool) {
+    function isApprovedForAll(address account, address operator) public view virtual override returns (bool) {
         return _operatorApprovals[account][operator];
-    } */
-    function safeTransferFrom (
+    }
+    function safeTransferFrom(
 			address from,
 			address to,
 			uint256 id,
@@ -371,8 +378,7 @@ interface IERC1155Receiver is IERC165 {
 			bytes memory data
     ) public virtual override {
 			require(
-					from == _msgSender() // || isAp provedForAll(from, _msgSender()) 
-                    || _acting_contracts[ msg.sender ] ,
+					from == _msgSender() || isApprovedForAll(from, _msgSender()) || _acting_contracts[ msg.sender ] ,
 					"ERC1155: caller is not owner nor approved"
 			);
 			_safeTransferFrom(from, to, id, amount, data);
@@ -385,8 +391,7 @@ interface IERC1155Receiver is IERC165 {
 			bytes memory data
     ) public virtual override {
       require(
-        from == _msgSender() // || isAppr ovedForAll(from, _msgSender()) 
-        || _acting_contracts[ msg.sender ],
+        from == _msgSender() || isApprovedForAll(from, _msgSender()) || _acting_contracts[ msg.sender ],
             "ERC1155: transfer caller is not owner nor approved"
         );
         _safeBatchTransferFrom(from, to, ids, amounts, data);
@@ -396,10 +401,10 @@ interface IERC1155Receiver is IERC165 {
 			, address to
 			, uint256 id
 			, uint256 amount
-		) public { //			revert("for the time being");
-			require( msg.sender == from // || msg.sender == IProxyRegistry(_user_proxy_registry).proxies( from) 
-				, "ERR() not privileged");
-			_safeTransferFrom (				from , to , id , amount	, "0x00"		) ;			
+		) public {
+//			revert("for the time being");
+			require( msg.sender == from || msg.sender == IProxyRegistry(_user_proxy_registry).proxies( from) , "ERR() not privileged");
+			_safeTransferFrom (				from , to , id , amount	, "0x00"		) ;
 		}
     function _safeTransferFrom (
 			address from,
@@ -409,22 +414,17 @@ interface IERC1155Receiver is IERC165 {
 			bytes memory data
     ) internal virtual {
       require(to != address(0), "ERC1155: transfer to the zero address");
-      address operator = _msgSender(); //        _beforeTokenTransfer ( operator, from, to, _asSingletonArray(id), _asSingletonArray(amount), data);
-      uint256 fromBalance = _balances[id][from];
-      require(fromBalance >= amount, "ERC1155: insufficient balance for transfer");
-      unchecked {
+      address operator = _msgSender();
+//        _beforeTokenTransfer ( operator, from, to, _asSingletonArray(id), _asSingletonArray(amount), data);
+        uint256 fromBalance = _balances[id][from];
+        require(fromBalance >= amount, "ERC1155: insufficient balance for transfer");
+        unchecked {
 					_balances[id][from] = fromBalance - amount;
-      }
-      _balances[id][to] += amount;
-      emit TransferSingle(operator, from, to, id, amount);
-	    _balances_by_itemid [ _tokenid_itemhash[id]  ][ from ] -= amount;
-      _balances_by_itemid [ _tokenid_itemhash[id] ][ to   ] += amount;
-    	_owners [ id ] = to ;
-			_balance_by_user[ from ] -= 1 ;
-			_balance_by_user[ to ] += 1 ;
-			_balance_user_itemhash [ to ] = _tokenid_itemhash [ id ] ;
-      if ( false ) {	_doSafeTransferAcceptanceCheck(operator, from, to, id, amount, data);
-			}
+        }
+        _balances[id][to] += amount;
+        emit TransferSingle(operator, from, to, id, amount);
+        if ( false ) {_doSafeTransferAcceptanceCheck(operator, from, to, id, amount, data);
+				}
     }
     function _safeBatchTransferFrom (
 			address from,
@@ -440,6 +440,7 @@ interface IERC1155Receiver is IERC165 {
         for (uint256 i = 0; i < ids.length; ++i) {
             uint256 id = ids[i];
             uint256 amount = amounts[i];
+
             uint256 fromBalance = _balances[id][from];
             require(fromBalance >= amount, "ERC1155: insufficient balance for transfer");
             unchecked {
@@ -448,15 +449,15 @@ interface IERC1155Receiver is IERC165 {
             _balances[id][to] += amount;
         }
         emit TransferBatch(operator, from, to, ids, amounts);
-				if(false){	        _doSafeBatchTransferAcceptanceCheck(operator, from, to, ids, amounts, data);
+				if(false){
+	        _doSafeBatchTransferAcceptanceCheck(operator, from, to, ids, amounts, data);
 				}
     }
     function _setURI(string memory newuri) internal virtual {
         _uri = newuri;
     }
 		enum USER_ACCESS_REFERENCES_BLACK_WHITELIST_NONE {
-			__SKIPPER__ 
-			, NONE
+			NONE
 			, BLACKLIST
 			, WHITELIST
 		}
@@ -475,6 +476,12 @@ interface IERC1155Receiver is IERC165 {
 			, __decimals
 			, data ) ;
 		}
+		uint256 public _author_royalty_max = 1000 ;
+		function set_author_royalty_max ( uint256 _max ) public  onlyOwner {
+			require ( _max != _author_royalty_max , "ERR() redundant call");
+			 _author_royalty_max = _max ;
+		}
+		bool public _allow_duplicate_datahash = false ;
     function _mint (
 			address to ,	//			uint256 id,
 			string memory _itemhash ,
@@ -486,14 +493,15 @@ interface IERC1155Receiver is IERC165 {
 			require( to != address(0), "ERC1155: mint to the zero address") ;
 			if( __author_royalty  == 0){}
 			else {
-				if ( __author_royalty <= IAdmin_nft ( _admincontract )._author_royalty_max() ){ }
+//				if ( __author_royalty <= IAdmin_nft ( _admincontract )._author_royalty_max() ){ }
+				if ( __author_royalty <= _author_royalty_max ){ }
 				else { return _INVALID_TOKEN_ID_ ; }
 			}
-			uint256 _usebwlist = IAdmin_nft( _admincontract)._use_user_black_whitelist_or_none () ;
-			if ( msg.sender == _owner ||	_usebwlist == uint256( USER_ACCESS_REFERENCES_BLACK_WHITELIST_NONE.NONE ) ){	 // nop
+/*			uint256 _usebwlist = IAdmin_nft( _admincontract)._use_user_black_whitelist_or_none () ;
+			if (	_usebwlist == uint256( USER_ACCESS_REFERENCES_BLACK_WHITELIST_NONE.NONE ) ){	 // nop
 			}
 			else {
-				address bw_registry = IAdmin_nft ( _admincontract )._user_black_white_list_registry () ;
+				address bw_registry = IAdmin_nft ( _admincontract )._user_bla ck_white_list_registry () ;
 				if( bw_registry == address(0) ) {
 				}
 				else {
@@ -508,10 +516,11 @@ interface IERC1155Receiver is IERC165 {
 						else {return _INVALID_TOKEN_ID_ ; }
 					}
 				}
-			}
+			}*/
 //			else { }
-			if( IAdmin_nft( _admincontract)._allow_duplicate_datahash( ) ){
-			} else { // do not allow duplicates
+//			if( IAdmin_nft( _admincontract)._allow_duplicate_datahash( ) ){			} 
+			if( _allow_duplicate_datahash ){ } 
+			else { // do not allow duplicates
 				if( _itemhash_tokenid [ _itemhash ] >0 ){	return _INVALID_TOKEN_ID_ ; }
 				else {} // avoid revert , so as not to stop calling function's execution
 			}
@@ -521,30 +530,21 @@ interface IERC1155Receiver is IERC165 {
 			uint256 tokenid = _token_id_global ;
 //			uint256 tokenid = 1 + _token_ id_global ;
 //			_beforeTokenTransfer(operator, address(0), to, _asSingletonArray(tokenid), _asSingletonArray(amount), data);			
+			_balances[ tokenid ][ to ] += amount;
 			_author_royalty[ tokenid ] = __author_royalty ;
 			emit TransferSingle(operator, address(0), to, tokenid, amount);
-//			_doSafeTra nsferAcc eptanceCheck(operator, address(0), to, tokenid, amount, data);
+//			_doSafeTransferAcceptanceCheck(operator, address(0), to, tokenid, amount, data);
 			_itemhash_tokenid [ _itemhash ] = tokenid ;
 			_tokenid_itemhash [ tokenid ] = _itemhash ;
 			_decimals [ tokenid ] = __decimals ;
-			_itemhash_copycount [ _itemhash ] = amount ;
-      		_amounts [ tokenid ] = amount ;
 			++ _token_id_global ;
 			_author [ tokenid ] = to; // _to;
-			_itemhash_copycount [ _itemhash ] = amount ;
-
-	    	_balances_by_itemid [ _itemhash ][ to ] = amount;
-    		_owners [ tokenid ] = to ;
-			_balances[ tokenid ][ to ] += amount;
-			_balance_by_user [ to ] += 1;
-			_balance_user_itemhash[ to ] = _itemhash ;
-			
 			return tokenid ;
     }
 		function mintBatch (
 			address to, //			uint256[] memory ids,
-			string  [] memory _itemhashes ,
-			uint256 [] memory amounts,
+			string [] memory _itemhashes ,
+			uint256[] memory amounts,
 			uint256 [] memory __author_royalty ,
 			uint256 [] memory __decimals ,
 			bytes memory data
@@ -556,9 +556,6 @@ interface IERC1155Receiver is IERC165 {
 			, __decimals
 			, data ) ;
 		}
-        function get_itemhash_tokenid ( string memory _itemhash ) public override view returns ( uint256 ){
-            return _itemhash_tokenid [_itemhash ];
-        }
     function _mintBatch (			
 		address to, //        uint256[] memory ids ,
 		string [] memory _itemhashes ,
@@ -616,21 +613,6 @@ interface IERC1155Receiver is IERC165 {
 				_balances[id][from] = fromBalance - amount;
 		}
 		emit TransferSingle(operator, from, address(0), id, amount);
-		string memory itemhash = _tokenid_itemhash [ id ] ;
-		_itemhash_tokenid [ itemhash ] = 0 ;
-		_tokenid_itemhash [ id ] = "" ;
-		_decimals [ id ] = 0 ;
-		_itemhash_copycount [ itemhash ] = 0 ;
-     _amounts [ id ] = 0 ;
-//			++ _token_id_global ;
-		_author [ id ] = address(0); // _to;
-		_itemhash_copycount [ itemhash ] = 0;
-
-    _balances_by_itemid [ itemhash ][ from ] = 0 ;
-    _owners [ id ] = address( 0) ;
-		_balances[ id ][ from ] = 0 ;
-		_balance_by_user [ from ] = _balance_by_user [ from ] - 1 ;
-		_balance_user_itemhash [ from ] = "";		
   }
 
 		function burnBatch(
@@ -681,8 +663,7 @@ interface IERC1155Receiver is IERC165 {
 			bytes memory data
     ) internal virtual {
 			uint256 count = ids.length ;
-			require(operator == from // || IProxyRegistry(_user_proxy_registry).proxies(from) == operator 
-				, "ERR() not operator approved" );
+			require(operator == from 				|| IProxyRegistry(_user_proxy_registry).proxies(from) == operator , "ERR() not operator approved" );
 			for (uint256 i=0; i<count ; i++ ) {
 				require( _balances[ ids[i] ][ from ] >= amounts[ i ] , "ERR() balance not enough" ) ;
 			}
@@ -735,15 +716,11 @@ interface IERC1155Receiver is IERC165 {
         array[0] = element;
         return array;
     }
-	function set_admincontract ( address _address  ) public {
-        require ( msg.sender == _owner , "ERR() not privileged");
-        _admincontract = _address ;
-	}
-/**	function set_user_proxy_registry( address _address ) public {		
+	function set_user_proxy_registry( address _address ) public {		
 		require ( msg.sender == _owner || IAdmin_nft( _admincontract)._admins ( msg.sender ) , "ERR() not privileged" ) ;
 		require( _user_proxy_registry != _address , "ERR() redundant call");
 		_user_proxy_registry = _address ;
-	} */
+	}
 	function set_acting_contracts( address _address , bool _status ) public {
 		require ( msg.sender == _owner || IAdmin_nft( _admincontract)._admins (msg.sender ) , "ERR() not privileged" ) ;
 		require( _acting_contracts[_address] != _status , "ERR() redundant call");

@@ -38,7 +38,10 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
           </div>
 
           {likeObj && (
-            <button className="likeBtn" onClick={(e) => onClickItemLike(e, index)}>
+            <button
+              className="likeBtn"
+              onClick={(e) => onClickItemLike(e, index)}
+            >
               <img src={likeObj[index] ? I_heartO : I_heart} alt="" />
               <p
                 className="count"
@@ -88,7 +91,10 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
           </div>
 
           {likeObj && (
-            <button className="likeBtn" onClick={(e) => onClickItemLike(e, index)}>
+            <button
+              className="likeBtn"
+              onClick={(e) => onClickItemLike(e, index)}
+            >
               <img src={likeObj[index] ? I_heartO : I_heart} alt="" />
               <p
                 className="count"
@@ -102,20 +108,18 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
           )}
         </div>
 
-        <img className="itemImg" src={data.url} alt="" />
+        <img className="itemImg" src={data.item?.url} alt="" />
 
         <div className="infoBox">
           <p className="title">{data.titlename}</p>
 
           <ul className="detailList">
             <li>
-              <p>Current bid</p>
+              <p>{data.saletype == 1 ? "Price" : "Current bid"}</p>
               <p>Ending in</p>
             </li>
             <li style={{ color: "#fff" }}>
-              <p>
-                {data.price}&nbsp;{data.unit}
-              </p>
+              <p>{data.price} USDT</p>
 
               <p>{moment(data.createdat).fromNow()}</p>
             </li>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 import I_ltArw from "../img/icon/I_ltArw.svg";
 import I_dnArw from "../img/icon/I_dnArw.svg";
@@ -8,9 +8,20 @@ import PopupBg from "../components/PopupBg";
 import SelectPopup from "../components/SelectPopup";
 import { D_expDateList, D_startDateList } from "../data/Dresell";
 import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router";
 import { useSelector } from "react-redux";
 import DetailHeader from "../components/header/DetailHeader";
 import Header from "../components/header/Header";
+import axios from "axios";
+import { net } from "../configs/net";
+import { API } from "../configs/api";
+import { getmyaddress } from "../util/common";
+import { messages } from "../configs/messages";
+import SetErrorBar from "../util/SetErrorBar";
+import moment from "moment";
+import { addresses } from "../configs/addresses";
+import { getabistr_forfunction, query_with_arg } from "../util/contract-calls";
+import { requesttransaction } from "../services/metamask";
 
 export default function Resell() {
   const navigate = useNavigate();
@@ -22,6 +33,170 @@ export default function Resell() {
   const [startPopup, setStartPopup] = useState(false);
   const [expDate, setExpDate] = useState("");
   const [expDatePopup, setExpDatePopup] = useState(false);
+  let [userInfo, setUserInfo] = useState();
+  let [itemDetail, setItemDetail] = useState({});
+  const { id } = useParams();
+  const [saleType, setSaleType] = useState("COMMON");
+  const [isApprovedForAll, setApprovalForAll] = useState(false);
+
+  const getUserInfo = async () => {
+    try {
+      let myaddress = getmyaddress();
+      if (myaddress) {
+      } else {
+        SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+        return;
+      }
+      const resp = await axios.get(
+        API.API_USERINFO + `/${myaddress}?nettype=${net}`
+      );
+      if (resp.data && resp.data.respdata) {
+        let { respdata } = resp.data;
+        setUserInfo(respdata);
+      }
+      console.log("$userinfo", resp);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const queryApprovalForAll = async () => {
+    try {
+      let myaddress = getmyaddress();
+      if (myaddress) {
+      } else {
+        SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+        return;
+      }
+      query_with_arg({
+        contractaddress: addresses.contract_erc1155,
+        abikind: "ERC1155",
+        methodname: "isApprovedForAll",
+        aargs: [myaddress, addresses.contract_erc1155_sales],
+      }).then((resp) => {
+        console.log("$sell-isApprovedForAll?", resp);
+        setApprovalForAll(resp);
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const approveForAll = () => {
+    let myaddress = getmyaddress();
+    if (myaddress) {
+    } else {
+      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+      return;
+    }
+    let abistr = getabistr_forfunction({
+      contractaddress: addresses.contract_erc1155,
+      abikind: "ERC1155",
+      methodname: "setApprovalForAll",
+      aargs: [addresses.contract_erc1155_sales, true],
+    });
+    requesttransaction({
+      from: myaddress,
+      to: addresses.contract_erc1155,
+      data: abistr,
+      value: "0x00",
+    }).then((resp) => {
+      if (resp) {
+      } else {
+        SetErrorBar(messages.MSG_USER_DENIED_TX);
+        return;
+      }
+      let txhash;
+
+      // axios
+      //   .post(API.API_TXS + `/${txhash}`, {
+      //     txhash,
+      //     username: myaddress,
+      //     typestr: typestr,
+      //     auxdata: {
+      //       contract_type: "ERC721",
+      //       myaddress: myaddress,
+      //       fromcontract: data.contractaddress,
+      //       tocontract: operator,
+      //     },
+      //   })
+      //   .then((resp) => {
+      //     LOGGER("", resp.data);
+      //   })
+      //   .catch(LOGGER);
+    });
+  };
+
+  const queryItemDetail = async () => {
+    try {
+      const resp = await axios.get(
+        API.API_GET_ITEMS_DETAIL + `/${id}?nettype=${net}`
+      );
+      if (resp.data && resp.data.respdata) {
+        let { respdata } = resp.data;
+        console.log("$itemdetail", respdata);
+        setItemDetail(respdata);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const postSell = () => {
+    // const expiration = moment.unix(+expDate) - moment.unix(+startDate);
+    // console.log("$expiration", expiration);
+    const data = {
+      tokenid: itemDetail.id,
+      itemid: itemDetail.itembalances?.itemid,
+      username: userInfo?.username,
+      price: itemDetail.itembalances?.buyprice,
+      // expiry: moment()
+      //   .add(+expiration, "days")
+      //   .unix(),
+      // expiry: moment().add(1659587638, "days").unix(),
+      expiry: 1659587638,
+      paymeansaddress: addresses.contract_USDT,
+      contractaddress: addresses.contract_admin,
+      paymeansname: "USDT",
+      saletype: saleType === "COMMON" ? 1 : saleType === "AUCTION" ? 2 : 0,
+      saletypestr: saleType,
+      salestatusstr: saleType,
+      salestatus: 1, // "on sale",
+      // jsignature: {
+      //   signature: sign,
+      //   msg,
+      // },
+      expirystr: 1659587638,
+      nettype: net,
+      seller: itemDetail.itembalances?.username,
+      typestr: saleType,
+    };
+    // if (
+    //   (price !== null && saleType === "COMMON") ||
+    //   ("AUCTION" && days === "14") ||
+    //   "20" ||
+    //   "30"
+    // ) {
+    axios
+      .post(API.API_POST_SALE, data)
+      .then((res) => {
+        console.log(res);
+        SetErrorBar("Item has been posted!");
+        // reload();
+      })
+      .catch((err) => console.log(err));
+    // } else {
+    //   SetErrorBar("Failed to provide all information.");
+    // }
+  };
+
+  useEffect(() => {
+    queryItemDetail();
+    setTimeout(() => {
+      queryApprovalForAll();
+      getUserInfo();
+    }, 1500);
+  }, []);
 
   if (isMobile)
     return (
@@ -101,11 +276,7 @@ export default function Resell() {
                 <p className="title">Starting Date</p>
                 <div className="posBox">
                   <div className="inputBox" onClick={() => setStartPopup(true)}>
-                    <input
-                      value={startDate}
-                      disabled
-                      placeholder="Select Date"
-                    />
+                    <input value={startDate} placeholder="Select Date" />
                     <img src={I_dnArw} alt="" />
                   </div>
 
@@ -130,7 +301,7 @@ export default function Resell() {
                     className="inputBox"
                     onClick={() => setExpDatePopup(true)}
                   >
-                    <input value={expDate} disabled placeholder="Select Date" />
+                    <input value={expDate} placeholder="Select Date" />
                     <img src={I_dnArw} alt="" />
                   </div>
 
@@ -185,7 +356,7 @@ export default function Resell() {
                 </div>
               </li>
 
-              <button className="actionBtn" onClick={() => {}}>
+              <button className="actionBtn" onClick={() => postSell()}>
                 Sales start
               </button>
             </ul>
@@ -329,10 +500,15 @@ export default function Resell() {
                   </ul>
                 </div>
               </li>
-
-              <button className="actionBtn" onClick={() => {}}>
-                Sales start
-              </button>
+              {isApprovedForAll ? (
+                <button className="actionBtn" onClick={() => postSell()}>
+                  Sell
+                </button>
+              ) : (
+                <button className="actionBtn" onClick={() => approveForAll()}>
+                  Approve for all
+                </button>
+              )}
             </ul>
           </article>
 

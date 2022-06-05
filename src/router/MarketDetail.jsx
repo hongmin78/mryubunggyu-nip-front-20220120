@@ -38,6 +38,8 @@ export default function MarketDetail() {
   const [showCopyBtn, setShowCopyBtn] = useState(false);
   let [itemdata, setitemdata] = useState();
   let [marketPlaceList, setmarketPlaceList] = useState([]);
+  const [saleStatus, setSaleStatus] = useState(1);
+
   const onclicklike = (_) => {
     let myaddress = getmyaddress();
     if (myaddress) {
@@ -110,6 +112,7 @@ export default function MarketDetail() {
         LOGGER("BYLjMqzlfl", resp.data);
         let { status, respdata } = resp.data;
         if (status == "OK") {
+          console.log("$item_detail", respdata);
           setitemdata(respdata);
         }
       });
@@ -190,7 +193,8 @@ export default function MarketDetail() {
                   <div className="price">
                     <p className="key">Current price</p>
                     <strong className="value">
-                      {itemdata?.group_ == "kong" ? "100" : ITEM_PRICE_DEF} USDT
+                      {/* {itemdata?.group_ == "kong" ? "100" : ITEM_PRICE_DEF} USDT */}
+                      {itemdata && itemdata.itembalances?.buyprice} USDT
                     </strong>
                   </div>
 
@@ -355,7 +359,8 @@ export default function MarketDetail() {
 
                   <div className="value">
                     <strong className="price">
-                      {itemdata?.group_ == "kong" ? "100" : ITEM_PRICE_DEF} USDT
+                      {/* {itemdata?.group_ == "kong" ? "100" : ITEM_PRICE_DEF} USDT */}
+                      {itemdata && itemdata.itembalances?.buyprice} USDT
                     </strong>
 
                     <ul className="timeList">
@@ -368,7 +373,7 @@ export default function MarketDetail() {
                 </div>
 
                 <button className="bidBtn" onClick={() => setBidPopup(true)}>
-                  Place bid
+                  {saleStatus == 0 ? "Place bid" : "Buy now"}
                 </button>
               </div>
 
@@ -448,7 +453,7 @@ export default function MarketDetail() {
 
           {bidPopup && (
             <>
-              <BidPopup off={setBidPopup} />
+              <BidPopup off={setBidPopup} itemdata={itemdata} />
               <PopupBg blur off={setBidPopup} />
             </>
           )}

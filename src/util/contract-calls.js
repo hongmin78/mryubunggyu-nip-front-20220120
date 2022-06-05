@@ -5,6 +5,8 @@ import { abi as abiadmin } from "../contracts/abi-admin";
 import { abi as abiticketnft } from "../contracts/abi-ticketnft";
 import { abi as abipay } from "../contracts/abipay";
 import { abi as abidelinquent } from "../contracts/abi-delinquents";
+import { abi as abierc1155 } from "../contracts/abi-erc1155";
+import { abi as abierc1155sales } from "../contracts/abi-erc1155Sale";
 
 // import { abi_putons ale } from '../contracts/abi/abi_puton sale'
 import { LOGGER } from "./common";
@@ -19,6 +21,8 @@ const MAP_STR_ABI = {
   TICKETNFT: abiticketnft,
   PAY: abipay,
   DELINQUENT: abidelinquent,
+  ERC1155Sale: abierc1155sales,
+  ERC1155: abierc1155,
 };
 const getabistr_forfunction = (jargs) => {
   let { contractaddress, abikind, methodname, aargs } = jargs;
