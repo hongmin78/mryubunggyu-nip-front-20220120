@@ -14,6 +14,7 @@ import Details from "../components/itemDetail/Details";
 import Properties from "../components/itemDetail/Properties";
 import MarketItem from "../components/MarketItem";
 import MarketItem0227 from "../components/MarketItem0227";
+import E_staking from "../img/common/E_staking.png";
 import BidPopup from "../components/BidPopup";
 import PopupBg from "../components/PopupBg";
 import { useSelector } from "react-redux";
@@ -304,13 +305,18 @@ export default function MarketDetail() {
         <Header />
         <PmarketDetailBox>
           <section className="itemInfoContainer">
-            <img className="itemImg" src={itemdata?.url} alt="" />
+            {itemdata?.url ? (
+              <img className="itemImg" src={itemdata?.url} alt="" />
+            ) : (
+              <img className="itemImg" src={E_staking} alt="" />
+            )}
 
             <article className="infoBox">
               <div className="itemInfoBox">
                 <div className="titleBox">
                   <strong className="title">
-                    King Kong {itemdata?.titlename}
+                    {itemdata && itemdata.itembalances?.group_.toUpperCase()}{" "}
+                    {itemdata?.titlename}
                   </strong>
 
                   <div className="btnBox">

@@ -161,32 +161,61 @@ export default function Resell() {
   const postSell = () => {
     // const expiration = moment.unix(+expDate) - moment.unix(+startDate);
     // console.log("$expiration", expiration);
-    const data = {
-      tokenid: itemDetail.id,
-      itemid: itemDetail.itembalances?.itemid,
-      username: userInfo?.username,
-      price: itemDetail.itembalances?.buyprice,
-      // expiry: moment()
-      //   .add(+expiration, "days")
-      //   .unix(),
-      // expiry: moment().add(1659587638, "days").unix(),
-      expiry: 1659587638,
-      paymeansaddress: addresses.contract_USDT,
-      contractaddress: addresses.contract_admin,
-      paymeansname: "USDT",
-      saletype: saleType === "COMMON" ? 1 : saleType === "AUCTION" ? 2 : 0,
-      saletypestr: saleType,
-      salestatusstr: saleType,
-      salestatus: 1, // "on sale",
-      // jsignature: {
-      //   signature: sign,
-      //   msg,
-      // },
-      expirystr: 1659587638,
-      nettype: net,
-      seller: itemDetail.itembalances?.username,
-      typestr: saleType,
+    const options_data = {
+      kingkong: {
+        tokenid: itemDetail.id,
+        itemid: itemDetail.itembalances?.itemid,
+        username: userInfo?.username,
+        price: itemDetail.itembalances?.buyprice,
+        // expiry: moment()
+        //   .add(+expiration, "days")
+        //   .unix(),
+        // expiry: moment().add(1659587638, "days").unix(),
+        expiry: 1659587638,
+        paymeansaddress: addresses.contract_USDT,
+        contractaddress: addresses.contract_admin,
+        paymeansname: "USDT",
+        saletype: saleType === "COMMON" ? 1 : saleType === "AUCTION" ? 2 : 0,
+        saletypestr: saleType,
+        salestatusstr: saleType,
+        salestatus: 1, // "on sale",
+        // jsignature: {
+        //   signature: sign,
+        //   msg,
+        // },
+        expirystr: 1659587638,
+        nettype: net,
+        seller: itemDetail.itembalances?.username,
+        typestr: saleType,
+      },
+      ticket: {
+        tokenid: itemDetail.itembalances?.id,
+        itemid: itemDetail.itembalances?.itemid,
+        username: itemDetail.itembalances?.username,
+        price: itemDetail.itembalances?.buyprice,
+        // expiry: moment()
+        //   .add(+expiration, "days")
+        //   .unix(),
+        // expiry: moment().add(1659587638, "days").unix(),
+        expiry: 1659587638,
+        paymeansaddress: addresses.contract_USDT,
+        contractaddress: addresses.contract_erc1155_ticket_sales_minter,
+        paymeansname: itemDetail.itembalances?.paymeans,
+        saletype: saleType === "COMMON" ? 1 : saleType === "AUCTION" ? 2 : 0,
+        saletypestr: saleType,
+        salestatusstr: saleType,
+        salestatus: 1, // "on sale",
+        // jsignature: {
+        //   signature: sign,
+        //   msg,
+        // },
+        expirystr: 1659587638,
+        nettype: net,
+        seller: itemDetail.itembalances?.username,
+        typestr: saleType,
+      },
     };
+    const data = {};
     // if (
     //   (price !== null && saleType === "COMMON") ||
     //   ("AUCTION" && days === "14") ||
@@ -194,7 +223,7 @@ export default function Resell() {
     //   "30"
     // ) {
     axios
-      .post(API.API_POST_SALE, data)
+      .post(API.API_POST_SALE, options_data[itemDetail.itembalances?.group_])
       .then((res) => {
         console.log(res);
         SetErrorBar("Item has been posted!");
@@ -534,9 +563,13 @@ export default function Resell() {
               {itemDetail && itemDetail.url ? (
                 <img className="itemImg" src={itemDetail.url} alt="" />
               ) : (
-                <img className="itemImg" src={E_item3} alt="" />
+                <img className="itemImg" src="" alt="broken_image" />
               )}
-              <p className="title">Series Kong #112</p>
+              <p className="title">
+                Series{" "}
+                {itemDetail && itemDetail.itembalances?.group_.toUpperCase()}{" "}
+                #112
+              </p>
             </li>
 
             <li className="transactionBox">

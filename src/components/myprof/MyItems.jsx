@@ -755,7 +755,11 @@ export default function MyItems() {
             itemBalData.map((item, index) => (
               <li key={index} className="swapBox">
                 <div className="imgBoxBal">
-                  <img className="itemImgBal" src={item.itemdata.url} alt="" />
+                  <img
+                    className="itemImgBal"
+                    src={item && item.itemdata?.url}
+                    alt=""
+                  />
 
                   <div className="topBarBal">
                     <button className="likeBtnBal" onClick={() => {}}>
@@ -766,21 +770,23 @@ export default function MyItems() {
                 </div>
                 <div className="infoBox">
                   <div className="titleBox">
-                    <strong className="title">{item.itemdata.titlename}</strong>
+                    <strong className="title">
+                      {item && item.itemdata?.titlename}
+                    </strong>
                   </div>
 
                   <div className="ownedBox">
                     <p className="key">Owned by</p>
-                    <p className="value">@{item.username}</p>
+                    <p className="value">@{item && item.username}</p>
                   </div>
                   <div className="ownedBox">
                     <p className="key">Bought Date</p>
                     <p className="value">
-                      {moment(item.createdat).format("YYYY-MM-DD")}
+                      {moment(item && item.createdat).format("YYYY-MM-DD")}
                     </p>
                     <p className="key">Sold Date</p>
                     <p className="value">
-                      {moment(item.createdat)
+                      {moment(item && item.createdat)
                         .add(3, "days")
                         .format("YYYY-MM-DD")}
                     </p>
@@ -812,7 +818,7 @@ export default function MyItems() {
                         <p className="key">Current price</p>
                         <p className="value">
                           {" "}
-                          {parseInt(item.buyprice).toFixed(2)} USDT
+                          {parseInt(item && item.buyprice).toFixed(2)} USDT
                         </p>
                       </li>
 

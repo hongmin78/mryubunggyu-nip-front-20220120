@@ -19,6 +19,7 @@ import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
 import { net } from "../configs/net";
 import { getabistr_forfunction, query_with_arg } from "../util/contract-calls";
+import E_staking from "../img/common/E_staking.png";
 import { addresses } from "../configs/addresses";
 import { getethrep, getweirep } from "../util/eth";
 import { requesttransaction } from "../services/metamask";
@@ -126,28 +127,92 @@ export default function BidPopup({ off, itemdata }) {
       itemdata.itembalances?.username // sellersaddress
     );
 
-    let abistr = await getabistr_forfunction({
-      contractaddress: addresses.contract_erc1155,
-      abikind: "ERC1155Sale",
-      methodname: "mint_and_match_single_simple_legacy",
-      // eslint-disable-next-line no-sparse-arrays
-      aargs: [
-        addresses.contract_erc1155, // target contractaddress
-        itemdata.itembalances?.itemid, // itemid
-        "1", // amounttomint
-        "0", // decimals
-        "250", // authorroyalty
-        itemdata.itembalances?.username, // authoraddress
-        "1", // amounttobuy
-        getweirep("" + itemdata.itembalances?.buyprice), // amounttopay
-        itemdata.itembalances?.paymeansaddress, // paymeansaddress
-        itemdata.itembalances?.username, // sellersaddress
-      ],
-    });
+    const options_abistr = {
+      kingkong: {
+        operator_contract: addresses.contract_erc1155_sales,
+        typestr: "BUY_NFT_ITEM",
+        amount: itemdata.itembalances?.buyprice,
+        auxdata: {
+          user_action: "BUY_NFT_ITEM",
+          contract_type: "ERC1155Sale", // .ETH_TESTNET
+          contractaddress: addresses.contract_erc1155_sales, // .ETH_TESTNET
+          my_address: myaddress,
+          authorRoyalty: "250",
+          itemid: itemdata.itembalances?.itemid,
+          tokenid: itemdata.itembalances?.id,
+          author: "",
+          paymeansaddress: itemdata.itembalances?.paymeansaddress,
+          amount: itemdata.itembalances?.buyprice,
+          uuid: itemdata.order_detail?.uuid,
+          paymeansname: itemdata.itembalances?.paymeans,
+          nettype: net,
+        },
+        abistr: {
+          contractaddress: addresses.contract_erc1155,
+          abikind: "ERC1155Sale",
+          methodname: "mint_and_match_single_simple_legacy",
+          // eslint-disable-next-line no-sparse-arrays
+          aargs: [
+            addresses.contract_erc1155, // target contractaddress
+            itemdata.itembalances?.itemid, // itemid
+            "1", // amounttomint
+            "0", // decimals
+            "250", // authorroyalty
+            itemdata.itembalances?.username, // authoraddress
+            "1", // amounttobuy
+            getweirep("" + itemdata.itembalances?.buyprice), // amounttopay
+            itemdata.itembalances?.paymeansaddress, // paymeansaddress
+            itemdata.itembalances?.username, // sellersaddress
+          ],
+        },
+      },
+      ticket: {
+        operator_contract: addresses.contract_erc1155_ticket_sales,
+        typestr: "BUY_NFT_ITEM",
+        amount: itemdata.itembalances?.buyprice,
+        auxdata: {
+          user_action: "BUY_NFT_ITEM",
+          contract_type: "contract_erc1155_ticket_sales", // .ETH_TESTNET
+          contractaddress: addresses.item_order_details?.contractaddress, // .ETH_TESTNET
+          my_address: myaddress,
+          authorRoyalty: "250",
+          itemid: itemdata.itembalances?.itemid,
+          tokenid: itemdata.itembalances?.id,
+          author: "",
+          paymeansaddress: itemdata.item_order_details?.paymeansaddress,
+          amount: itemdata.itembalances?.buyprice,
+          uuid: itemdata.item_order_details?.uuid,
+          paymeansname: itemdata.item_order_details?.paymeans,
+          nettype: itemdata.item_order_details.nettype,
+        },
+        abistr: {
+          contractaddress: addresses.contract_erc1155_ticket_sales,
+          abikind: "ERC1155Sale",
+          methodname: "stake_featuring_transferfrom",
+          // eslint-disable-next-line no-sparse-arrays
+          aargs: [
+            addresses.contract_erc1155, // target contractaddress
+            itemdata.itembalances?.itemid, // itemid
+            "1", // amounttomint
+            "0", // decimals
+            "250", // authorroyalty
+            itemdata.itembalances?.username, // authoraddress
+            "1", // amounttobuy
+            getweirep("" + itemdata.itembalances?.buyprice), // amounttopay
+            itemdata.itembalances?.paymeansaddress, // paymeansaddress
+            itemdata.itembalances?.username, // sellersaddress
+          ],
+        },
+      },
+    };
+
+    let abistr = await getabistr_forfunction(
+      options_abistr[itemdata?.itembalances].abistr
+    );
     console.log("", abistr);
     requesttransaction({
       from: myaddress,
-      to: addresses.contract_erc1155_sales,
+      to: options_abistr[itemdata?.itembalances].operator_contract,
       data: abistr,
       value: "0x00",
     }).then((resp) => {
@@ -169,23 +234,9 @@ export default function BidPopup({ off, itemdata }) {
         .post(API.API_TXS + `/${txhash}`, {
           txhash,
           username: myaddress,
-          typestr: "BUY_NFT_ITEM",
-          amount: itemdata.itembalances?.buyprice,
-          auxdata: {
-            user_action: "BUY_NFT_ITEM",
-            contract_type: "ERC1155Sale", // .ETH_TESTNET
-            contractaddress: addresses.contract_erc1155_sales, // .ETH_TESTNET
-            my_address: myaddress,
-            authorRoyalty: "250",
-            itemid: itemdata.itembalances?.itemid,
-            tokenid: itemdata.itembalances?.id,
-            author: "",
-            paymeansaddress: itemdata.itembalances?.paymeansaddress,
-            amount: itemdata.itembalances?.buyprice,
-            uuid: itemdata.order_detail?.uuid,
-            paymeansname: itemdata.itembalances?.paymeans,
-            nettype: net,
-          },
+          typestr: options_abistr[itemdata?.itembalances].typestr,
+          amount: options_abistr[itemdata?.itembalances].amount,
+          auxdata: options_abistr[itemdata?.itembalances].auxdata,
         })
         .then((res) => {
           LOGGER("BUY_NFT_ITEM", resp);
@@ -272,7 +323,11 @@ export default function BidPopup({ off, itemdata }) {
 
         <article className="contBox">
           <div className="itemBox">
-            <img src={itemdata?.url} alt="" />
+            {itemdata?.url ? (
+              <img src={itemdata?.url} alt="" />
+            ) : (
+              <img src={E_staking} alt="" />
+            )}
             <p>You are about to purchase a King Kong {itemdata?.titlename}</p>
           </div>
 
