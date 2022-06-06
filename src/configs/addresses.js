@@ -13,8 +13,12 @@ const jaddresses = {
     // payment_for_delinquency: "0x2cdb6d037cc0a9e5480f9071b4a00f20055057a7",
     payment_for_delinquency: "0x3a21780372d2bf9be278906295984a9799bea2a8",
     contract_ticketnft: "0x60123597c04bB08655e027B3398D0BD336ad68C6",
-    contract_erc1155_sales: "0xfa9bD682A5b282852AB00776A8a7bB3ee6e91Daa",
-    contract_erc1155: "0xE437A4F3E2b69331CEd5B816682f2653530000DC",
+    contract_erc1155_sales: "0x701B224c3E0CBF57d16C857D588A38F30FF3E82a", // 2022.06.05 11:20pm latest release
+    contract_erc1155: "0xE437A4F3E2b69331CEd5B816682f2653530000DC", // 2022.06.05 latest release
+    // ticket sales contracts
+    contract_erc1155_ticket_sales: "0x792b9E8c8F3748B734ae5CDa9Bd87fa5A02596AE",
+    contract_erc1155_ticket_sales_minter:
+      "0x9521e09419342219CCbD84b7f24C26277793CE90",
   },
   BSC_MAINNET: {
     contract_USDT: "0x55d398326f99059fF775485246999027B3197955", // owner : 0x83f714ad20e34748516e8367faf143abde6c3783

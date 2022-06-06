@@ -37,14 +37,16 @@ export default function Mypage() {
   const fetchdata = async (_) => {
     let myaddress = getmyaddress();
     if (myaddress) {
-      axios.get(API.API_USERINFO + `/${myaddress}?nettype=${net}`).then((resp) => {
-        LOGGER("userInfo", resp.data);
-        let { status, respdata } = resp.data;
+      axios
+        .get(API.API_USERINFO + `/${myaddress}?nettype=${net}`)
+        .then((resp) => {
+          LOGGER("userInfo", resp.data);
+          let { status, respdata } = resp.data;
 
-        if (status == "OK") {
-          setuserinfo(respdata);
-        }
-      });
+          if (status == "OK") {
+            setuserinfo(respdata);
+          }
+        });
     } else {
       SetErrorBar(messages.MSG_CONNECTWALET);
     }
@@ -82,7 +84,10 @@ export default function Mypage() {
                   </button>
 
                   <div className="hoverBox">
-                    <button className="editBtn displayBtn" onClick={() => navigate("/editprof")}>
+                    <button
+                      className="editBtn displayBtn"
+                      onClick={() => navigate("/editprof")}
+                    >
                       <p>Edit Profile</p>
                     </button>
                   </div>
@@ -160,7 +165,10 @@ export default function Mypage() {
                   </button>
 
                   <div className="hoverBox">
-                    <button className="editBtn displayBtn" onClick={() => navigate("/editprof", { state: userinfo })}>
+                    <button
+                      className="editBtn displayBtn"
+                      onClick={() => navigate("/editprof", { state: userinfo })}
+                    >
                       <p>Edit Profile</p>
                     </button>
                   </div>

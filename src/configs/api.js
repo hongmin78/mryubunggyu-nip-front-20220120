@@ -4,8 +4,8 @@ import { net } from "./net";
 
 let URL;
 const url = {
-  ETH_TESTNET: "https://nftinfinity.world:34825",
-  BSC_MAINNET: "https://nftinfinity.world:34925",
+  ETH_TESTNET: "https://nftinfinity.world:34925",
+  BSC_MAINNET: "https://nftinfinity.world:34825",
 };
 
 URL = url[net];
@@ -46,7 +46,7 @@ const API = {
   API_QUERY_STRING: (_value) =>
     `${URL}/queries/singlerow/settings/key_/${_value}`,
   API_POST_SALE: `${URL}/orders`,
-  API_ALL_ITEMS_MARKET: URL + "/queries/rows/orders",
+  API_ALL_ITEMS_MARKET: URL + "/queries/orders",
 };
 
 export { API };

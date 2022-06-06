@@ -22,6 +22,9 @@ import moment from "moment";
 import { addresses } from "../configs/addresses";
 import { getabistr_forfunction, query_with_arg } from "../util/contract-calls";
 import { requesttransaction } from "../services/metamask";
+import awaitTransactionMined from "await-transaction-mined";
+import { web3 } from "../configs/configweb3-ropsten";
+import { TX_POLL_OPTIONS } from "../configs/configs";
 
 export default function Resell() {
   const navigate = useNavigate();
@@ -38,6 +41,7 @@ export default function Resell() {
   const { id } = useParams();
   const [saleType, setSaleType] = useState("COMMON");
   const [isApprovedForAll, setApprovalForAll] = useState(false);
+  let [spinner, setSpinner] = useState(false);
 
   const getUserInfo = async () => {
     try {
@@ -76,6 +80,7 @@ export default function Resell() {
       }).then((resp) => {
         console.log("$sell-isApprovedForAll?", resp);
         setApprovalForAll(resp);
+        setSpinner(false);
       });
     } catch (err) {
       console.log(err);
@@ -87,8 +92,10 @@ export default function Resell() {
     if (myaddress) {
     } else {
       SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+      setSpinner(false);
       return;
     }
+    setSpinner(true);
     let abistr = getabistr_forfunction({
       contractaddress: addresses.contract_erc1155,
       abikind: "ERC1155",
@@ -106,7 +113,16 @@ export default function Resell() {
         SetErrorBar(messages.MSG_USER_DENIED_TX);
         return;
       }
-      let txhash;
+      let txhash = resp;
+
+      awaitTransactionMined
+        .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+        .then(async (minedtxreceipt) => {
+          console.log(minedtxreceipt);
+          SetErrorBar(messages.MSG_TX_FINALIZED);
+          queryApprovalForAll();
+          setSpinner(false);
+        });
 
       // axios
       //   .post(API.API_TXS + `/${txhash}`, {
@@ -145,32 +161,61 @@ export default function Resell() {
   const postSell = () => {
     // const expiration = moment.unix(+expDate) - moment.unix(+startDate);
     // console.log("$expiration", expiration);
-    const data = {
-      tokenid: itemDetail.id,
-      itemid: itemDetail.itembalances?.itemid,
-      username: userInfo?.username,
-      price: itemDetail.itembalances?.buyprice,
-      // expiry: moment()
-      //   .add(+expiration, "days")
-      //   .unix(),
-      // expiry: moment().add(1659587638, "days").unix(),
-      expiry: 1659587638,
-      paymeansaddress: addresses.contract_USDT,
-      contractaddress: addresses.contract_admin,
-      paymeansname: "USDT",
-      saletype: saleType === "COMMON" ? 1 : saleType === "AUCTION" ? 2 : 0,
-      saletypestr: saleType,
-      salestatusstr: saleType,
-      salestatus: 1, // "on sale",
-      // jsignature: {
-      //   signature: sign,
-      //   msg,
-      // },
-      expirystr: 1659587638,
-      nettype: net,
-      seller: itemDetail.itembalances?.username,
-      typestr: saleType,
+    const options_data = {
+      kingkong: {
+        tokenid: itemDetail.id,
+        itemid: itemDetail.itembalances?.itemid,
+        username: userInfo?.username,
+        price: itemDetail.itembalances?.buyprice,
+        // expiry: moment()
+        //   .add(+expiration, "days")
+        //   .unix(),
+        // expiry: moment().add(1659587638, "days").unix(),
+        expiry: 1659587638,
+        paymeansaddress: addresses.contract_USDT,
+        contractaddress: addresses.contract_admin,
+        paymeansname: "USDT",
+        saletype: saleType === "COMMON" ? 1 : saleType === "AUCTION" ? 2 : 0,
+        saletypestr: saleType,
+        salestatusstr: saleType,
+        salestatus: 1, // "on sale",
+        // jsignature: {
+        //   signature: sign,
+        //   msg,
+        // },
+        expirystr: 1659587638,
+        nettype: net,
+        seller: itemDetail.itembalances?.username,
+        typestr: saleType,
+      },
+      ticket: {
+        tokenid: itemDetail.itembalances?.id,
+        itemid: itemDetail.itembalances?.itemid,
+        username: itemDetail.itembalances?.username,
+        price: itemDetail.itembalances?.buyprice,
+        // expiry: moment()
+        //   .add(+expiration, "days")
+        //   .unix(),
+        // expiry: moment().add(1659587638, "days").unix(),
+        expiry: 1659587638,
+        paymeansaddress: addresses.contract_USDT,
+        contractaddress: addresses.contract_erc1155_ticket_sales_minter,
+        paymeansname: itemDetail.itembalances?.paymeans,
+        saletype: saleType === "COMMON" ? 1 : saleType === "AUCTION" ? 2 : 0,
+        saletypestr: saleType,
+        salestatusstr: saleType,
+        salestatus: 1, // "on sale",
+        // jsignature: {
+        //   signature: sign,
+        //   msg,
+        // },
+        expirystr: 1659587638,
+        nettype: net,
+        seller: itemDetail.itembalances?.username,
+        typestr: saleType,
+      },
     };
+    const data = {};
     // if (
     //   (price !== null && saleType === "COMMON") ||
     //   ("AUCTION" && days === "14") ||
@@ -178,7 +223,7 @@ export default function Resell() {
     //   "30"
     // ) {
     axios
-      .post(API.API_POST_SALE, data)
+      .post(API.API_POST_SALE, options_data[itemDetail.itembalances?.group_])
       .then((res) => {
         console.log(res);
         SetErrorBar("Item has been posted!");
@@ -191,6 +236,7 @@ export default function Resell() {
   };
 
   useEffect(() => {
+    setSpinner(true);
     queryItemDetail();
     setTimeout(() => {
       queryApprovalForAll();
@@ -502,11 +548,11 @@ export default function Resell() {
               </li>
               {isApprovedForAll ? (
                 <button className="actionBtn" onClick={() => postSell()}>
-                  Sell
+                  {spinner ? <div id="loading"></div> : "Sell"}
                 </button>
               ) : (
                 <button className="actionBtn" onClick={() => approveForAll()}>
-                  Approve for all
+                  {spinner ? <div id="loading"></div> : "Approve for all"}
                 </button>
               )}
             </ul>
@@ -514,8 +560,16 @@ export default function Resell() {
 
           <ul className="itemSec">
             <li className="itemBox">
-              <img className="itemImg" src={E_item3} alt="" />
-              <p className="title">Series Kong #112</p>
+              {itemDetail && itemDetail.url ? (
+                <img className="itemImg" src={itemDetail.url} alt="" />
+              ) : (
+                <img className="itemImg" src="" alt="broken_image" />
+              )}
+              <p className="title">
+                Series{" "}
+                {itemDetail && itemDetail.itembalances?.group_.toUpperCase()}{" "}
+                #112
+              </p>
             </li>
 
             <li className="transactionBox">
@@ -903,6 +957,27 @@ const PresellBox = styled.section`
         color: #fff;
         background: #000;
         border-radius: 12px;
+        #loading {
+          display: inline-block;
+          width: 38px;
+          height: 38px;
+          border: 3px solid rgba(255, 255, 255, 0.3);
+          border-radius: 50%;
+          border-top-color: #fff;
+          animation: spin 1s ease-in-out infinite;
+          -webkit-animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+          to {
+            -webkit-transform: rotate(360deg);
+          }
+        }
+        @-webkit-keyframes spin {
+          to {
+            -webkit-transform: rotate(360deg);
+          }
+        }
       }
     }
   }

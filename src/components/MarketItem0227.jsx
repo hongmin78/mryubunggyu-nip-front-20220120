@@ -4,6 +4,7 @@ import I_heartO from "../img/icon/I_heartO.svg";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import E_staking from "../img/common/E_staking.png";
 import moment from "moment";
 
 export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
@@ -108,11 +109,14 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
           )}
         </div>
 
-        <img className="itemImg" src={data.item?.url} alt="" />
+        {data.item?.url ? (
+          <img className="itemImg" src={data.item?.url} alt="" />
+        ) : (
+          <img className="itemImg" src={E_staking} alt="" />
+        )}
 
         <div className="infoBox">
           <p className="title">{data.titlename}</p>
-
           <ul className="detailList">
             <li>
               <p>{data.saletype == 1 ? "Price" : "Current bid"}</p>
