@@ -45,12 +45,22 @@ export default function BidPopup({ off, itemdata }) {
       return;
     }
 
-    query_with_arg({
-      contractaddress: addresses.contract_USDT,
-      abikind: "ERC20",
-      methodname: "allowance",
-      aargs: [myaddress, addresses.contract_erc1155_sales],
-    }).then((resp) => {
+    const options_arg = {
+      kingkong: {
+        contractaddress: addresses.contract_USDT,
+        abikind: "ERC20",
+        methodname: "allowance",
+        aargs: [myaddress, addresses.contract_erc1155_sales],
+      },
+      ticket: {
+        contractaddress: addresses.contract_USDT,
+        abikind: "ERC20",
+        methodname: "allowance",
+        aargs: [myaddress, addresses.contract_erc1155_ticket_sales],
+      },
+    };
+
+    query_with_arg(options_arg[itemdata.itembalances?.group_]).then((resp) => {
       console.log("$allowance_usdt: ", resp);
       setAllowance(getethrep("" + resp));
       SetErrorBar(`Allowance: ${getethrep("" + resp)}`);
@@ -68,13 +78,31 @@ export default function BidPopup({ off, itemdata }) {
     }
 
     setSpinner(true);
+    const options_arg = {
+      kingkong: {
+        abistr: {
+          contractaddress: addresses.contract_USDT,
+          abikind: "ERC20",
+          methodname: "approve",
+          aargs: [addresses.contract_erc1155_sales, getweirep("" + 10000_0000)],
+        },
+      },
+      ticket: {
+        abistr: {
+          contractaddress: addresses.contract_USDT,
+          abikind: "ERC20",
+          methodname: "approve",
+          aargs: [
+            addresses.contract_erc1155_ticket_sales,
+            getweirep("" + 10000_0000),
+          ],
+        },
+      },
+    };
 
-    let abistr = getabistr_forfunction({
-      contractaddress: addresses.contract_USDT,
-      abikind: "ERC20",
-      methodname: "approve",
-      aargs: [addresses.contract_erc1155_sales, getweirep("" + 10000_0000)],
-    });
+    let abistr = getabistr_forfunction(
+      options_arg[itemdata.itembalances?.group_].abistr
+    );
 
     requesttransaction({
       from: myaddress,
@@ -110,9 +138,7 @@ export default function BidPopup({ off, itemdata }) {
       setSpinner(false);
       return;
     }
-
     setSpinner(true);
-
     console.log(
       "$abistr_forfunction",
       addresses.contract_erc1155, // target contractaddress
@@ -187,32 +213,32 @@ export default function BidPopup({ off, itemdata }) {
         },
         abistr: {
           contractaddress: addresses.contract_erc1155_ticket_sales,
-          abikind: "ERC1155Sale",
+          abikind: "TICKETNFT",
           methodname: "stake_featuring_transferfrom",
           // eslint-disable-next-line no-sparse-arrays
           aargs: [
-            addresses.contract_erc1155, // target contractaddress
-            itemdata.itembalances?.itemid, // itemid
-            "1", // amounttomint
-            "0", // decimals
-            "250", // authorroyalty
-            itemdata.itembalances?.username, // authoraddress
-            "1", // amounttobuy
-            getweirep("" + itemdata.itembalances?.buyprice), // amounttopay
-            itemdata.itembalances?.paymeansaddress, // paymeansaddress
-            itemdata.itembalances?.username, // sellersaddress
+            // addresses.contract_erc1155, // target contractaddress
+            // itemdata.itembalances?.itemid, // itemid
+            // "1", // amounttomint
+            // "0", // decimals
+            // "250", // authorroyalty
+            // itemdata.itembalances?.username, // authoraddress
+            // "1", // amounttobuy
+            // getweirep("" + itemdata.itembalances?.buyprice), // amounttopay
+            // itemdata.itembalances?.paymeansaddress, // paymeansaddress
+            // itemdata.itembalances?.username, // sellersaddress
           ],
         },
       },
     };
 
     let abistr = await getabistr_forfunction(
-      options_abistr[itemdata?.itembalances].abistr
+      options_abistr[itemdata?.itembalances.group_].abistr
     );
     console.log("", abistr);
     requesttransaction({
       from: myaddress,
-      to: options_abistr[itemdata?.itembalances].operator_contract,
+      to: options_abistr[itemdata?.itembalances.group_].operator_contract,
       data: abistr,
       value: "0x00",
     }).then((resp) => {
@@ -234,9 +260,9 @@ export default function BidPopup({ off, itemdata }) {
         .post(API.API_TXS + `/${txhash}`, {
           txhash,
           username: myaddress,
-          typestr: options_abistr[itemdata?.itembalances].typestr,
-          amount: options_abistr[itemdata?.itembalances].amount,
-          auxdata: options_abistr[itemdata?.itembalances].auxdata,
+          typestr: options_abistr[itemdata?.itembalances.group_].typestr,
+          amount: options_abistr[itemdata?.itembalances.group_].amount,
+          auxdata: options_abistr[itemdata?.itembalances.group_].auxdata,
         })
         .then((res) => {
           LOGGER("BUY_NFT_ITEM", resp);
