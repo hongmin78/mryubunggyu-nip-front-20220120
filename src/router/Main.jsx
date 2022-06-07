@@ -69,7 +69,7 @@ export default function Main() {
   useEffect(() => {
     setTimeout(() => {
       let address = getmyaddress();
-      console.log("address", address);
+      console.log(address);
       axios
         .get(`${API.API_DELINQUENCY}/${address}`)
         .then((res) => {
@@ -79,13 +79,11 @@ export default function Main() {
           if (status === "OK") {
             let { list } = res.data;
             if (list && list?.length > 0) {
-              // const amount = list.reduce((a, b) => a.amount + b.amount, 0);
               let sum = 0;
               list.forEach((item) => {
                 sum += +item.amount;
               });
               dispatch(setDelinquencyAmount(sum.toFixed(2)));
-              console.log(sum);
 
               SetErrorBar("Please pay delinquency fee");
               navigate("/penalty");
