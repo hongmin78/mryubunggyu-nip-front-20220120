@@ -7,38 +7,278 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import { LOGGER , getmyaddress, onclickcopy, PARSER
-	, conv_jdata_arrkeyvalue
+import {
+  LOGGER,
+  getmyaddress,
+  onclickcopy,
+  PARSER,
+  conv_jdata_arrkeyvalue,
 } from "../util/common";
 import { API } from "../configs/api";
-import SetErrorBar from '../util/SetErrorBar'
-import { messages } from '../configs/messages'
+import SetErrorBar from "../util/SetErrorBar";
+import { messages } from "../configs/messages";
+import { net } from "../configs/net";
+import { getabistr_forfunction, query_with_arg } from "../util/contract-calls";
+import E_staking from "../img/common/E_staking.png";
+import { addresses } from "../configs/addresses";
+import { getethrep, getweirep } from "../util/eth";
+import { requesttransaction } from "../services/metamask";
+import awaitTransactionMined from "await-transaction-mined";
+import { web3 } from "../configs/configweb3-ropsten";
+import { TX_POLL_OPTIONS } from "../configs/configs";
 
-export default function BidPopup({ off }) {
-	const params = useParams();
+export default function BidPopup({ off, itemdata }) {
+  const params = useParams();
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
   const [price, setPrice] = useState("");
-	let [ itemdata , setitemdata ] = useState()
-	let [ attributes , setattributes ] = useState ( [] )
+  const [saleStatus] = useState(1);
+  const [allowance, setAllowance] = useState(0);
+  let [spinner, setSpinner] = useState(false);
 
-	const getitem=_=>{
-		axios.get( API.API_ITEMDETAIL + `/${params.itemid }`).then ( resp => { LOGGER ('7FzS4oxYPN' , resp.data )
-		let { status , respdata}=resp.data
-		if (status == 'OK'){
-			setitemdata( respdata )
-			let { metadata}=respdata
-			if ( metadata ) {
-				let jmetadata= PARSER( metadata )
-				LOGGER ( 'oXhffF8eTM' , conv_jdata_arrkeyvalue ( jmetadata ) )
-				setattributes ( conv_jdata_arrkeyvalue ( jmetadata ) )
-			}
-		}
-	})
-	}
-	useEffect (_=>{
-		getitem() //		getAuction()
-	} , [] )
+  const queryAllowance = () => {
+    let myaddress = getmyaddress();
+    if (myaddress) {
+    } else {
+      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+      setSpinner(false);
+      return;
+    }
+
+    const options_arg = {
+      kingkong: {
+        contractaddress: addresses.contract_USDT,
+        abikind: "ERC20",
+        methodname: "allowance",
+        aargs: [myaddress, addresses.contract_erc1155_sales],
+      },
+      ticket: {
+        contractaddress: addresses.contract_USDT,
+        abikind: "ERC20",
+        methodname: "allowance",
+        aargs: [myaddress, addresses.contract_erc1155_ticket_sales],
+      },
+    };
+
+    query_with_arg(options_arg[itemdata.itembalances?.group_]).then((resp) => {
+      console.log("$allowance_usdt: ", resp);
+      setAllowance(getethrep("" + resp));
+      SetErrorBar(`Allowance: ${getethrep("" + resp)}`);
+      setSpinner(false);
+    });
+  };
+
+  const approve = async () => {
+    let myaddress = getmyaddress();
+    if (myaddress) {
+    } else {
+      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+      setSpinner(false);
+      return;
+    }
+
+    setSpinner(true);
+    const options_arg = {
+      kingkong: {
+        abistr: {
+          contractaddress: addresses.contract_USDT,
+          abikind: "ERC20",
+          methodname: "approve",
+          aargs: [addresses.contract_erc1155_sales, getweirep("" + 10000_0000)],
+        },
+      },
+      ticket: {
+        abistr: {
+          contractaddress: addresses.contract_USDT,
+          abikind: "ERC20",
+          methodname: "approve",
+          aargs: [
+            addresses.contract_erc1155_ticket_sales,
+            getweirep("" + 10000_0000),
+          ],
+        },
+      },
+    };
+
+    let abistr = getabistr_forfunction(
+      options_arg[itemdata.itembalances?.group_].abistr
+    );
+
+    requesttransaction({
+      from: myaddress,
+      to: addresses.contract_USDT,
+      data: abistr,
+      value: "0x00",
+    }).then((resp) => {
+      if (resp) {
+      } else {
+        SetErrorBar(messages.MSG_USER_DENIED_TX);
+        return;
+      }
+
+      let txhash = resp;
+
+      awaitTransactionMined
+        .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+        .then(async (minedtxreceipt) => {
+          console.log(minedtxreceipt);
+          SetErrorBar(messages.MSG_TX_FINALIZED);
+          queryAllowance();
+          setSpinner(false);
+        });
+      console.log("txhash", txhash);
+    });
+  };
+
+  const onClickBuy = async () => {
+    let myaddress = getmyaddress();
+    if (myaddress) {
+    } else {
+      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+      setSpinner(false);
+      return;
+    }
+    setSpinner(true);
+    console.log(
+      "$abistr_forfunction",
+      addresses.contract_erc1155, // target contractaddress
+      itemdata.itembalances?.itemid, // itemid
+      "1", // amounttomint
+      "0", // decimals
+      "250", // authorroyalty
+      itemdata.itembalances?.username, // authoraddress
+      "1", // amounttobuy
+      getweirep("" + itemdata.itembalances?.buyprice), // amounttopay
+      itemdata.itembalances?.paymeansaddress, // paymeansaddress
+      itemdata.itembalances?.username // sellersaddress
+    );
+
+    const options_abistr = {
+      kingkong: {
+        operator_contract: addresses.contract_erc1155_sales,
+        typestr: "BUY_NFT_ITEM",
+        amount: itemdata.itembalances?.buyprice,
+        auxdata: {
+          user_action: "BUY_NFT_ITEM",
+          contract_type: "ERC1155Sale", // .ETH_TESTNET
+          contractaddress: addresses.contract_erc1155_sales, // .ETH_TESTNET
+          my_address: myaddress,
+          authorRoyalty: "250",
+          itemid: itemdata.itembalances?.itemid,
+          tokenid: itemdata.itembalances?.id,
+          author: "",
+          paymeansaddress: itemdata.itembalances?.paymeansaddress,
+          amount: itemdata.itembalances?.buyprice,
+          uuid: itemdata.order_detail?.uuid,
+          paymeansname: itemdata.itembalances?.paymeans,
+          nettype: net,
+        },
+        abistr: {
+          contractaddress: addresses.contract_erc1155,
+          abikind: "ERC1155Sale",
+          methodname: "mint_and_match_single_simple_legacy",
+          // eslint-disable-next-line no-sparse-arrays
+          aargs: [
+            addresses.contract_erc1155, // target contractaddress
+            itemdata.itembalances?.itemid, // itemid
+            "1", // amounttomint
+            "0", // decimals
+            "250", // authorroyalty
+            itemdata.itembalances?.username, // authoraddress
+            "1", // amounttobuy
+            getweirep("" + itemdata.itembalances?.buyprice), // amounttopay
+            itemdata.itembalances?.paymeansaddress, // paymeansaddress
+            itemdata.itembalances?.username, // sellersaddress
+          ],
+        },
+      },
+      ticket: {
+        operator_contract: addresses.contract_erc1155_ticket_sales,
+        typestr: "BUY_NFT_ITEM",
+        amount: itemdata.itembalances?.buyprice,
+        auxdata: {
+          user_action: "BUY_NFT_ITEM",
+          contract_type: "contract_erc1155_ticket_sales", // .ETH_TESTNET
+          contractaddress: addresses.item_order_details?.contractaddress, // .ETH_TESTNET
+          my_address: myaddress,
+          authorRoyalty: "250",
+          itemid: itemdata.itembalances?.itemid,
+          tokenid: itemdata.itembalances?.id,
+          author: "",
+          paymeansaddress: itemdata.item_order_details?.paymeansaddress,
+          amount: itemdata.itembalances?.buyprice,
+          uuid: itemdata.item_order_details?.uuid,
+          paymeansname: itemdata.item_order_details?.paymeans,
+          nettype: itemdata.item_order_details.nettype,
+        },
+        abistr: {
+          contractaddress: addresses.contract_erc1155_ticket_sales,
+          abikind: "TICKETNFT",
+          methodname: "stake_featuring_transferfrom",
+          // eslint-disable-next-line no-sparse-arrays
+          aargs: [
+            // addresses.contract_erc1155, // target contractaddress
+            // itemdata.itembalances?.itemid, // itemid
+            // "1", // amounttomint
+            // "0", // decimals
+            // "250", // authorroyalty
+            // itemdata.itembalances?.username, // authoraddress
+            // "1", // amounttobuy
+            // getweirep("" + itemdata.itembalances?.buyprice), // amounttopay
+            // itemdata.itembalances?.paymeansaddress, // paymeansaddress
+            // itemdata.itembalances?.username, // sellersaddress
+          ],
+        },
+      },
+    };
+
+    let abistr = await getabistr_forfunction(
+      options_abistr[itemdata?.itembalances.group_].abistr
+    );
+    console.log("", abistr);
+    requesttransaction({
+      from: myaddress,
+      to: options_abistr[itemdata?.itembalances.group_].operator_contract,
+      data: abistr,
+      value: "0x00",
+    }).then((resp) => {
+      console.log("asdofijdf", resp);
+      if (resp) {
+      } else {
+        console.log("USER DENIED TX");
+        SetErrorBar(messages.MSG_USER_DENIED_TX);
+        setSpinner(false);
+        off();
+        return;
+      }
+      SetErrorBar(messages.MSG_DONE_SENDING_TX_REQ);
+      setSpinner(false);
+      let txhash = resp;
+
+      console.log("txhash", txhash);
+      axios
+        .post(API.API_TXS + `/${txhash}`, {
+          txhash,
+          username: myaddress,
+          typestr: options_abistr[itemdata?.itembalances.group_].typestr,
+          amount: options_abistr[itemdata?.itembalances.group_].amount,
+          auxdata: options_abistr[itemdata?.itembalances.group_].auxdata,
+        })
+        .then((res) => {
+          LOGGER("BUY_NFT_ITEM", resp);
+          off();
+        })
+        .catch((err) => console.log(err));
+    });
+  };
+
+  useEffect(() => {
+    console.log("$itemdata", itemdata);
+    setSpinner(true);
+    setTimeout(() => {
+      queryAllowance();
+    }, 1200);
+  }, []);
 
   if (isMobile)
     return (
@@ -53,7 +293,7 @@ export default function BidPopup({ off }) {
 
         <article className="contBox">
           <div className="itemBox">
-            <img src={itemdata?.url } alt="" />
+            <img src={itemdata?.url} alt="" />
             <p>You are about to purchase a Kingkong #12</p>
           </div>
 
@@ -101,7 +341,7 @@ export default function BidPopup({ off }) {
       <PbidPopupBox>
         <article className="topBar">
           <span className="blank" />
-          <p className="title">Place a bid</p>
+          <p className="title">{saleStatus == 1 ? "Buy now" : "Place bid"}</p>
           <button className="exitBtn" onClick={() => off()}>
             <img src={I_x} alt="" />
           </button>
@@ -109,8 +349,12 @@ export default function BidPopup({ off }) {
 
         <article className="contBox">
           <div className="itemBox">
-            <img src={ itemdata?.url } alt="" />
-            <p>You are about to purchase a Kingkong #12</p>
+            {itemdata?.url ? (
+              <img src={itemdata?.url} alt="" />
+            ) : (
+              <img src={E_staking} alt="" />
+            )}
+            <p>You are about to purchase a King Kong {itemdata?.titlename}</p>
           </div>
 
           <div className="priceBox">
@@ -140,15 +384,39 @@ export default function BidPopup({ off }) {
             </ul>
           </div>
 
-          <div className="confrimBox">
-            <p className="explain">
-              Placing this bid will start a 24 hour auction for the artwork.
-              Once a bid is placed, it cannot be withdrawn.
-            </p>
-            <button className="confirmBtn" onClick={() => off()}>
-              Bid amount is required
-            </button>
-          </div>
+          {saleStatus == 1 ? (
+            <div>
+              <div className="confrimBox">
+                {allowance > 0 ? (
+                  <button
+                    disabled={spinner}
+                    className="confirmBtn"
+                    onClick={() => onClickBuy()}
+                  >
+                    {spinner ? <div id="loading"></div> : "Buy"}
+                  </button>
+                ) : (
+                  <button
+                    disabled={spinner}
+                    className="confirmBtn"
+                    onClick={() => approve()}
+                  >
+                    {spinner ? <div id="loading"></div> : "Approve"}
+                  </button>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="confrimBox">
+              <p className="explain">
+                Placing this bid will start a 24 hour auction for the artwork.
+                Once a bid is placed, it cannot be withdrawn.
+              </p>
+              <button className="confirmBtn" onClick={() => off()}>
+                Bid amount is required
+              </button>
+            </div>
+          )}
         </article>
       </PbidPopupBox>
     );
@@ -288,10 +556,10 @@ const MbidPopupBox = styled.section`
         background: #000;
         border-radius: 3.33vw;
 
-        &:disabled {
+        /* &:disabled {
           color: #7a7a7a;
           background: #e1e1e1;
-        }
+        } */
       }
     }
   }
@@ -421,10 +689,32 @@ const PbidPopupBox = styled.section`
         background: #000;
         border-radius: 12px;
 
-        &:disabled {
+        #loading {
+          display: inline-block;
+          width: 38px;
+          height: 38px;
+          border: 3px solid rgba(255, 255, 255, 0.3);
+          border-radius: 50%;
+          border-top-color: #fff;
+          animation: spin 1s ease-in-out infinite;
+          -webkit-animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+          to {
+            -webkit-transform: rotate(360deg);
+          }
+        }
+        @-webkit-keyframes spin {
+          to {
+            -webkit-transform: rotate(360deg);
+          }
+        }
+
+        /* &:disabled {
           color: #7a7a7a;
           background: #e1e1e1;
-        }
+        } */
       }
     }
   }

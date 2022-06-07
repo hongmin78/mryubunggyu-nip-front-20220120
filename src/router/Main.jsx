@@ -33,6 +33,9 @@ import axios from "axios";
 import { API } from "../configs/api";
 import { LOGGER, getmyaddress } from "../util/common";
 import { setDelinquencyAmount } from "../util/store/commonSlice";
+import moment from "moment";
+import { strDot } from "../util/Util";
+import { net } from "../configs/net";
 
 export default function Main() {
   const navigate = useNavigate();
@@ -57,8 +60,11 @@ export default function Main() {
   const [auctionListSecond, setAuctionListSecond] = useState([]);
   const [likeObj, setLikeObj] = useState({});
   let [premiumitemlist, setpremiumitemlist] = useState([]);
+  const [typestrPay, setTypestrPay] = useState([]);
+
   const dispatch = useDispatch();
 
+  console.log("auctionListFirst", auctionListFirst);
   function onClickTopBtn() {
     window.scrollTo({
       top: 0,
@@ -69,9 +75,13 @@ export default function Main() {
   useEffect(() => {
     setTimeout(() => {
       let address = getmyaddress();
-      console.log(address);
+      let myaddress = address;
+      console.log("address", address);
       axios
-        .get(`${API.API_DELINQUENCY}/${address}`)
+        .get(
+          `${API.API_DELINQUENCY}/${address}/0/10/id/DESC` +
+            `?nettype=${net}&itemdetail=1`
+        )
         .then((res) => {
           console.log("RES", res);
           let { status } = res.data;
@@ -79,12 +89,13 @@ export default function Main() {
           if (status === "OK") {
             let { list } = res.data;
             if (list && list?.length > 0) {
+              // const amount = list.reduce((a, b) => a.amount + b.amount, 0);
               let sum = 0;
               list.forEach((item) => {
                 sum += +item.amount;
               });
               dispatch(setDelinquencyAmount(sum.toFixed(2)));
-
+              localStorage.setItem("seller", list[0].seller);
               SetErrorBar("Please pay delinquency fee");
               navigate("/penalty");
             }
@@ -94,23 +105,41 @@ export default function Main() {
           console.log(err);
           alert(err.message);
         });
+      axios
+        .get(API.API_RECEIVABLES + `/${address}` + `?nettype=${net}`)
+        .then((res) => {
+          let { list } = res.data;
+          LOGGER("receivables", list);
+          if (list?.length > 0) {
+            SetErrorBar("exists receivables");
+          }
+        })
+        .catch((err) => console.log(err));
     }, 1500);
   }, []);
 
   function fetchitems() {
     axios
-      //      .get(  "http://3.35.117.87:34705/auction/list", { params: { limit: 16 } })
-      .get(API.API_COMMONITEMS + `/items/group_/kong/0/128/id/DESC`)
+
+      .get(
+        API.API_COMMONITEMS +
+          `/items/group_/kong/0/128/roundnumber/DESC?nettype=${net}` +
+          `&itemdetail=1`
+      )
       .then((res) => {
-        // console.log(res.data);
+        console.log("@query kong: ", res.data);
         let { status, list } = res.data;
         if (status == "OK") {
-          setAuctionListFirst(list.slice(0, 64));
-          setAuctionListSecond(list.slice(64));
+          let roundNumber1 = list.filter((item) => item.roundnumber > 0);
+          setAuctionListFirst(roundNumber1.slice(0, 64));
+          setAuctionListSecond(roundNumber1.slice(64));
         }
       });
     axios
-      .get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC`)
+      .get(
+        API.API_PREMIUMITEMS +
+          `/items/group_/kingkong/0/128/id/DESC?nettype=${net}`
+      )
       .then((resp) => {
         LOGGER("De0Mlt93PT", resp.data);
         let { status, list } = resp.data;
@@ -118,26 +147,37 @@ export default function Main() {
           setpremiumitemlist(list);
         }
       });
+    axios.get(API.API_TYPESTR + `?nettype=${net}`).then((resp) => {
+      LOGGER("itemBalance", resp.data);
+      let { status, payload } = resp.data;
+      if (status == "OK") {
+        setTypestrPay(resp.data.list);
+      }
+    });
   }
 
   useEffect(() => {
     fetchitems();
     setInterval(() => {
       if (!issueRef.current) return;
-      const contHeight = issueRef.current.children[0].offsetHeight;
-      issueIndex++;
-      if (issueRef.current?.scrollTo) {
-        if (issueIndex < D_issueList.length) {
-          issueRef.current.scrollTo({
-            top:
-              contHeight * issueIndex + issueIndex * getStyle(issueRef, "gap"),
-            behavior: "smooth",
-          });
-        } else {
-          issueRef.current.scrollTo({
-            top: 0,
-            behavior: "smooth",
-          });
+      if (issueRef.current?.children[0]) {
+        const contHeight = issueRef?.current?.children[0]?.offsetHeight;
+
+        issueIndex++;
+        if (issueRef.current?.scrollTo) {
+          if (issueIndex < D_issueList.length) {
+            issueRef.current.scrollTo({
+              top:
+                contHeight * issueIndex +
+                issueIndex * getStyle(issueRef, "gap"),
+              behavior: "smooth",
+            });
+          } else {
+            issueRef.current.scrollTo({
+              top: 0,
+              behavior: "smooth",
+            });
+          }
         }
       }
     }, 5000);
@@ -249,12 +289,15 @@ export default function Main() {
                   <div className="infoBox">
                     <div className="profBox">
                       <img src={E_issueProf} alt="" />
-                      <p className="nickname">@andyfeltham</p>
+                      <p className="nickname">{strDot(cont.username, 4, 10)}</p>
                     </div>
-                    <div className="timeBox">4 mins ago</div>
+                    <div className="timeBox">
+                      {moment(new Date()).diff(moment(cont.createdat), "days")}
+                      days ago
+                    </div>
                   </div>
                   <p className="cont">
-                    purchased <u>Kingkong #122</u> at 158 USDT
+                    at {parseInt(cont.buyprice).toFixed(2)} USDT
                   </p>
                 </li>
               ))}
@@ -295,16 +338,17 @@ export default function Main() {
                 </div>
                 <div className="posBox">
                   <ul className="itemList">
-                    {auctionListSecond.map((cont, index) => (
-                      <Fragment key={index}>
-                        <AuctionItem0228
-                          data={cont}
-                          index={index}
-                          likeObj={likeObj}
-                          setLikeObj={setLikeObj}
-                        />
-                      </Fragment>
-                    ))}
+                    {auctionListSecond.length > 0 &&
+                      auctionListSecond.map((cont, index) => (
+                        <Fragment key={index}>
+                          <AuctionItem0228
+                            data={cont}
+                            index={index}
+                            likeObj={likeObj}
+                            setLikeObj={setLikeObj}
+                          />
+                        </Fragment>
+                      ))}
                   </ul>
                   <button className="nextBtn">
                     <img src={I_rtArw} alt="" />
@@ -487,7 +531,7 @@ export default function Main() {
         <PmainBox>
           <section className="headLineContainer">
             <ul ref={headLineRef}>
-              {headLineList.map((value, index) => (
+              {headLineList?.map((value, index) => (
                 <li key={index}>
                   <article className="leftBox">
                     <span className="interview">
@@ -538,17 +582,28 @@ export default function Main() {
 
           <section className="issueContainer">
             <ul className="issueList" ref={issueRef}>
-              {D_issueList.map((cont, index) => (
+              {typestrPay?.map((cont, index) => (
                 <li className="issueBox" key={index}>
                   <div className="infoBox">
                     <div className="profBox">
                       <img src={E_issueProf} alt="" />
-                      <p className="nickname">@andyfeltham</p>
+                      <p className="nickname">{strDot(cont.username, 15)}</p>
                     </div>
-                    <div className="timeBox">4 mins ago</div>
+                    {/* <div className="timeBox">At__{cont.createdat.split("T")[0]}</div> */}
+                    <div className="timeBox">
+                      {moment(new Date()).diff(
+                        moment(cont.createdat),
+                        "days"
+                      ) === 0
+                        ? "Today"
+                        : `${moment(new Date()).diff(
+                            moment(cont.createdat),
+                            "days"
+                          )} days ago`}
+                    </div>
                   </div>
                   <p className="cont">
-                    purchased <u>Kingkong #122</u> at 158 USDT
+                    at {parseInt(cont.buyprice).toFixed(2)} USDT
                   </p>
                 </li>
               ))}
@@ -573,47 +628,52 @@ export default function Main() {
                       </Fragment>
                     ))}
                   </ul>
-                  <button
-                    className="nextBtn"
-                    onClick={() =>
-                      onClickNextBtn(
-                        firstAuctionRef,
-                        auctionListFirst,
-                        firstAuctionIndex,
-                        setFirstAuctionIndex
-                      )
-                    }
-                  >
-                    <img src={I_rtArw} alt="" />
-                  </button>
+                  {auctionListFirst.length > 0 && (
+                    <button
+                      className="nextBtn"
+                      onClick={() =>
+                        onClickNextBtn(
+                          firstAuctionRef,
+                          auctionListFirst,
+                          firstAuctionIndex,
+                          setFirstAuctionIndex
+                        )
+                      }
+                    >
+                      <img src={I_rtArw} alt="" />
+                    </button>
+                  )}
                 </div>
 
                 <div className="posBox">
                   <ul className="itemList" ref={secondAuctionRef}>
-                    {auctionListSecond.map((cont, index) => (
-                      <Fragment key={index}>
-                        <AuctionItem0228
-                          data={cont}
-                          index={index}
-                          likeObj={likeObj}
-                          setLikeObj={setLikeObj}
-                        />
-                      </Fragment>
-                    ))}
+                    {auctionListSecond.length > 0 &&
+                      auctionListSecond.map((cont, index) => (
+                        <Fragment key={index}>
+                          <AuctionItem0228
+                            data={cont}
+                            index={index}
+                            likeObj={likeObj}
+                            setLikeObj={setLikeObj}
+                          />
+                        </Fragment>
+                      ))}
                   </ul>
-                  <button
-                    className="nextBtn"
-                    onClick={() =>
-                      onClickNextBtn(
-                        secondAuctionRef,
-                        auctionListSecond,
-                        secondAuctionIndex,
-                        setSecondAuctionIndex
-                      )
-                    }
-                  >
-                    <img src={I_rtArw} alt="" />
-                  </button>
+                  {auctionListSecond.length > 0 && (
+                    <button
+                      className="nextBtn"
+                      onClick={() =>
+                        onClickNextBtn(
+                          secondAuctionRef,
+                          auctionListSecond,
+                          secondAuctionIndex,
+                          setSecondAuctionIndex
+                        )
+                      }
+                    >
+                      <img src={I_rtArw} alt="" />
+                    </button>
+                  )}
                 </div>
               </div>
             </article>
@@ -1232,7 +1292,7 @@ const PmainBox = styled.div`
         display: flex;
         justify-content: space-between;
         align-items: center;
-        width: 820px;
+        width: 1000px;
         height: 60px;
         min-height: 60px;
         padding: 0 34px;

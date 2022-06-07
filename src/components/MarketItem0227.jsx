@@ -4,6 +4,7 @@ import I_heartO from "../img/icon/I_heartO.svg";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import E_staking from "../img/common/E_staking.png";
 import moment from "moment";
 
 export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
@@ -17,16 +18,24 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
     setLikeObj({ ...dataObj });
   }
 
+  function contentsReload(id) {
+    window.location.href = `/#/market/detail/${id}`;
+    window.location.reload();
+    window.scrollTo(0, 0);
+  }
+
   if (isMobile)
     return (
       <Mitem
         className="item"
-        onClick={() => navigate(`/market/detail/${data?.itemid }`)}
+        onClick={() => {
+          contentsReload(data?.itemid);
+        }}
       >
         <div className="topBar">
           <div className="profBox">
             <img src={data.url} alt="" />
-            <p className="address">{strDot("0x123456789012345", 5, 4)}</p>
+            <p className="address">{strDot(data?.username, 5, 4)}</p>
           </div>
 
           {likeObj && (
@@ -41,16 +50,16 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
                   color: likeObj[index] && "#ff5050",
                 }}
               >
-                {data.like}
+                {data.like ? data.like : 0}
               </p>
             </button>
           )}
         </div>
 
-        <img className="itemImg" src={data.url} alt="" />
+        <img className="itemImg" src={data?.url} alt="" />
 
         <div className="infoBox">
-          <p className="title">{data.titlename}</p>
+          <p className="title">{data?.titlename}</p>
 
           <ul className="detailList">
             <li>
@@ -59,10 +68,10 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
             </li>
             <li style={{ color: "#fff" }}>
               <p>
-                {data.price}&nbsp;{data.unit}
+                {data?.price}&nbsp;{data?.unit}
               </p>
 
-              <p>{moment(data.createdat).fromNow()}</p>
+              <p>{moment(data?.createdat).fromNow()}</p>
             </li>
           </ul>
         </div>
@@ -72,12 +81,14 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
     return (
       <Pitem
         className="item"
-        onClick={() => navigate(`/market/detail/${data?.itemid }`)}
+        onClick={() => {
+          contentsReload(data?.itemid);
+        }}
       >
         <div className="topBar">
           <div className="profBox">
             <img src={data.url} alt="" />
-            <p className="address">{strDot("0x123456789012345", 5, 4)}</p>
+            <p className="address">{strDot(data?.username, 5, 4)}</p>
           </div>
 
           {likeObj && (
@@ -92,26 +103,27 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
                   color: likeObj[index] && "#ff5050",
                 }}
               >
-                {data.like}
+                {data.like ? data.like : 0}
               </p>
             </button>
           )}
         </div>
 
-        <img className="itemImg" src={data.url} alt="" />
+        {data.item?.url ? (
+          <img className="itemImg" src={data.item?.url} alt="" />
+        ) : (
+          <img className="itemImg" src={E_staking} alt="" />
+        )}
 
         <div className="infoBox">
           <p className="title">{data.titlename}</p>
-
           <ul className="detailList">
             <li>
-              <p>Current bid</p>
+              <p>{data.saletype == 1 ? "Price" : "Current bid"}</p>
               <p>Ending in</p>
             </li>
             <li style={{ color: "#fff" }}>
-              <p>
-                {data.price}&nbsp;{data.unit}
-              </p>
+              <p>{data.price} USDT</p>
 
               <p>{moment(data.createdat).fromNow()}</p>
             </li>

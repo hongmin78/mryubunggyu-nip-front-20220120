@@ -8,7 +8,12 @@ import { useSelector } from "react-redux";
 import PopupBg from "./PopupBg";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { getabistr_forfunction, query_with_arg, query_noarg, query_eth_balance } from "../util/contract-calls";
+import {
+  getabistr_forfunction,
+  query_with_arg,
+  query_noarg,
+  query_eth_balance,
+} from "../util/contract-calls";
 import { addresses } from "../configs/addresses";
 import { DECIMALS_DISP_DEF } from "../configs/configs"; // MIN_STAKE_AMOUNT,
 import { LOGGER, getmyaddress, getobjtype } from "../util/common";
@@ -18,10 +23,16 @@ import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
 import { API } from "../configs/api";
 import awaitTransactionMined from "await-transaction-mined";
-import { web3, BASE_CURRENCY, STAKE_CURRENCY, NETTYPE } from "../configs/configweb3";
+import {
+  web3,
+  BASE_CURRENCY,
+  STAKE_CURRENCY,
+  NETTYPE,
+} from "../configs/configweb3";
 import { TX_POLL_OPTIONS } from "../configs/configs";
 import I_spinner from "../img/icon/I_spinner.svg";
 import { strDot } from "../util/Util";
+import { net } from "../configs/net";
 const MODE_DEV_PROD = "PROD";
 export default function StakingPopup({ off }) {
   const navigate = useNavigate();
@@ -43,17 +54,23 @@ export default function StakingPopup({ off }) {
   let [MIN_STAKE_AMOUNT, setMIN_STAKE_AMOUNT] = useState("100");
   useEffect((_) => {
     const spinner = spinnerHref.current; // document.querySelector("Spinner");
-    spinner.animate([{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], {
-      duration: 1000,
-      iterations: Infinity,
-    });
+    spinner.animate(
+      [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
+      {
+        duration: 1000,
+        iterations: Infinity,
+      }
+    );
     const spinner_approve = spinnerHref_approve.current; // document.querySelector("Spinner");
-    spinner_approve.animate([{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], {
-      duration: 1000,
-      iterations: Infinity,
-    });
+    spinner_approve.animate(
+      [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
+      {
+        duration: 1000,
+        iterations: Infinity,
+      }
+    );
     const fetchdata = async (_) => {
-      axios.get(API.API_TICKERS).then((resp) => {
+      axios.get(API.API_TICKERS + `?nettype=${net}`).then((resp) => {
         LOGGER("MDmEMQ5xde", resp.data);
         let { status, payload, list } = resp;
         //				let { USDT } = payload.list
@@ -130,7 +147,9 @@ export default function StakingPopup({ off }) {
         setmyethbalance((+getethrep(resp)).toFixed(DECIMALS_DISP_DEF));
       });
     };
-    fetchdata();
+    setTimeout(() => {
+      fetchdata();
+    }, 1500);
   }, []);
   const onclick_approve = async (_) => {
     LOGGER("");
@@ -148,22 +167,23 @@ export default function StakingPopup({ off }) {
       to: addresses.contract_USDT, // ETH_TESTNET.
       data: abistr,
     }).then((resp) => {
-      setisloader_00(false);
       if (resp) {
       } else {
+        setDone(false);
         SetErrorBar(messages.MSG_USER_DENIED_TX);
         return;
       }
       let txhash = resp;
       SetErrorBar(messages.MSG_TX_REQUEST_SENT);
       axios
-        .post(API.API_TXS + `/${txhash}`, {
+        .post(API.API_TXS + `/${txhash}?nettype=${net}`, {
           txhash,
           username: myaddress,
           typestr: "APPROVE",
           auxdata: {
             erc20: addresses.contract_USDT, // .ETH_TESTNET
             target: addresses.contract_stake, // .ETH_TESTNET
+            nettype: net,
           },
           nettype: NETTYPE,
         })
@@ -172,26 +192,28 @@ export default function StakingPopup({ off }) {
           SetErrorBar(messages.MSG_TX_REQUEST_SENT);
         });
 
-      awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then((minedtxreceipt) => {
-        LOGGER("", minedtxreceipt);
-        SetErrorBar(messages.MSG_TX_FINALIZED);
+      awaitTransactionMined
+        .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+        .then((minedtxreceipt) => {
+          LOGGER("asdasdasd", minedtxreceipt);
+          SetErrorBar(messages.MSG_TX_FINALIZED);
 
-        query_with_arg({
-          contractaddress: addresses.contract_USDT, // .ETH_TESTNET
-          abikind: "ERC20",
-          methodname: "allowance",
-          aargs: [myaddress, addresses.contract_stake], // ETH_TESTNET.
-        }).then((resp) => {
-          let allowanceineth = getethrep(resp);
-          LOGGER("gCwXF6Jjkh", resp, allowanceineth);
-          setallowanceamount(allowanceineth); //				setallowanceamount ( 100 )
-          if (allowanceineth > 0) {
-            setisallowanceok(false);
-          } else {
-          }
+          query_with_arg({
+            contractaddress: addresses.contract_USDT, // .ETH_TESTNET
+            abikind: "ERC20",
+            methodname: "allowance",
+            aargs: [myaddress, addresses.contract_stake], // ETH_TESTNET.
+          }).then((resp) => {
+            let allowanceineth = getethrep(resp);
+            LOGGER("gCwXF6Jjkh", resp, allowanceineth);
+            setallowanceamount(allowanceineth); //				setallowanceamount ( 100 )
+            setisloader_00(false);
+            if (allowanceineth > 0) {
+              setisallowanceok(false);
+            } else {
+            }
+          });
         });
-        //					Setisloader(false);
-      });
     });
   };
   const onclick_buy = async (_) => {
@@ -205,21 +227,17 @@ export default function StakingPopup({ off }) {
       setDone(false);
       return;
     }
-    /** 		if (myaddress){}
-		else { 
-			SetErrorBar( messages.MSG_PLEASE_ CONNECT_WALLET )
-			return 
-		} */
     let abistr = getabistr_forfunction({
       contractaddress: addresses.contract_stake, // .ETH_TESTNET
       abikind: "STAKE",
       methodname: "stake",
       aargs: [
         addresses.contract_USDT, // .ETH_TESTNET
-        getweirep("" + MIN_STAKE_AMOUNT),
+        getweirep("" + 100),
         myaddress,
       ],
     });
+
     LOGGER("", abistr); //		return
     const callreqtx = async (_) => {
       let resp;
@@ -229,26 +247,19 @@ export default function StakingPopup({ off }) {
           from: myaddress,
           to: addresses.contract_stake, // .ETH_TESTNET
           data: abistr,
-          //			, value : ''
         });
-        setisloader_01(false);
+
         if (resp) {
         } else {
+          setDone(false);
           SetErrorBar(messages.MSG_USER_DENIED_TX);
           return;
         }
-        let resptype = getobjtype(resp);
-        let txhash;
-        switch (resptype) {
-          case "String":
-            txhash = resp;
-            break;
-          case "Object":
-            txhash = resp.txHash;
-            break;
-        }
+        // eslint-disable-next-line default-case
+        let txhash = resp;
+
         axios
-          .post(API.API_TXS + `/${txhash}`, {
+          .post(API.API_TXS + `/${txhash}?nettype=${net}`, {
             txhash,
             username: myaddress,
             typestr: "STAKE",
@@ -256,36 +267,47 @@ export default function StakingPopup({ off }) {
               amount: MIN_STAKE_AMOUNT,
               currency: STAKE_CURRENCY,
               currencyaddress: addresses.contract_USDT, // ETH_TESTNET.
+              nettype: NETTYPE,
             },
-            nettype: NETTYPE,
+            nettype: net,
           })
           .then((resp) => {
             LOGGER("", resp);
             SetErrorBar(messages.MSG_TX_REQUEST_SENT);
+            console.log("0");
           });
         /***** */
-        awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
-          LOGGER("", minedtxreceipt);
-          SetErrorBar(messages.MSG_TX_FINALIZED);
-          setDone(false);
-          let resp_balances = await query_with_arg({
-            contractaddress: addresses.ETH_TESTNET.contract_stake,
-            abikind: "STAKE",
-            methodname: "_balances",
-            aargs: [myaddress],
+
+        awaitTransactionMined
+          .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+          .then(async (minedtxreceipt) => {
+            LOGGER("", minedtxreceipt);
+            console.log("2");
+            SetErrorBar(messages.MSG_TX_FINALIZED);
+            setisloader_01(true);
+            let resp_balances = await query_with_arg({
+              contractaddress: addresses.contract_stake,
+              abikind: "STAKE",
+              methodname: "_balances",
+              aargs: [myaddress],
+            });
+            setDone(false);
+            off(false);
+            LOGGER("uQJ2POHvP8", resp_balances);
+            setstakedbalance(getethrep(resp_balances));
+            setisloader_01(false);
+            navigate("/");
           });
-          LOGGER("uQJ2POHvP8", resp_balances);
-          setstakedbalance(getethrep(resp_balances));
-          off();
-        });
       } catch (err) {
         setisloader_01(false);
+        setDone(false);
+        off(false);
         LOGGER();
         SetErrorBar(messages.MSG_USER_DENIED_TX);
       }
+      console.log("4");
     };
     callreqtx();
-    //		.then(resp=>{ LOGGER( '' , resp )		})
   };
 
   if (isMobile)
@@ -310,20 +332,23 @@ export default function StakingPopup({ off }) {
                 <ul className="priceList">
                   <li className="price">{MIN_STAKE_AMOUNT} USDT</li>
                   <li className="exchange">
-                    ${+MIN_STAKE_AMOUNT && tickerusdt ? putCommaAtPrice(+MIN_STAKE_AMOUNT * +tickerusdt) : null}
+                    $
+                    {+MIN_STAKE_AMOUNT && tickerusdt
+                      ? putCommaAtPrice(+MIN_STAKE_AMOUNT * +tickerusdt)
+                      : null}
                   </li>
                 </ul>
               </div>
 
               <ul className="dataList">
-                <li>
+                {/* <li>
                   <p className="key">Calculation</p>
                   <p className="value">2022-01-11 00:00 UTC</p>
                 </li>
                 <li>
                   <p className="key">Distribution</p>
                   <p className="value">2022-03-12 00:00 UTC</p>
-                </li>
+                </li> */}
                 <li style={MODE_DEV_PROD == "DEV" ? {} : { display: "none" }}>
                   <p className="key">Total Staked</p>
                   <p className="value">{tvl} USDT</p>
@@ -389,7 +414,11 @@ export default function StakingPopup({ off }) {
                   onclick_approve();
                   false && navigate(-1);
                 }}
-                style={+allowanceamount > 0 ? { visibility: "hidden" } : { display: "block" }}
+                style={
+                  +allowanceamount > 0
+                    ? { visibility: "hidden" }
+                    : { display: "block" }
+                }
               >
                 Approve!
                 <img
@@ -429,7 +458,7 @@ export default function StakingPopup({ off }) {
         <article className="topBar">
           <span className="blank" />
           <p className="title">Stake</p>
-          <button className="exitBtn" onClick={() => off()}>
+          <button className="exitBtn" onClick={() => off(false)}>
             <img src={I_x} alt="" />
           </button>
         </article>
@@ -442,22 +471,20 @@ export default function StakingPopup({ off }) {
               </span>
 
               <ul className="priceList">
-                <li className="price">{MIN_STAKE_AMOUNT} USDT</li>
-                <li className="exchange">
-                  ${+MIN_STAKE_AMOUNT && tickerusdt ? putCommaAtPrice(+MIN_STAKE_AMOUNT * +tickerusdt) : null}
-                </li>
+                <li className="price">100 USDT</li>
+                <li className="exchange">100$</li>
               </ul>
             </div>
 
             <ul className="dataList">
-              <li>
+              {/* <li>
                 <p className="key">Calculation</p>
                 <p className="value">2022-01-11 00:00 UTC</p>
               </li>
               <li>
                 <p className="key">Distribution</p>
                 <p className="value">2022-03-12 00:00 UTC</p>
-              </li>
+              </li> */}
               <li style={MODE_DEV_PROD == "DEV" ? {} : { display: "none" }}>
                 <p className="key">Total Staked</p>
                 <p className="value">{tvl} USDT</p>
@@ -527,7 +554,11 @@ export default function StakingPopup({ off }) {
               onClick={() => {
                 onclick_approve();
               }}
-              style={+allowanceamount > 0 ? { visibility: "hidden" } : { display: "inline" }}
+              style={
+                +allowanceamount > 0
+                  ? { visibility: "hidden" }
+                  : { display: "inline" }
+              }
             >
               {" "}
               Approve
@@ -535,7 +566,12 @@ export default function StakingPopup({ off }) {
                 ref={spinnerHref_approve}
                 src={I_spinner}
                 alt=""
-                style={{ display: isloader_00 ? "block" : "none", width: "18px", right: "160px", position: "absolute" }}
+                style={{
+                  display: isloader_00 ? "block" : "none",
+                  width: "18px",
+                  right: "160px",
+                  position: "absolute",
+                }}
               />
             </button>
 
@@ -544,7 +580,7 @@ export default function StakingPopup({ off }) {
               disabled={done}
               onClick={() => {
                 onclick_buy();
-                false && off();
+                false && off(false);
               }}
             >
               {done ? "Pending" : "Confirm"}

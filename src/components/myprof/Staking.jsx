@@ -2,7 +2,7 @@ import styled from "styled-components";
 import I_copy from "../../img/icon/I_copy.svg";
 import I_circleChk from "../../img/icon/I_circleChk.svg";
 import { D_recommendList } from "../../data/DmyPage";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { strDot } from "../../util/Util";
 import {
@@ -11,12 +11,39 @@ import {
   D_vaultHeader,
   D_vaultList,
 } from "../../data/Dstaking";
+import { getmyaddress, LOGGER } from "../../util/common";
+import axios from "axios";
+import moment from "moment";
+import { API } from "../../configs/api";
+import ticketImg from "../../img/staking/E_prof1.png";
+import { net } from "../../configs/net";
 
 export default function Staking() {
   const isMobile = useSelector((state) => state.common.isMobile);
 
   const [toggleCode, setToggleCode] = useState(false);
   const [toggleLink, setToggleLink] = useState(false);
+  const [ticketInfo, setItckInfo] = useState();
+
+  const fatchData = () => {
+    let myaddress = getmyaddress();
+    axios
+      .get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`)
+      .then((resp) => {
+        LOGGER("API_ticketInfo", resp.data);
+
+        let { status, respdata } = resp.data;
+        if (status == "OK" && respdata !== null) {
+          setItckInfo([respdata]);
+        }
+      });
+  };
+
+  useEffect(() => {
+    fatchData();
+  }, []);
+
+  console.log("logsataasdasd", ticketInfo);
 
   if (isMobile)
     return (
@@ -27,76 +54,86 @@ export default function Staking() {
 
             <div className="listBox">
               <ul className="list">
-                {D_vaultList.map((cont, index) => (
-                  <li key={index}>
-                    <div className="topBar">
-                      <img src={cont.img} alt="" />
-                      <p className="title">{cont.name}</p>
-                    </div>
+                {ticketInfo &&
+                  ticketInfo.map((cont, index) => (
+                    <li key={index}>
+                      <div className="topBar">
+                        <img src={ticketImg} alt="" />
+                        <p>
+                          {cont.active && cont.active === 1
+                            ? "ACTIVE"
+                            : "UNACTIVE"}
+                        </p>
+                      </div>
 
-                    <ul className="dataList">
-                      <li>
-                        <p className="key">Staking Amount</p>
-                        <p className="value">{cont.amount} USDT</p>
-                      </li>
-                      <li>
-                        <p className="key">Start</p>
-                        <p className="value">{cont.start}</p>
-                      </li>
-                      <li>
-                        <p className="key">Ended</p>
-                        <p className="value">{cont.end}</p>
-                      </li>
-                    </ul>
+                      <ul className="dataList">
+                        <li>
+                          <p className="key">Staking Amount</p>
+                          <p>{cont.amount}&nbsp;USDT</p>
+                        </li>
+                        <li>
+                          <p className="key">Start</p>
+                          <p className="value">
+                            {moment(cont.createdat).format(
+                              "YYYY-MM-DD hh:mm:ss"
+                            )}
+                          </p>
+                        </li>
+                        <li>
+                          <p className="key">Ended</p>
+                          <p className="value">
+                            {moment(cont.createdat)
+                              .add(90, "day")
+                              .format("YYYY-MM-DD hh:mm:ss")}
+                          </p>
+                        </li>
+                      </ul>
 
-                    <button className="unstakeBtn" onClick={() => {}}>
-                      Unstake
-                    </button>
-                  </li>
-                ))}
+                      <button className="unstakeBtn" onClick={() => {}}>
+                        Unstake
+                      </button>
+                    </li>
+                  ))}
               </ul>
             </div>
           </li>
 
-          <li className="rewardBox">
+          {/* <li className="rewardBox">
             <strong className="contTitle">Earned Rewards</strong>
 
             <div className="listBox">
               <ul className="list">
-                {D_rewardList.map((cont, index) => (
-                  <li key={index}>
-                    <div className="topBar">
-                      <img src={cont.img} alt="" />
-                      <p className="title">{cont.name}</p>
-                    </div>
+                {ticketInfo &&
+                  ticketInfo.map((cont, index) => (
+                    <li key={index}>
+                      <div className="topBar">
+                        <img src={ticketImg} alt="" />
+                        <p>{cont.active && cont.active === 1 ? "ACTIVE" : "UNACTIVE"}</p>
+                      </div>
 
-                    <ul className="dataList">
-                      <li>
-                        <p className="key">Staking Amount</p>
-                        <p className="value">{cont.amount} USDT</p>
-                      </li>
-                      <li>
-                        <p className="key">APY</p>
-                        <p className="value">{cont.apy}</p>
-                      </li>
-                      <li>
-                        <p className="key">Reward Distribution Cycle</p>
-                        <p className="value">{cont.cycle}</p>
-                      </li>
-                      <li>
-                        <p className="key">Earned</p>
-                        <p className="value">{cont.earned} NIP</p>
-                      </li>
-                    </ul>
+                      <ul className="dataList">
+                        <li>
+                          <p className="key">Staking Amount</p>
+                          <p>{cont.amount}&nbsp;USDT</p>
+                        </li>
+                        <li>
+                          <p className="key">Start</p>
+                          <p className="value">{cont.cycle}</p>
+                        </li>
+                        <li>
+                          <p className="key">Ended</p>
+                          <span>{moment(cont.createdat).add(90, "day").format("YYYY-MM-DD hh:mm:ss")}</span>
+                        </li>
+                      </ul>
 
-                    <button className="unstakeBtn" onClick={() => {}}>
-                      Claim
-                    </button>
-                  </li>
-                ))}
+                      <button className="unstakeBtn" onClick={() => {}}>
+                        Claim
+                      </button>
+                    </li>
+                  ))}
               </ul>
             </div>
-          </li>
+          </li> */}
         </ul>
       </MstakingBox>
     );
@@ -115,33 +152,44 @@ export default function Staking() {
               </ul>
 
               <ul className="list">
-                {D_vaultList.map((cont, index) => (
-                  <li key={index}>
-                    <span>
-                      <img src={cont.img} alt="" />
-                      <p>{cont.name}</p>
-                    </span>
+                {ticketInfo &&
+                  ticketInfo?.map((cont, index) => (
+                    <li key={index}>
+                      <span>
+                        <img src={ticketImg} alt="" />
+                        <p>
+                          {cont.active && cont.active === 1
+                            ? "ACTIVE"
+                            : "UNACTIVE"}
+                        </p>
+                      </span>
 
-                    <span>
-                      <p>{cont.amount}&nbsp;USDT</p>
-                    </span>
+                      <span>
+                        <p>{cont.amount}&nbsp;USDT</p>
+                      </span>
 
-                    <span>{cont.start}</span>
+                      <span>
+                        {moment(cont.createdat).format("YYYY-MM-DD hh:mm:ss")}
+                      </span>
 
-                    <span>{cont.end}</span>
+                      <span>
+                        {moment(cont.createdat)
+                          .add(90, "day")
+                          .format("YYYY-MM-DD hh:mm:ss")}
+                      </span>
 
-                    <span>
-                      <button className="unstakeBtn" onClick={() => {}}>
-                        Unstake
-                      </button>
-                    </span>
-                  </li>
-                ))}
+                      <span>
+                        <button className="unstakeBtn" onClick={() => {}}>
+                          Unstake
+                        </button>
+                      </span>
+                    </li>
+                  ))}
               </ul>
             </div>
           </li>
 
-          <li className="rewardBox">
+          {/* <li className="rewardBox">
             <strong className="contTitle">Earned Rewards</strong>
 
             <div className="listBox">
@@ -177,7 +225,7 @@ export default function Staking() {
                 ))}
               </ul>
             </div>
-          </li>
+          </li> */}
         </ul>
       </PstakingBox>
     );

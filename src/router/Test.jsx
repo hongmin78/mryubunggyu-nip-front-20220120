@@ -1,47 +1,49 @@
 import axios from "axios";
 import { useState } from "react";
 import styled from "styled-components";
+import { net } from "../configs/net";
 
 export default function Test() {
   const [image, setImg] = useState("");
   /*
   image,
   */
- const itemData = {
-   name: " #17",
-   description: "",
-   image,
-   dna: "dbccbfe9f467e87307b9b35236ccfabe2715c4ee",
-   edition: 17,
-   date: 1643469914234,
-   attributes: [
-     {
-       trait_type: "background",
-       value: "blue",
-     },
-     {
-       trait_type: "skin",
-       value: "green",
-     },
-     {
-       trait_type: "body",
-       value: "violet suit",
-     },
-     {
-       trait_type: "mouth",
-       value: "tongue out",
-     },
-     {
-       trait_type: "eyes",
-       value: "vr",
-     },
-     {
-       trait_type: "head",
-       value: "cap",
-     },
-   ],
-   compiler: "HashLips Art Engine",
- };
+  const itemData = {
+    name: " #17",
+    description: "",
+    image,
+    dna: "dbccbfe9f467e87307b9b35236ccfabe2715c4ee",
+    edition: 17,
+    date: 1643469914234,
+    attributes: [
+      {
+        trait_type: "background",
+        value: "blue",
+      },
+      {
+        trait_type: "skin",
+        value: "green",
+      },
+      {
+        trait_type: "body",
+        value: "violet suit",
+      },
+      {
+        trait_type: "mouth",
+        value: "tongue out",
+      },
+      {
+        trait_type: "eyes",
+        value: "vr",
+      },
+      {
+        trait_type: "head",
+        value: "cap",
+      },
+    ],
+    compiler: "HashLips Art Engine",
+    nettype: net,
+  };
 
   function OnChangeProfImgFile(file) {
     if (file.size >= 10 * 1024 * 1024) return;
@@ -62,11 +64,13 @@ export default function Test() {
   }
 
   function get() {
-    axios.get("http://3.35.11 7.87:34805/auction").then((res) => console.log(res));
+    axios
+      .get("http://3.35.11 7.87:34805/auction?nettype=" + net)
+      .then((res) => console.log(res));
   }
   function post() {
     axios
-      .post("http://3.35.11 7.87:34805/auction", itemData)
+      .post("http://3.35.11 7.87:34805/auction?nettype=" + net, itemData)
       .then((res) => console.log(res));
   }
 

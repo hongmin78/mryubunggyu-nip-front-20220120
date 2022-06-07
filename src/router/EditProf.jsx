@@ -1,25 +1,100 @@
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import I_ltArw from "../img/icon/I_ltArw.svg";
 import I_img from "../img/icon/I_img.svg";
 import { useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import Header from "../components/header/Header";
 import DetailHeader from "../components/header/DetailHeader";
+import axios from "axios";
+import { API } from "../configs/api";
+import { LOGGER, getmyaddress, getobjtype } from "../util/common.js";
+import SetErrorBar from "../util/SetErrorBar";
+import { net } from "../configs/net";
 
 export default function EditProf() {
+  const location = useLocation().state;
+  console.log("asdasdasdasdasd", location);
   const navigate = useNavigate();
-  const profImgInputRef = useRef();
   const covImgInputRef = useRef();
-
   const isMobile = useSelector((state) => state.common.isMobile);
-
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(location?.email);
   const [pw, setPw] = useState("");
+  const [pwCheck, setPwCheck] = useState("");
   const [onClickChange, setOnClickChange] = useState(false);
+  const [imgBase64, setImgBase64] = useState([]); // 파일 base64
+  const [imgFile, setImgFile] = useState(null); //파일
 
-  function OnChangeProfImgFile(file) {}
-  function OnChangeCovImgFile(file) {}
+  const handleChangeFile = (event) => {
+    console.log(event.target.files);
+    setImgFile(event.target.files);
+    //fd.append("file", event.target.files)
+    setImgBase64([]);
+    for (var i = 0; i < event.target.files.length; i++) {
+      if (event.target.files[i]) {
+        let reader = new FileReader();
+        reader.readAsDataURL(event.target.files[i]); // 1. 파일을 읽어 버퍼에 저장합니다.
+        // 파일 상태 업데이트
+        reader.onloadend = () => {
+          // 2. 읽기가 완료되면 아래코드가 실행됩니다.
+          const base64 = reader.result;
+          console.log(base64);
+          if (base64) {
+            //  images.push(base64.toString())
+            var base64Sub = base64.toString();
+
+            setImgBase64((imgBase64) => [...imgBase64, base64Sub]);
+            //  setImgBase64(newObj);
+            // 파일 base64 상태 업데이트
+            //  console.log(images)
+          }
+        };
+      }
+    }
+  };
+
+  const onclick_submit = async () => {
+    let myaddress = getmyaddress();
+    const fd = new FormData();
+    Object.values(imgFile).forEach((file) => fd.append("file", file));
+    fd.append("email", email);
+    fd.append("pw", pw);
+    fd.append("image64", imgBase64);
+    if (email && pw && imgBase64) {
+      if (pw === pwCheck) {
+        await axios
+          .put(API.API_PUT_USERS + `/${myaddress}?nettype=${net}`, fd, {
+            email,
+            pw,
+            headers: {
+              "Content-Type": `multipart/form-data; `,
+            },
+          })
+          .then((res) => {
+            SetErrorBar("OK");
+            console.log(res);
+            // navigate("/mypage");
+          })
+          .catch((err) => console.log("err", err));
+      } else {
+        SetErrorBar("Passwords did not match!");
+      }
+    } else {
+      SetErrorBar("please insert all");
+    }
+  };
+
+  const checkEmail = (e) => {
+    var regExp =
+      /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+    // 형식에 맞는 경우 true 리턴
+    if (regExp.test(e.target.value)) {
+      setEmail(e.target.value);
+    } else {
+      setEmail("");
+      SetErrorBar("Check Email form please");
+    }
+  };
 
   if (isMobile)
     return (
@@ -27,27 +102,6 @@ export default function EditProf() {
         <DetailHeader title="Edit Profile" />
         <MeditProfBox>
           <ul className="setList">
-            <li className="profImgBox">
-              <p className="title">Upload a profile image</p>
-
-              <button
-                className="profImgBtn"
-                onClick={() => profImgInputRef.current.click()}
-              >
-                <div className="innerBox">
-                  <img src={I_img} alt="" />
-                </div>
-
-                <input
-                  ref={profImgInputRef}
-                  className="noSpace"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => OnChangeProfImgFile(e.target.files[0])}
-                />
-              </button>
-            </li>
-
             <li className="covImgBox">
               <p className="title">Upload a profile image</p>
 
@@ -64,14 +118,14 @@ export default function EditProf() {
 
                   <button className="chooseBtn">Choose File</button>
                 </div>
-
+                {/* 
                 <input
                   ref={covImgInputRef}
                   className="noSpace"
                   type="file"
                   accept="image/*"
                   onChange={(e) => OnChangeCovImgFile(e.target.files[0])}
-                />
+                /> */}
               </button>
             </li>
 
@@ -80,9 +134,10 @@ export default function EditProf() {
 
               <div className="inputBox">
                 <input
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="enter email"
+                  type="email"
+                  defaultValue={email}
+                  onChange={(e) => checkEmail(e.target.value)}
+                  placeholder={location.eamil ? location : "insert a email"}
                 />
               </div>
               <button className="updateBtn" onClick={() => {}}>
@@ -149,27 +204,6 @@ export default function EditProf() {
           </article>
 
           <ul className="setList">
-            <li className="profImgBox">
-              <p className="title">Upload a profile image</p>
-
-              <button
-                className="profImgBtn"
-                onClick={() => profImgInputRef.current.click()}
-              >
-                <div className="innerBox">
-                  <img src={I_img} alt="" />
-                </div>
-
-                <input
-                  ref={profImgInputRef}
-                  className="noSpace"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => OnChangeProfImgFile(e.target.files[0])}
-                />
-              </button>
-            </li>
-
             <li className="covImgBox">
               <p className="title">Upload a profile image</p>
 
@@ -177,22 +211,38 @@ export default function EditProf() {
                 className="covImgBtn"
                 onClick={() => covImgInputRef.current.click()}
               >
-                <div className="innerBox">
-                  <p className="explain">
-                    Recommended size: 1500x500px.
-                    <br />
-                    JPG, PNG, or GIF. 10MB max size.
-                  </p>
+                {imgBase64.length > 0 ? (
+                  imgBase64.map((item, i) => {
+                    return (
+                      <div className="innerBox" key={i}>
+                        <img
+                          src={item}
+                          alt="First slide"
+                          style={{ width: "400px", height: "300px" }}
+                        />
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="innerBox">
+                    <p className="explain">
+                      Recommended size: 1500x500px.
+                      <br />
+                      JPG, PNG, or GIF. 10MB max size.
+                    </p>
 
-                  <button className="chooseBtn">Choose File</button>
-                </div>
+                    <button className="chooseBtn">Choose File</button>
+                  </div>
+                )}
 
                 <input
                   ref={covImgInputRef}
                   className="noSpace"
                   type="file"
                   accept="image/*"
-                  onChange={(e) => OnChangeCovImgFile(e.target.files[0])}
+                  onChange={(e) => {
+                    handleChangeFile(e);
+                  }}
                 />
               </button>
             </li>
@@ -202,9 +252,10 @@ export default function EditProf() {
 
               <div className="inputBox">
                 <input
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="enter email"
+                  type="email"
+                  defaultValue={email}
+                  onBlur={checkEmail}
+                  placeholder={location ? location.email : "insert a email"}
                 />
 
                 <button className="updateBtn" onClick={() => {}}>
@@ -220,41 +271,35 @@ export default function EditProf() {
                 <div className="inputBox">
                   <input
                     type="password"
-                    value={pw}
+                    defaultChecked={pw}
                     onChange={(e) => setPw(e.target.value)}
                     placeholder="enter password"
                   />
                 </div>
-
-                <button
-                  className="changeBtn"
-                  onClick={() => setOnClickChange(true)}
-                >
-                  Change Password
-                </button>
               </div>
             </li>
 
-            {onClickChange && (
-              <li className="chkPwBox">
-                <p className="title">Confirm password</p>
+            <li className="chkPwBox">
+              <p className="title">Confirm password</p>
 
-                <div className="inputCont">
-                  <div className="inputBox">
-                    <input
-                      type="password"
-                      value={pw}
-                      onChange={(e) => setPw(e.target.value)}
-                      placeholder="enter confirm password"
-                    />
-                  </div>
-
-                  <p className="alarm">Passwords are not matching.</p>
+              <div className="inputCont">
+                <div className="inputBox">
+                  <input
+                    type="password"
+                    defaultChecked={pw}
+                    onChange={(e) => setPwCheck(e.target.value)}
+                    placeholder="enter confirm password"
+                  />
                 </div>
-              </li>
-            )}
+              </div>
+            </li>
 
-            <button className="saveBtn" onClick={() => {}}>
+            <button
+              className="saveBtn"
+              onClick={() => {
+                onclick_submit();
+              }}
+            >
               Save Changes
             </button>
           </ul>

@@ -1,30 +1,53 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 import I_x from "../img/icon/I_x.svg";
 import I_heartO from "../img/icon/I_heartO.svg";
 import I_heart from "../img/icon/I_heart.svg";
 import E_marketProf1 from "../img/main/E_marketProf1.png";
 import E_marketItem1 from "../img/main/E_marketItem1.png";
-
+import { API } from "../configs/api";
 import { useNavigate } from "react-router-dom";
 import LogoHeader from "../components/header/LogoHeader";
 import { useSelector } from "react-redux";
 import PayDelinquency from "../components/PayDelinquency";
+import axios from "axios";
+import { LOGGER, getmyaddress } from "../util/common";
+import { net } from "../configs/net";
+import { strDot } from "../util/Util";
 
 export default function Penalty() {
   const navigate = useNavigate();
-
+  let address = getmyaddress();
   const isMobile = useSelector((state) => state.common.isMobile);
-  const delinquencyAmount = useSelector(
-    (state) => state.common.delinquencyAmount
-  );
+  const delinquencyAmount = useSelector((state) => state.common.delinquencyAmount);
 
   const [like, setLike] = useState(false);
   const [openModal, setOpenModal] = useState(false);
+  const [payList, setPayList] = useState([]);
 
   const modalToggle = () => {
     setOpenModal(() => !openModal);
   };
+
+  const fatchData = () => {
+    axios
+      .get(`${API.API_DELINQUENCY}/${address}/0/10/id/DESC` + `?nettype=${net}&itemdetail=1`)
+      .then((res) => {
+        console.log("Pay", res);
+        let { status, list } = res.data;
+        if (status === "OK") {
+          setPayList(list);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        alert(err.message);
+      });
+  };
+
+  useEffect(() => {
+    fatchData();
+  }, []);
 
   if (isMobile)
     return (
@@ -42,16 +65,7 @@ export default function Penalty() {
                 </div>
 
                 <div className="explain">
-                  {/* <p className="cong">
-                    If the winning auction bid amount is not paid by 9:00 on the
-                    same day, the account will be locked and a 10% penalty will
-                    be charged
-                  </p> */}
-                  <p className="cong">
-                    Your profile is blocked temporarily. Please pay for your
-                    delinquency.
-                  </p>
-                  <p className="pay">Pay 688 USDT for your NFT transfer</p>
+                  <p className="cong">Your profile is blocked temporarily. Please pay for your delinquency.</p>
                 </div>
               </div>
             </article>
@@ -60,7 +74,7 @@ export default function Penalty() {
               <div className="topBar">
                 <div className="profBox">
                   <img src={E_marketProf1} alt="" />
-                  <p className="address">@andyfeltham</p>
+                  <p className="address">{payList[0] ? strDot(payList[0].username, 4, 10) : null}</p>
                 </div>
 
                 <button className="likeBtn" onClick={() => setLike(!like)}>
@@ -76,31 +90,25 @@ export default function Penalty() {
                 </button>
               </div>
 
-              <img className="itemImg" src={E_marketItem1} alt="" />
-
               <div className="infoBox">
-                <p className="title">Series Kong #1</p>
-
-                <ul className="detailList">
-                  <li className="time">
-                    <p>Last</p>
-                  </li>
-                  <li className="price">
-                    <p>688&nbsp;USDT</p>
-                  </li>
-                </ul>
+                {payList &&
+                  payList.map((item, i) => (
+                    <ul className="detailList" key={i}>
+                      <li className="time">
+                        <p>Series Kong #{item.item.titlename}</p>
+                      </li>
+                      <li className="price">
+                        <p>Price : {item.circulations.price} USDT</p>
+                      </li>
+                      <li className="price">
+                        <p>Penalty : {item.amount} USDT</p>
+                      </li>
+                    </ul>
+                  ))}
               </div>
             </article>
-
+            <p style={{ fontSize: "6vw", fontWeight: "bold" }}>Please pay Total {delinquencyAmount} USDT</p>
             <article className="btnBox">
-              <p className="explain">
-                If payment is not made by 2022-01-22 21:00:00, payment will be
-                It will be canceled and your account will be locked.
-              </p>
-
-              {/* <button className="confirmBtn" onClick={() => navigate("/")}>
-                Confirm checkout
-              </button> */}
               <button className="confirmBtn" onClick={modalToggle}>
                 Pay now
               </button>
@@ -126,7 +134,7 @@ export default function Penalty() {
                 <div className="topBar">
                   <div className="profBox">
                     <img src={E_marketProf1} alt="" />
-                    <p className="address">@andyfeltham</p>
+                    <p className="address">{payList[0] ? strDot(payList[0].username, 4, 10) : null}</p>
                   </div>
 
                   <button className="likeBtn" onClick={() => setLike(!like)}>
@@ -142,19 +150,21 @@ export default function Penalty() {
                   </button>
                 </div>
 
-                <img className="itemImg" src={E_marketItem1} alt="" />
-
                 <div className="infoBox">
-                  <p className="title">Series Kong #1</p>
-
-                  <ul className="detailList">
-                    <li className="time">
-                      <p>Last</p>
-                    </li>
-                    <li className="price">
-                      <p>688&nbsp;USDT</p>
-                    </li>
-                  </ul>
+                  {payList &&
+                    payList.map((item, i) => (
+                      <ul className="detailList" key={i}>
+                        <li className="time">
+                          <p>Series Kong {item.item.titlename}</p>
+                        </li>
+                        <li className="price">
+                          <p>Price : {parseInt(item.circulations.price).toFixed(2)} USDT</p>
+                        </li>
+                        <li className="price">
+                          <p>Penalty : {parseInt(item.amount).toFixed(2)} USDT</p>
+                        </li>
+                      </ul>
+                    ))}
                 </div>
               </div>
 
@@ -166,25 +176,12 @@ export default function Penalty() {
                   </strong>
 
                   <div className="explain">
-                    {/* <p className="cong">
-                      If the winning auction bid amount is not paid by 9:00 on
-                      the same day, the account will be locked and a 10% penalty
-                      will be charged
-                    </p> */}
-                    <p className="cong">Please pay {delinquencyAmount}</p>
-                    {/* <p className="pay">Pay 688 USDT for your NFT transfer</p> */}
+                    <p className="pay">Your profile is blocked temporarily. Please pay for your delinquency.</p>
+                    <p className="cong">Please pay Total {delinquencyAmount} USDT</p>
                   </div>
                 </div>
 
                 <div className="btnBox">
-                  {/* <p className="explain">
-                    If payment is not made by 2022-01-22 21:00:00, payment will
-                    be It will be canceled and your account will be locked.
-                  </p> */}
-
-                  {/* <button className="confirmBtn" onClick={() => navigate("/")}>
-                    Confirm checkout
-                  </button> */}
                   <button className="confirmBtn" onClick={modalToggle}>
                     Pay now
                   </button>
@@ -192,12 +189,7 @@ export default function Penalty() {
               </div>
             </article>
           </section>
-          {openModal && (
-            <PayDelinquency
-              off={modalToggle}
-              delinquencyAmount={delinquencyAmount}
-            />
-          )}
+          {openModal && <PayDelinquency off={modalToggle} delinquencyAmount={delinquencyAmount} />}
         </PpenaltyBox>
       </>
     );
@@ -265,7 +257,13 @@ const MpenaltyBox = styled.div`
         align-items: center;
         height: 16.66vw;
         padding: 0 4.44vw;
-
+        img {
+          width: 6vw;
+        }
+        .address {
+          font-size: 4.44vw;
+          font-weight: 500;
+        }
         .profBox {
           display: flex;
           align-items: center;
@@ -298,7 +296,7 @@ const MpenaltyBox = styled.div`
       .infoBox {
         display: flex;
         flex-direction: column;
-        height: 27.77vw;
+        height: 90vw;
 
         .title {
           display: flex;
@@ -323,11 +321,11 @@ const MpenaltyBox = styled.div`
           li {
             display: flex;
             justify-content: space-between;
-
+            margin-top: 2vw;
             &.time {
-              font-size: 3.88vw;
+              font-size: 4.44vw;
               line-height: 3.88vw;
-              color: #7a7a7a;
+              color: #fff;
             }
 
             &.price {
@@ -418,6 +416,7 @@ const PpenaltyBox = styled.div`
           align-items: center;
           height: 60px;
           padding: 0 16px;
+          margin-bottom: 1.5vw;
 
           .profBox {
             display: flex;
@@ -450,7 +449,7 @@ const PpenaltyBox = styled.div`
         .infoBox {
           display: flex;
           flex-direction: column;
-          height: 132px;
+          height: 90vw;
 
           .title {
             height: 54px;
@@ -466,8 +465,8 @@ const PpenaltyBox = styled.div`
             flex-direction: column;
             justify-content: center;
             gap: 6px;
-            padding: 0 12px;
-            font-size: 16px;
+            padding: 20px 12px;
+            font-size: 20px;
             font-weight: 500;
             line-height: 19px;
             background: #000;
@@ -477,7 +476,7 @@ const PpenaltyBox = styled.div`
               justify-content: space-between;
 
               &.time {
-                color: #7a7a7a;
+                color: #fff;
               }
 
               &.price {
@@ -511,6 +510,7 @@ const PpenaltyBox = styled.div`
             gap: 13px;
 
             .cong {
+              margin-top: 4vw;
               font-size: 24px;
               font-weight: 500;
               font-family: "Roboto", sans-serif;

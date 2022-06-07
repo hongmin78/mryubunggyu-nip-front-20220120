@@ -56,9 +56,7 @@ export default function MarketDetail() {
       } else {
         moreRef.current.scrollTo({
           left: isMobile
-            ? moreRef.current.scrollLeft +
-              moreRef.current.children[moreIndex].getBoundingClientRect().left -
-              20
+            ? moreRef.current.scrollLeft + moreRef.current.children[moreIndex].getBoundingClientRect().left - 20
             : contWidth * itemNumByPage * moreIndex + itemNumByPage * 40,
           behavior: "smooth",
         });
@@ -79,27 +77,18 @@ export default function MarketDetail() {
                 <div className="titleBox">
                   <div className="topBar">
                     <div className="btnBox">
-                      <button
-                        className="likeBtn hoverBtn"
-                        onClick={() => setToggleLike(!toggleLike)}
-                      >
+                      <button className="likeBtn hoverBtn" onClick={() => setToggleLike(!toggleLike)}>
                         <img src={toggleLike ? I_heartO : I_heart} alt="" />
                       </button>
 
-                      <button
-                        className="moreBtn hoverBtn"
-                        onClick={() => setShowCopyBtn(true)}
-                      >
+                      <button className="moreBtn hoverBtn" onClick={() => setShowCopyBtn(true)}>
                         <img src={I_3dot} alt="" />
                       </button>
                     </div>
 
                     {showCopyBtn && (
                       <>
-                        <button
-                          className="copyBtn displayBtn"
-                          onClick={() => setShowCopyBtn(false)}
-                        >
+                        <button className="copyBtn displayBtn" onClick={() => setShowCopyBtn(false)}>
                           <img src={I_clip} alt="" />
                           Copy Link
                         </button>
@@ -119,9 +108,7 @@ export default function MarketDetail() {
                 <div className="saleBox">
                   <div className="price">
                     <p className="key">Current price</p>
-                    <strong className="value">
-                      {putCommaAtPrice(100)} USDT
-                    </strong>
+                    <strong className="value">{putCommaAtPrice(100)} USDT</strong>
                   </div>
 
                   <div className="time">
@@ -239,27 +226,18 @@ export default function MarketDetail() {
 
                   <div className="btnBox">
                     <div className="posBox">
-                      <button
-                        className="likeBtn hoverBtn"
-                        onClick={() => setToggleLike(!toggleLike)}
-                      >
+                      <button className="likeBtn hoverBtn" onClick={() => setToggleLike(!toggleLike)}>
                         <img src={toggleLike ? I_heartO : I_heart} alt="" />
                       </button>
                     </div>
 
                     <div className="posBox">
-                      <button
-                        className="moreBtn hoverBtn"
-                        onClick={() => setShowCopyBtn(true)}
-                      >
+                      <button className="moreBtn hoverBtn" onClick={() => setShowCopyBtn(true)}>
                         <img src={I_3dot} alt="" />
                       </button>
 
                       <div className="hoverBox">
-                        <button
-                          className="copyBtn displayBtn"
-                          onClick={() => setShowCopyBtn(false)}
-                        >
+                        <button className="copyBtn displayBtn" onClick={() => setShowCopyBtn(false)}>
                           <img src={I_clip} alt="" />
                           Copy Link
                         </button>
@@ -280,9 +258,7 @@ export default function MarketDetail() {
                   </div>
 
                   <div className="value">
-                    <strong className="price">
-                      {putCommaAtPrice(372)} USDT
-                    </strong>
+                    <strong className="price">{putCommaAtPrice(372)} USDT</strong>
 
                     <ul className="timeList">
                       <li>00</li>

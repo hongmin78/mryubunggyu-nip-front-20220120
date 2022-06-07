@@ -9,7 +9,7 @@ export default function Details({ itemdata }) {
   if (isMobile)
     return (
       <MdetailsBox>
-        {itemdata.map((cont, index) => (
+        {itemdata?.map((cont, index) => (
           <li key={index}>
             <p className="part">{cont.part}</p>
             <p className="option">{cont.option}</p>
@@ -20,7 +20,7 @@ export default function Details({ itemdata }) {
   else
     return (
       <PdetailsBox>
-        {itemdata.map((cont, index) => (
+        {itemdata?.map((cont, index) => (
           <li key={index}>
             <p className="part">{cont.trait_type}</p>
             <p className="option">{cont.value}</p>

@@ -28,13 +28,7 @@ const D_vaultList = [
   },
 ];
 
-const D_rewardHeader = [
-  "Earned item",
-  "Staking Amount",
-  "APY",
-  "Reward Distribution Cycle",
-  "Earned",
-];
+const D_rewardHeader = ["Earned item", "Staking Amount", "APY", "Reward Distribution Cycle", "Earned"];
 
 const D_rewardList = [
   {

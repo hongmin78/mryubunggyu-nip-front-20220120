@@ -5,11 +5,13 @@ import I_heartO from "../img/icon/I_heartO.svg";
 import I_3dot from "../img/icon/I_3dot.svg";
 import I_rtArw from "../img/icon/I_rtArw.svg";
 import { Fragment, useEffect, useRef, useState } from "react";
-import { getStyle, putCommaAtPrice } from "../util/Util";
+import { getStyle, putCommaAtPrice, strDot, onClickNextBtn, onClickPreBtn } from "../util/Util";
 import { D_category, D_transactionHistory } from "../data/DauctionDetail";
 import Offer from "../components/itemDetail/Offer";
 import { autoAuctionList } from "../data/Dmain";
 // import AuctionItem from "../components/AuctionItem";
+import I_tagWhite from "../img/icon/I_tagWhite.svg";
+import I_arwCrossWhite from "../img/icon/I_arwCrossWhite.svg";
 import AuctionItem0228 from "../components/AuctionItem0228";
 import Details from "../components/itemDetail/Details";
 import Details0303 from "../components/itemDetail/Details0303";
@@ -23,6 +25,11 @@ import { LOGGER, getmyaddress, onclickcopy, PARSER, conv_jdata_arrkeyvalue } fro
 import { API } from "../configs/api";
 import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
+import { ITEM_PRICE_DEF } from "../configs/configs";
+import { GET_CONTENTS_DEF } from "../configs/configs";
+import moment from "moment";
+import { net } from "../configs/net";
+import person from "../img/itemDetail/E_prof3.png";
 
 export default function AuctionDetail() {
   const params = useParams();
@@ -31,10 +38,14 @@ export default function AuctionDetail() {
   const [toggleLike, setToggleLike] = useState(false);
   const [category, setCategory] = useState(0);
   const [moreIndex, setMoreIndex] = useState(0);
+  const [moreAutcionIndex, setMoreAuctionIndex] = useState(0);
   const [showCopyBtn, setShowCopyBtn] = useState(false);
-  const [itemdata, setitemdata] = useState({});
+  const [itemdata, setitemdata] = useState();
   const [moreCollection, setMoreCollection] = useState([]);
   let [attributes, setattributes] = useState([]);
+
+  const [transaction, setTranSaction] = useState([]);
+
   const onclicklike = (_) => {
     let myaddress = getmyaddress();
     if (myaddress) {
@@ -42,82 +53,95 @@ export default function AuctionDetail() {
       SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
       return;
     }
-    axios.post(API.API_TOGGLE_FAVORITE + `/${itemdata?.itemid}`, { username: myaddress }).then((resp) => {
-      LOGGER("", resp.data);
-      let { status, respdata } = resp.data;
-      if (status == "OK") {
-        setToggleLike(respdata ? true : false);
-        switch (+respdata) {
-          case 1:
-            SetErrorBar(messages.MSG_DONE_LIKE);
-            break;
-          default:
-            SetErrorBar(messages.MSG_DONE_UNLIKE);
-            break;
+    axios
+      .post(API.API_TOGGLE_FAVORITE + `/${itemdata?.itemid}?nettype=${net}`, {
+        username: myaddress,
+        nettype: net,
+      })
+      .then((resp) => {
+        LOGGER("", resp.data);
+        let { status, respdata } = resp.data;
+        if (status == "OK") {
+          setToggleLike(respdata ? true : false);
+          switch (+respdata) {
+            case 1:
+              SetErrorBar(messages.MSG_DONE_LIKE);
+              break;
+            default:
+              SetErrorBar(messages.MSG_DONE_UNLIKE);
+              break;
+          }
         }
-      }
-    });
+      });
     setToggleLike(!toggleLike);
   };
 
-  const onclickfavorite = (_) => {
-    axios.post(API.API_TOGGLE_FAVORITE).then((resp) => {
-      LOGGER("xMYQNYFa9d", resp.data);
-    });
-    setToggleLike(!toggleLike);
-    LOGGER("8FCYJgzDZX");
-  };
   function onClickAuctionNextBtn() {
     if (!moreRef.current.children[0]) return;
     const wrapWidth = moreRef.current.offsetWidth;
     const contWidth = moreRef.current.children[0].offsetWidth;
     const itemNumByPage = Math.floor(wrapWidth / contWidth);
-    const pageNum = Math.ceil(autoAuctionList.length / itemNumByPage);
+    const pageNum = Math.ceil(moreCollection.length / itemNumByPage);
     if (moreIndex < pageNum - 1) setMoreIndex(moreIndex + 1);
     else setMoreIndex(0);
   }
   const getitem = (_) => {
-    axios.get(API.API_ITEMDETAIL + `/${params.itemid}`).then((resp) => {
+    axios.get(API.API_GET_ITEMS_DETAIL + `/${params.itemid}?nettype=${net}`).then((resp) => {
       LOGGER("7FzS4oxYPN", resp.data);
       let { status, respdata } = resp.data;
       if (status == "OK") {
         setitemdata(respdata);
         let { metadata } = respdata;
         if (metadata) {
-          let jmetadata = PARSER(metadata);
+          let jmetadata = JSON.parse(metadata);
           LOGGER("oXhffF8eTM", conv_jdata_arrkeyvalue(jmetadata));
-          setattributes(conv_jdata_arrkeyvalue(jmetadata));
+          setattributes(jmetadata);
         }
       }
     });
+    axios.get(API.API_GET_TRANSACTIONS + `/${params.itemid}?nettype=${net}`).then((resp) => {
+      LOGGER("transction", resp.data);
+      let { status, respdata } = resp.data;
+      if (status === "OK") {
+        setTranSaction(resp.data.list);
+      }
+    });
   };
+
+  const setIcon = (param) => {
+    switch (param) {
+      case "TENTATIVE_ASSIGN":
+        return <img src={I_tagWhite} alt="" />;
+      case "PAY":
+        return <img src={I_arwCrossWhite} alt="" />;
+      default:
+        break;
+    }
+  };
+
   function getAuction() {
-    axios //      .get("http://3.35.1 17.87:34705/auction/list", { params: { limit: 8 } })
-      .get(API.API_COMMONITEMS + `/items/group_/kong/0/128/id/DESC`)
+    axios
+      .get(API.API_COMMONITEMS + `/items/group_/kong/0/128/roundnumber/DESC?nettype=${net}` + `&itemdetail=1`)
       .then((resp) => {
-        LOGGER("", resp.data);
+        LOGGER("@circulations", resp.data);
         let { status, list } = resp.data;
         if (status == "OK") {
-          setMoreCollection(list);
+          let roundNumber1 = list.filter((item) => item.roundnumber > 0);
+          setMoreCollection(roundNumber1);
         }
-        //        console.log(res.data);
-        //      setMoreCollection(res.data);
       });
   }
 
-  useEffect((_) => {
-    getitem();
+  useEffect(
+    (_) => {
+      getitem();
+    },
+    [params]
+  );
+
+  useEffect(() => {
     getAuction();
   }, []);
-  /**   useEffect(() => {
-    axios
-      .ge t(`http://3.35.117.87:34705/auction/item/${params.dna}`)
-      .then((res) => {
-        console.log(res.data[0]);
-        setItemD ata(res.data[0]);
-      });
-    getAuction();
-  }, []); */
 
   useEffect(() => {
     if (!moreRef.current.children[0]) return;
@@ -186,29 +210,24 @@ export default function AuctionDetail() {
                     )}
                   </div>
 
-                  <strong className="title">Kingkong #112</strong>
+                  <strong className="title">
+                    Series {itemdata?.group_} {attributes.name}
+                  </strong>
                 </div>
 
                 <div className="ownedBox">
                   <p className="key">Owned by</p>
-                  <p className="value">@andyfeltham</p>
+                  {itemdata && <p className="value">@ {itemdata?.circulations?.username}</p>}
                 </div>
 
                 <div className="saleBox">
                   <div className="price">
                     <p className="key">Current price</p>
-                    <strong className="value">{putCommaAtPrice(372)} USDT</strong>
-                  </div>
-
-                  <div className="time">
-                    <p className="key">Ending in</p>
-
-                    <ul className="timeList">
-                      <li>00</li>
-                      <li>12</li>
-                      <li>59</li>
-                      <li>09</li>
-                    </ul>
+                    {itemdata && (
+                      <strong className="price">
+                        {putCommaAtPrice(parseInt(itemdata?.circulations?.price))} {itemdata?.circulations?.priceunit}{" "}
+                      </strong>
+                    )}
                   </div>
                 </div>
               </div>
@@ -230,7 +249,7 @@ export default function AuctionDetail() {
                 </ul>
 
                 <div className="contBox">
-                  {category === 0 && <Offer />}
+                  {category === 0 && <Offer params={params} />}
                   {category === 1 && <Details0303 attributes={attributes} />}
                   {category === 2 && <Properties itemdata={itemdata} />}
                 </div>
@@ -243,29 +262,17 @@ export default function AuctionDetail() {
               <strong className="title">Transaction History</strong>
             </article>
 
-            <ul className="historyList">
-              {D_transactionHistory.map((cont, index) => (
-                <Fragment key={index}>
-                  {index ? (
-                    <div key={0} className="sideBarBox">
-                      <span className="sideBar" />
-                    </div>
-                  ) : (
-                    <></>
-                  )}
-                  <li key={index}>
-                    <span className="iconBox">
-                      <img src={cont.img} alt="" />
-                    </span>
-
-                    <div className="contBox">
-                      <p className="cont">{cont.cont}</p>
-                      <p className="time">{cont.time}</p>
-                    </div>
-                  </li>
-                </Fragment>
+            {transaction &&
+              transaction?.map((itm, i) => (
+                <ul key={i} style={{ fontSize: "3vw", marginTop: "2vw" }}>
+                  <list>
+                    <img style={{ width: "8vw", paddingRight: "1vw", paddingLeft: "1vw" }} src={person} />
+                  </list>
+                  <list>{strDot(itm.username, 4, 10)}/</list>
+                  <list>{itm.createdat?.split("T")[0]}/</list>
+                  <list>{putCommaAtPrice(parseInt(itemdata?.circulations?.price))} USDT</list>
+                </ul>
               ))}
-            </ul>
           </section>
 
           <section className="moreBox">
@@ -274,13 +281,16 @@ export default function AuctionDetail() {
             <div className="listBox">
               <div className="posBox">
                 <ul className="itemList" ref={moreRef}>
-                  {moreCollection.map((cont, index) => (
-                    <Fragment key={index}>
-                      <AuctionItem0228 data={cont} index={index} />
-                    </Fragment>
-                  ))}
+                  {moreCollection?.map(
+                    (cont, index) =>
+                      index < GET_CONTENTS_DEF && (
+                        <Fragment key={index}>
+                          <AuctionItem0228 data={cont} index={index} />
+                        </Fragment>
+                      )
+                  )}
                 </ul>
-                <button className="nextBtn" onClick={onClickAuctionNextBtn}>
+                <button className="nextBtn" onClick={onClickAuctionNextBtn(moreRef, moreCollection, moreIndex)}>
                   <img src={I_rtArw} alt="" />
                 </button>
               </div>
@@ -304,7 +314,9 @@ export default function AuctionDetail() {
             <article className="infoBox">
               <div className="itemInfoBox">
                 <div className="titleBox">
-                  <strong className="title">Series Kong {itemdata?.titlename}</strong>
+                  <strong className="title">
+                    Series {itemdata?.group_} {itemdata?.titlename}
+                  </strong>
 
                   <div className="btnBox">
                     <div className="posBox">
@@ -342,24 +354,20 @@ export default function AuctionDetail() {
 
                 <div className="ownedBox">
                   <p className="key">Owned by</p>
-                  <p className="value">@andyfeltham</p>
+                  {itemdata && <p className="value">@ {itemdata?.circulations?.username}</p>}
                 </div>
 
                 <div className="saleBox">
                   <div className="key">
                     <p className="price">Current price</p>
-                    <p className="time">Ending in</p>
                   </div>
 
                   <div className="value">
-                    <strong className="price">{putCommaAtPrice(372)} USDT</strong>
-
-                    <ul className="timeList">
-                      <li>00</li>
-                      <li>12</li>
-                      <li>59</li>
-                      <li>09</li>
-                    </ul>
+                    {itemdata && (
+                      <strong className="price">
+                        {putCommaAtPrice(parseInt(itemdata?.circulations?.price))} {itemdata?.circulations?.priceunit}{" "}
+                      </strong>
+                    )}
                   </div>
                 </div>
 
@@ -383,7 +391,7 @@ export default function AuctionDetail() {
                 </ul>
 
                 <div className="contBox">
-                  {category === 0 && <Offer />}
+                  {category === 0 && <Offer params={params} />}
                   {category === 1 && <Details0303 attributes={attributes} />}
                   {category === 2 && <Properties itemdata={itemdata} />}
                 </div>
@@ -396,28 +404,38 @@ export default function AuctionDetail() {
               <strong className="title">Transaction History</strong>
             </article>
 
-            <ul className="historyList">
-              {D_transactionHistory.map((cont, index) => (
-                <Fragment key={index}>
-                  {index ? (
-                    <div className="sideBarBox">
-                      <span className="sideBar" />
-                    </div>
-                  ) : (
-                    <></>
-                  )}
-                  <li>
-                    <span className="iconBox">
-                      <img src={cont.img} alt="" />
-                    </span>
+            {transaction?.map((itm, i) => (
+              <ul key={i} style={{ fontSize: "23px", marginTop: "30px" }}>
+                <list>
+                  <img style={{ width: "70px", paddingRight: "30px" }} src={person} />
+                </list>
+                <list>{strDot(itm.username, 15)}/</list>
+                <list>{itm.createdat?.split("T")[0]}/</list>
+                <list>{putCommaAtPrice(parseInt(itemdata?.circulations?.price))} USDT</list>
+              </ul>
+            ))}
 
-                    <div className="contBox">
-                      <p className="cont">{cont.cont}</p>
-                      <p className="time">{cont.time}</p>
-                    </div>
-                  </li>
-                </Fragment>
-              ))}
+            <ul className="historyList">
+              {itemdata?.itemhistories &&
+                itemdata?.itemhistories.map((cont, index) => (
+                  <Fragment key={index}>
+                    {index ? (
+                      <div className="sideBarBox">
+                        <span className="sideBar" />
+                      </div>
+                    ) : (
+                      <></>
+                    )}
+                    <li>
+                      <span className="iconBox">{setIcon(cont.typestr)}</span>
+
+                      <div className="contBox">
+                        <p className="cont">{cont.typestr}</p>
+                        <p className="time">{moment(cont.createdat).fromNow()}</p>
+                      </div>
+                    </li>
+                  </Fragment>
+                ))}
             </ul>
           </section>
 
@@ -433,7 +451,12 @@ export default function AuctionDetail() {
                     </Fragment>
                   ))}
                 </ul>
-                <button className="nextBtn" onClick={onClickAuctionNextBtn}>
+                <button
+                  className="nextBtn"
+                  onClick={() => {
+                    onClickAuctionNextBtn();
+                  }}
+                >
                   <img src={I_rtArw} alt="" />
                 </button>
               </div>
@@ -539,7 +562,7 @@ const MauctionDetailBox = styled.div`
           display: flex;
           gap: 2.22vw;
           margin: 2.22vw 0 0 0;
-          font-size: 4.44vw;
+          font-size: 3vw;
           font-weight: 500;
 
           .key {

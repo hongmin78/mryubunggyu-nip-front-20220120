@@ -1,7 +1,13 @@
 import { useLayoutEffect } from "react";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { HashRouter, Route, Routes, useNavigate } from "react-router-dom";
+import {
+  HashRouter,
+  Route,
+  Routes,
+  useNavigate,
+  Navigate,
+} from "react-router-dom";
 import styled from "styled-components";
 import Auction from "./router/Auction";
 import AuctionDetail from "./router/AuctionDetail";
@@ -23,10 +29,20 @@ import GlobalStyle from "./util/GlobalStyle";
 import { setLogin, setMobile, setaddress } from "./util/store/commonSlice";
 import { messages } from "./configs/messages";
 import SetErrorBar from "./util/SetErrorBar";
-import { LOGGER } from "./util/common";
+import { getmyaddress, LOGGER } from "./util/common";
 import { strDot } from "./util/Util";
 import axios from "axios";
 import { API } from "./configs/api";
+import {
+  browserName,
+  browserVersion,
+  isChrome,
+  isFirefox,
+  isSafari,
+  isEdge,
+} from "react-device-detect";
+import { CURRENT_TIME } from "./configs/configs";
+import { net } from "./configs/net";
 
 function App() {
   const dispatch = useDispatch();
@@ -36,45 +52,65 @@ function App() {
     else dispatch(setMobile(true));
   }
 
-  useEffect(
-    (_) => {
-      const queryuseraddress = (address) => {
-        axios
-          .get(API.API_QUERY_USERADDRESS + `/users/username/${address}`)
-          .then((resp) => {
-            LOGGER("QlzCkJ0KYu", resp.data);
-            let { status, respdata } = resp.data;
-            if (status == "OK") {
-              if (respdata?.id) {
-                dispatch(setaddress(address));
-                dispatch(setLogin(address));
-                setaddress(address);
-              }
-            } else {
-              LOGGER("user not found");
-            }
-          });
-      };
-      let { ethereum } = window;
-      if (ethereum) {
+  const queryuseraddress = (address) => {
+    axios
+      .get(
+        API.API_QUERY_USERADDRESS + `/users/username/${address}?nettype=${net}`
+      )
+      .then((resp) => {
+        LOGGER("QlzCkJ0KYu", resp.data);
+        let { status, respdata } = resp.data;
+        if (status == "OK") {
+          if (respdata?.id) {
+            dispatch(setaddress(address));
+            dispatch(setLogin(address));
+            setaddress(address);
+          }
+        } else {
+          LOGGER("user not found");
+        }
+      });
+  };
+
+  useEffect(() => {
+    setTimeout(() => {
+      let myaddress = getmyaddress();
+      if (myaddress) {
+      } else {
+        SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+        return;
+      }
+      queryuseraddress(myaddress);
+    }, 1500);
+  }, []);
+
+  useEffect(() => {
+    axios.get(API.API_KEY_TIME_STAMP + `?nettype=${net}`).then((resp) => {
+      LOGGER("asdasdasdasds", resp.data);
+      let { status, respdata } = resp.data;
+      if (status == "OK") {
+        if (parseInt(respdata.value) > CURRENT_TIME)
+          window.location.reload("/");
       } else {
         return;
       }
+    });
+    let { ethereum } = window;
+    if (ethereum) {
       let { selectedAddress: address } = ethereum;
-      if (address) {
-        queryuseraddress(address);
-      } else {
-      }
       ethereum.on("accountsChanged", (resp) => {
         LOGGER("GsnRPWi8Zg@accountsChanged", resp);
+        window.location.replace("/");
         SetErrorBar(messages.MSG_ACCOUNTS_CHANGED);
         if (resp[0]) {
           let address = resp[0];
           dispatch(setaddress(address));
           dispatch(setLogin(address));
           setaddress(address);
+          dispatch(setLogin(address));
         } else {
           dispatch(setaddress(null));
+          dispatch(setLogin(null));
           dispatch(setLogin(null));
           setaddress(null);
         }
@@ -86,16 +122,36 @@ function App() {
       ethereum.on("chainChanged", (chainId) => {
         LOGGER("@chainChanged", chainId);
       });
-      //		dispatch( setaddress(  ) )  // strDot(ethereum.selectedAddress , 8 , 0 ) )
-    },
-    [window.ethereum]
-  );
-  useLayoutEffect(async () => {
-    //    const walletAddress = localStorage.getItem("walletAddress");
-    //	console.log("walletAddress", walletAddress);
-    setLogin(null);
-    //    if (walletAddress) dispatch(setLogin(walletAddress));
-  });
+
+      setTimeout(() => {
+        if (address) {
+        } else {
+          SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+          return;
+        }
+        queryuseraddress(address);
+      }, 1500);
+    } else {
+      SetErrorBar("Please Install MetaMask");
+      if (isChrome) {
+        window.open(
+          "https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en",
+          "_blank"
+        );
+      }
+      if (isSafari) {
+        alert(
+          "Metamask is not supported on Safari, please use a different browser!"
+        );
+      }
+      if (isEdge) {
+        window.open(
+          "https://microsoftedge.microsoft.com/addons/detail/metamask/ejbalbakoplchlghecdalmeeeajnimhm?hl=en-US",
+          "_blank"
+        );
+      }
+    }
+  }, [window.ethereum]);
 
   useEffect(() => {
     if (window.innerWidth > 1024) dispatch(setMobile(false));
@@ -131,6 +187,7 @@ function App() {
       <GlobalStyle />
       <HashRouter>
         <Routes>
+          {/* <Route path="*" element={<Navigate to="/" />} /> */}
           <Route path="/" element={<Main />} />
           <Route path="/winning" element={<Winning />} />
           <Route path="/penalty" element={<Penalty />} />
@@ -138,7 +195,7 @@ function App() {
           <Route path="/term" element={<Term />} />
 
           <Route path="/connectwallet" element={<ConnectWallet />} />
-          <Route path="/connectwallet/:popup" element={<ConnectWallet />} />
+          <Route path="/connectwallet/:refere" element={<ConnectWallet />} />
           <Route
             path="/emailauth/:email/:authNum/:walletaddress"
             element={<EmailAuth />}
@@ -162,7 +219,7 @@ function App() {
           <Route path="/mypage" element={<Mypage />} />
           <Route path="/editprof" element={<EditProf />} />
 
-          <Route path="/resell" element={<Resell />} />
+          <Route path="/resell/:id" element={<Resell />} />
           <Route path="/test" element={<Test />} />
         </Routes>
       </HashRouter>

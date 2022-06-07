@@ -3,65 +3,70 @@ import I_etherScan from "../../img/icon/I_etherScan.png";
 import I_cube from "../../img/icon/I_cube.svg";
 import I_eye from "../../img/icon/I_eye.svg";
 import { useSelector } from "react-redux";
-import { URL_METADATA_BASE } from '../../configs/configs'
+import { URL_METADATA_BASE } from "../../configs/configs";
 
-export default function Properties( { itemdata } ) {
+export default function Properties({ itemdata }) {
   const isMobile = useSelector((state) => state.common.isMobile);
-
+  console.log("itemdata", itemdata);
   if (isMobile)
     return (
       <MpropertiesBox>
-        <li>
+        {/* <li>
           <button className="" onClick={() => {}}>
             <img src={I_etherScan} alt="" />
             <p>View on Etherscan</p>
           </button>
-        </li>
+        </li> */}
         <li>
-          <button className="" onClick={() => {
-//						window.open ( URL_METADATA_BASE + '' )
-						window.open ( itemdata?.metadataurl )
-					}}>
+          <button
+            className=""
+            onClick={() => {
+              //						window.open ( URL_METADATA_BASE + '' )
+              window.open(itemdata?.metadataurl);
+            }}
+          >
             <img src={I_cube} alt="" />
             <p>View metadata</p>
           </button>
         </li>
-        <li>
+        {/* <li>
           <button className="" onClick={() => {}}>
             <img src={I_eye} alt="" />
             <p>View on IPFS</p>
           </button>
-        </li>
+        </li> */}
       </MpropertiesBox>
     );
   else
     return (
       <PpropertiesBox>
-        <li>
+        {/* <li>
           <button className="" onClick={() => {}}>
             <img src={I_etherScan} alt="" />
             <p>View on Etherscan</p>
           </button>
-        </li>
+        </li> */}
         <li>
-          <button className="" onClick={() => {
-						window.open ( URL_METADATA_BASE + '' )
-					}}>
+          <button
+            className=""
+            onClick={() => {
+              //						window.open ( URL_METADATA_BASE + '' )
+              window.open(itemdata?.metadataurl);
+            }}
+          >
             <img src={I_cube} alt="" />
             <p>View metadata</p>
           </button>
         </li>
-        <li>
+        {/* <li>
           <button className="" onClick={() => {}}>
             <img src={I_eye} alt="" />
             <p>View on IPFS</p>
           </button>
-        </li>
+        </li> */}
       </PpropertiesBox>
     );
 }
-
-
 
 const MpropertiesBox = styled.ul`
   display: flex;

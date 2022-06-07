@@ -2,11 +2,11 @@ import { strDot } from "../util/Util";
 import I_heart from "../img/icon/I_heart.svg";
 import I_heartO from "../img/icon/I_heartO.svg";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { autoAuctionList } from "../data/Dmain";
 
-export default function AuctionItem0228 ({ data, index, likeObj, setLikeObj }) {
+export default function AuctionItem0228({ data, index, likeObj, setLikeObj }) {
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
   function onClickItemLike(e, index) {
@@ -16,24 +16,30 @@ export default function AuctionItem0228 ({ data, index, likeObj, setLikeObj }) {
     setLikeObj({ ...dataObj });
   }
 
+  function contentsReload(id) {
+    window.location.reload(`/#/auction/detail/${id}`);
+    window.scrollTo(0, 0);
+  }
+
   if (isMobile)
     return (
       <Mitem
-				className="item"
-				onClick={() => navigate(`/auction/detail/${data.itemid }`)}
+        className="item"
+        onClick={() => {
+          navigate(`/auction/detail/${data.itemid}`);
+          window.scrollTo(0, 0);
+          // contentsReload(data.itemid);
+        }}
         // onClick={() => navigate(`/auction/detail/${data.dna}`)}
       >
         <div className="topBar">
           <div className="profBox">
-            <img src={autoAuctionList[index]?.profImg} alt="" />
-            <p className="address">{strDot(autoAuctionList[index]?.address, 5, 4)}</p>
+            <img className="profImg" src={data?.profImg ? data?.profImg : data?.url} alt="" />
+            <p className="address">{strDot(data?.username, 5, 4)}</p>
           </div>
 
           {likeObj && (
-            <button
-              className="likeBtn"
-              onClick={(e) => onClickItemLike(e, index)}
-            >
+            <button className="likeBtn" onClick={(e) => onClickItemLike(e, index)}>
               <img src={likeObj[index] ? I_heartO : I_heart} alt="" />
               <p
                 className="count"
@@ -41,20 +47,22 @@ export default function AuctionItem0228 ({ data, index, likeObj, setLikeObj }) {
                   color: likeObj[index] && "#ff5050",
                 }}
               >
-                0
+                {data?.like ? data?.like : 0}
               </p>
             </button>
           )}
         </div>
 
-        <img className="itemImg" src={data?.url } alt="" />
+        <img className="itemImg" src={data?.url} alt="" />
 
         <div className="infoBox">
-          <p className="title">Series Kong{data?.titlename }</p>
+          <p className="title">Series Kong{data?.titlename}</p>
 
           <ul className="detailList">
             <li>Last sold for</li>
-            <li>100&nbsp;USDT</li>
+            <li>
+              {data?.circulations?.price || "100"}&nbsp;{data?.circulations?.priceunit}
+            </li>
           </ul>
         </div>
       </Mitem>
@@ -63,22 +71,20 @@ export default function AuctionItem0228 ({ data, index, likeObj, setLikeObj }) {
     return (
       <Pitem
         className="item"
-//				onClick={() => navigate(`/auction/detail/${data.dna}`)}
-				onClick={() => navigate(`/auction/detail/${data.itemid }`)}
+        //				onClick={() => navigate(`/auction/detail/${data.dna}`)}
+        onClick={() => {
+          navigate(`/auction/detail/${data.itemid}`);
+          window.scrollTo(0, 0);
+        }}
       >
         <div className="topBar">
           <div className="profBox">
-            <img src={autoAuctionList[index]?.profImg} alt="" />
-            <p className="address">
-              {strDot(autoAuctionList[index]?.address, 5, 4)}
-            </p>
+            <img className="profImg" src={data?.profImg ? data?.profImg : data?.url} alt="" />
+            <p className="address">{strDot(data?.username, 5, 4)}</p>
           </div>
 
           {likeObj && (
-            <button
-              className="likeBtn"
-              onClick={(e) => onClickItemLike(e, index)}
-            >
+            <button className="likeBtn" onClick={(e) => onClickItemLike(e, index)}>
               <img src={likeObj[index] ? I_heartO : I_heart} alt="" />
               <p
                 className="count"
@@ -86,21 +92,21 @@ export default function AuctionItem0228 ({ data, index, likeObj, setLikeObj }) {
                   color: likeObj[index] && "#ff5050",
                 }}
               >
-                {autoAuctionList[index]?.like}
+                {data?.like ? data?.like : 0}
               </p>
             </button>
           )}
         </div>
 
-        <img className="itemImg" src={data?.url } alt="" />
+        <img className="itemImg" src={data?.url} alt="" />
 
         <div className="infoBox">
-          <p className="title">Series Kong{data?.titlename }</p>
+          <p className="title">Series Kong{data?.titlename}</p>
 
           <ul className="detailList">
             <li>Last sold for</li>
             <li>
-              100&nbsp;USDT
+              {parseInt(data?.circulations?.price).toFixed(2)}&nbsp;{data?.circulations?.priceunit}
             </li>
           </ul>
         </div>
@@ -213,6 +219,13 @@ const Pitem = styled.li`
       display: flex;
       align-items: center;
       gap: 10px;
+    }
+
+    .profImg {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      object-fit: cover;
     }
 
     .likeBtn {

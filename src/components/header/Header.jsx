@@ -6,67 +6,148 @@ import HeaderPopup from "../../components/HeaderPopup";
 import I_headerLogo from "../../img/icon/I_headerLogo.png";
 import I_headerLogoM from "../../img/icon/I_headerLogoM.png";
 import I_headerLogoWhite from "../../img/icon/I_headerLogoWhite.png";
-
+import axios from "axios";
 import I_3line from "../../img/icon/I_3line.svg";
 import I_3lineWhite from "../../img/icon/I_3lineWhite.svg";
 import { strDot } from "../../util/Util";
 import MmenuPopup from "./MmenuPopup";
 import { query_with_arg } from "../../util/contract-calls";
 import { LOGGER, getmyaddress } from "../../util/common";
-import { addresses } from '../../configs/addresses'
+import { addresses } from "../../configs/addresses";
 import { getethrep } from "../../util/eth";
+import { API } from "../../configs/api";
+import SetErrorBar from "../../util/SetErrorBar.js";
+import { messages } from "../../configs/messages";
+import { net } from "../../configs/net";
 
 export default function Header() {
   const navigate = useNavigate();
   const pathname = useLocation().pathname;
   let isStaking = pathname.indexOf("/staking") !== -1;
   const isMobile = useSelector((state) => state.common.isMobile);
-	const isLogin = useSelector((state) => state.common.isLogin);
-	let address = useSelector ( state => state.common.address )
+  const isLogin = useSelector((state) => state.common.isLogin);
+  const isAddress = useSelector((state) => state.common.address);
+  let [isstaked, setisstaked] = useState(false);
+  let address = useSelector((state) => state.common.address);
   const [headerPopup, setHeaderPopup] = useState(false);
-	const [menuPopup, setMenuPopup] = useState(false)
-	let [ mybalance , setmybalance ] = useState()
-	let [ myaddress , setmyaddress ] = useState()
-/**  	useEffect(_=>{
-		const spinner = document.querySelector("#Spinner");
-    spinner.animate(
-      [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
-      {        duration: 1000,
-        iterations: Infinity,
-      }
-    )
-	} , [] ) */
-	useEffect(_=>{
-		if( address ){} // isLogin
-		else { return }
-		const fetchdata = _=>{
-			let myaddress = getmyaddress() ; LOGGER( 'MXZfykw8Mw' , myaddress )
-			setmyaddress( myaddress )
-			if ( myaddress){}
-			else { return }
-      console.log(addresses.contract_USDT, [myaddress]) // ETH_TESTNET.
-			query_with_arg ({contractaddress : addresses.contract_USDT // ETH_TESTNET.
-				, abikind : 'ERC20'
-				, methodname : 'balanceOf'
-				, aargs : [ myaddress 
-			] } ).then(resp=>{LOGGER( 'Ce4mDMhjbS' , resp )
-				setmybalance( getethrep ( resp ) )				
-			})
+  const [menuPopup, setMenuPopup] = useState(false);
+  let [mybalance, setmybalance] = useState();
+  let [myaddress, setmyaddress] = useState();
+  const [ticketInfo, setTickInfo] = useState();
+  const [walletStatus, setWalletStatus] = useState("");
 
-			window.ethereum.on('networkChanged', function (networkId) { LOGGER( '' ,  networkId )
-				// Time to reload your interface with the new networkId
-			})
-		}
-		setTimeout(_=>{ 
-			fetchdata()
-		} , 3000 )
-	} , [ isLogin , address ] )
+  useEffect(() => {
+    setTimeout(() => {
+      let myaddress = getmyaddress();
+      if (myaddress) {
+      } else {
+        SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+        return;
+      }
+      axios
+        .get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`)
+        .then((resp) => {
+          LOGGER("API_ticketInfo", resp.data);
+
+          let { status, respdata } = resp.data;
+          if (status == "OK" && respdata !== null) {
+            setTickInfo(respdata);
+            awaitWallet();
+          }
+        });
+    }, 1000);
+  }, []);
+
+  const awaitWallet = () => {
+    let myaddress = getmyaddress();
+    setTimeout(() => {
+      if (myaddress) {
+        return;
+      } else {
+        setWalletStatus("Connect Wallet");
+      }
+    }, 1600);
+    setWalletStatus("Connecting...");
+  };
+
+  const fetchdataStaked = async () => {
+    let myaddress = getmyaddress();
+    if (myaddress) {
+    } else {
+      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+      return;
+    }
+    LOGGER("", myaddress);
+    let resp = await axios.get(
+      API.API_USERINFO + `/${myaddress}?nettype=${net}`
+    );
+    LOGGER("rBojncz0CD", resp.data);
+    let { status, respdata } = resp.data;
+    if (status == "OK") {
+      setisstaked(respdata.isstaked ? true : false);
+      console.log("dddd", respdata);
+    }
+  };
+  const fetchdata = (_) => {
+    let myaddress = getmyaddress();
+    if (myaddress) {
+    } else {
+      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+      return;
+    }
+    LOGGER("MXZfykw8Mw", myaddress);
+    setmyaddress(myaddress);
+    if (myaddress) {
+      query_with_arg({
+        contractaddress: addresses.contract_USDT, // ETH_TESTNET.
+        abikind: "ERC20",
+        methodname: "balanceOf",
+        aargs: [myaddress],
+      }).then((resp) => {
+        LOGGER("Ce4mDMhjbS", resp);
+        setmybalance(getethrep(resp));
+      });
+
+      window.ethereum.on("networkChanged", function (networkId) {
+        LOGGER("", networkId);
+        // Time to reload your interface with the new networkId
+      });
+    } else {
+      return;
+    }
+    console.log("asdoiajsod", addresses.contract_USDT, [myaddress]); // ETH_TESTNET.
+  };
+
+  useEffect(
+    (_) => {
+      console.log("$ISLOGIN", isLogin);
+      fetchdataStaked();
+      fetchdata();
+      awaitWallet();
+    },
+    [isLogin, address]
+  );
+
+  console.log("mybalance", mybalance);
+
+  const onclick_staked_val_btn = (currentValue) => {
+    if (ticketInfo) {
+      navigate(currentValue);
+    } else {
+      SetErrorBar("You need purchased lucky ticket");
+    }
+  };
+
   if (isMobile) {
     return (
       <>
         <MheaderBox style={{ background: isStaking && "unset" }}>
           <button className="logoBox" onClick={() => navigate("/")}>
-            <img className="logoImg" src={I_headerLogoM} alt="" />
+            <img
+              className="logoImg"
+              src={isStaking ? I_headerLogoWhite : I_headerLogo}
+              alt=""
+            />
           </button>
 
           <button className="menuBtn" onClick={() => setMenuPopup(true)}>
@@ -74,7 +155,7 @@ export default function Header() {
           </button>
         </MheaderBox>
 
-        {menuPopup && <MmenuPopup off={setMenuPopup} />}
+        {menuPopup && <MmenuPopup off={setMenuPopup} mybalance={mybalance} />}
       </>
     );
   } else {
@@ -93,38 +174,50 @@ export default function Header() {
             <nav>
               <button
                 style={{ color: isStaking && "#fff" }}
-                onClick={() => navigate(`/staking`)}
+                onClick={() => {
+                  navigate("/staking");
+                }}
               >
                 Lucky Ticket
               </button>
               <button
                 style={{ color: isStaking && "#fff" }}
-                onClick={() => navigate("/auction")}
+                onClick={() => {
+                  onclick_staked_val_btn("/auction");
+                }}
               >
                 Subscription Auction
               </button>
               <button
                 style={{ color: isStaking && "#fff" }}
-                onClick={() => navigate("/market")}
+                onClick={() => {
+                  onclick_staked_val_btn("/market");
+                }}
               >
-                Marketplece
+                Marketplace
               </button>
             </nav>
 
-{/**  <button className='menuBtn' >
-		<span className='balanceBox'>Switch network</span></button>*/}
+            {/**  <button className='menuBtn' >
+		      <span className='balanceBox'>Switch network</span></button>*/}
             {isLogin ? (
-              <button
+              <div
                 className="menuBtn"
                 style={{
                   color: isStaking && "#000",
                   background: isStaking && "#fff",
                 }}
-                onClick={() => setHeaderPopup(!headerPopup)}
+                onClick={() => {
+                  if (isstaked) {
+                    setHeaderPopup(!headerPopup);
+                  } else {
+                    SetErrorBar("You need purchased tickets");
+                  }
+                }}
               >
                 <span className="balanceBox">
-                  <p className="price">{ mybalance }</p>
-                  <p className="unit">USDT</p>
+                  <p className="price">{mybalance ? mybalance : "..."}</p>
+                  <p className="unit">{mybalance && "USDT"}</p>
                 </span>
 
                 <span
@@ -137,16 +230,16 @@ export default function Header() {
                 </span>
 
                 {headerPopup && <HeaderPopup />}
-              </button>
+              </div>
             ) : (
-              <button
+              <div
                 className="connectBtn"
-								onClick={() => {	navigate("/connectwallet")
-
-								} }
+                onClick={() => {
+                  navigate("/connectwallet");
+                }}
               >
-                { myaddress ? strDot(myaddress , 8 , 0 )  : 'Connect Wallet' }
-              </button>
+                {myaddress ? strDot(myaddress, 8, 0) : walletStatus}
+              </div>
             )}
           </article>
         </section>
@@ -222,7 +315,7 @@ const PheaderBox = styled.header`
         justify-content: space-between;
         align-items: center;
         gap: 14px;
-        width: 280px;
+        width: 290px;
         height: 54px;
         padding: 6px 6px 6px 24px;
         font-size: 18px;
@@ -234,12 +327,12 @@ const PheaderBox = styled.header`
         position: relative;
 
         .balanceBox {
-          flex: 1;
           display: flex;
           overflow: hidden;
+          align-items: center;
+          gap: 10px;
 
           .price {
-            flex: 1;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;

@@ -19,6 +19,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import { LOGGER } from "../util/common";
 import { API } from "../configs/api";
+import { net } from "../configs/net";
 
 export default function AuctionDetail() {
   const params = useParams();
@@ -28,17 +29,18 @@ export default function AuctionDetail() {
   const [category, setCategory] = useState(0);
   const [moreIndex, setMoreIndex] = useState(0);
   const [showCopyBtn, setShowCopyBtn] = useState(false);
-  const [itemData, setItemData ] = useState({});
+  const [itemData, setItemData] = useState({});
   const [moreCollection, setMoreCollection] = useState([]);
 
-	const onclickfavorite=_=>{
-		axios.post (API.API_TOGGLE_FAVORITE ).then(resp=>{
-			LOGGER( 'xMYQNYFa9d' , resp.data )
-
-		})
-		setToggleLike(!toggleLike)
-		LOGGER('8FCYJgzDZX')
-	} 
+  const onclickfavorite = (_) => {
+    axios
+      .post(API.API_TOGGLE_FAVORITE + `?nettype=${net}`, { nettype: net })
+      .then((resp) => {
+        LOGGER("xMYQNYFa9d", resp.data);
+      });
+    setToggleLike(!toggleLike);
+    LOGGER("8FCYJgzDZX");
+  };
   function onClickAuctionNextBtn() {
     if (!moreRef.current.children[0]) return;
     const wrapWidth = moreRef.current.offsetWidth;
@@ -51,8 +53,8 @@ export default function AuctionDetail() {
   }
 
   function getAuction() {
-		axios //      .get("http://3.35.1 17.87:34705/auction/list", { params: { limit: 8 } })
-			.get(API.API_COMMONITEMS  )
+    axios //      .get("http://3.35.1 17.87:34705/auction/list", { params: { limit: 8 } })
+      .get(API.API_COMMONITEMS + `?nettype=${net}`)
       .then((res) => {
         console.log(res.data);
         setMoreCollection(res.data);
@@ -61,7 +63,7 @@ export default function AuctionDetail() {
 
   useEffect(() => {
     axios
-      .get(`http://3.35.117.87:34705/auction/item/${params.dna}`)
+      .get(`http://3.35.117.87:34705/auction/item/${params.dna}?nettype=${net}`)
       .then((res) => {
         console.log(res.data[0]);
         setItemData(res.data[0]);
@@ -112,8 +114,9 @@ export default function AuctionDetail() {
                     <div className="btnBox">
                       <button
                         className="likeBtn hoverBtn"
-												onClick={() => { onclickfavorite ()
-												} }
+                        onClick={() => {
+                          onclickfavorite();
+                        }}
                       >
                         <img src={toggleLike ? I_heartO : I_heart} alt="" />
                       </button>
@@ -268,8 +271,9 @@ export default function AuctionDetail() {
                     <div className="posBox">
                       <button
                         className="likeBtn hoverBtn"
-												onClick={() => { onclickfavorite()
-												} }
+                        onClick={() => {
+                          onclickfavorite();
+                        }}
                       >
                         <img src={toggleLike ? I_heartO : I_heart} alt="" />
                       </button>

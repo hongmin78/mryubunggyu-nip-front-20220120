@@ -18,9 +18,14 @@ import { query_with_arg } from "../../util/contract-calls";
 import { addresses } from "../../configs/addresses";
 import { TIME_FETCH_MYADDRESS_DEF } from "../../configs/configs";
 import { getmyaddress, LOGGER } from "../../util/common";
+import { web3 } from "../../configs/configweb3-bscmainnet";
+import { abi } from "../../contracts/abi-staker-20220414";
 // import BidPopup from "../BidPopup";
-import PayPopup from "../PayPopup";
+import StakingPopup from "../StakingPopup";
 import moment from "moment";
+import PayPopup from "../PayPopup";
+import { net } from "../../configs/net";
+import { nettype } from "../../configs/configweb3-ropsten";
 
 const MAP_NETTYPE_SCAN = {
   ETH_TESTNET: "https://etherscan.io",
@@ -36,65 +41,89 @@ export default function MyItems() {
   const [isstaked, setisstaked] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [receivables, setReceivables] = useState();
+  const [userInfoRco, setUserInfoReco] = useState([]);
+  const [getTimeMoment, setGetTimeMoment] = useState();
+  const [timeMoment, setTimeMoment] = useState();
   let [itemData, setItemData] = useState([]);
-  let [mytokenid, setmytokenid] = useState(0);
+  let [itemBalData, setItemBalData] = useState([]);
+  let [mytokenid, setmytokenid] = useState();
   let [stakedata, setstakedata] = useState({});
   let [myaddress, setmyaddress] = useState();
   let [txhash, settxhash] = useState();
   let [txscanurl, settxscanurl] = useState();
   let [buydate, setbuydate] = useState([]);
   let [userinfo, setuserinfo] = useState(null);
-
-  const threeSecods = () => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve("success");
-      }, 3000);
-    });
-  };
+  const [timeReceivables, setTimeReceivables] = useState();
+  const [gettimeReceivables, setgetTimeReceivables] = useState();
+  const [logstakes, setlogstakes] = useState(null);
+  const [getTickTimer, setGetTickTimer] = useState();
+  const [tickTimer, setTickTimer] = useState();
+  const [ticketInfo, setTickInfo] = useState();
+  const [itemDataInfo, setItemDataInfo] = useState();
+  const [circulations, setCirculations] = useState([]);
+  console.log("itemDataInfo", itemDataInfo);
 
   const fetchdata = async (_) => {
     let myaddress = getmyaddress();
+    setmyaddress(myaddress);
     LOGGER("myaddress", myaddress);
+    axios
+      .get(API.API_USERINFO + `/${myaddress}?nettype=${net}`)
+      .then((resp) => {
+        if (resp.data && resp.data.respdata) {
+          let { respdata } = resp.data;
+          LOGGER("myticket", resp.data);
+          setuserinfo(respdata);
+        }
+      });
 
-    axios.get(API.API_USERINFO + `/${myaddress}`).then((resp) => {
-      LOGGER("", resp.data);
-      let { status, respdata } = resp.data;
-      if (status == "OK") {
-        setuserinfo(respdata);
-        console.log("userinfo", userinfo);
-      }
-    });
-    false &&
-      axios
-        .get(
-          API.API_QUERY_SINGLEROW +
-            `/transactions/username/${myaddress}?typestr=STAKE&status=1`
-        )
-        .then((resp) => {
-          LOGGER("", resp.data);
-          let { status, respdata } = resp.data;
-          if (status == "OK") {
-            let { txhash } = respdata;
-            setstakedata(respdata);
-            settxhash(strDot(txhash, 16, 0));
-            settxscanurl(MAP_NETTYPE_SCAN[respdata.nettype] + `/tx/${txhash}`);
-            let buydatetime = moment(respdata.createdat);
-            setbuydate([
-              buydatetime.year().toString().substr(2),
-              (1 + buydatetime.month()).toString().padStart(2, "0"),
-              buydatetime.day().toString().padStart(2, "0"),
-              buydatetime.hour().toString().padStart(2, "0"),
-            ]);
-          }
+    axios
+      .get(API.API_RECEIVABLES + `/${myaddress}?nettype=${net}`)
+      .then((res) => {
+        let { list } = res.data;
+        setItemData(list);
+        LOGGER("receivables", list);
+        list.forEach((el) => {
+          let { duetimeunix } = el;
         });
-    false &&
+        setgetTimeReceivables(list[0]?.duetimeunix);
+      })
+      .catch((err) => console.log(err));
+
+    axios
+      .get(API.API_ITEMBALANCES + `/${myaddress}?nettype=${net}`)
+      .then((res) => {
+        let { list, status } = res.data;
+        LOGGER("getITEmBALANCES", res.data);
+        if (status === "OK" && list?.length) {
+          setItemBalData(list);
+          LOGGER("ITEMBALANCES", list);
+          list.forEach((el) => {
+            let { duetimeunix } = el;
+          });
+        }
+        axios //      .get("http://3.35.1 17.87:34705/auction/list", { params: { limit: 8 } })
+          .get(API.API_GET_CIRCULATIONS_ITEM + `?nettype=${net}`)
+          .then((resp) => {
+            LOGGER("circulations", resp.data);
+            let { status, list } = resp.data;
+            if (status == "OK") {
+              setCirculations(resp.data.list);
+            }
+            //        console.log(res.data);
+            //      setMoreCollection(res.data);
+          });
+      });
+
+    //true
+    true &&
       query_with_arg({
         contractaddress: addresses.contract_ticketnft, // ETH_TESTNET.
         abikind: "TICKETNFT",
         methodname: "_balance_user_itemhash",
         aargs: [myaddress], // ETH_TESTNET.
       }).then(async (resp) => {
+        LOGGER("tickeinfo", resp);
         let myitemhash = resp;
         let mytokenid;
         try {
@@ -114,43 +143,62 @@ export default function MyItems() {
       });
   };
 
-  const fetchReceivables = () => {
-    let myaddress = getmyaddress();
-    axios
-      .get(API.API_RECEIVABLES + `/${myaddress}`)
-      .then((res) => {
-        console.log(res);
-        if (res.data.list) {
-          let { list } = res.data;
-          setItemData(list);
-          LOGGER("receivables", list);
-          LOGGER("receivables-useState", itemData);
-          list.forEach((el) => {
-            let { duetimeunix } = el;
-            const current = moment().unix() - duetimeunix;
-            console.log(moment.unix(current).format("YYYY-MM-DD"));
-          });
-        }
-      })
-      .catch((err) => console.log(err));
-  };
+  console.log("asdiofjaosdijfasdf", itemData);
+
+  // useEffect(() => {
+  //   setInterval(() => {
+  //     getTimeMoment && setTimeMoment(moment(moment.unix(getTimeMoment) - moment()));
+  //   }, 1000);
+  // }, [getTimeMoment]);
+
+  // useEffect(() => {
+  //   setInterval(() => {
+  //     gettimeReceivables && setTimeReceivables(moment(moment.unix(gettimeReceivables) - moment()));
+  //   }, 1000);
+  // }, [gettimeReceivables]);
 
   useEffect(() => {
-    fetchReceivables();
-  }, []);
+    let myaddress = getmyaddress();
+    axios
+      .get(API.API_LOGSTAKES + `/${myaddress}?nettype=${net}`)
+      .then((resp) => {
+        LOGGER("API_LOGSTAKES", resp.data);
+        let { status, respdata } = resp.data;
+        if (status == "OK") {
+          setlogstakes(respdata);
+          setGetTickTimer(respdata?.createdat);
+        }
+      });
 
-  useEffect(
-    (_) => {
-      setTimeout((_) => {
-        fetchdata();
-      }, TIME_FETCH_MYADDRESS_DEF);
-    },
-    [itemData]
-  );
+    // setInterval(() => {
+    //   getTickTimer && setTickTimer(moment(getTickTimer).add(90, "days") - moment());
+    // }, 1000);
+  }, [getTickTimer]);
+
+  useEffect((_) => {
+    setTimeout((_) => {
+      fetchdata();
+    }, 1500);
+  }, []);
+  const date = moment().unix();
 
   const openModal = () => {
     setIsOpen((prevState) => !prevState);
   };
+
+  useEffect(() => {
+    let myaddress = getmyaddress();
+    axios
+      .get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`)
+      .then((resp) => {
+        LOGGER("API_ticketInfo", resp.data);
+
+        let { status, respdata } = resp.data;
+        if (status == "OK" && respdata !== null) {
+          setTickInfo(respdata);
+        }
+      });
+  }, []);
 
   if (isMobile)
     return (
@@ -216,218 +264,239 @@ export default function MyItems() {
                 </span>
               </div>
             </div>
-
-            <div className="infoBox">
-              <div className="titleBox">
-                <strong className="title">
-                  Lucky Ticket #{("" + mytokenid)?.padStart(5, "0")}
-                </strong>
-              </div>
-
-              <div className="ownedBox">
-                <p className="key">Owned by</p>
-                <p className="value">@{userinfo?.nickname}</p>
-              </div>
-
-              <div className="saleBox">
-                <div className="price">
-                  <p className="key">Current price</p>
-                  <strong className="value">{putCommaAtPrice(100)} USDT</strong>
+            {ticketInfo == null && (
+              <div className="infoBox">
+                <div className="titleBox">
+                  <strong className="title">
+                    Need a buy <hr />
+                    "Lucky Ticket"
+                  </strong>
                 </div>
+                <div className="saleBox"></div>
 
-                <div className="time">
-                  <p className="key">Bought</p>
-                  <ul className="timeList">
-                    <li>{buydate[0]}</li>
-                    <li>{buydate[1]}</li>
-                    <li>{buydate[2]}</li>
-                    <li>{buydate[3]}</li>
-                  </ul>
-                </div>
-              </div>
-
-              <ul className="priceBox">
-                <li>
-                  <p className="key">Current price</p>
-                  <p className="value">586 USDT</p>
-                </li>
-                <li>
-                  <p className="key">Transaction price</p>
-                  <p className="value">688 USDT</p>
-                </li>
-                <li
-                  onClick={(evt) => {
-                    window.open(txscanurl);
-                  }}
-                >
-                  <p className="key">TxHash</p>
-                  <p className="value">{txhash}</p>
-                </li>
-              </ul>
-
-              <button className="actionBtn" onClick={() => navigate("/resell")}>
-                Sell
-              </button>
-
-              <p className="description">
-                The NFT purchased by participating in the subscription auction
-                generates 12% of profits after 3 days and is sold random. In
-                addition, the results are announced at 9:00 AM, and the
-                transaction is completed from 9:00 AM to 21:00 PM. If the
-                transaction is not completed within time, all transactions in
-                your account will be suspended. It operates normally after
-                applying a penalty of 10% of the winning bid amount.
-              </p>
-            </div>
-          </li>
-
-          <li className="swapBox">
-            <div className="imgBox">
-              <img className="itemImg" src={E_item2} alt="" />
-
-              <div className="topBar">
-                <button className="likeBtn" onClick={() => {}}>
-                  <img src={I_heartO} alt="" />
-                  <p>22</p>
-                </button>
-              </div>
-            </div>
-
-            <div className="infoBox">
-              <div className="titleBox">
-                <strong className="title">Series Kong #010000</strong>
-              </div>
-
-              <div className="ownedBox">
-                <p className="key">Owned by</p>
-                <p className="value">@andyfeltham</p>
-              </div>
-
-              <div className="saleBox">
-                <div className="price">
-                  <p className="key">Current price</p>
-                  <strong className="value">{putCommaAtPrice(372)} USDT</strong>
-                </div>
-
-                <div className="time">
-                  <p className="key">Ending in</p>
-                  <ul className="timeList">
-                    <li>00</li>
-                    <li>00</li>
-                    <li>00</li>
-                    <li>00</li>
-                  </ul>
-                </div>
-              </div>
-
-              <ul className="priceBox">
-                <li>
-                  <p className="key">Current price</p>
-                  <p className="value">372 USDT</p>
-                </li>
-                <li>
-                  <p className="key">Transaction price</p>
-                  <p className="value">688 USDT</p>
-                </li>
-                <li
-                  onClick={(evt) => {
-                    window.open(txscanurl);
-                  }}
-                >
-                  <p className="key">TxHash</p>
-                  <p className="value">{txhash}</p>
-                </li>
-              </ul>
-
-              <button className="actionBtn">Swap</button>
-
-              <p className="description">
-                The NFT purchased by participating in the subscription auction
-                generates 12% of profits after 3 days and is sold random. In
-                addition, the results are announced at 9:00 AM, and the
-                transaction is completed from 9:00 AM to 21:00 PM. If the
-                transaction is not completed within time, all transactions in
-                your account will be suspended. It operates normally after
-                applying a penalty of 10% of the winning bid amount.
-              </p>
-            </div>
-          </li>
-
-          <li className="sellBox">
-            <div className="imgBox">
-              <img className="itemImg" src={E_item3} alt="" />
-
-              <div className="topBar">
-                <button className="likeBtn" onClick={() => {}}>
-                  <img src={I_heartO} alt="" />
-                  <p>22</p>
-                </button>
-              </div>
-            </div>
-
-            <div className="infoBox">
-              <div className="titleBox">
-                <strong className="title">King Kong #010000</strong>
-              </div>
-
-              <div className="ownedBox">
-                <p className="key">Owned by</p>
-                <p className="value">@andyfeltham</p>
-              </div>
-
-              <div className="saleBox">
-                <div className="price">
-                  <p className="key">Current price</p>
-                  <strong className="value">{putCommaAtPrice(100)} USDT</strong>
-                </div>
-
-                <div className="time">
-                  <p className="key">Ending in</p>
-                  <ul className="timeList">
-                    <li>00</li>
-                    <li>00</li>
-                    <li>00</li>
-                    <li>00</li>
-                  </ul>
-                </div>
-              </div>
-
-              <ul className="priceBox">
-                <li>
-                  <p className="key">Current price</p>
-                  <p className="value">586 USDT</p>
-                </li>
-                <li>
-                  <p className="key">Transaction price</p>
-                  <p className="value">688 USDT</p>
-                </li>
-                <li
-                  onClick={(evt) => {
-                    window.open(txscanurl);
-                  }}
-                >
-                  <p className="key">TxHash</p>
-                  <p className="value">{txhash}</p>
-                </li>
-              </ul>
-
-              <div className="btnBox">
                 <button
                   className="actionBtn"
+                  onClick={() => navigate("/staking")}
+                >
+                  Buy
+                </button>
+
+                <p className="description">
+                  The NFT purchased by participating in the subscription auction
+                  generates 12% of profits after 3 days and is sold random. In
+                  addition, the results are announced at 9:00 AM, and the
+                  transaction is completed from 9:00 AM to 21:00 PM. If the
+                  transaction is not completed within time, all transactions in
+                  your account will be suspended. It operates normally after
+                  applying a penalty of 10% of the winning bid amount.
+                </p>
+              </div>
+            )}
+            {ticketInfo && (
+              <div className="infoBox">
+                <div className="titleBox">
+                  <strong className="title">
+                    Lucky Ticket #{ticketInfo.id}
+                  </strong>
+                </div>
+
+                <div className="ownedBox">
+                  <p className="key">Owned by</p>
+                  <p className="value">@{userinfo?.nickname}</p>
+                </div>
+
+                <div className="saleBox">
+                  <div className="time">
+                    <p className="key">Bought</p>
+                    {/* <ul className="timeList">
+                      <li>{tickDate?.days()}일</li>
+                      <li>{tickDate?.hours()}시간</li>
+                      <li>{tickDate?.minutes()}분</li>
+                      <li>{tickDate?.seconds()}초</li>
+                    </ul> */}
+                  </div>
+                </div>
+
+                <ul className="priceBox">
+                  <li>
+                    <p className="key">Current price</p>
+                    <strong className="price">100 USDT</strong>
+                  </li>
+                  {/* <li>
+                    <p className="key">Transaction price</p>
+                    <p className="value">688 USDT</p>
+                  </li> */}
+                  <li
+                    onClick={(evt) => {
+                      window.open(txscanurl);
+                    }}
+                  >
+                    {/* <p className="key">TxHash</p>
+                    <p className="value">{txhash}</p> */}
+                  </li>
+                </ul>
+
+                <button
+                  className="actionBtn"
+                  disabled={tickTimer !== 0 ? true : false}
                   onClick={() => navigate("/resell")}
                 >
                   Sell
                 </button>
-                <button className="actionBtn">Staking</button>
-              </div>
 
-              <p className="description">
-                King Kong NFT can be staking or sold to Marketplace at a price
-                of up to 25%. If you steaking, you will get 30% annual NIP COIN
-                reward.
-              </p>
-            </div>
+                <p className="description">
+                  The NFT purchased by participating in the subscription auction
+                  generates 12% of profits after 3 days and is sold random. In
+                  addition, the results are announced at 9:00 AM, and the
+                  transaction is completed from 9:00 AM to 21:00 PM. If the
+                  transaction is not completed within time, all transactions in
+                  your account will be suspended. It operates normally after
+                  applying a penalty of 10% of the winning bid amount.
+                </p>
+              </div>
+            )}
           </li>
+          {itemData &&
+            itemData?.length !== 0 &&
+            itemData.map((item, index) => {
+              return (
+                <li className="swapBox">
+                  <div className="imgBox">
+                    <img className="itemImg" src={item.itemdata.url} alt="" />
+
+                    <div className="topBar">
+                      <button className="likeBtn" onClick={() => {}}>
+                        <img src={I_heartO} alt="" />
+                        <p>22</p>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="infoBox">
+                    <div className="titleBox">
+                      <strong className="title">
+                        {item.itemdata.titlename}
+                      </strong>
+                    </div>
+
+                    <div className="ownedBox">
+                      <p className="key">Owned by</p>
+                      <p className="value">@{item.username}</p>
+                    </div>
+                    <div className="ownedBox">
+                      <p className="key">Round Number</p>
+                      <p className="value">{item.itemdata.roundnumber} Round</p>
+                    </div>
+
+                    <div className="saleBox">
+                      {/* <div className="time">
+                        <p className="key">Ending in</p>
+                        <ul className="timeList">
+                          <li>{timeReceivables && timeReceivables.days()}일</li>
+                          <li>{timeReceivables && timeReceivables.hour()}시간</li>
+                          <li>{timeReceivables && timeReceivables.minutes()}분</li>
+                          <li>{timeReceivables && timeReceivables.second()}초</li>
+                        </ul>
+                      </div> */}
+                    </div>
+
+                    <ul className="priceBox">
+                      <li>
+                        <p className="key">Current price</p>
+                        <p className="value">
+                          {Math.ceil(item.amount * 100) / 100} USDT
+                        </p>
+                      </li>
+                    </ul>
+
+                    <button
+                      className="actionBtn"
+                      onClick={() => {
+                        setReceivables(item);
+                        openModal();
+                      }}
+                    >
+                      Pay
+                    </button>
+
+                    <p className="description">
+                      The NFT purchased by participating in the subscription
+                      auction generates 12% of profits after 3 days and is sold
+                      random. In addition, the results are announced at 9:00 AM,
+                      and the transaction is completed from 9:00 AM to 21:00 PM.
+                      If the transaction is not completed within time, all
+                      transactions in your account will be suspended. It
+                      operates normally after applying a penalty of 10% of the
+                      winning bid amount.
+                    </p>
+                  </div>
+                </li>
+              );
+            })}
+          {itemBalData.length !== 0 &&
+            itemBalData.map((item, index) => (
+              <li className="sellBox">
+                <div className="imgBoxBal">
+                  <img className="itemImgBal" src={item.itemdata.url} alt="" />
+
+                  <div className="topBarBal">
+                    <button className="likeBtnBal" onClick={() => {}}>
+                      <img src={I_heartO} alt="" />
+                      <p>22</p>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="infoBox">
+                  <div className="titleBox">
+                    <strong className="title">{item.itemdata.titlename}</strong>
+                  </div>
+
+                  <div className="ownedBox">
+                    <p className="key">Owned by</p>
+                    <p className="value">@{item.username}</p>
+                  </div>
+
+                  <div className="saleBox">
+                    <div className="price">
+                      {/* 
+                        <strong className="value">{putCommaAtPrice(item.buyprice)} USDT</strong> */}
+                      <strong className="value"></strong>
+                    </div>
+                    {/* <div className="time">
+                      <p className="key">Ending in</p>
+                      <ul className="timeList">
+                        <li>{timeMoment && timeMoment.day()}일</li>
+                        <li>{timeMoment && timeMoment.hour()}시간</li>
+                        <li>{timeMoment && timeMoment.minutes()}분</li>
+                        <li>{timeMoment && timeMoment.second()}초</li>
+                      </ul>
+                    </div> */}
+                  </div>
+
+                  <ul className="priceBox">
+                    <li>
+                      <p className="key">Current price</p>
+                      {circulations.map((itm, i) => {
+                        if (item.itemid === itm.itemid)
+                          return (
+                            <p className="value">
+                              {" "}
+                              {Math.ceil(itm.price * 100) / 100} USDT
+                            </p>
+                          );
+                      })}
+                    </li>
+                  </ul>
+                  <p className="description">
+                    King Kong NFT can be staking or sold to Marketplace at a
+                    price of up to 25%. If you steaking, you will get 30% annual
+                    NIP COIN reward.
+                  </p>
+                </div>
+              </li>
+            ))}
+          {isOpen && <PayPopup off={openModal} receivables={receivables} />}
         </ul>
       </MmyItemsBox>
     );
@@ -495,137 +564,276 @@ export default function MyItems() {
                 </span>
               </div>
             </div>
+            {ticketInfo == null && (
+              <div className="infoBox">
+                <div className="titleBox">
+                  <strong className="title">
+                    Need a buy <hr />
+                    "Lucky Ticket"
+                  </strong>
+                </div>
+                <div className="saleBox"></div>
 
-            <div className="infoBox">
-              <div className="titleBox">
-                <strong className="title">
-                  Lucky Ticket #{("" + mytokenid)?.padStart(5, "0")}
-                </strong>
+                <button
+                  className="actionBtn"
+                  onClick={() => navigate("/staking")}
+                >
+                  Buy
+                </button>
+
+                <p className="description">
+                  The NFT purchased by participating in the subscription auction
+                  generates 12% of profits after 3 days and is sold random. In
+                  addition, the results are announced at 9:00 AM, and the
+                  transaction is completed from 9:00 AM to 21:00 PM. If the
+                  transaction is not completed within time, all transactions in
+                  your account will be suspended. It operates normally after
+                  applying a penalty of 10% of the winning bid amount.
+                </p>
               </div>
+            )}
 
-              <div className="ownedBox">
-                <p className="key">Owned by</p>
-                <p className="value">@{userinfo?.nickname}</p>
-              </div>
-
-              <div className="saleBox">
-                <div className="key">
-                  <p className="price">Current price</p>
-                  <p className="time">Bought</p>
+            {ticketInfo && (
+              <div className="infoBox">
+                <div className="titleBox">
+                  <strong className="title">
+                    Lucky Ticket #{ticketInfo.id}
+                  </strong>
                 </div>
 
-                <div className="value">
-                  <strong className="price">{putCommaAtPrice(100)} USDT</strong>
+                <div className="ownedBox">
+                  <p className="key">Owned by</p>
+                  <p className="value">@{userinfo?.nickname}</p>
+                </div>
 
-                  <ul className="timeList">
-                    <li>{buydate[0]}</li>
-                    <li>{buydate[1]}</li>
-                    <li>{buydate[2]}</li>
-                    <li>{buydate[3]}</li>
+                <div className="saleBox">
+                  <div className="key">
+                    <p className="price">Current price</p>
+                    <p className="time">Bought</p>
+                  </div>
+
+                  <div className="value">
+                    <strong className="price">100 USDT</strong>
+
+                    {/* <ul className="timeList">
+                      <li>{moment(tickTimer).days()}일</li>
+                      <li>{moment(tickTimer).hours()}시간</li>
+                      <li>{moment(tickTimer).month()}분</li>
+                      <li>{moment(tickTimer).second()}초</li>
+                    </ul> */}
+                  </div>
+
+                  <ul className="priceBox">
+                    <li>
+                      <p className="key">Current price</p>
+                      <p className="value">100 USDT</p>
+                    </li>
+                    {/* <li>
+                    <p className="key">Transaction price</p>
+                    <p className="value">100 USDT</p>
+                  </li> */}
+                    <li
+                      onClick={(evt) => {
+                        window.open(txscanurl);
+                      }}
+                    >
+                      {/* <p className="key">TxHash</p>
+                    <p className="value">{txhash}</p> */}
+                    </li>
                   </ul>
                 </div>
 
-                <ul className="priceBox">
-                  <li>
-                    <p className="key">Current price</p>
-                    <p className="value">586 USDT</p>
-                  </li>
-                  <li>
-                    <p className="key">Transaction price</p>
-                    <p className="value">688 USDT</p>
-                  </li>
-                  <li
-                    onClick={(evt) => {
-                      window.open(txscanurl);
-                    }}
-                  >
-                    <p className="key">TxHash</p>
-                    <p className="value">{txhash}</p>
-                  </li>
-                </ul>
+                <button
+                  className="actionBtn"
+                  disabled={tickTimer !== 0 ? true : false}
+                  onClick={() => navigate("/resell")}
+                >
+                  Purchased
+                </button>
+
+                <p className="description">
+                  The NFT purchased by participating in the subscription auction
+                  generates 12% of profits after 3 days and is sold random. In
+                  addition, the results are announced at 9:00 AM, and the
+                  transaction is completed from 9:00 AM to 21:00 PM. If the
+                  transaction is not completed within time, all transactions in
+                  your account will be suspended. It operates normally after
+                  applying a penalty of 10% of the winning bid amount.
+                </p>
               </div>
-
-              <button className="actionBtn" onClick={() => navigate("/resell")}>
-                Sell
-              </button>
-
-              <p className="description">
-                The NFT purchased by participating in the subscription auction
-                generates 12% of profits after 3 days and is sold random. In
-                addition, the results are announced at 9:00 AM, and the
-                transaction is completed from 9:00 AM to 21:00 PM. If the
-                transaction is not completed within time, all transactions in
-                your account will be suspended. It operates normally after
-                applying a penalty of 10% of the winning bid amount.
-              </p>
-            </div>
+            )}
           </li>
-          {itemData.length !== 0 &&
-            itemData.map((item, index) => (
-              <li key={index} className="swapBox">
-                <div className="imgBox">
-                  <img className="itemImg" src={item.itemdata.url} alt="" />
 
-                  <div className="topBar">
-                    <button className="likeBtn" onClick={() => {}}>
+          {itemData &&
+            itemData?.length !== 0 &&
+            itemData.map((item, index) => {
+              return (
+                <li key={index} className="swapBox">
+                  <div className="imgBox">
+                    {item && item.itemdata?.url ? (
+                      <img className="itemImg" src={item.itemdata.url} alt="" />
+                    ) : (
+                      <img className="itemImg" src={E_staking} alt="" />
+                    )}
+
+                    <div className="topBar">
+                      <button className="likeBtn" onClick={() => {}}>
+                        <img src={I_heartO} alt="" />
+                        <p>22</p>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="infoBox">
+                    <div className="titleBox">
+                      <strong className="title">
+                        {item.itemdata.titlename}
+                      </strong>
+                    </div>
+
+                    <div className="ownedBox">
+                      <p className="key">Owned by</p>
+                      <p className="value">@{item.username}</p>
+                    </div>
+                    <div className="ownedBox">
+                      <p className="key">Round Number</p>
+                      <p className="value">{item.itemdata.roundnumber} Round</p>
+                    </div>
+
+                    <div className="saleBox">
+                      <div className="key">
+                        {/* <p className="price">Current price</p> */}
+                        {/* <p className="time">Ending in</p> */}
+                      </div>
+
+                      <div className="value">
+                        <strong className="price">
+                          {parseInt(item.amount).toFixed(2)} USDT
+                        </strong>
+
+                        {/* <ul className="timeList">
+                          <li>{timeReceivables && timeReceivables.days()}일</li>
+                          <li>{timeReceivables && timeReceivables.hour()}시간</li>
+                          <li>{timeReceivables && timeReceivables.minutes()}분</li>
+                          <li>{timeReceivables && timeReceivables.second()}초</li>
+                        </ul> */}
+                      </div>
+
+                      <ul className="priceBox">
+                        <li>
+                          <p className="key">Current price</p>
+                          <p className="value">
+                            {parseInt(item.amount).toFixed(2)} USDT
+                          </p>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <button
+                      className="actionBtn"
+                      onClick={() => {
+                        setReceivables(item);
+                        openModal();
+                        setItemDataInfo(item.itemdata);
+                      }}
+                    >
+                      Pay
+                    </button>
+
+                    <p className="description">
+                      The NFT purchased by participating in the subscription
+                      auction generates 12% of profits after 3 days and is sold
+                      random. In addition, the results are announced at 9:00 AM,
+                      and the transaction is completed from 9:00 AM to 21:00 PM.
+                      If the transaction is not completed within time, all
+                      transactions in your account will be suspended. It
+                      operates normally after applying a penalty of 10% of the
+                      winning bid amount.
+                    </p>
+                  </div>
+                </li>
+              );
+            })}
+
+          {itemBalData.length !== 0 &&
+            itemBalData.map((item, index) => (
+              <li key={index} className="swapBox">
+                <div className="imgBoxBal">
+                  {item && item.itemdata?.url ? (
+                    <img className="itemImg" src={item.itemdata.url} alt="" />
+                  ) : (
+                    <img className="itemImg" src={E_staking} alt="" />
+                  )}
+
+                  <div className="topBarBal">
+                    <button className="likeBtnBal" onClick={() => {}}>
                       <img src={I_heartO} alt="" />
                       <p>22</p>
                     </button>
                   </div>
                 </div>
-
                 <div className="infoBox">
                   <div className="titleBox">
-                    <strong className="title">{item.itemdata.titlename}</strong>
+                    <strong className="title">
+                      {item && item.itemdata?.titlename}
+                    </strong>
                   </div>
 
                   <div className="ownedBox">
                     <p className="key">Owned by</p>
-                    <p className="value">@andyfeltham</p>
+                    <p className="value">@{item && item.username}</p>
+                  </div>
+                  <div className="ownedBox">
+                    <p className="key">Bought Date</p>
+                    <p className="value">
+                      {moment(item && item.createdat).format("YYYY-MM-DD")}
+                    </p>
+                    <p className="key">Sold Date</p>
+                    <p className="value">
+                      {moment(item && item.createdat)
+                        .add(3, "days")
+                        .format("YYYY-MM-DD")}
+                    </p>
                   </div>
 
                   <div className="saleBox">
-                    <div className="key">
-                      <p className="price">Current price</p>
-                      <p className="time">Ending in</p>
-                    </div>
-
-                    <div className="value">
-                      <strong className="price">
-                        {putCommaAtPrice(372)} USDT
-                      </strong>
-
+                    <div className="key"></div>
+                    {/* <div className="value">
                       <ul className="timeList">
-                        <li>00</li>
-                        <li>00</li>
-                        <li>00</li>
-                        <li>00</li>
+                        <li>{timeMoment && timeMoment.day()}일</li>
+                        <li>{timeMoment && timeMoment.hour()}시간</li>
+                        <li>{timeMoment && timeMoment.minutes()}분</li>
+                        <li>{timeMoment && timeMoment.second()}초</li>
                       </ul>
-                    </div>
+                    </div> */}
 
                     <ul className="priceBox">
-                      <li>
+                      {/* {circulations?.map((itm, i) => {
+                          if (item?.itemid === itm.itemid)
+                            return (
+                              <p className="value">
+                                {" "}
+                                {parseInt(itm.price).toFixed(2)} USDT
+                              </p>
+                            );
+                        })} */}
+
+                      <li key={index}>
                         <p className="key">Current price</p>
-                        <p className="value">586 USDT</p>
+                        <p className="value">
+                          {" "}
+                          {parseInt(item && item.buyprice).toFixed(2)} USDT
+                        </p>
                       </li>
-                      <li>
-                        <p className="key">Transaction price</p>
-                        <p className="value">688 USDT</p>
-                      </li>
-                      <li
-                        onClick={(evt) => {
-                          window.open(txscanurl);
-                        }}
+
+                      <button
+                        className="actionBtn"
+                        onClick={() => navigate("/resell/" + item.itemid)}
                       >
-                        <p className="key">TxHash</p>
-                        <p className="value">{txhash}</p>
-                      </li>
+                        Sell
+                      </button>
                     </ul>
                   </div>
-
-                  <button className="actionBtn" onClick={openModal}>
-                    Pay
-                  </button>
 
                   <p className="description">
                     The NFT purchased by participating in the subscription
@@ -641,86 +849,13 @@ export default function MyItems() {
               </li>
             ))}
 
-          {isOpen && <PayPopup off={openModal} />}
-
-          {/* <li className="sellBox">
-            <div className="imgBox">
-              <img className="itemImg" src={E_item3} alt="" />
-
-              <div className="topBar">
-                <button className="likeBtn" onClick={() => {}}>
-                  <img src={I_heartO} alt="" />
-                  <p>22</p>
-                </button>
-              </div>
-            </div>
-
-            <div className="infoBox">
-              <div className="titleBox">
-                <strong className="title">King Kong #010000</strong>
-              </div>
-
-              <div className="ownedBox">
-                <p className="key">Owned by</p>
-                <p className="value">@andyfeltham</p>
-              </div>
-
-              <div className="saleBox">
-                <div className="key">
-                  <p className="price">Current price</p>
-                  <p className="time">Ending in</p>
-                </div>
-
-                <div className="value">
-                  <strong className="price">
-                    {putCommaAtPrice(686.6)} USDT
-                  </strong>
-
-                  <ul className="timeList">
-                    <li>00</li>
-                    <li>12</li>
-                    <li>59</li>
-                    <li>09</li>
-                  </ul>
-                </div>
-
-                <ul className="priceBox">
-                  <li>
-                    <p className="key">Current price</p>
-                    <p className="value">10 USDT</p>
-                  </li>
-                  <li>
-                    <p className="key">Transaction price</p>
-                    <p className="value">15 USDT</p>
-                  </li>
-                  <li
-                    onClick={evt => {
-                      window.open(txscanurl);
-                    }}
-                  >
-                    <p className="key">TxHash</p>
-                    <p className="value">{txhash}</p>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="btnBox">
-                <button
-                  className="actionBtn"
-                  onClick={() => navigate("/resell")}
-                >
-                  Sell
-                </button>
-                <button className="actionBtn">Staking</button>
-              </div>
-
-              <p className="description">
-                King Kong NFT can be staking or sold to Marketplace at a price
-                of up to 25%. If you steaking, you will get 30% annual NIP COIN
-                reward.
-              </p>
-            </div>
-          </li> */}
+          {isOpen && (
+            <PayPopup
+              off={openModal}
+              userInfo={userinfo}
+              receivables={receivables}
+            />
+          )}
         </ul>
       </PmyItemsBox>
     );
@@ -728,16 +863,13 @@ export default function MyItems() {
 
 const MmyItemsBox = styled.section`
   padding: 4.44vw 5.55vw 0 5.55vw;
-
   & > .topBar {
     display: flex;
     flex-direction: column;
     gap: 2.77vw;
-
     .sortBox {
       position: relative;
       width: 100%;
-
       .sortBtn {
         display: flex;
         justify-content: space-between;
@@ -752,10 +884,8 @@ const MmyItemsBox = styled.section`
         border-radius: 3.33vw;
       }
     }
-
     .filterList {
       display: flex;
-
       li {
         display: flex;
         justify-content: center;
@@ -767,7 +897,6 @@ const MmyItemsBox = styled.section`
         font-family: "Roboto", sans-serif;
         border-radius: 3.33vw;
         cursor: pointer;
-
         &.on {
           color: #fff;
           background: #000;
@@ -775,28 +904,30 @@ const MmyItemsBox = styled.section`
       }
     }
   }
-
   .itemList {
     display: flex;
     flex-direction: column;
     gap: 10vw;
     margin: 5.55vw 0 0 0;
-
     * {
       font-family: "Roboto", sans-serif;
     }
-
     & > li {
       display: flex;
       flex-direction: column;
       gap: 3.33vw;
-
       .imgBox {
         width: 100%;
         height: 88.9vw;
         border-radius: 3.33vw;
         position: relative;
         overflow: hidden;
+        border-radius: 12px;
+        border: 20px solid transparent;
+        background-image: linear-gradient(to right, red 0%, orange 100%),
+          linear-gradient(to right, red 0%, orange 100%);
+        background-origin: border-box;
+        background-clip: content-box, border-box;
 
         .itemImg {
           width: 100%;
@@ -804,14 +935,12 @@ const MmyItemsBox = styled.section`
           object-fit: contain;
           position: absolute;
         }
-
         .topBar {
           display: flex;
           justify-content: space-between;
           width: 100%;
           padding: 2.5vw 3.61vw;
           position: relative;
-
           .likeBtn {
             display: flex;
             justify-content: center;
@@ -829,7 +958,6 @@ const MmyItemsBox = styled.section`
           }
         }
       }
-
       .infoBox {
         .titleBox {
           display: flex;
@@ -837,35 +965,29 @@ const MmyItemsBox = styled.section`
           align-items: center;
           font-size: 7.77vw;
           font-weight: 600;
-
           .title {
             font-family: "Poppins", sans-serif;
           }
         }
-
         .ownedBox {
           display: flex;
           gap: 1.94vw;
           margin: 1.94vw 0 0 0;
           font-size: 4.44vw;
           font-weight: 500;
-
           .key {
             color: #7a7a7a;
           }
         }
-
         .saleBox {
           display: flex;
           flex-direction: column;
           gap: 1.38vw;
           margin: 4.44vw 0 0 0;
-
           .price {
             display: flex;
             flex-direction: column;
             gap: 1.11vw;
-
             .key {
               font-size: 3.88vw;
               font-weight: 500;
@@ -879,33 +1001,29 @@ const MmyItemsBox = styled.section`
             flex-direction: column;
             align-items: flex-end;
             gap: 3.33vw;
-
             .key {
               font-size: 5vw;
               font-weight: 500;
             }
-
             .timeList {
               display: flex;
               gap: 10px;
-
               li {
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                width: 9.72vw;
-                height: 9.72vw;
+                width: 80px;
+                height: 45px;
                 font-weight: 700;
-                font-size: 5.55vw;
-                line-height: 5.55vw;
+                font-size: 24px;
+                line-height: 24px;
                 color: #fff;
                 background: #000;
-                border-radius: 1.66vw;
+                border-radius: 6px;
               }
             }
           }
         }
-
         .priceBox {
           display: flex;
           flex-direction: column;
@@ -914,7 +1032,6 @@ const MmyItemsBox = styled.section`
           margin: 4.4vw 0 0 0;
           background: #f7f7f7;
           border-radius: 3.33vw;
-
           li {
             display: flex;
             justify-content: space-between;
@@ -922,7 +1039,6 @@ const MmyItemsBox = styled.section`
             font-weight: 500;
           }
         }
-
         .actionBtn {
           display: flex;
           justify-content: center;
@@ -938,18 +1054,15 @@ const MmyItemsBox = styled.section`
           background: #000;
           border-radius: 3.33vw;
         }
-
         .description {
           margin: 5.55vw 0 0 0;
           font-size: 3.88vw;
           color: #7a7a7a;
         }
       }
-
       &.stakingBox {
         .imgBox {
           background: #000;
-
           .itemImg {
             width: 71.66vw;
             height: 71.66vw;
@@ -957,13 +1070,11 @@ const MmyItemsBox = styled.section`
             left: 50%;
             transform: translate(-50%, 0%);
           }
-
           .topBar {
             height: unset;
             padding: 6.66vw 5vw;
             justify-content: space-between;
             align-items: center;
-
             .profImg {
               display: flex;
               justify-content: center;
@@ -975,14 +1086,12 @@ const MmyItemsBox = styled.section`
               background: #fff;
               border: 1.38vw solid #333;
               backdrop-filter: blur(60px);
-
               img {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
               }
             }
-
             .profName {
               display: flex;
               justify-content: center;
@@ -993,7 +1102,6 @@ const MmyItemsBox = styled.section`
               font-size: 4.44vw;
               color: #fff;
               background: #333;
-
               strong {
                 font-family: "Poppins", sans-serif;
               }
@@ -1001,14 +1109,12 @@ const MmyItemsBox = styled.section`
           }
         }
       }
-
       &.swapBox {
         .saleBox {
           .time {
             .key {
               color: #ff5050;
             }
-
             .timeList {
               li {
                 background: #d9d9d9;
@@ -1017,15 +1123,50 @@ const MmyItemsBox = styled.section`
           }
         }
       }
-
       &.sellBox {
         .btnBox {
           display: flex;
           gap: 20px;
-
           button {
             flex: 1;
           }
+        }
+      }
+    }
+    .imgBoxBal {
+      display: flex;
+      flex-direction: column;
+      * {
+        font-family: "Roboto", sans-serif;
+      }
+      width: 760px;
+      height: 760px;
+      position: relative;
+      overflow: hidden;
+      .itemImgBal {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        position: absolute;
+        border-radius: 12px;
+      }
+      .topBarBal {
+        display: flex;
+        justify-content: flex-end;
+        padding: 36px;
+        .likeBtnBal {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 8px;
+          width: 110px;
+          height: 54px;
+          font-size: 22px;
+          font-weight: 500;
+          color: #ff5050;
+          background: rgba(255, 255, 255, 0.2);
+          backdrop-filter: blur(60px);
+          border-radius: 30px;
         }
       }
     }
@@ -1038,11 +1179,9 @@ const PmyItemsBox = styled.section`
     justify-content: space-between;
     align-items: center;
     height: 92px;
-
     .filterList {
       display: flex;
       gap: 10px;
-
       li {
         padding: 12px 14px;
         font-size: 18px;
@@ -1050,18 +1189,15 @@ const PmyItemsBox = styled.section`
         font-family: "Roboto", sans-serif;
         border-radius: 12px;
         cursor: pointer;
-
         &.on {
           color: #fff;
           background: #000;
         }
       }
     }
-
     .sortBox {
       position: relative;
       width: 240px;
-
       .sortBtn {
         display: flex;
         justify-content: space-between;
@@ -1077,33 +1213,32 @@ const PmyItemsBox = styled.section`
       }
     }
   }
-
   .itemList {
     display: flex;
     flex-direction: column;
     gap: 90px;
-
     * {
       font-family: "Roboto", sans-serif;
     }
-
     li {
       display: flex;
       justify-content: space-between;
       gap: 40px;
-
       .imgBox {
         width: 760px;
         height: 760px;
-        border-radius: 12px;
         position: relative;
         overflow: hidden;
-
+        border-radius: 12px;
+        border: 20px solid transparent;
+        background-image: linear-gradient(red, red),
+          linear-gradient(to right, red 0%, orange 100%);
+        background-origin: border-box;
+        background-clip: content-box, border-box;
         @media screen and (max-width: 1440px) {
           min-width: 500px;
           height: 500px;
         }
-
         .itemImg {
           width: 100%;
           height: 100%;
@@ -1111,12 +1246,10 @@ const PmyItemsBox = styled.section`
           position: absolute;
           border-radius: 12px;
         }
-
         .topBar {
           display: flex;
           justify-content: flex-end;
           padding: 36px;
-
           .likeBtn {
             display: flex;
             justify-content: center;
@@ -1133,12 +1266,10 @@ const PmyItemsBox = styled.section`
           }
         }
       }
-
       .infoBox {
         max-width: 608px;
         min-width: 445px;
         width: 100%;
-
         .titleBox {
           display: flex;
           justify-content: space-between;
@@ -1146,15 +1277,12 @@ const PmyItemsBox = styled.section`
           font-size: 56px;
           font-weight: 600;
           line-height: 84px;
-
           .title {
             font-family: "Poppins", sans-serif;
           }
-
           .btnBox {
             display: flex;
             gap: 20px;
-
             button {
               display: flex;
               justify-content: center;
@@ -1164,32 +1292,40 @@ const PmyItemsBox = styled.section`
               padding: 10px;
               border-radius: 50%;
               box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
-
               img {
                 width: 100%;
               }
             }
           }
         }
-
         .ownedBox {
           display: flex;
           gap: 10px;
           margin: 14px 0 0 0;
           font-size: 18px;
           font-weight: 500;
-
           .key {
             color: #7a7a7a;
           }
         }
-
         .saleBox {
           display: flex;
           flex-direction: column;
           gap: 14px;
           margin: 44px 0 0 0;
-
+          button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 45px;
+            font-weight: 700;
+            font-size: 24px;
+            line-height: 24px;
+            color: #fff;
+            background: #000;
+            border-radius: 6px;
+          }
           .key {
             display: flex;
             justify-content: space-between;
@@ -1197,16 +1333,13 @@ const PmyItemsBox = styled.section`
             font-weight: 500;
             line-height: 21px;
           }
-
           .value {
             display: flex;
             justify-content: space-between;
             align-items: center;
-
             .price {
               font-size: 38px;
             }
-
             .timeList {
               display: flex;
               gap: 10px;
@@ -1226,7 +1359,6 @@ const PmyItemsBox = styled.section`
               }
             }
           }
-
           .priceBox {
             display: flex;
             flex-direction: column;
@@ -1234,14 +1366,12 @@ const PmyItemsBox = styled.section`
             padding: 20px;
             background: #f7f7f7;
             border-radius: 12px;
-
             li {
               font-size: 18px;
               font-weight: 500;
             }
           }
         }
-
         .actionBtn {
           display: flex;
           justify-content: center;
@@ -1257,18 +1387,15 @@ const PmyItemsBox = styled.section`
           background: #000;
           border-radius: 12px;
         }
-
         .description {
           margin: 30px 0 0 0;
           font-size: 18px;
           color: #7a7a7a;
         }
       }
-
       &.stakingBox {
         .imgBox {
           background: #000;
-
           .itemImg {
             width: 400px;
             height: 400px;
@@ -1276,12 +1403,10 @@ const PmyItemsBox = styled.section`
             left: 50%;
             transform: translate(-50%, -50%);
           }
-
           .topBar {
             height: unset;
             padding: 25px 40px;
             justify-content: space-between;
-
             .profImg {
               display: flex;
               justify-content: center;
@@ -1293,14 +1418,12 @@ const PmyItemsBox = styled.section`
               background: #fff;
               border: 7px solid #333;
               backdrop-filter: blur(60px);
-
               img {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
               }
             }
-
             .profName {
               display: flex;
               justify-content: center;
@@ -1311,7 +1434,6 @@ const PmyItemsBox = styled.section`
               font-size: 22px;
               color: #fff;
               background: #333;
-
               strong {
                 font-family: "Poppins", sans-serif;
               }
@@ -1319,11 +1441,6 @@ const PmyItemsBox = styled.section`
           }
         }
       }
-
-      h5 {
-        text-align: center;
-      }
-
       &.swapBox {
         .saleBox {
           .key {
@@ -1331,7 +1448,6 @@ const PmyItemsBox = styled.section`
               color: #ff5050;
             }
           }
-
           .value {
             .timeList {
               li {
@@ -1341,12 +1457,293 @@ const PmyItemsBox = styled.section`
           }
         }
       }
-
       &.sellBox {
         .btnBox {
           display: flex;
           gap: 20px;
+          button {
+            flex: 1;
+          }
+        }
+      }
+    }
+  }
+  .imgBoxBal {
+    display: flex;
+    flex-direction: column;
+    * {
+      font-family: "Roboto", sans-serif;
+    }
+    width: 760px;
+    height: 760px;
+    position: relative;
+    overflow: hidden;
+    @media screen and (max-width: 1440px) {
+      min-width: 500px;
+      height: 500px;
+    }
+    .itemImgBal {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      position: absolute;
+      border-radius: 12px;
+    }
+    .topBarBal {
+      display: flex;
+      justify-content: flex-end;
+      padding: 36px;
+      .likeBtnBal {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        width: 110px;
+        height: 54px;
+        font-size: 22px;
+        font-weight: 500;
+        color: #ff5050;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(60px);
+        border-radius: 30px;
+      }
+    }
+  }
+  .itemList {
+    display: flex;
+    flex-direction: column;
+    gap: 90px;
+    * {
+      font-family: "Roboto", sans-serif;
+    }
 
+    li {
+      display: flex;
+      justify-content: space-between;
+      gap: 40px;
+      .imgBox {
+        width: 760px;
+        height: 760px;
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+        border: 20px solid transparent;
+        background-image: linear-gradient(to right, red 0%, orange 100%),
+          linear-gradient(to right, red 0%, orange 100%);
+        background-origin: border-box;
+        background-clip: content-box, border-box;
+        @media screen and (max-width: 1440px) {
+          min-width: 500px;
+          height: 500px;
+        }
+        .itemImg {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          position: absolute;
+          border-radius: 12px;
+        }
+        .topBar {
+          display: flex;
+          justify-content: flex-end;
+          padding: 36px;
+          .likeBtn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            width: 110px;
+            height: 54px;
+            font-size: 22px;
+            font-weight: 500;
+            color: #ff5050;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(60px);
+            border-radius: 30px;
+          }
+        }
+      }
+      .infoBox {
+        max-width: 608px;
+        min-width: 445px;
+        width: 100%;
+        .titleBox {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 56px;
+          font-weight: 600;
+          line-height: 84px;
+          .title {
+            font-family: "Poppins", sans-serif;
+          }
+          .btnBox {
+            display: flex;
+            gap: 20px;
+            button {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              width: 40px;
+              height: 40px;
+              padding: 10px;
+              border-radius: 50%;
+              box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+              img {
+                width: 100%;
+              }
+            }
+          }
+        }
+        .ownedBox {
+          display: flex;
+          gap: 10px;
+          margin: 14px 0 0 0;
+          font-size: 18px;
+          font-weight: 500;
+          .key {
+            color: #7a7a7a;
+          }
+        }
+        .saleBox {
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+          margin: 44px 0 0 0;
+          .key {
+            display: flex;
+            justify-content: space-between;
+            font-size: 18px;
+            font-weight: 500;
+            line-height: 21px;
+          }
+          .value {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            .price {
+              font-size: 38px;
+            }
+            .timeList {
+              display: flex;
+              gap: 10px;
+              li {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 70px;
+                height: 50px;
+                font-weight: 700;
+                font-size: 20px;
+                line-height: 24px;
+                color: #fff;
+                background: #000;
+                border-radius: 6px;
+              }
+            }
+          }
+          .priceBox {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 20px;
+            background: #f7f7f7;
+            border-radius: 12px;
+            li {
+              font-size: 18px;
+              font-weight: 500;
+            }
+          }
+        }
+        .actionBtn {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+          height: 60px;
+          margin: 60px 0 0 0;
+          font-size: 20px;
+          font-weight: 500;
+          line-height: 20px;
+          color: #fff;
+          font-family: "Poppins", sans-serif;
+          background: #000;
+          border-radius: 12px;
+        }
+        .description {
+          margin: 30px 0 0 0;
+          font-size: 18px;
+          color: #7a7a7a;
+        }
+      }
+      &.stakingBox {
+        .imgBox {
+          background: #000;
+          .itemImg {
+            width: 400px;
+            height: 400px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+          }
+          .topBar {
+            height: unset;
+            padding: 25px 40px;
+            justify-content: space-between;
+            .profImg {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              width: 82px;
+              height: 82px;
+              padding: 16px;
+              border-radius: 50%;
+              background: #fff;
+              border: 7px solid #333;
+              backdrop-filter: blur(60px);
+              img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+              }
+            }
+            .profName {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              width: 206px;
+              height: 52px;
+              border-radius: 30px;
+              font-size: 22px;
+              color: #fff;
+              background: #333;
+              strong {
+                font-family: "Poppins", sans-serif;
+              }
+            }
+          }
+        }
+      }
+      &.swapBox {
+        .saleBox {
+          .key {
+            .time {
+              color: #ff5050;
+            }
+          }
+          .value {
+            .timeList {
+              li {
+                background: #d9d9d9;
+              }
+            }
+          }
+        }
+      }
+      &.sellBox {
+        .btnBox {
+          display: flex;
+          gap: 20px;
           button {
             flex: 1;
           }

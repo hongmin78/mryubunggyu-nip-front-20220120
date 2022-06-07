@@ -21,6 +21,9 @@ import axios from "axios";
 import { API } from "../configs/api";
 import { addresses } from "../configs/addresses";
 import { TIME_FETCH_MYADDRESS_DEF } from "../configs/configs";
+import SetErrorBar from "../util/SetErrorBar.js";
+import { messages } from "../configs/messages";
+import { net } from "../configs/net";
 
 export default function Mypage() {
   const navigate = useNavigate();
@@ -29,22 +32,27 @@ export default function Mypage() {
   const [category, setCategory] = useState(0);
   const [showEditBtn, setShowEditBtn] = useState(false);
   const [showCopyBtn, setShowCopyBtn] = useState(false);
-  let [userinfo, setuserinfo] = useState();
+  const [userinfo, setuserinfo] = useState();
 
   const fetchdata = async (_) => {
     let myaddress = getmyaddress();
-    axios.get(API.API_USERINFO + `/${myaddress}`).then((resp) => {
-      LOGGER("", resp.data);
-      let { status, respdata } = resp.data;
-      if (status == "OK") {
-        setuserinfo(respdata);
-      }
-    });
+    if (myaddress) {
+      axios
+        .get(API.API_USERINFO + `/${myaddress}?nettype=${net}`)
+        .then((resp) => {
+          LOGGER("userInfo", resp.data);
+          let { status, respdata } = resp.data;
+
+          if (status == "OK") {
+            setuserinfo(respdata);
+          }
+        });
+    } else {
+      SetErrorBar(messages.MSG_CONNECTWALET);
+    }
   };
   useEffect((_) => {
-    setTimeout((_) => {
-      fetchdata();
-    }, TIME_FETCH_MYADDRESS_DEF);
+    fetchdata();
   }, []);
 
   if (isMobile)
@@ -52,102 +60,6 @@ export default function Mypage() {
       <>
         <Header />
         <MmypageBox>
-          <article className="profBox">
-            <img className="bg" src={B_mypage} alt="" />
-            <div className="contBox">
-              <div className="topBar">
-                <span className="profImg">
-                  <img src={E_prof} alt="" />
-                </span>
-
-                <div className="btnBox">
-                  <div className="posBox">
-                    <button
-                      className="moreBtn hoverBtn"
-                      onClick={() => setShowEditBtn(true)}
-                    >
-                      <img src={I_3dot} alt="" />
-                    </button>
-
-                    {showEditBtn && (
-                      <>
-                        <button
-                          className="editBtn displayBtn"
-                          onClick={() => navigate("/editprof")}
-                        >
-                          <p>Edit Profile</p>
-                        </button>
-                        <PopupBg off={setShowEditBtn} />
-                      </>
-                    )}
-                  </div>
-
-                  <div className="posBox">
-                    <button
-                      className="shareBtn hoverBtn"
-                      onClick={() => setShowCopyBtn(true)}
-                    >
-                      <img src={I_upload} alt="" />
-                      <p>Share</p>
-                    </button>
-
-                    {showCopyBtn && (
-                      <>
-                        <button
-                          className="copyBtn displayBtn"
-                          onClick={() => setShowCopyBtn(false)}
-                        >
-                          <img src={I_clip} alt="" />
-                          <p>Copy Link</p>
-                        </button>
-                        <PopupBg off={setShowCopyBtn} />
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <span className="adressContainer">
-                <span className="name">@{userinfo?.nickname}</span>
-                <span className="addressBox">
-                  <p>{strDot(isLogin, 4, 4)}</p>
-                  <img src={I_copy} alt="" />
-                </span>
-              </span>
-            </div>
-          </article>
-
-          <article className="categoryCont">
-            <ul className="categoryBar">
-              {categoryList.map((cont, index) => (
-                <li key={index} onClick={() => setCategory(index)}>
-                  <p>{cont}</p>
-
-                  <div
-                    className="underLine"
-                    style={{
-                      display: category === index && "block",
-                    }}
-                  />
-                </li>
-              ))}
-            </ul>
-
-            <div className="contBox">
-              {category === 0 && <MyItems />}
-              {category === 1 && <Staking />}
-              {category === 2 && <Recommend />}
-            </div>
-          </article>
-        </MmypageBox>
-        <Footer />
-      </>
-    );
-  else
-    return (
-      <>
-        <Header />
-        <PmypageBox>
           <article className="profBox">
             <img className="bg" src={B_mypage} alt="" />
             <div className="contBox">
@@ -217,7 +129,88 @@ export default function Mypage() {
             <div className="contBox">
               {category === 0 && <MyItems />}
               {category === 1 && <Staking />}
-              {category === 2 && <Recommend />}
+              {category === 2 && <Recommend userinfo={userinfo} />}
+            </div>
+          </article>
+        </MmypageBox>
+        <Footer />
+      </>
+    );
+  else
+    return (
+      <>
+        <Header />
+        <PmypageBox>
+          <article className="profBox">
+            <img className="bg" src={B_mypage} alt="" />
+            <div className="contBox">
+              <div className="leftBox">
+                <span className="profImg">
+                  <img src={userinfo?.profileimageurl} alt="" />
+                </span>
+
+                <span className="adressContainer">
+                  <span className="name">@{userinfo?.nickname}</span>
+                  <span className="addressBox">
+                    <p>{strDot(isLogin, 10)}</p>
+                    <img src={I_copy} alt="" />
+                  </span>
+                </span>
+              </div>
+
+              <div className="btnBox">
+                <div className="posBox">
+                  <button className="moreBtn hoverBtn" onClick={() => {}}>
+                    <img src={I_3dot} alt="" />
+                  </button>
+
+                  <div className="hoverBox">
+                    <button
+                      className="editBtn displayBtn"
+                      onClick={() => navigate("/editprof", { state: userinfo })}
+                    >
+                      <p>Edit Profile</p>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="posBox">
+                  <button className="shareBtn hoverBtn" onClick={() => {}}>
+                    <img src={I_upload} alt="" />
+                    <p>Share</p>
+                  </button>
+
+                  <div className="hoverBox">
+                    <button className="copyBtn displayBtn" onClick={() => {}}>
+                      <img src={I_clip} alt="" />
+                      <p>Copy Link</p>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article className="categoryCont">
+            <ul className="categoryBar">
+              {categoryList.map((cont, index) => (
+                <li key={index} onClick={() => setCategory(index)}>
+                  <p>{cont}</p>
+
+                  <div
+                    className="underLine"
+                    style={{
+                      display: category === index && "block",
+                    }}
+                  />
+                </li>
+              ))}
+            </ul>
+
+            <div className="contBox">
+              {category === 0 && <MyItems />}
+              {category === 1 && <Staking />}
+              {category === 2 && <Recommend userinfo={userinfo} />}
             </div>
           </article>
         </PmypageBox>
@@ -298,7 +291,7 @@ const MmypageBox = styled.section`
               height: 10.55vw;
               font-size: 3.88vw;
               font-weight: 500;
-              background: #fff;
+              background: red;
               box-shadow: 2px 0px 6px rgba(0, 0, 0, 0.1);
 
               &.moreBtn {

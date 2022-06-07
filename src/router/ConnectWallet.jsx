@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import I_metaMask from "../img/icon/I_metaMask.svg";
@@ -13,41 +13,55 @@ import SetErrorBar from "../util/SetErrorBar";
 import axios from "axios";
 import { API } from "../configs/api";
 import { messages } from "../configs/messages";
-import { TIME_PAGE_TRANSITION_DEF } from '../configs/configs'
+import { TIME_PAGE_TRANSITION_DEF } from "../configs/configs";
+import { net } from "../configs/net";
 
 export default function ConnectWallet() {
   const navigate = useNavigate();
   const param = useParams();
   const dispatch = useDispatch();
   const isMobile = useSelector((state) => state.common.isMobile);
-  const [signUpPopup, setSignUpPopup ] = useState(false);
+  const [signUpPopup, setSignUpPopup] = useState(false);
   const [walletAddress, setWalletAddress] = useState("");
 
   async function requestconnect() {
     let { ethereum } = window;
-		if ( ethereum ) {}
-		else { return }
+    if (ethereum) {
+    } else {
+      SetErrorBar("Please Install MetaMask");
+      return;
+    }
     ethereum.request({ method: "eth_requestAccounts" }).then(async (res) => {
-			if (res && res[0]){} else {SetErrorBar ( messages.MSG_PLEASE_CONNECT_WALLET ); return }
+      if (res && res[0]) {
+      } else {
+        SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+        return;
+      }
       let address = res[0];
-      setWalletAddress( address )
-      try{
-				const resp = await axios.post ( API.API_LOGIN , {address 
-					, cryptotype : 'ETH' 
-				} ) // login( address )
-				console.log ( '' , resp.data ) // walletAddress
-				let { status }=resp.data 
-				if ( status == 'OK'){
-					dispatch(setLogin( address )); // resp.walletAddress
-//					localStorage.setItem("walletAddress", resp.walletAddress);
-					SetErrorBar( messages.MSG_DONE_LOGIN  ) // resp.message
-					setTimeout ( _=>{
-						navigate("/")
-					} , TIME_PAGE_TRANSITION_DEF )
-				} else {				
-					if (isMobile){navigate('/signup') } // navigate("signup");
-					else {	setSignUpPopup(true) } 
-				}
+      setWalletAddress(address);
+      try {
+        const resp = await axios.post(API.API_LOGIN + `?nettype=${net}`, {
+          address,
+          cryptotype: "ETH",
+          nettype: net,
+        }); // login( address )
+        console.log("", resp.data); // walletAddress
+        let { status } = resp.data;
+        if (status == "OK") {
+          dispatch(setLogin(address)); // resp.walletAddress
+          //					localStorage.setItem("walletAddress", resp.walletAddress);
+          SetErrorBar(messages.MSG_DONE_LOGIN); // resp.message
+          setTimeout((_) => {
+            navigate("/");
+          }, TIME_PAGE_TRANSITION_DEF);
+        } else {
+          if (isMobile) {
+            navigate("/connectwallet/:popup");
+          } // navigate("signup");
+          else {
+            setSignUpPopup(true);
+          }
+        }
       } catch {
         if (isMobile) navigate("signup");
         else setSignUpPopup(true);
@@ -56,6 +70,11 @@ export default function ConnectWallet() {
       // dispatch(setLogin(address));
     });
   }
+  useEffect((_) => {
+    if (param.referer) {
+      localStorage.setItem("referer", param.referer);
+    }
+  }, []);
 
   if (param.popup) return <SignUpPopup walletAddress={walletAddress} />;
   else
@@ -84,7 +103,7 @@ const ConnectWalletBox = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 60px;
-  padding: 280px 0 0 0;
+  padding: 280px 0 280px 0;
 
   .explain {
     font-size: 24px;

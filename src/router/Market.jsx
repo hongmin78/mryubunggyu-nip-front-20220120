@@ -5,15 +5,16 @@ import I_dnArw from "../img/icon/I_dnArw.svg";
 import Footer from "./Footer";
 import PopupBg from "../components/PopupBg";
 import MarketItem from "../components/MarketItem";
-import MarketItem0227 from '../components/MarketItem0227'
+import MarketItem0227 from "../components/MarketItem0227";
 
 import { D_marketItemList, D_sortList } from "../data/Dmarket";
 import SelectPopup from "../components/SelectPopup";
 import { useSelector } from "react-redux";
 import Header from "../components/header/Header";
-import { API } from '../configs/api'
+import { API } from "../configs/api";
 import { LOGGER } from "../util/common";
-import axios from 'axios'
+import axios from "axios";
+import { net } from "../configs/net";
 
 export default function Market() {
   const searchBoxRef = useRef();
@@ -24,19 +25,34 @@ export default function Market() {
   const [sortPopup, setSortPopup] = useState(false);
   const [likeObj, setLikeObj] = useState({});
   const [limit, setLimit] = useState(8);
-	let [ D_marketItemList , setD_marketItemList ] = useState( [] )
-	const fetchdata=()=>{
-		axios.get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC`).then(resp=>{
-			LOGGER('' , resp.data )
-			let { status , list } = resp.data
-			if ( status == 'OK' ) {
-				setD_marketItemList ( list )
-			}
-		})
-	}
-	useEffect(()=>{
-		fetchdata()
-	}, [] )
+  let [D_marketItemList, setD_marketItemList] = useState([]);
+  // const fetchdata = () => {
+  //   axios.get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC?nettype=${net}`).then((resp) => {
+  //     LOGGER("", resp.data);
+  //     let { status, list } = resp.data;
+  //     if (status == "OK") {
+  //       setD_marketItemList(list);
+  //     }
+  //   });
+  // };
+  const fetchData = async () => {
+    try {
+      const res = await axios.get(
+        API.API_ALL_ITEMS_MARKET + `/active/1/0/100/id/DESC?nettype=${net}`
+      );
+      if (res.data && res.data.list) {
+        let { list } = res.data;
+        console.log("$market_items", res);
+        setD_marketItemList(list);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
   if (isMobile)
     return (
       <>
@@ -44,7 +60,7 @@ export default function Market() {
         <MmarketBox>
           <div className="innerBox">
             <section className="topBar">
-              <p className="title">Marketplece All NFTs</p>
+              <p className="title">Marketplace All NFTs</p>
 
               <article className="rightBox">
                 <div className="searchBox" ref={searchBoxRef}>
@@ -95,7 +111,7 @@ export default function Market() {
             </section>
 
             <ul className="itemList">
-              {D_marketItemList.map( (cont, index) => {
+              {D_marketItemList.map((cont, index) => {
                 if (index < limit)
                   return (
                     <Fragment key={index}>
@@ -125,7 +141,7 @@ export default function Market() {
         <Header />
         <PmarketBox>
           <section className="topBar">
-            <p className="title">Marketplece All NFTs</p>
+            <p className="title">Marketplace All NFTs</p>
 
             <article className="rightBox">
               <div className="searchBox" ref={searchBoxRef}>
@@ -351,7 +367,7 @@ const PmarketBox = styled.div`
           display: flex;
           justify-content: center;
           align-content: center;
-          
+
           img {
             width: 24px;
             height: 24px;

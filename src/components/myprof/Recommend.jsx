@@ -2,16 +2,54 @@ import styled from "styled-components";
 import I_copy from "../../img/icon/I_copy.svg";
 import I_circleChk from "../../img/icon/I_circleChk.svg";
 import { D_recommendList } from "../../data/DmyPage";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { strDot } from "../../util/Util";
 import { onclickcopy } from "../../util/common.js";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { API } from "../../configs/api";
+import { getmyaddress, LOGGER } from "../../util/common";
+import SetErrorBar from "../../util/SetErrorBar.js";
+import { messages } from "../../configs/messages";
+import { TIME_FETCH_MYADDRESS_DEF } from "../../configs/configs";
+import { net } from "../../configs/net";
 
 export default function Recommend() {
   const isMobile = useSelector((state) => state.common.isMobile);
+  const navigate = useNavigate();
 
   const [toggleCode, setToggleCode] = useState(false);
   const [toggleLink, setToggleLink] = useState(false);
+  const [userinfoProp, setUserinfoProp] = useState([]);
+  const [myRefererList, setMyRefererList] = useState([]);
+
+  const fetchdataUserInfo = async (_) => {
+    let myaddress = getmyaddress();
+    if (myaddress) {
+      axios.get(API.API_USERINFO + `/${myaddress}?nettype=${net}`).then((resp) => {
+        let { status, respdata } = resp.data;
+        LOGGER("userInfo", respdata);
+        if (status == "OK") {
+          setUserinfoProp(respdata);
+          respdata.myreferercode &&
+            axios.get(API.API_REFERER + `/${respdata.myreferercode}/0/120/id/DESC?nettype=${net}`).then((resp) => {
+              console.log("myRefererList", resp.data);
+              let { status, list } = resp.data;
+              if (status == "OK") {
+                setMyRefererList(list);
+              }
+            });
+        }
+      });
+    } else {
+      SetErrorBar(messages.MSG_CONNECTWALET);
+    }
+  };
+  useEffect((_) => {
+    fetchdataUserInfo();
+    return () => {};
+  }, []);
 
   if (isMobile)
     return (
@@ -25,7 +63,7 @@ export default function Recommend() {
             <p className="explain">
               Share your referral link! When a new user who accesses this link purchases a product,
               <br />
-              an additional 2% of the sales amount is paid. Referral rewards are paid in lump sum every month.
+              an additional 4% of the sales amount is paid. Referral rewards are paid in lump sum every month.
             </p>
           </li>
 
@@ -36,84 +74,11 @@ export default function Recommend() {
               <li className="codeBox">
                 <strong className="key">Code</strong>
                 <span className="value">
-                  <p>98Dd4DBE</p>
+                  <p>{userinfoProp.myreferercode}</p>
                   <button
                     className="copyBtn"
                     onClick={() => {
-                      onclickcopy();
-                      setToggleCode(true);
-                    }}
-                  >
-                    <img src={toggleCode ? I_circleChk : I_copy} alt="" />
-                  </button>
-                </span>
-              </li>
-              <li className="linkBox">
-                <strong className="key">
-                  Link{" "}
-                  <button className="copyBtn" onClick={() => setToggleLink(true)}>
-                    <img src={toggleLink ? I_circleChk : I_copy} alt="" />
-                  </button>
-                </strong>
-                <span className="value">
-                  <p>https://ausp.io/market/?ref=0x97b155a698d4bdec4c4bf3a92e9071190093cafb</p>
-                </span>
-              </li>
-            </ul>
-          </li>
-
-          <li className="recommenderBox">
-            <strong className="contTitle">My recommender</strong>
-
-            <ul className="dataList">
-              {D_recommendList.map((cont, index) => (
-                <li key={index}>
-                  <div>
-                    <p className="account">{cont.account}</p>
-                    <p className="symbol">{cont.symbol ? cont.symbol : "-"}</p>
-                  </div>
-                  <div>
-                    <p className="level">{cont.level} Level</p>
-                  </div>
-                  <div>
-                    <p className="point">{cont.point} USDT</p>
-                    <p className="date">{cont.date}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </li>
-        </ul>
-      </MrecommendBox>
-    );
-  else
-    return (
-      <PrecommendBox>
-        <p className="title">Referals</p>
-
-        <ul className="contList">
-          <li className="friendBox">
-            <strong className="contTitle">Friend Recommendation</strong>
-
-            <p className="explain">
-              Share your referral link! When a new user who accesses this link purchases a product,
-              <br />
-              an additional 2% of the sales amount is paid. Referral rewards are paid in lump sum every month.
-            </p>
-          </li>
-
-          <li className="recommendBox">
-            <strong className="contTitle">Recommend</strong>
-
-            <ul>
-              <li className="codeBox">
-                <strong className="key">Code</strong>
-                <span className="value">
-                  <p>98Dd4DBE</p>
-                  <button
-                    className="copyBtn"
-                    onClick={() => {
-                      onclickcopy("98Dd4DBE");
+                      onclickcopy(userinfoProp.myreferercode);
                       setToggleCode(true);
                     }}
                   >
@@ -124,12 +89,19 @@ export default function Recommend() {
               <li className="linkBox">
                 <strong className="key">Link</strong>
                 <span className="value">
-                  <p>https://ausp.io/market/?ref=0x97b155a698d4bdec4c4bf3a92e9071190093cafb</p>
+                  <p
+                    onClick={() => {
+                      navigate(`/connectwallet/${userinfoProp?.myreferercode}`);
+                    }}
+                  >
+                    http://nftinfinityworld.net/#/staking?referer=$
+                    {userinfoProp?.myreferercode}
+                  </p>
                   <button
                     className="copyBtn"
                     onClick={() => {
                       setToggleLink(true);
-                      onclickcopy("https://ausp.io/market/?ref=0x97b155a698d4bdec4c4bf3a92e9071190093cafb");
+                      onclickcopy(`https://nftinfinity.world/#/connectwallet/${userinfoProp?.myreferercode}`);
                     }}
                   >
                     <img src={toggleLink ? I_circleChk : I_copy} alt="" />
@@ -150,14 +122,101 @@ export default function Recommend() {
               </ul>
 
               <ul className="dataList">
-                {D_recommendList.map((cont, index) => (
+                {myRefererList?.map((cont, index) => (
                   <li key={index}>
-                    <span>{String(index + 1).padStart(2, "0")}</span>
-                    <span>{strDot(cont.account, 4, 4)}</span>
+                    <span>{cont.id}</span>
+                    <span>{strDot(cont.username, 4, 4)}</span>
                     <span>{cont.symbol ? cont.symbol : "-"}</span>
-                    <span>{cont.level} Level</span>
-                    <span>{cont.date}</span>
-                    <span>{cont.point} USDT</span>
+                    <span>{cont.referer}</span>
+                    <span>{cont.createdat.substring(0, 10)}</span>
+                    <span>{cont.amount} USDT</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </MrecommendBox>
+    );
+  else
+    return (
+      <PrecommendBox>
+        <p className="title">Referals</p>
+
+        <ul className="contList">
+          <li className="friendBox">
+            <strong className="contTitle">Friend Recommendation</strong>
+
+            <p className="explain">
+              Share your referral link! When a new user who accesses this link purchases a product,
+              <br />
+              an additional 4% of the sales amount is paid. Referral rewards are paid in lump sum every month.
+            </p>
+          </li>
+
+          <li className="recommendBox">
+            <strong className="contTitle">Recommend</strong>
+
+            <ul>
+              <li className="codeBox">
+                <strong className="key">Code</strong>
+                <span className="value">
+                  <p>{userinfoProp?.myreferercode}</p>
+                  <button
+                    className="copyBtn"
+                    onClick={() => {
+                      onclickcopy(userinfoProp?.myreferercode);
+                      setToggleCode(true);
+                    }}
+                  >
+                    <img src={toggleCode ? I_circleChk : I_copy} alt="" />
+                  </button>
+                </span>
+              </li>
+              <li className="linkBox">
+                <strong className="key">Link</strong>
+                <span className="value">
+                  <p
+                    onClick={() => {
+                      navigate(`/connectwallet/${userinfoProp?.myreferercode}`);
+                    }}
+                  >
+                    https://nftinfinity.world/#/connectwallet/$
+                    {userinfoProp?.myreferercode}
+                  </p>
+                  <button
+                    className="copyBtn"
+                    onClick={() => {
+                      setToggleLink(true);
+                      onclickcopy(`https://nftinfinity.world/#/connectwallet/${userinfoProp?.myreferercode}`);
+                    }}
+                  >
+                    <img src={toggleLink ? I_circleChk : I_copy} alt="" />
+                  </button>
+                </span>
+              </li>
+            </ul>
+          </li>
+
+          <li className="recommenderBox">
+            <strong className="contTitle">My recommender</strong>
+
+            <div className="listBox">
+              <ul className="listHeader">
+                {headerList.map((cont, index) => (
+                  <li key={index}>{cont}</li>
+                ))}
+              </ul>
+
+              <ul className="dataList">
+                {myRefererList?.map((cont, index) => (
+                  <li key={index}>
+                    <span>{cont.id}</span>
+                    <span>{strDot(cont.username, 4, 4)}</span>
+                    <span>{cont.symbol ? cont.symbol : "-"}</span>
+                    <span>{cont.referer}</span>
+                    <span>{cont.createdat.substring(0, 10)}</span>
+                    <span>{cont.amount} USDT</span>
                   </li>
                 ))}
               </ul>
@@ -255,18 +314,50 @@ const MrecommendBox = styled.section`
       }
 
       &.recommenderBox {
+        .listBox {
+          box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.16);
+          border-radius: 20px;
+          overflow: hidden;
+          .listHeader {
+            display: flex;
+            align-items: center;
+            height: 55px;
+            padding: 0 20px;
+            font-weight: 600;
+          }
+        }
+        .listHeader li,
+        .dataList span {
+          &:nth-of-type(1) {
+            width: 4.64%;
+            text-align: center;
+          }
+          &:nth-of-type(2) {
+            width: 17.85%;
+            text-align: center;
+          }
+          &:nth-of-type(3) {
+            width: 15%;
+            margin: 0 0 0 3.71%;
+          }
+          &:nth-of-type(4) {
+            width: 22.28%;
+          }
+          &:nth-of-type(5) {
+            width: 20.85%;
+          }
+          &:nth-of-type(6) {
+            flex: 1;
+          }
+        }
         .dataList {
-          display: flex;
-          flex-direction: column;
-          gap: 4.44vw;
-
           li {
             display: flex;
-            flex-direction: column;
-            gap: 3.33vw;
-            padding: 4.44vw;
-            box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.25);
-            border-radius: 2.22vw;
+            align-items: center;
+            height: 70px;
+            padding: 0 20px;
+            font-weight: 500;
+            border-top: 1px solid #d9d9d9;
 
             & > div {
               display: flex;
@@ -412,4 +503,4 @@ const PrecommendBox = styled.section`
   }
 `;
 
-const headerList = ["No", "Account", "Symbol", "Recommender Level", "Date of subscription	", "Points Received"];
+const headerList = ["No", "Account", "Symbol", "Recommender", "Date of subscription	", "Points Received"];

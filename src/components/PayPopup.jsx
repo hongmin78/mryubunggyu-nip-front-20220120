@@ -8,14 +8,9 @@ import { useSelector } from "react-redux";
 import PopupBg from "./PopupBg";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import {
-  getabistr_forfunction,
-  query_with_arg,
-  query_noarg,
-  query_eth_balance,
-} from "../util/contract-calls";
+import { getabistr_forfunction, query_with_arg, query_noarg, query_eth_balance } from "../util/contract-calls";
 import { addresses } from "../configs/addresses";
-import { DECIMALS_DISP_DEF } from "../configs/configs"; // MIN_STAKE_AMOUNT,
+import { DECIMALS_DISP_DEF } from "../configs/configs"; // DueAmount,
 import { LOGGER, getmyaddress, getobjtype } from "../util/common";
 import { getweirep, getethrep } from "../util/eth";
 import { requesttransaction } from "../services/metamask";
@@ -23,17 +18,13 @@ import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
 import { API } from "../configs/api";
 import awaitTransactionMined from "await-transaction-mined";
-import {
-  web3,
-  BASE_CURRENCY,
-  PAY_CURRENCY,
-  NETTYPE,
-} from "../configs/configweb3";
+import { web3, BASE_CURRENCY, PAY_CURRENCY, NETTYPE } from "../configs/configweb3";
 import { TX_POLL_OPTIONS } from "../configs/configs";
 import I_spinner from "../img/icon/I_spinner.svg";
 import { strDot } from "../util/Util";
+import { net } from "../configs/net";
 const MODE_DEV_PROD = "PROD";
-export default function PayPopup({ off, receivables }) {
+export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
   const [termChk, setTermChk] = useState(false);
@@ -41,7 +32,7 @@ export default function PayPopup({ off, receivables }) {
   let [mybalance, setmybalance] = useState();
   let [isallowanceok, setisallowanceok] = useState(false);
   let [allowanceamount, setallowanceamount] = useState();
-  let [stakedbalance, setstakedbalance] = useState();
+  // let [st akedbalance, setsta kedbalance] = useState();
   let [tvl, settvl] = useState();
   let [tickerusdt, settickerusdt] = useState(1);
   let [myethbalance, setmyethbalance] = useState();
@@ -50,26 +41,31 @@ export default function PayPopup({ off, receivables }) {
   let spinnerHref_approve = useRef();
   let [isloader_00, setisloader_00] = useState(false);
   let [isloader_01, setisloader_01] = useState(false);
-  let [MIN_STAKE_AMOUNT, setMIN_STAKE_AMOUNT] = useState(receivables.amount);
+  let [DueAmount, setDueAmount] = useState(receivables.amount);
+  let [refererFeeRate, setRefererFeeRate] = useState("");
   useEffect((_) => {
     const spinner = spinnerHref.current; // document.querySelector("Spinner");
-    spinner.animate(
-      [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
-      {
-        duration: 1000,
-        iterations: Infinity,
-      }
-    );
+    spinner.animate([{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], {
+      duration: 1000,
+      iterations: Infinity,
+    });
     const spinner_approve = spinnerHref_approve.current; // document.querySelector("Spinner");
-    spinner_approve.animate(
-      [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
-      {
-        duration: 1000,
-        iterations: Infinity,
-      }
-    );
+    spinner_approve.animate([{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], {
+      duration: 1000,
+      iterations: Infinity,
+    });
+    axios
+      .get(API.API_QUERY_STRING("SALE_REFERER_FEE_RATE") + `?nettype=${net}`)
+      .then((res) => {
+        if (res.data && res.data.respdata) {
+          console.log("$fee_rate", res);
+          let { value_ } = res.data.respdata;
+          setRefererFeeRate(value_);
+        }
+      })
+      .catch((err) => console.log(err));
     const fetchdata = async (_) => {
-      axios.get(API.API_TICKERS).then((resp) => {
+      axios.get(API.API_TICKERS + `?nettype=${net}`).then((resp) => {
         LOGGER("MDmEMQ5xde", resp.data);
         let { status, payload, list } = resp;
         //				let { USDT } = payload.list
@@ -79,13 +75,13 @@ export default function PayPopup({ off, receivables }) {
       let myaddress = getmyaddress();
       LOGGER("", addresses.contract_pay_for_assigned_item, myaddress); // .ETH_TESTNET
       // let resp_balances = await query_with_arg({
-      //   contractaddress: addresses.contract_stake, // ETH_TESTNET.
+      //   contractaddress: addresses.contract_st ake, // ETH_TESTNET.
       //   abikind: "PAY",
       //   methodname: "_balances",
       //   aargs: [myaddress],
       // });
       // LOGGER("uQJ2POHvP8", resp_balances);
-      // setstakedbalance(getethrep(resp_balances));
+      // setst akedbalance(getethrep(resp_balances));
       query_with_arg({
         contractaddress: addresses.contract_USDT, // ETH_TESTNET.
         abikind: "ERC20",
@@ -111,8 +107,8 @@ export default function PayPopup({ off, receivables }) {
         setmybalance(getethrep(resp, 4));
       });
       // query_noarg({
-      //   contractaddress: addresses.contract_stake, // ETH_TESTNET.
-      //   abikind: "STAKE",
+      //   contractaddress: addresses.contract_st ake, // ETH_TESTNET.
+      //   abikind: "ST AKE",
       //   methodname: "_tvl",
       // }).then((resp) => {
       //   LOGGER("", resp);
@@ -122,7 +118,7 @@ export default function PayPopup({ off, receivables }) {
       // query_with_arg({
       //   contractaddress: addresses.contract_admin,
       //   abikind: "ADMIN",
-      //   methodname: "_stakeplans",
+      //   methodname: "_st akeplans",
       //   aargs: [addresses.contract_USDT],
       // }).then((resp) => {
       //   LOGGER("HSudcIgxuB", resp);
@@ -130,59 +126,59 @@ export default function PayPopup({ off, receivables }) {
       //   } else {
       //     return;
       //   }
-      //   setMIN_STAKE_AMOUNT(getethrep(resp[4]));
+      //   setMIN_ST AKE_AMOUNT(getethrep(resp[4]));
       // });
-      false &&
-        query_with_arg({
-          contractaddress: addresses.contract_stake, // .ETH_TESTNET
-          abikind: "STAKE",
-          methodname: "_tvl_nft",
-        }).then((resp) => {
-          LOGGER("", resp);
-          //				settvlnft ( resp )
-        });
+      // false &&
+      //   query_with_arg({
+      //     contractaddress: addresses.contract_st ake, // .ETH_TESTNET
+      //     abikind: "ST AKE",
+      //     methodname: "_tvl_nft",
+      //   }).then((resp) => {
+      //     LOGGER("", resp);
+      //     //				settvlnft ( resp )
+      //   });
       query_eth_balance(myaddress).then((resp) => {
         LOGGER("rmgUxgo5ye", resp);
         setmyethbalance((+getethrep(resp)).toFixed(DECIMALS_DISP_DEF));
       });
     };
-    fetchdata();
+    setTimeout(() => {
+      fetchdata();
+    }, 1500);
   }, []);
   const onclick_approve = async (_) => {
     LOGGER("");
+    setisloader_00(true);
     let myaddress = getmyaddress();
     let abistr = getabistr_forfunction({
       contractaddress: addresses.contract_USDT, // ETH_TESTNET.
       abikind: "ERC20",
       methodname: "approve",
-      aargs: [
-        addresses.contract_pay_for_assigned_item,
-        getweirep("" + 10 ** 10),
-      ], // .ETH_TESTNET
+      aargs: [addresses.contract_pay_for_assigned_item, getweirep("" + 10 ** 10)], // .ETH_TESTNET
     });
     LOGGER("", abistr);
-    setisloader_00(true);
     requesttransaction({
       from: myaddress,
       to: addresses.contract_USDT, // ETH_TESTNET.
       data: abistr,
     }).then((resp) => {
-      setisloader_00(false);
       if (resp) {
       } else {
         SetErrorBar(messages.MSG_USER_DENIED_TX);
+        setisloader_00(false);
         return;
       }
       let txhash = resp;
       SetErrorBar(messages.MSG_TX_REQUEST_SENT);
       axios
-        .post(API.API_TXS + `/${txhash}`, {
+        .post(API.API_TXS + `/${txhash}?nettype=${net}`, {
           txhash,
           username: myaddress,
           typestr: "APPROVE",
           auxdata: {
             erc20: addresses.contract_USDT, // .ETH_TESTNET
             target: addresses.contract_pay_for_assigned_item, // .ETH_TESTNET
+            nettype: net,
           },
           nettype: NETTYPE,
         })
@@ -190,129 +186,125 @@ export default function PayPopup({ off, receivables }) {
           LOGGER("APPROVE RESP", resp);
           SetErrorBar(messages.MSG_TX_REQUEST_SENT);
         });
-
-      awaitTransactionMined
-        .awaitTx(web3, txhash, TX_POLL_OPTIONS)
-        .then((minedtxreceipt) => {
-          LOGGER("minedtxreceipt", minedtxreceipt);
-          SetErrorBar(messages.MSG_TX_FINALIZED);
-
-          query_with_arg({
-            contractaddress: addresses.contract_USDT, // .ETH_TESTNET
-            abikind: "ERC20",
-            methodname: "allowance",
-            aargs: [myaddress, addresses.contract_pay_for_assigned_item], // ETH_TESTNET.
-          }).then((resp) => {
-            let allowanceineth = getethrep(resp);
-            LOGGER("gCwXF6Jjkh", resp, allowanceineth);
-            setallowanceamount(allowanceineth); //				setallowanceamount ( 100 )
-            if (allowanceineth > 0) {
-              setisallowanceok(false);
-            } else {
-            }
-          });
-          //					Setisloader(false);
+      awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then((minedtxreceipt) => {
+        LOGGER("minedtxreceipt", minedtxreceipt);
+        SetErrorBar(messages.MSG_TX_FINALIZED);
+        query_with_arg({
+          contractaddress: addresses.contract_USDT, // .ETH_TESTNET
+          abikind: "ERC20",
+          methodname: "allowance",
+          aargs: [myaddress, addresses.contract_pay_for_assigned_item], // ETH_TESTNET.
+        }).then((resp) => {
+          let allowanceineth = getethrep(resp);
+          LOGGER("gCwXF6Jjkh", resp, allowanceineth);
+          setallowanceamount(allowanceineth); //				setallowanceamount ( 100 )
+          setisloader_00(false);
+          if (allowanceineth > 0) {
+            setisallowanceok(false);
+            setisloader_00(false);
+          } else {
+          }
         });
+      });
     });
   };
 
-  console.log(allowanceamount);
   const onclick_buy = async (_) => {
     setDone(true);
+    setisloader_01(true);
     LOGGER("YFVGAF0sBJ");
     let myaddress = getmyaddress();
     // LOGGER("eYJAgMYkR5", myaddress);
-    if (mybalance >= MIN_STAKE_AMOUNT) {
+    if (mybalance >= DueAmount) {
     } else {
       SetErrorBar(messages.MSG_BALANCE_NOT_ENOUGH);
       setDone(false);
+      setisloader_01(false);
       return;
     }
-    /** 		if (myaddress){}
-		else { 
-			SetErrorBar( messages.MSG_PLEASE_ CONNECT_WALLET )
-			return 
-		} */
-    let abistr = getabistr_forfunction({
-      contractaddress: addresses.contract_pay_for_assigned_item, // .ETH_TESTNET
-      abikind: "PAY",
-      methodname: "pay",
-      aargs: [
-        addresses.contract_USDT, // .ETH_TESTNET
-        getweirep("" + receivables.amount),
-        myaddress,
-        receivables.itemdata.itemid,
-      ],
-    });
-    LOGGER("abistr", abistr); //		return
-    const callreqtx = async (_) => {
-      let resp;
-      try {
-        setisloader_01(true);
-        resp = await requesttransaction({
-          from: myaddress,
-          to: addresses.contract_pay_for_assigned_item, // .ETH_TESTNET
-          data: abistr,
-          //			, value : ''
-        });
-        setisloader_01(false);
-        if (resp) {
-        } else {
-          SetErrorBar(messages.MSG_USER_DENIED_TX);
-          return;
-        }
-        let resptype = getobjtype(resp);
-        let txhash;
-        switch (resptype) {
-          case "String":
-            txhash = resp;
-            break;
-          case "Object":
-            txhash = resp.txHash;
-            break;
-        }
-        axios
-          .post(API.API_TXS + `/${txhash}`, {
-            txhash,
-            username: myaddress,
-            typestr: "PAY",
-            auxdata: {
-              amount: receivables.amount,
-              currency: PAY_CURRENCY,
-              currencyaddress: addresses.contract_USDT, // ETH_TESTNET.
-            },
-            nettype: NETTYPE,
-          })
-          .then((resp) => {
-            LOGGER("", resp);
-            SetErrorBar(messages.MSG_TX_REQUEST_SENT);
-            off();
+    console.log(
+      "$INPUTS",
+      addresses.contract_USDT, // .ETH_TESTNET
+      getweirep("" + receivables.amount),
+      receivables.seller,
+      receivables.itemid,
+      userInfo?.refereraddress,
+      "$refererFeerate",
+      refererFeeRate
+    );
+    if (receivables.seller) {
+      let abistr = getabistr_forfunction({
+        contractaddress: addresses.contract_pay_for_assigned_item, // .ETH_TESTNET
+        abikind: "PAY",
+        methodname: "pay",
+        aargs: [
+          addresses.contract_USDT, // .ETH_TESTNET
+          getweirep("" + receivables.amount),
+          receivables.seller,
+          receivables.itemid,
+          userInfo?.refereraddress,
+          refererFeeRate,
+        ],
+      });
+      LOGGER("abistr", abistr); //		return
+      const callreqtx = async (_) => {
+        let resp;
+        try {
+          resp = await requesttransaction({
+            from: myaddress,
+            to: addresses.contract_pay_for_assigned_item, // .ETH_TESTNET
+            data: abistr,
           });
-        /***** */
-        awaitTransactionMined
-          .awaitTx(web3, txhash, TX_POLL_OPTIONS)
-          .then(async (minedtxreceipt) => {
+          if (resp) {
+          } else {
+            SetErrorBar(messages.MSG_USER_DENIED_TX);
+            setDone(false);
+            setisloader_01(false);
+            return;
+          }
+          let txhash = resp;
+          axios
+            .post(API.API_TXS + `/${txhash}?nettype=${net}`, {
+              txhash,
+              username: myaddress,
+              typestr: "PAY",
+              itemid: receivables.itemid,
+              nettype: net,
+
+              auxdata: {
+                referfeeamount: receivables.amount,
+                feerate: refererFeeRate,
+                currency: PAY_CURRENCY || "USDT",
+                currencyaddress: addresses.contract_USDT, // ETH_TESTNET.
+                nettype: net,
+                amount: receivables.amount,
+              },
+            })
+            .then((resp) => {
+              LOGGER("", resp);
+              SetErrorBar(messages.MSG_TX_REQUEST_SENT);
+            });
+          /***** */
+          awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
             LOGGER("minedtxreceipt", minedtxreceipt);
             SetErrorBar(messages.MSG_TX_FINALIZED);
             setDone(false);
-            let resp_balances = await query_with_arg({
-              contractaddress: addresses.contract_pay_for_assigned_iteme,
-              abikind: "PAY",
-              methodname: "pay",
-              aargs: [myaddress],
-            });
-            LOGGER("uQJ2POHvP8", resp_balances);
-            setstakedbalance(getethrep(resp_balances));
+            setisloader_01(false);
             off();
+            window.location.reload();
           });
-      } catch (err) {
-        setisloader_01(false);
-        LOGGER();
-        SetErrorBar(messages.MSG_USER_DENIED_TX);
-      }
-    };
-    callreqtx();
-    //		.then(resp=>{ LOGGER( '' , resp )		})
+        } catch (err) {
+          SetErrorBar(messages.MSG_USER_DENIED_TX);
+          setDone(false);
+          setisloader_01(false);
+          LOGGER();
+        }
+      };
+      callreqtx();
+      //		.then(resp=>{ LOGGER( '' , resp )		})
+    } else {
+      SetErrorBar("셀러가 없습니다 관리자에게 문의 해 주세요");
+    }
   };
 
   if (isMobile)
@@ -335,32 +327,21 @@ export default function PayPopup({ off, receivables }) {
                 </span>
 
                 <ul className="priceList">
-                  <li className="price">{MIN_STAKE_AMOUNT} USDT</li>
+                  <li className="price">{DueAmount} USDT</li>
                   <li className="exchange">
-                    $
-                    {+MIN_STAKE_AMOUNT && tickerusdt
-                      ? putCommaAtPrice(+MIN_STAKE_AMOUNT * +tickerusdt)
-                      : null}
+                    ${+DueAmount && tickerusdt ? putCommaAtPrice(+DueAmount * +tickerusdt) : null}
                   </li>
                 </ul>
               </div>
 
               <ul className="dataList">
-                <li>
-                  <p className="key">Calculation</p>
-                  <p className="value">2022-01-11 00:00 UTC</p>
-                </li>
-                <li>
-                  <p className="key">Distribution</p>
-                  <p className="value">2022-03-12 00:00 UTC</p>
-                </li>
                 <li style={MODE_DEV_PROD == "DEV" ? {} : { display: "none" }}>
                   <p className="key">Total Staked</p>
                   <p className="value">{tvl} USDT</p>
                 </li>
-                <li>
-                  <p className="key">Your Stake</p>
-                  <p className="value">{stakedbalance} USDT</p>
+                <li style={{ display: "none" }}>
+                  <p className="key">Your St ake</p>
+                  {/* <p className="value">{st akedbalance} USDT</p> */}
                 </li>
 
                 <li>
@@ -371,13 +352,7 @@ export default function PayPopup({ off, receivables }) {
                   <p className="key">Your USDT balance</p>
                   <p className="value">{mybalance} USDT</p>
                 </li>
-                <li
-                  style={
-                    allowanceamount && +allowanceamount
-                      ? { display: "block" }
-                      : {}
-                  }
-                >
+                <li style={allowanceamount && +allowanceamount ? { display: "block" } : {}}>
                   <p className="key">Allowance</p>
                   <p className="value">{allowanceamount} USDT</p>
                 </li>
@@ -391,33 +366,7 @@ export default function PayPopup({ off, receivables }) {
             </div>
 
             <div className="confirmBox">
-              <div className="termBox">
-                <p className="key">Would you like to stake long term?</p>
-                <span className="value">
-                  <button className="yesBtn" onClick={() => setTermChk(true)}>
-                    <span
-                      className="chkBtn"
-                      style={{
-                        background: termChk && "#000",
-                      }}
-                    >
-                      <img src={I_chkWhite} alt="" />
-                    </span>
-                    yes
-                  </button>
-                  <button className="noBtn" onClick={() => setTermChk(false)}>
-                    <span
-                      className="chkBtn"
-                      style={{
-                        background: !termChk && "#000",
-                      }}
-                    >
-                      <img src={I_chkWhite} alt="" />
-                    </span>
-                    no
-                  </button>
-                </span>
-              </div>
+              <div className="termBox"></div>
 
               <button
                 className="confirmBtn"
@@ -425,11 +374,7 @@ export default function PayPopup({ off, receivables }) {
                   onclick_approve();
                   false && navigate(-1);
                 }}
-                style={
-                  allowanceamount && +allowanceamount
-                    ? { display: "none" }
-                    : { display: "inline" }
-                }
+                style={allowanceamount && +allowanceamount ? { display: "none" } : { display: "inline" }}
               >
                 Approve!
                 <img
@@ -482,25 +427,14 @@ export default function PayPopup({ off, receivables }) {
               </span>
 
               <ul className="priceList">
-                <li className="price">{MIN_STAKE_AMOUNT} USDT</li>
+                <li className="price">{DueAmount} USDT</li>
                 <li className="exchange">
-                  $
-                  {+MIN_STAKE_AMOUNT && tickerusdt
-                    ? putCommaAtPrice(+MIN_STAKE_AMOUNT * +tickerusdt)
-                    : null}
+                  ${+DueAmount && tickerusdt ? putCommaAtPrice(+DueAmount * +tickerusdt) : null}
                 </li>
               </ul>
             </div>
 
             <ul className="dataList">
-              <li>
-                <p className="key">Calculation</p>
-                <p className="value">2022-01-11 00:00 UTC</p>
-              </li>
-              <li>
-                <p className="key">Distribution</p>
-                <p className="value">2022-03-12 00:00 UTC</p>
-              </li>
               <li style={MODE_DEV_PROD == "DEV" ? {} : { display: "none" }}>
                 <p className="key">Total Staked</p>
                 <p className="value">{tvl} USDT</p>
@@ -514,7 +448,7 @@ export default function PayPopup({ off, receivables }) {
                 <p className="value">{mybalance} USDT</p>
               </li>
               <li style={allowanceamount ? { display: "block" } : {}}>
-                <p className="key">Allowance</p>
+                <p className="key">Allowance:</p>
                 <p className="value">{allowanceamount} USDT</p>
               </li>
               <li>
@@ -528,36 +462,7 @@ export default function PayPopup({ off, receivables }) {
 
           <div className="confirmBox">
             <div className="termBox">
-              <p className="key">Would you like to stake long term?</p>
-              <span className="value">
-                <button
-                  className="yesBtn"
-                  onClick={() => {
-                    setTermChk(true);
-                  }}
-                >
-                  <span
-                    className="chkBtn"
-                    style={{
-                      background: termChk && "#000",
-                    }}
-                  >
-                    <img src={I_chkWhite} alt="" />
-                  </span>
-                  yes
-                </button>
-                <button className="noBtn" onClick={() => setTermChk(false)}>
-                  <span
-                    className="chkBtn"
-                    style={{
-                      background: !termChk && "#000",
-                    }}
-                  >
-                    <img src={I_chkWhite} alt="" />
-                  </span>
-                  no
-                </button>
-              </span>
+              <span className="value"></span>
             </div>
 
             <button
@@ -565,13 +470,8 @@ export default function PayPopup({ off, receivables }) {
               onClick={() => {
                 onclick_approve();
               }}
-              style={
-                allowanceamount && +allowanceamount
-                  ? { display: "none" }
-                  : { display: "inline" }
-              }
+              style={allowanceamount && +allowanceamount ? { display: "none" } : { display: "inline" }}
             >
-              {" "}
               Approve
               <img
                 ref={spinnerHref_approve}
@@ -580,7 +480,9 @@ export default function PayPopup({ off, receivables }) {
                 style={{
                   display: isloader_00 ? "block" : "none",
                   width: "18px",
-                  right: "160px",
+                  top: "20px",
+                  right: "150px",
+                  top: "20px",
                   position: "absolute",
                 }}
               />
@@ -623,41 +525,34 @@ const MstakingPopupBox = styled.section`
   position: fixed;
   z-index: 6;
   overflow: hidden;
-
   .topBar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     height: 15.55vw;
     padding: 0 5.55vw;
-
     .title {
       font-size: 5vw;
       font-weight: 600;
       line-height: 5vw;
     }
-
     .blank,
     .exitBtn img {
       width: 4.44vw;
     }
   }
-
   .contBox {
     display: flex;
     flex-direction: column;
     gap: 4.44vw;
     padding: 3.61vw 5.55vw 7.77vw 5.55vw;
-
     * {
       font-family: "Roboto", sans-serif;
     }
-
     .infoBox {
       display: flex;
       flex-direction: column;
       gap: 4.16vw;
-
       .coinBox {
         display: flex;
         align-items: center;
@@ -666,7 +561,6 @@ const MstakingPopupBox = styled.section`
         padding: 0 4.72vw;
         background: #f6f6f6;
         border-radius: 3.33vw;
-
         .coinImgBox {
           display: flex;
           justify-content: center;
@@ -677,31 +571,26 @@ const MstakingPopupBox = styled.section`
           border-radius: 50%;
           background: #fff;
           box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
-
           img {
             width: 100%;
             object-fit: contain;
           }
         }
-
         .priceList {
           display: flex;
           flex-direction: column;
           gap: 6px;
           font-size: 5vw;
           line-height: 5vw;
-
           .price {
             font-weight: 600;
           }
-
           .exchange {
             font-weight: 500;
             color: #7a7a7a;
           }
         }
       }
-
       .dataList {
         display: flex;
         flex-direction: column;
@@ -709,45 +598,37 @@ const MstakingPopupBox = styled.section`
         font-size: 4.44vw;
         font-weight: 500;
         color: #7a7a7a;
-
         li {
           display: flex;
           flex-direction: column;
           gap: 0.8vw;
-
           .key {
             color: #aeaeae;
           }
         }
       }
     }
-
     .confirmBox {
       display: flex;
       flex-direction: column;
       gap: 20px;
-
       .termBox {
         display: flex;
         flex-direction: column;
         gap: 4.44vw;
-
         * {
           font-size: 4.44vw;
           line-height: 4.44vw;
         }
-
         .value {
           display: flex;
           justify-content: flex-end;
           align-items: center;
           gap: 5vw;
-
           button {
             display: flex;
             align-items: center;
             gap: 6px;
-
             .chkBtn {
               display: flex;
               justify-content: center;
@@ -760,7 +641,6 @@ const MstakingPopupBox = styled.section`
           }
         }
       }
-
       .confirmBtn {
         height: 13.88vw;
         font-size: 5.55vw;
@@ -782,41 +662,34 @@ const PstakingPopupBox = styled.section`
   transform: translate(-50%, -50%);
   position: fixed;
   z-index: 6;
-
   .topBar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     height: 72px;
     padding: 0 30px;
-
     .title {
       font-size: 24px;
       font-weight: 600;
       line-height: 24px;
     }
-
     .blank,
     .exitBtn {
       width: 22px;
     }
   }
-
   .contBox {
     display: flex;
     flex-direction: column;
     gap: 80px;
     padding: 40px;
-
     * {
       font-family: "Roboto", sans-serif;
     }
-
     .infoBox {
       display: flex;
       flex-direction: column;
       gap: 24px;
-
       .coinBox {
         display: flex;
         justify-content: space-between;
@@ -825,7 +698,6 @@ const PstakingPopupBox = styled.section`
         padding: 0 26px;
         background: #f6f6f6;
         border-radius: 12px;
-
         .coinImgBox {
           display: flex;
           justify-content: center;
@@ -836,13 +708,11 @@ const PstakingPopupBox = styled.section`
           border-radius: 50%;
           background: #fff;
           box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
-
           img {
             width: 100%;
             object-fit: contain;
           }
         }
-
         .priceList {
           display: flex;
           flex-direction: column;
@@ -850,18 +720,15 @@ const PstakingPopupBox = styled.section`
           gap: 6px;
           font-size: 20px;
           line-height: 20px;
-
           .price {
             font-weight: 600;
           }
-
           .exchange {
             font-weight: 500;
             color: #7a7a7a;
           }
         }
       }
-
       .dataList {
         display: flex;
         flex-direction: column;
@@ -869,39 +736,32 @@ const PstakingPopupBox = styled.section`
         font-size: 18px;
         font-weight: 500;
         color: #7a7a7a;
-
         li {
           display: flex;
           justify-content: space-between;
         }
       }
     }
-
     .confirmBox {
       display: flex;
       flex-direction: column;
       gap: 20px;
-
       .termBox {
         display: flex;
         align-items: center;
         gap: 10px;
-
         * {
           font-size: 18px;
           line-height: 18px;
         }
-
         .value {
           display: flex;
           gap: 18px;
           align-items: center;
-
           button {
             display: flex;
             align-items: center;
             gap: 6px;
-
             .chkBtn {
               display: flex;
               justify-content: center;
@@ -914,7 +774,6 @@ const PstakingPopupBox = styled.section`
           }
         }
       }
-
       .confirmBtn {
         display: flex;
         justify-content: center;

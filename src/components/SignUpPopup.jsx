@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import styled from "styled-components";
 import I_x from "../img/icon/I_x.svg";
 import I_chkWhite from "../img/icon/I_chkWhite.svg";
@@ -10,124 +10,146 @@ import { signup, getRequestEmail } from "../api/Signup";
 import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
 import { generaterandomstr_charset, LOGGER, getmyaddress } from "../util/common";
-import axios from 'axios'
-import { API } from '../configs/api'
+import axios from "axios";
+import { API } from "../configs/api";
 import { TIME_PAGE_TRANSITION_DEF } from "../configs/configs";
+import { net } from "../configs/net";
 
-export default function SignUpPopup({ walletAddress }) {  
+export default function SignUpPopup({ walletAddress }) {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const referer = useParams().refere;
+  const isAuthEmail = useSelector((state) => state.common.isAuthEmail);
   const isMobile = useSelector((state) => state.common.isMobile);
   const [email, setEmail] = useState("");
   const [emailAlarm, setEmailAlarm] = useState("");
   const [pw, setPw] = useState("");
   const [pwConfrim, setPwConfirm] = useState("");
   const [pwAlarm, setPwAlarm] = useState("");
-  const [referral, setReferal] = useState("");
-  const [agreeList, setAgreeList ] = useState(new Array(2).fill(false));
-  const [pending, setPending] =useState(false)
-  const [ mailcheck, setMailcheck] =useState(false)
-	let [ isemailrequested , setisemailrequested] = useState( false )
-	let [ myaddress , setmyaddress] = useState( getmyaddress() )
-	let [ nickname , setnickname] = useState('')
-  localStorage.setItem("mailcheck", false);
+  const [referral, setReferal] = useState(referer ? referer : "");
+  const [agreeList, setAgreeList] = useState(new Array(2).fill(false));
+  const [pending, setPending] = useState(false);
+  const [mailcheck, setMailcheck] = useState(false);
+  const [emailCodeNumber, setEmailCodeNumber] = useState("");
+  const [emailCodeState, setEmailCodeState] = useState(false);
+  let [isemailrequested, setisemailrequested] = useState(false);
+  let [myaddress, setmyaddress] = useState(getmyaddress());
+  let [nickname, setnickname] = useState("");
+  const [emailAuthNumber, setEmailAuthNumber] = useState("");
+
+  console.log("asdasd", referer);
+
   function clickRegistrationBtn() {
-    setPending(true)
+    setPending(true);
     localStorage.setItem("MAIL_CHECK", false);
-		let myaddress = getmyaddress()
-		axios.post( API.API_EMAIL_REQUEST , { email, walletAddress : myaddress })
-		.then( resp => { // SetErrorBar(res.data);
-			LOGGER ( '' , resp.data )
-			let { status }=resp.data
-			if ( status == 'OK') {
-				SetErrorBar ( messages.MSG_EMAIL_SENT )
-//				setPending( false )
-				setisemailrequested( true )
-			} else {
-				SetErrorBar ( messages.MSG_SERVER_ERR )
-			}
-		})
-		.catch((err) =>{ 
-			LOGGER( '' , err )
-			SetErrorBar( messages.MSG_SERVER_ERR ) ; 
-			return 
-		} )
-//    getRequestEmail( email, walletAddress );
+    let myaddress = getmyaddress();
+    axios
+      .post(API.API_EMAIL_REQUEST+"?nettype="+net, { email, walletAddress: myaddress,
+        nettype: net, })
+      .then((resp) => {
+        // SetErrorBar(res.data);
+        LOGGER("", resp.data);
+        let { status, message } = resp.data;
+
+        if (status == "OK") {
+          SetErrorBar(messages.MSG_EMAIL_SENT);
+          //				setPending( false )
+          setisemailrequested(true);
+          setEmailAuthNumber(String(message.code));
+        }
+      })
+      .catch((err) => {
+        LOGGER("", err);
+
+        SetErrorBar(messages.MSG_SERVER_ERR);
+        return;
+      });
+    //    getRequestEmail( email, walletAddress );
   }
-  
-  window.addEventListener('storage', function(event) {
-    setMailcheck(localStorage.getItem("MAIL_CHECK"))
-  }, false);
+
+  const onClickEmailAuthBtn = () => {
+    if (emailAuthNumber === emailCodeNumber) {
+      setEmailCodeState(true);
+      SetErrorBar("SUCCESS");
+    } else {
+      setEmailCodeState(false);
+      SetErrorBar("FAIL");
+    }
+  };
+
+  // 4pqaht46D4
+  window.addEventListener(
+    "storage",
+    function (event) {
+      setMailcheck(localStorage.getItem("MAIL_CHECK"));
+    },
+    false
+  );
 
   useEffect(() => {
-		console.log(walletAddress);
-		let pwrandom = generaterandomstr_charset(6 , 'base58')
-		setPw('')
-		setPwConfirm ('')
-		setReferal('')
-		setEmail ('')
-  }, [] )
+    console.log(walletAddress);
+    let pwrandom = generaterandomstr_charset(6, "base58");
+    setPw("");
+    setPwConfirm("");
+    setEmail("");
+  }, []);
 
   const disableConfirm =
-		!(email && pw && pwConfrim && agreeList[0] && agreeList[1]
-				&& isemailrequested
-			) ||
+    !(email && pw && pwConfrim && agreeList[0] && agreeList[1] && isemailrequested && emailCodeState) ||
     emailAlarm ||
     pwAlarm;
-
   function onClickAgreeList(index) {
     let dataList = agreeList;
     dataList[index] = !dataList[index];
     setAgreeList([...dataList]);
   }
 
-  useEffect(()=>{
-    if(!pending)return;
-    console.log('checking')
-
-  })
+  useEffect(() => {
+    if (!pending) return;
+    console.log("checking");
+  });
 
   async function onClickSignUpBtn() {
-		if(chkValidEmail( email) ){}
-		else {SetErrorBar( messages.MSG_EMAIL_INVALID ); return }
-		if ( isemailrequested ){}
-		else {SetErrorBar( messages.MSG_PLEASE_REQUEST_EMAIL_VERIFY_CODE ) ; return }
-		if(referral){}
-		else { SetErrorBar( messages.MSG_PLEASE_INPUT + ' referer code' ); return }
-		let respreferer = await axios.get( API.API_QUERY_REFERER + `/users/myreferercode/${referral}`)
-		LOGGER('' , respreferer.data )
-		let { status , respdata} = respreferer.data
-		if ( status == 'OK' && respdata && respdata?.myreferercode ) {
-		}
-		else { SetErrorBar( messages.MSG_REFERER_CODE_INVALID ) ; return }
-		axios.post( API.API_SIGNUP , {
-			walletAddress 
-			, email
-			, password : pw  
-			, referral 
-			, nickname
-		} ).then(resp=>{			LOGGER ( 'VrPcFLisLA' , resp.data )
-			let { status }=resp.data
-			if ( status == 'OK'){
-				SetErrorBar( messages.MSG_DONE_REGISTERING )
-				setTimeout(() => {
-					navigate("/staking");
-				}, TIME_PAGE_TRANSITION_DEF );
-			} else { 
-				SetErrorBar( messages.MSG_SERVER_ERR )
-				return
-			}
-		})
-    
-/** 		const res = await signup(walletAddress, email, pw, referral);
-    console.log(res);
-    if (res) {
-      dispatch(setLogin(walletAddress));
-			localStorage.setItem( "walletAddress" , walletAddress);
-			localStorage.setItem( "address" , walletAddress);
-      SetErrorBar(res.message);
-      navigate("/staking");
-    }*/
+    if (chkValidEmail(email)) {
+    } else {
+      SetErrorBar(messages.MSG_EMAIL_INVALID);
+      return;
+    }
+    if (isemailrequested) {
+    } else {
+      SetErrorBar(messages.MSG_PLEASE_REQUEST_EMAIL_VERIFY_CODE);
+      return;
+    }
+    if (referral) {
+    } else {
+      SetErrorBar(messages.MSG_PLEASE_INPUT + " referer code");
+      return;
+    }
+    await axios
+      .post(API.API_SIGNUP+`?nettype=${net}`, {
+        walletAddress,
+        email,
+        password: pw,
+        referral,
+        nickname,
+        nettype: net,
+      })
+      .then((resp) => {
+        console.log("resp", resp.data.message);
+        LOGGER("VrPcFLisLA", resp.data);
+        let { status, message } = resp.data;
+        if (status == "OK") {
+          SetErrorBar(messages.MSG_DONE_REGISTERING);
+          setTimeout(() => {
+            navigate("/staking");
+          }, TIME_PAGE_TRANSITION_DEF);
+        } else if (message === "ERR_EMAIL_COUNTING") {
+          SetErrorBar("You can use only ten email for join");
+          return;
+        } else {
+          SetErrorBar(messages.MSG_SERVER_ERR);
+          return;
+        }
+      });
   }
 
   useEffect(() => {
@@ -166,11 +188,7 @@ export default function SignUpPopup({ walletAddress }) {
             <p className="contTitle">Address</p>
             <div className="inputContainer">
               <div className="inputBox">
-                <input style={{color:'#bbb'}}
-                  type=""
-                  value={ myaddress }
-									disabled
-									/>
+                <input style={{ color: "#bbb" }} type="" value={myaddress} disabled />
               </div>
             </div>
           </li>
@@ -185,10 +203,7 @@ export default function SignUpPopup({ walletAddress }) {
 
               {emailAlarm && <p className="alarm">{emailAlarm}</p>}
 
-              <button
-                className="registrationBtn"
-                onClick={clickRegistrationBtn}
-              >
+              <button className="registrationBtn" onClick={clickRegistrationBtn}>
                 Registration
               </button>
             </div>
@@ -198,12 +213,7 @@ export default function SignUpPopup({ walletAddress }) {
             <p className="contTitle">Password</p>
             <div className="inputContainer">
               <div className="inputBox">
-                <input 
-                  type=""
-                  value={pw}
-                  onChange={(e) => setPw(e.target.value)}
-                  placeholder="Password"
-                />
+                <input type="" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="Password" />
               </div>
             </div>
           </li>
@@ -234,7 +244,7 @@ export default function SignUpPopup({ walletAddress }) {
                   onChange={(e) => setnickname(e.target.value)}
                   placeholder="Nickname"
                 />
-              </div>              
+              </div>
             </div>
           </li>
 
@@ -245,7 +255,7 @@ export default function SignUpPopup({ walletAddress }) {
                 <input
                   value={referral}
                   onChange={(e) => setReferal(e.target.value)}
-									placeholder="Friend Recommendation"									
+                  placeholder="Friend Recommendation"
                 />
               </div>
             </div>
@@ -256,15 +266,13 @@ export default function SignUpPopup({ walletAddress }) {
           <li>
             <button
               className={agreeList[0] ? "chkBtn on" : "chkBtn"}
-							onClick={() => onClickAgreeList(0)}
-							style={{transform:'scale(3,3)'}}
+              onClick={() => onClickAgreeList(0)}
+              style={{ transform: "scale(3,3)" }}
             >
               <img src={I_chkWhite} alt="" />
             </button>
             <p>
-              Subscribe{" "}
-              <u onClick={() => navigate("/term")}>Terms of Service</u>{" "}
-              &#40;required&#41;
+              Subscribe <u onClick={() => navigate("/term")}>Terms of Service</u> &#40;required&#41;
             </p>
           </li>
 
@@ -276,10 +284,7 @@ export default function SignUpPopup({ walletAddress }) {
             >
               <img src={I_chkWhite} alt="" />
             </button>
-            <p>
-              Personal lnformation Collection and Usage Agreement
-              &#40;required&#41;
-            </p>
+            <p>Personal lnformation Collection and Usage Agreement &#40;required&#41;</p>
           </li>
         </ul>
 
@@ -287,11 +292,7 @@ export default function SignUpPopup({ walletAddress }) {
           <button className="cancelBtn" onClick={() => navigate("/")}>
             Cancel
           </button>
-          <button
-            className="confirmBtn"
-            disabled={disableConfirm}
-            onClick={onClickSignUpBtn}
-          >
+          <button className="confirmBtn" disabled={disableConfirm} onClick={onClickSignUpBtn}>
             Sign up
           </button>
         </ul>
@@ -307,11 +308,7 @@ export default function SignUpPopup({ walletAddress }) {
             <p className="contTitle">Address</p>
             <div className="inputContainer">
               <div className="inputBox">
-                <input style={{color:'#bbb'}}
-                  type=""
-                  value={ myaddress }
-									disabled
-									/>
+                <input style={{ color: "#bbb" }} type="" value={myaddress} disabled />
               </div>
             </div>
           </li>
@@ -327,15 +324,30 @@ export default function SignUpPopup({ walletAddress }) {
                   disabled={mailcheck}
                 />
 
-                {pending?(<button>{mailcheck?"VERIFIED":"PENDING"}</button>):(<button
-                  className="registrationBtn"
-                  onClick={clickRegistrationBtn }
-                >
-                  Registration
-                </button>)}
+                {pending ? (
+                  <button>{mailcheck ? "VERIFIED" : "PENDING"}</button>
+                ) : (
+                  <button className="registrationBtn" onClick={clickRegistrationBtn}>
+                    Registration
+                  </button>
+                )}
               </div>
-
               {emailAlarm && <p className="alarm">{emailAlarm}</p>}
+
+              <div className="inputBox">
+                <input
+                  onChange={(e) => setEmailCodeNumber(e.target.value)}
+                  onClick={() => {}}
+                  placeholder="Please write your email verify code"
+                />
+                {emailCodeState ? (
+                  <button>{emailCodeState ? "SUCCESS" : "FAIL"}</button>
+                ) : (
+                  <button className="registrationBtn" onClick={onClickEmailAuthBtn}>
+                    Click Check
+                  </button>
+                )}
+              </div>
             </div>
           </li>
 
@@ -343,12 +355,7 @@ export default function SignUpPopup({ walletAddress }) {
             <p className="contTitle">Password</p>
             <div className="inputContainer">
               <div className="inputBox">
-                <input
-                  type="password"
-                  value={pw}
-                  onChange={(e) => setPw(e.target.value)}
-                  placeholder="Password"
-                />
+                <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="Password" />
               </div>
             </div>
           </li>
@@ -379,7 +386,7 @@ export default function SignUpPopup({ walletAddress }) {
                   onChange={(e) => setnickname(e.target.value)}
                   placeholder="Nickname"
                 />
-              </div>              
+              </div>
             </div>
           </li>
 
@@ -388,9 +395,10 @@ export default function SignUpPopup({ walletAddress }) {
             <div className="inputContainer">
               <div className="inputBox">
                 <input
-                  value={referral}
+                  defaultValue={referer ? referer : null}
+                  disabled={referer ? true : false}
                   onChange={(e) => setReferal(e.target.value)}
-                  placeholder="Friend Recommendation"
+                  placeholder={referer ? referer : "Friend Recommendation"}
                 />
               </div>
             </div>
@@ -399,16 +407,11 @@ export default function SignUpPopup({ walletAddress }) {
 
         <ul className="agreeList">
           <li>
-            <button
-              className={agreeList[0] ? "chkBtn on" : "chkBtn"}
-              onClick={() => onClickAgreeList(0)}
-            >
+            <button className={agreeList[0] ? "chkBtn on" : "chkBtn"} onClick={() => onClickAgreeList(0)}>
               <img src={I_chkWhite} alt="" />
             </button>
             <p>
-              Subscribe{" "}
-              <u onClick={() => navigate("/term")}>Terms of Service</u>{" "}
-              &#40;required&#41;
+              Subscribe <u onClick={() => navigate("/term")}>Terms of Service</u> &#40;required&#41;
             </p>
           </li>
 
@@ -420,24 +423,20 @@ export default function SignUpPopup({ walletAddress }) {
             >
               <img src={I_chkWhite} alt="" />
             </button>
-            <p>
-              Personal lnformation Collection and Usage Agreement
-              &#40;required&#41;
-            </p>
+            <p>Personal lnformation Collection and Usage Agreement &#40;required&#41;</p>
           </li>
         </ul>
 
         <ul className="btnBox">
-          <button className="cancelBtn" onClick={() => {
-						navigate("/")}						
-					}>
+          <button
+            className="cancelBtn"
+            onClick={() => {
+              navigate("/");
+            }}
+          >
             Cancel
           </button>
-          <button
-            className="confirmBtn"
-            disabled={disableConfirm}
-            onClick={onClickSignUpBtn}
-          >
+          <button className="confirmBtn" disabled={disableConfirm} onClick={onClickSignUpBtn}>
             Sign up
           </button>
         </ul>
@@ -449,7 +448,7 @@ const MsignUpBox = styled.section`
   display: flex;
   flex-direction: column;
   padding: 0 0 9.44vw 0;
-
+  overflow-y: scroll;
   .topBar {
     display: flex;
     justify-content: space-between;
@@ -564,7 +563,7 @@ const MsignUpBox = styled.section`
     display: flex;
     gap: 24px;
     margin: 8.33vw 0 0 0;
-    padding: 0 5.55vw;
+    padding: 0, 5.55vw;
 
     button {
       flex: 1;
@@ -594,19 +593,22 @@ const MsignUpBox = styled.section`
 `;
 
 const PsignUpPopupBox = styled.div`
+
   display: flex;
   flex-direction: column;
   gap: 44px;
-  width: 720px;
+  width: 800px;
   padding: 60px 50px 70px;
   border-radius: 20px;
   background: #fff;
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
-  top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  position: fixed;
+  top: 50%;
   z-index: 6;
+  overflow-y: scroll;
+ 
+  }
+  
 
   .title {
     font-size: 24px;
@@ -618,7 +620,7 @@ const PsignUpPopupBox = styled.div`
   .inputList {
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 8px;
 
     li {
       display: flex;
