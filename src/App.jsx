@@ -43,6 +43,7 @@ import {
 } from "react-device-detect";
 import { CURRENT_TIME } from "./configs/configs";
 import { net } from "./configs/net";
+import Employment from "./router/Employment";
 
 function App() {
   const dispatch = useDispatch();
@@ -210,6 +211,7 @@ function App() {
           <Route path="/auction/detail/:itemid" element={<AuctionDetail />} />
 
           <Route path="/market" element={<Market />} />
+          <Route path="/employment" element={<Employment />} />
           <Route path="/market/detail/:itemid" element={<MarketDetail />} />
           <Route
             path="/market/detail/:itemid/:popup"

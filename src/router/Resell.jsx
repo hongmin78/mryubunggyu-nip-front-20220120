@@ -104,7 +104,7 @@ export default function Resell() {
         },
       };
 
-      query_with_arg(options_arg[item?.itembalances?.group_]).then((resp) => {
+      query_with_arg(options_arg[item.group_]).then((resp) => {
         console.log("$sell-isApprovedForAll?", resp);
         setApprovalForAll(resp);
         setSpinner(false);
@@ -464,7 +464,6 @@ export default function Resell() {
                   Suggested: 0%, 10%, 20%. Maximum is 25%
                 </p>
               </li>
-
               <li className="dateContainer contBox">
                 <div className="startDateBox dateBox">
                   <p className="title">Starting Date</p>
@@ -524,7 +523,6 @@ export default function Resell() {
                   </div>
                 </div>
               </li>
-
               <li className="instructionBox contBox">
                 <p className="title">Instruction</p>
 
@@ -555,7 +553,15 @@ export default function Resell() {
                     </li>
                   </ul>
                 </div>
-              </li>
+              </li>{" "}
+              <div className="employment">
+                <button className="actionBtn" onClick={() => {}}>
+                  Employ
+                </button>
+                <button className="actionBtn" onClick={() => {}}>
+                  UnEmploy
+                </button>
+              </div>
               {isApprovedForAll ? (
                 <button className="actionBtn" onClick={() => postSell()}>
                   {spinner ? <div id="loading"></div> : "Sell"}
@@ -957,6 +963,15 @@ const PresellBox = styled.section`
               line-height: 18px;
             }
           }
+        }
+      }
+
+      .employment {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        .actionBtn {
+          width: 320px;
         }
       }
 
