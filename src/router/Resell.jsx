@@ -37,7 +37,7 @@ export default function Resell() {
   const [expDate, setExpDate] = useState("");
   const [expDatePopup, setExpDatePopup] = useState(false);
   let [userInfo, setUserInfo] = useState();
-  let [itemDetail, setItemDetail] = useState({});
+  let [itemDetail, setItemDetail] = useState();
   const { id } = useParams();
   const [saleType, setSaleType] = useState("COMMON");
   const [isApprovedForAll, setApprovalForAll] = useState(false);
@@ -64,7 +64,23 @@ export default function Resell() {
     }
   };
 
-  const queryApprovalForAll = async () => {
+  const queryItemDetail = async () => {
+    try {
+      const resp = await axios.get(
+        API.API_GET_ITEMS_DETAIL + `/${id}?nettype=${net}`
+      );
+      if (resp.data && resp.data.respdata) {
+        let { respdata } = resp.data;
+        console.log("$itemdetail_ITEMDETAIL", respdata);
+        setItemDetail(respdata);
+        queryApprovalForAll(respdata);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const queryApprovalForAll = async (item) => {
     try {
       let myaddress = getmyaddress();
       if (myaddress) {
@@ -72,12 +88,23 @@ export default function Resell() {
         SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
         return;
       }
-      query_with_arg({
-        contractaddress: addresses.contract_erc1155,
-        abikind: "ERC1155",
-        methodname: "isApprovedForAll",
-        aargs: [myaddress, addresses.contract_erc1155_sales],
-      }).then((resp) => {
+
+      const options_arg = {
+        kingkong: {
+          contractaddress: addresses.contract_erc1155,
+          abikind: "ERC1155",
+          methodname: "isApprovedForAll",
+          aargs: [myaddress, addresses.contract_erc1155_sales],
+        },
+        ticket: {
+          contractaddress: addresses.contract_erc1155_ticket_sales_minter,
+          abikind: "ERC1155_TICKET_MINTER",
+          methodname: "_operatorApprovals",
+          aargs: [myaddress, addresses.contract_erc1155_ticket_sales],
+        },
+      };
+
+      query_with_arg(options_arg[item.group_]).then((resp) => {
         console.log("$sell-isApprovedForAll?", resp);
         setApprovalForAll(resp);
         setSpinner(false);
@@ -143,21 +170,6 @@ export default function Resell() {
     });
   };
 
-  const queryItemDetail = async () => {
-    try {
-      const resp = await axios.get(
-        API.API_GET_ITEMS_DETAIL + `/${id}?nettype=${net}`
-      );
-      if (resp.data && resp.data.respdata) {
-        let { respdata } = resp.data;
-        console.log("$itemdetail", respdata);
-        setItemDetail(respdata);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
   const postSell = () => {
     // const expiration = moment.unix(+expDate) - moment.unix(+startDate);
     // console.log("$expiration", expiration);
@@ -215,7 +227,6 @@ export default function Resell() {
         typestr: saleType,
       },
     };
-    const data = {};
     // if (
     //   (price !== null && saleType === "COMMON") ||
     //   ("AUCTION" && days === "14") ||
@@ -237,11 +248,10 @@ export default function Resell() {
 
   useEffect(() => {
     setSpinner(true);
-    queryItemDetail();
     setTimeout(() => {
-      queryApprovalForAll();
+      queryItemDetail();
       getUserInfo();
-    }, 1500);
+    }, 1200);
   }, []);
 
   if (isMobile)
@@ -454,7 +464,6 @@ export default function Resell() {
                   Suggested: 0%, 10%, 20%. Maximum is 25%
                 </p>
               </li>
-
               <li className="dateContainer contBox">
                 <div className="startDateBox dateBox">
                   <p className="title">Starting Date</p>
@@ -514,7 +523,6 @@ export default function Resell() {
                   </div>
                 </div>
               </li>
-
               <li className="instructionBox contBox">
                 <p className="title">Instruction</p>
 
@@ -545,7 +553,15 @@ export default function Resell() {
                     </li>
                   </ul>
                 </div>
-              </li>
+              </li>{" "}
+              <div className="employment">
+                <button className="actionBtn" onClick={() => {}}>
+                  Employ
+                </button>
+                <button className="actionBtn" onClick={() => {}}>
+                  UnEmploy
+                </button>
+              </div>
               {isApprovedForAll ? (
                 <button className="actionBtn" onClick={() => postSell()}>
                   {spinner ? <div id="loading"></div> : "Sell"}
@@ -947,6 +963,15 @@ const PresellBox = styled.section`
               line-height: 18px;
             }
           }
+        }
+      }
+
+      .employment {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        .actionBtn {
+          width: 320px;
         }
       }
 

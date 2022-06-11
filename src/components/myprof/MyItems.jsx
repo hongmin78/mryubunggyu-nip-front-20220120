@@ -670,7 +670,11 @@ export default function MyItems() {
               return (
                 <li key={index} className="swapBox">
                   <div className="imgBox">
-                    <img className="itemImg" src={item.itemdata.url} alt="" />
+                    {item && item.itemdata?.url ? (
+                      <img className="itemImg" src={item.itemdata.url} alt="" />
+                    ) : (
+                      <img className="itemImg" src={E_staking} alt="" />
+                    )}
 
                     <div className="topBar">
                       <button className="likeBtn" onClick={() => {}}>
@@ -755,11 +759,11 @@ export default function MyItems() {
             itemBalData.map((item, index) => (
               <li key={index} className="swapBox">
                 <div className="imgBoxBal">
-                  <img
-                    className="itemImgBal"
-                    src={item && item.itemdata?.url}
-                    alt=""
-                  />
+                  {item && item.itemdata?.url ? (
+                    <img className="itemImg" src={item.itemdata.url} alt="" />
+                  ) : (
+                    <img className="itemImg" src={E_staking} alt="" />
+                  )}
 
                   <div className="topBarBal">
                     <button className="likeBtnBal" onClick={() => {}}>

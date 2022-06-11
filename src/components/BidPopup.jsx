@@ -60,7 +60,9 @@ export default function BidPopup({ off, itemdata }) {
       },
     };
 
-    query_with_arg(options_arg[itemdata.itembalances?.group_]).then((resp) => {
+    console.log("$itemdata", itemdata);
+
+    query_with_arg(options_arg[itemdata.group_]).then((resp) => {
       console.log("$allowance_usdt: ", resp);
       setAllowance(getethrep("" + resp));
       SetErrorBar(`Allowance: ${getethrep("" + resp)}`);

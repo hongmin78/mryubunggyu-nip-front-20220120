@@ -417,5 +417,9 @@ const D_sortList = [
   "Recently Listed",
   "Oldest",
 ];
+const E_sortList = [
+  { title: "Employed NFTs", action: "UnEmploy" },
+  { title: "UnEmployed NFTs", action: "Employ" },
+];
 
-export { D_marketItemList, D_sortList };
+export { D_marketItemList, D_sortList, E_sortList };

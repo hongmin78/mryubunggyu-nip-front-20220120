@@ -3,6 +3,7 @@ import { abi as abierc20 } from "../contracts/abi-erc20";
 import { abi as abistake } from "../contracts/abi-staker";
 import { abi as abiadmin } from "../contracts/abi-admin";
 import { abi as abiticketnft } from "../contracts/abi-ticketnft";
+import { abi as abiticketminter } from "../contracts/abi-erc1155_ticket_minter";
 import { abi as abipay } from "../contracts/abipay";
 import { abi as abidelinquent } from "../contracts/abi-delinquents";
 import { abi as abierc1155 } from "../contracts/abi-erc1155";
@@ -19,6 +20,7 @@ const MAP_STR_ABI = {
   STAKE: abistake,
   ADMIN: abiadmin,
   TICKETNFT: abiticketnft,
+  ERC1155_TICKET_MINTER: abiticketminter,
   PAY: abipay,
   DELINQUENT: abidelinquent,
   ERC1155Sale: abierc1155sales,

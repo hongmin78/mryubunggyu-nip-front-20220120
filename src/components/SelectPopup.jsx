@@ -8,8 +8,8 @@ export default function SelectPopup({ off, dataList, select, setFunc }) {
     return (
       <MselectPopupBox className="sortPopup" onClick={() => off()}>
         {dataList.map((cont, index) => (
-          <li key={index} onClick={() => setFunc(cont)}>
-            {cont}
+          <li key={index} onClick={() => setFunc(cont.title)}>
+            {cont.title}
           </li>
         ))}
       </MselectPopupBox>
@@ -18,8 +18,13 @@ export default function SelectPopup({ off, dataList, select, setFunc }) {
     return (
       <PselectPopupBox className="sortPopup" onClick={() => off()}>
         {dataList.map((cont, index) => (
-          <li key={index} onClick={() => setFunc(cont)}>
-            {cont}
+          <li
+            key={index}
+            onClick={() => {
+              setFunc(cont);
+            }}
+          >
+            {cont.title}
           </li>
         ))}
       </PselectPopupBox>
