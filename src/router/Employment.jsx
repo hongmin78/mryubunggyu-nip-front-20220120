@@ -7,7 +7,7 @@ import PopupBg from "../components/PopupBg";
 import MarketItem from "../components/MarketItem";
 import MarketItem0227 from "../components/MarketItem0227";
 
-import { D_marketItemList, D_sortList } from "../data/Dmarket";
+import { D_marketItemList, E_sortList } from "../data/Dmarket";
 import SelectPopup from "../components/SelectPopup";
 import { useSelector } from "react-redux";
 import Header from "../components/header/Header";
@@ -15,26 +15,22 @@ import { API } from "../configs/api";
 import { LOGGER } from "../util/common";
 import axios from "axios";
 import { net } from "../configs/net";
+import EmploymentItem from "../components/EmploymentItem";
+import StatusBar from "../components/StatusBar";
 
 export default function Employment() {
   const searchBoxRef = useRef();
   const sortBtnRef = useRef();
+  const statBarRef = useRef();
   const isMobile = useSelector((state) => state.common.isMobile);
   const [search, setSearch] = useState("");
-  const [sortOpt, setSortOpt] = useState(D_sortList[1]);
+  const [sortOpt, setSortOpt] = useState(E_sortList[0]);
+  const [statusBar, setStatusBar] = useState(false);
   const [sortPopup, setSortPopup] = useState(false);
   const [likeObj, setLikeObj] = useState({});
   const [limit, setLimit] = useState(8);
-  let [D_marketItemList, setD_marketItemList] = useState([]);
-  // const fetchdata = () => {
-  //   axios.get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC?nettype=${net}`).then((resp) => {
-  //     LOGGER("", resp.data);
-  //     let { status, list } = resp.data;
-  //     if (status == "OK") {
-  //       setD_marketItemList(list);
-  //     }
-  //   });
-  // };
+  // let [D_marketItemList, setD_marketItemList] = useState([]);
+
   const fetchData = async () => {
     try {
       const res = await axios.get(
@@ -43,7 +39,7 @@ export default function Employment() {
       if (res.data && res.data.list) {
         let { list } = res.data;
         console.log("$market_items", res);
-        setD_marketItemList(list);
+        // setD_marketItemList(list);
       }
     } catch (err) {
       console.log(err);
@@ -91,7 +87,7 @@ export default function Employment() {
                     }
                     onClick={() => setSortPopup(true)}
                   >
-                    <p>{sortOpt}</p>
+                    <p>{sortOpt.title}</p>
                     <img src={I_dnArw} alt="" />
                   </button>
 
@@ -99,7 +95,7 @@ export default function Employment() {
                     <>
                       <SelectPopup
                         off={setSortPopup}
-                        dataList={D_sortList}
+                        dataList={E_sortList}
                         select={sortOpt}
                         setFunc={setSortOpt}
                       />
@@ -115,11 +111,12 @@ export default function Employment() {
                 if (index < limit)
                   return (
                     <Fragment key={index}>
-                      <MarketItem0227
+                      <EmploymentItem
                         data={cont}
                         index={index}
                         likeObj={likeObj}
                         setLikeObj={setLikeObj}
+                        sortOpt={sortOpt}
                       />
                     </Fragment>
                   );
@@ -141,9 +138,32 @@ export default function Employment() {
         <Header />
         <PmarketBox>
           <section className="topBar">
-            <p className="title">Employed NFTs</p>
+            <p className="title">{sortOpt.title}</p>
 
             <article className="rightBox">
+              <div className="sortBox">
+                <button
+                  ref={statBarRef}
+                  className="sortBtn"
+                  onFocus={() =>
+                    (statBarRef.current.style.border = "3px solid #000000")
+                  }
+                  onBlur={() =>
+                    (statBarRef.current.style.border = "1px solid #d9d9d9")
+                  }
+                  onClick={() => setStatusBar(true)}
+                >
+                  <p>Status Bar</p>
+                  <img src={I_dnArw} alt="" />
+                </button>
+                {statusBar && (
+                  <>
+                    <StatusBar />
+                    <PopupBg off={setStatusBar} />
+                  </>
+                )}
+              </div>
+
               <div className="searchBox" ref={searchBoxRef}>
                 <input
                   value={search}
@@ -172,7 +192,7 @@ export default function Employment() {
                   }
                   onClick={() => setSortPopup(true)}
                 >
-                  <p>{sortOpt}</p>
+                  <p>{sortOpt.title}</p>
                   <img src={I_dnArw} alt="" />
                 </button>
 
@@ -180,7 +200,7 @@ export default function Employment() {
                   <>
                     <SelectPopup
                       off={setSortPopup}
-                      dataList={D_sortList}
+                      dataList={E_sortList}
                       select={sortOpt}
                       setFunc={setSortOpt}
                     />
@@ -193,18 +213,19 @@ export default function Employment() {
 
           <ul className="itemList">
             {D_marketItemList.map((cont, index) => {
-              if (index < limit)
-                return (
-                  <Fragment key={index}>
-                    <MarketItem0227
-                      data={cont}
-                      index={index}
-                      likeObj={likeObj}
-                      setLikeObj={setLikeObj}
-                    />
-                  </Fragment>
-                );
-              else return <Fragment key={index} />;
+              // if (index < limit)
+              return (
+                <Fragment key={index}>
+                  <EmploymentItem
+                    data={cont}
+                    index={index}
+                    likeObj={likeObj}
+                    setLikeObj={setLikeObj}
+                    sortOpt={sortOpt}
+                  />
+                </Fragment>
+              );
+              // else return <Fragment key={index} />;
             })}
           </ul>
 
