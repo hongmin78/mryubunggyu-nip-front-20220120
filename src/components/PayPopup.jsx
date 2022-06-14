@@ -107,37 +107,7 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
         LOGGER("mybalance", resp);
         setmybalance(getethrep(resp, 4));
       });
-      // query_noarg({
-      //   contractaddress: addresses.contract_st ake, // ETH_TESTNET.
-      //   abikind: "ST AKE",
-      //   methodname: "_tvl",
-      // }).then((resp) => {
-      //   LOGGER("", resp);
-      //   settvl(getethrep(resp));
-      // });
 
-      // query_with_arg({
-      //   contractaddress: addresses.contract_admin,
-      //   abikind: "ADMIN",
-      //   methodname: "_st akeplans",
-      //   aargs: [addresses.contract_USDT],
-      // }).then((resp) => {
-      //   LOGGER("HSudcIgxuB", resp);
-      //   if (resp) {
-      //   } else {
-      //     return;
-      //   }
-      //   setMIN_ST AKE_AMOUNT(getethrep(resp[4]));
-      // });
-      // false &&
-      //   query_with_arg({
-      //     contractaddress: addresses.contract_st ake, // .ETH_TESTNET
-      //     abikind: "ST AKE",
-      //     methodname: "_tvl_nft",
-      //   }).then((resp) => {
-      //     LOGGER("", resp);
-      //     //				settvlnft ( resp )
-      //   });
       query_eth_balance(myaddress).then((resp) => {
         LOGGER("rmgUxgo5ye", resp);
         setmyethbalance((+getethrep(resp)).toFixed(DECIMALS_DISP_DEF));
@@ -223,6 +193,7 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
       setisloader_01(false);
       return;
     }
+
     console.log(
       "$INPUTS",
       addresses.contract_USDT, // .ETH_TESTNET
