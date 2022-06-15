@@ -65,6 +65,7 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
         }
       })
       .catch((err) => console.log(err));
+
     const fetchdata = async (_) => {
       axios.get(API.API_TICKERS + `?nettype=${net}`).then((resp) => {
         LOGGER("MDmEMQ5xde", resp.data);
@@ -186,7 +187,9 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
     LOGGER("YFVGAF0sBJ");
     let myaddress = getmyaddress();
     // LOGGER("eYJAgMYkR5", myaddress);
-    if (mybalance >= DueAmount) {
+    console.log("mybalance", mybalance);
+    console.log("DueAmount", DueAmount);
+    if (parseInt(mybalance) >= parseInt(DueAmount)) {
     } else {
       SetErrorBar(messages.MSG_BALANCE_NOT_ENOUGH);
       setDone(false);
@@ -263,7 +266,6 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
             setDone(false);
             setisloader_01(false);
             off();
-            window.location.reload();
           });
         } catch (err) {
           SetErrorBar(messages.MSG_USER_DENIED_TX);

@@ -41,21 +41,13 @@ export default function MyItems() {
   const [isstaked, setisstaked] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [receivables, setReceivables] = useState();
-  const [userInfoRco, setUserInfoReco] = useState([]);
-  const [getTimeMoment, setGetTimeMoment] = useState();
-  const [timeMoment, setTimeMoment] = useState();
+
   let [itemData, setItemData] = useState([]);
   let [itemBalData, setItemBalData] = useState([]);
-  let [mytokenid, setmytokenid] = useState();
-  let [stakedata, setstakedata] = useState({});
-  let [myaddress, setmyaddress] = useState();
-  let [txhash, settxhash] = useState();
+
   let [txscanurl, settxscanurl] = useState();
-  let [buydate, setbuydate] = useState([]);
+
   let [userinfo, setuserinfo] = useState(null);
-  const [timeReceivables, setTimeReceivables] = useState();
-  const [gettimeReceivables, setgetTimeReceivables] = useState();
-  const [logstakes, setlogstakes] = useState(null);
   const [getTickTimer, setGetTickTimer] = useState();
   const [tickTimer, setTickTimer] = useState();
   const [ticketInfo, setTickInfo] = useState();
@@ -65,17 +57,15 @@ export default function MyItems() {
 
   const fetchdata = async (_) => {
     let myaddress = getmyaddress();
-    setmyaddress(myaddress);
+
     LOGGER("myaddress", myaddress);
-    axios
-      .get(API.API_USERINFO + `/${myaddress}?nettype=${net}`)
-      .then((resp) => {
-        if (resp.data && resp.data.respdata) {
-          let { respdata } = resp.data;
-          LOGGER("myticket", resp.data);
-          setuserinfo(respdata);
-        }
-      });
+    axios.get(API.API_USERINFO + `/${myaddress}?nettype=${net}`).then((resp) => {
+      if (resp.data && resp.data.respdata) {
+        let { respdata } = resp.data;
+        LOGGER("myticket", resp.data);
+        setuserinfo(respdata);
+      }
+    });
 
     axios
       .get(API.API_RECEIVABLES + `/${myaddress}?nettype=${net}`)
@@ -83,37 +73,28 @@ export default function MyItems() {
         let { list } = res.data;
         setItemData(list);
         LOGGER("receivables", list);
-        list.forEach((el) => {
-          let { duetimeunix } = el;
-        });
-        setgetTimeReceivables(list[0]?.duetimeunix);
       })
       .catch((err) => console.log(err));
 
-    axios
-      .get(API.API_ITEMBALANCES + `/${myaddress}?nettype=${net}`)
-      .then((res) => {
-        let { list, status } = res.data;
-        LOGGER("getITEmBALANCES", res.data);
-        if (status === "OK" && list?.length) {
-          setItemBalData(list);
-          LOGGER("ITEMBALANCES", list);
-          list.forEach((el) => {
-            let { duetimeunix } = el;
-          });
-        }
-        axios //      .get("http://3.35.1 17.87:34705/auction/list", { params: { limit: 8 } })
-          .get(API.API_GET_CIRCULATIONS_ITEM + `?nettype=${net}`)
-          .then((resp) => {
-            LOGGER("circulations", resp.data);
-            let { status, list } = resp.data;
-            if (status == "OK") {
-              setCirculations(resp.data.list);
-            }
-            //        console.log(res.data);
-            //      setMoreCollection(res.data);
-          });
-      });
+    axios.get(API.API_ITEMBALANCES + `/${myaddress}?nettype=${net}`).then((res) => {
+      let { list, status } = res.data;
+      LOGGER("getITEmBALANCES", res.data);
+      if (status === "OK" && list?.length) {
+        setItemBalData(list);
+        LOGGER("ITEMBALANCES", list);
+      }
+      axios //      .get("http://3.35.1 17.87:34705/auction/list", { params: { limit: 8 } })
+        .get(API.API_GET_CIRCULATIONS_ITEM + `?nettype=${net}`)
+        .then((resp) => {
+          LOGGER("circulations", resp.data);
+          let { status, list } = resp.data;
+          if (status == "OK") {
+            setCirculations(resp.data.list);
+          }
+          //        console.log(res.data);
+          //      setMoreCollection(res.data);
+        });
+    });
 
     //true
     true &&
@@ -134,7 +115,6 @@ export default function MyItems() {
             aargs: [myitemhash],
           });
           LOGGER("GEVKU97nIv", mytokenid);
-          setmytokenid(mytokenid);
         } catch (err) {
           LOGGER(err);
           mytokenid = null;
@@ -159,27 +139,27 @@ export default function MyItems() {
 
   useEffect(() => {
     let myaddress = getmyaddress();
-    axios
-      .get(API.API_LOGSTAKES + `/${myaddress}?nettype=${net}`)
-      .then((resp) => {
-        LOGGER("API_LOGSTAKES", resp.data);
-        let { status, respdata } = resp.data;
-        if (status == "OK") {
-          setlogstakes(respdata);
-          setGetTickTimer(respdata?.createdat);
-        }
-      });
+    axios.get(API.API_LOGSTAKES + `/${myaddress}?nettype=${net}`).then((resp) => {
+      LOGGER("API_LOGSTAKES", resp.data);
+      let { status, respdata } = resp.data;
+      if (status == "OK") {
+        setGetTickTimer(respdata?.createdat);
+      }
+    });
 
     // setInterval(() => {
     //   getTickTimer && setTickTimer(moment(getTickTimer).add(90, "days") - moment());
     // }, 1000);
   }, [getTickTimer]);
 
-  useEffect((_) => {
-    setTimeout((_) => {
-      fetchdata();
-    }, 1500);
-  }, []);
+  useEffect(
+    (_) => {
+      setTimeout((_) => {
+        fetchdata();
+      }, 1000);
+    },
+    [isOpen]
+  );
   const date = moment().unix();
 
   const openModal = () => {
@@ -188,16 +168,14 @@ export default function MyItems() {
 
   useEffect(() => {
     let myaddress = getmyaddress();
-    axios
-      .get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`)
-      .then((resp) => {
-        LOGGER("API_ticketInfo", resp.data);
+    axios.get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`).then((resp) => {
+      LOGGER("API_ticketInfo", resp.data);
 
-        let { status, respdata } = resp.data;
-        if (status == "OK" && respdata !== null) {
-          setTickInfo(respdata);
-        }
-      });
+      let { status, respdata } = resp.data;
+      if (status == "OK" && respdata !== null) {
+        setTickInfo(respdata);
+      }
+    });
   }, []);
 
   if (isMobile)
@@ -208,12 +186,8 @@ export default function MyItems() {
             <button
               className="sortBtn"
               ref={sortBtnRef}
-              onFocus={() =>
-                (sortBtnRef.current.style.border = "3px solid #000")
-              }
-              onBlur={() =>
-                (sortBtnRef.current.style.border = "1px solid #d9d9d9")
-              }
+              onFocus={() => (sortBtnRef.current.style.border = "3px solid #000")}
+              onBlur={() => (sortBtnRef.current.style.border = "1px solid #d9d9d9")}
               onClick={() => setSortPopup(true)}
             >
               <p>{sortOpt}</p>
@@ -222,12 +196,7 @@ export default function MyItems() {
 
             {sortPopup && (
               <>
-                <SelectPopup
-                  off={setSortPopup}
-                  dataList={D_sortList}
-                  select={sortOpt}
-                  setFunc={setSortOpt}
-                />
+                <SelectPopup off={setSortPopup} dataList={D_sortList} select={sortOpt} setFunc={setSortOpt} />
 
                 <PopupBg off={setSortPopup} />
               </>
@@ -236,11 +205,7 @@ export default function MyItems() {
 
           <ul className="filterList">
             {filterList.map((cont, index) => (
-              <li
-                key={index}
-                className={filter === index ? "on" : ""}
-                onClick={() => setFilter(index)}
-              >
+              <li key={index} className={filter === index ? "on" : ""} onClick={() => setFilter(index)}>
                 {cont}
               </li>
             ))}
@@ -248,10 +213,7 @@ export default function MyItems() {
         </div>
 
         <ul className="itemList">
-          <li
-            className="stakingBox"
-            style={isstaked ? {} : { display: "none" }}
-          >
+          <li className="stakingBox" style={isstaked ? {} : { display: "none" }}>
             <div className="imgBox">
               <div className="topBar">
                 <img className="itemImg" src={E_staking} alt="" />
@@ -274,30 +236,23 @@ export default function MyItems() {
                 </div>
                 <div className="saleBox"></div>
 
-                <button
-                  className="actionBtn"
-                  onClick={() => navigate("/staking")}
-                >
+                <button className="actionBtn" onClick={() => navigate("/staking")}>
                   Buy
                 </button>
 
                 <p className="description">
-                  The NFT purchased by participating in the subscription auction
-                  generates 12% of profits after 3 days and is sold random. In
-                  addition, the results are announced at 9:00 AM, and the
-                  transaction is completed from 9:00 AM to 21:00 PM. If the
-                  transaction is not completed within time, all transactions in
-                  your account will be suspended. It operates normally after
-                  applying a penalty of 10% of the winning bid amount.
+                  The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days
+                  and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
+                  completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all transactions
+                  in your account will be suspended. It operates normally after applying a penalty of 10% of the winning
+                  bid amount.
                 </p>
               </div>
             )}
             {ticketInfo && (
               <div className="infoBox">
                 <div className="titleBox">
-                  <strong className="title">
-                    Lucky Ticket #{ticketInfo.id}
-                  </strong>
+                  <strong className="title">Lucky Ticket #{ticketInfo.id}</strong>
                 </div>
 
                 <div className="ownedBox">
@@ -345,13 +300,11 @@ export default function MyItems() {
                 </button>
 
                 <p className="description">
-                  The NFT purchased by participating in the subscription auction
-                  generates 12% of profits after 3 days and is sold random. In
-                  addition, the results are announced at 9:00 AM, and the
-                  transaction is completed from 9:00 AM to 21:00 PM. If the
-                  transaction is not completed within time, all transactions in
-                  your account will be suspended. It operates normally after
-                  applying a penalty of 10% of the winning bid amount.
+                  The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days
+                  and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
+                  completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all transactions
+                  in your account will be suspended. It operates normally after applying a penalty of 10% of the winning
+                  bid amount.
                 </p>
               </div>
             )}
@@ -374,9 +327,7 @@ export default function MyItems() {
 
                   <div className="infoBox">
                     <div className="titleBox">
-                      <strong className="title">
-                        {item.itemdata.titlename}
-                      </strong>
+                      <strong className="title">{item.itemdata.titlename}</strong>
                     </div>
 
                     <div className="ownedBox">
@@ -385,7 +336,7 @@ export default function MyItems() {
                     </div>
                     <div className="ownedBox">
                       <p className="key">Round Number</p>
-                      <p className="value">{item.itemdata.roundnumber} Round</p>
+                      <p className="value">{item.roundnumber} Round</p>
                     </div>
 
                     <div className="saleBox">
@@ -403,9 +354,7 @@ export default function MyItems() {
                     <ul className="priceBox">
                       <li>
                         <p className="key">Current price</p>
-                        <p className="value">
-                          {Math.ceil(item.amount * 100) / 100} USDT
-                        </p>
+                        <p className="value">{Math.ceil(item.amount * 100) / 100} USDT</p>
                       </li>
                     </ul>
 
@@ -420,14 +369,11 @@ export default function MyItems() {
                     </button>
 
                     <p className="description">
-                      The NFT purchased by participating in the subscription
-                      auction generates 12% of profits after 3 days and is sold
-                      random. In addition, the results are announced at 9:00 AM,
-                      and the transaction is completed from 9:00 AM to 21:00 PM.
-                      If the transaction is not completed within time, all
-                      transactions in your account will be suspended. It
-                      operates normally after applying a penalty of 10% of the
-                      winning bid amount.
+                      The NFT purchased by participating in the subscription auction generates 12% of profits after 3
+                      days and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
+                      completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all
+                      transactions in your account will be suspended. It operates normally after applying a penalty of
+                      10% of the winning bid amount.
                     </p>
                   </div>
                 </li>
@@ -479,19 +425,13 @@ export default function MyItems() {
                       <p className="key">Current price</p>
                       {circulations.map((itm, i) => {
                         if (item.itemid === itm.itemid)
-                          return (
-                            <p className="value">
-                              {" "}
-                              {Math.ceil(itm.price * 100) / 100} USDT
-                            </p>
-                          );
+                          return <p className="value"> {Math.ceil(itm.price * 100) / 100} USDT</p>;
                       })}
                     </li>
                   </ul>
                   <p className="description">
-                    King Kong NFT can be staking or sold to Marketplace at a
-                    price of up to 25%. If you steaking, you will get 30% annual
-                    NIP COIN reward.
+                    King Kong NFT can be staking or sold to Marketplace at a price of up to 25%. If you steaking, you
+                    will get 30% annual NIP COIN reward.
                   </p>
                 </div>
               </li>
@@ -506,11 +446,7 @@ export default function MyItems() {
         <div className="topBar">
           <ul className="filterList">
             {filterList.map((cont, index) => (
-              <li
-                key={index}
-                className={filter === index ? "on" : ""}
-                onClick={() => setFilter(index)}
-              >
+              <li key={index} className={filter === index ? "on" : ""} onClick={() => setFilter(index)}>
                 {cont}
               </li>
             ))}
@@ -520,12 +456,8 @@ export default function MyItems() {
             <button
               className="sortBtn"
               ref={sortBtnRef}
-              onFocus={() =>
-                (sortBtnRef.current.style.border = "3px solid #000")
-              }
-              onBlur={() =>
-                (sortBtnRef.current.style.border = "1px solid #d9d9d9")
-              }
+              onFocus={() => (sortBtnRef.current.style.border = "3px solid #000")}
+              onBlur={() => (sortBtnRef.current.style.border = "1px solid #d9d9d9")}
               onClick={() => setSortPopup(true)}
             >
               <p>{sortOpt}</p>
@@ -534,12 +466,7 @@ export default function MyItems() {
 
             {sortPopup && (
               <>
-                <SelectPopup
-                  off={setSortPopup}
-                  dataList={D_sortList}
-                  select={sortOpt}
-                  setFunc={setSortOpt}
-                />
+                <SelectPopup off={setSortPopup} dataList={D_sortList} select={sortOpt} setFunc={setSortOpt} />
 
                 <PopupBg off={setSortPopup} />
               </>
@@ -548,10 +475,7 @@ export default function MyItems() {
         </div>
 
         <ul className="itemList">
-          <li
-            className="stakingBox"
-            style={isstaked ? {} : { display: "none" }}
-          >
+          <li className="stakingBox" style={isstaked ? {} : { display: "none" }}>
             <div className="imgBox">
               <div className="topBar">
                 <img className="itemImg" src={E_staking} alt="" />
@@ -574,21 +498,16 @@ export default function MyItems() {
                 </div>
                 <div className="saleBox"></div>
 
-                <button
-                  className="actionBtn"
-                  onClick={() => navigate("/staking")}
-                >
+                <button className="actionBtn" onClick={() => navigate("/staking")}>
                   Buy
                 </button>
 
                 <p className="description">
-                  The NFT purchased by participating in the subscription auction
-                  generates 12% of profits after 3 days and is sold random. In
-                  addition, the results are announced at 9:00 AM, and the
-                  transaction is completed from 9:00 AM to 21:00 PM. If the
-                  transaction is not completed within time, all transactions in
-                  your account will be suspended. It operates normally after
-                  applying a penalty of 10% of the winning bid amount.
+                  The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days
+                  and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
+                  completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all transactions
+                  in your account will be suspended. It operates normally after applying a penalty of 10% of the winning
+                  bid amount.
                 </p>
               </div>
             )}
@@ -596,9 +515,7 @@ export default function MyItems() {
             {ticketInfo && (
               <div className="infoBox">
                 <div className="titleBox">
-                  <strong className="title">
-                    Lucky Ticket #{ticketInfo.id}
-                  </strong>
+                  <strong className="title">Lucky Ticket #{ticketInfo.id}</strong>
                 </div>
 
                 <div className="ownedBox">
@@ -652,13 +569,11 @@ export default function MyItems() {
                 </button>
 
                 <p className="description">
-                  The NFT purchased by participating in the subscription auction
-                  generates 12% of profits after 3 days and is sold random. In
-                  addition, the results are announced at 9:00 AM, and the
-                  transaction is completed from 9:00 AM to 21:00 PM. If the
-                  transaction is not completed within time, all transactions in
-                  your account will be suspended. It operates normally after
-                  applying a penalty of 10% of the winning bid amount.
+                  The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days
+                  and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
+                  completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all transactions
+                  in your account will be suspended. It operates normally after applying a penalty of 10% of the winning
+                  bid amount.
                 </p>
               </div>
             )}
@@ -686,9 +601,7 @@ export default function MyItems() {
 
                   <div className="infoBox">
                     <div className="titleBox">
-                      <strong className="title">
-                        {item.itemdata.titlename}
-                      </strong>
+                      <strong className="title">{item.itemdata.titlename}</strong>
                     </div>
 
                     <div className="ownedBox">
@@ -697,7 +610,7 @@ export default function MyItems() {
                     </div>
                     <div className="ownedBox">
                       <p className="key">Round Number</p>
-                      <p className="value">{item.itemdata.roundnumber} Round</p>
+                      <p className="value">{item.roundnumber} Round</p>
                     </div>
 
                     <div className="saleBox">
@@ -707,9 +620,7 @@ export default function MyItems() {
                       </div>
 
                       <div className="value">
-                        <strong className="price">
-                          {parseInt(item.amount).toFixed(2)} USDT
-                        </strong>
+                        <strong className="price">{parseInt(item.amount).toFixed(2)} USDT</strong>
 
                         {/* <ul className="timeList">
                           <li>{timeReceivables && timeReceivables.days()}일</li>
@@ -722,9 +633,7 @@ export default function MyItems() {
                       <ul className="priceBox">
                         <li>
                           <p className="key">Current price</p>
-                          <p className="value">
-                            {parseInt(item.amount).toFixed(2)} USDT
-                          </p>
+                          <p className="value">{parseInt(item.amount).toFixed(2)} USDT</p>
                         </li>
                       </ul>
                     </div>
@@ -741,14 +650,11 @@ export default function MyItems() {
                     </button>
 
                     <p className="description">
-                      The NFT purchased by participating in the subscription
-                      auction generates 12% of profits after 3 days and is sold
-                      random. In addition, the results are announced at 9:00 AM,
-                      and the transaction is completed from 9:00 AM to 21:00 PM.
-                      If the transaction is not completed within time, all
-                      transactions in your account will be suspended. It
-                      operates normally after applying a penalty of 10% of the
-                      winning bid amount.
+                      The NFT purchased by participating in the subscription auction generates 12% of profits after 3
+                      days and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
+                      completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all
+                      transactions in your account will be suspended. It operates normally after applying a penalty of
+                      10% of the winning bid amount.
                     </p>
                   </div>
                 </li>
@@ -760,9 +666,9 @@ export default function MyItems() {
               <li key={index} className="swapBox">
                 <div className="imgBoxBal">
                   {item && item.itemdata?.url ? (
-                    <img className="itemImg" src={item.itemdata.url} alt="" />
+                    <img className="itemImgBal" src={item.itemdata.url} alt="" />
                   ) : (
-                    <img className="itemImg" src={E_staking} alt="" />
+                    <img className="itemImgBal" src={E_staking} alt="" />
                   )}
 
                   <div className="topBarBal">
@@ -774,9 +680,7 @@ export default function MyItems() {
                 </div>
                 <div className="infoBox">
                   <div className="titleBox">
-                    <strong className="title">
-                      {item && item.itemdata?.titlename}
-                    </strong>
+                    <strong className="title">{item && item.itemdata?.titlename}</strong>
                   </div>
 
                   <div className="ownedBox">
@@ -785,9 +689,7 @@ export default function MyItems() {
                   </div>
                   <div className="ownedBox">
                     <p className="key">Bought Date</p>
-                    <p className="value">
-                      {moment(item && item.createdat).format("YYYY-MM-DD")}
-                    </p>
+                    <p className="value">{moment(item && item.createdat).format("YYYY-MM-DD")}</p>
                     <p className="key">Sold Date</p>
                     <p className="value">
                       {moment(item && item.createdat)
@@ -820,42 +722,28 @@ export default function MyItems() {
 
                       <li key={index}>
                         <p className="key">Current price</p>
-                        <p className="value">
-                          {" "}
-                          {parseInt(item && item.buyprice).toFixed(2)} USDT
-                        </p>
+                        <p className="value"> {parseInt(item && item.buyprice).toFixed(2)} USDT</p>
                       </li>
-
-                      <button
-                        className="actionBtn"
-                        onClick={() => navigate("/resell/" + item.itemid)}
-                      >
-                        Sell
-                      </button>
+                      {item.group_ == "kingkong" && (
+                        <button className="actionBtn" onClick={() => navigate("/resell/" + item.itemid)}>
+                          Sell
+                        </button>
+                      )}
                     </ul>
                   </div>
 
                   <p className="description">
-                    The NFT purchased by participating in the subscription
-                    auction generates 12% of profits after 3 days and is sold
-                    random. In addition, the results are announced at 9:00 AM,
-                    and the transaction is completed from 9:00 AM to 21:00 PM.
-                    If the transaction is not completed within time, all
-                    transactions in your account will be suspended. It operates
-                    normally after applying a penalty of 10% of the winning bid
-                    amount.
+                    The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days
+                    and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
+                    completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all
+                    transactions in your account will be suspended. It operates normally after applying a penalty of 10%
+                    of the winning bid amount.
                   </p>
                 </div>
               </li>
             ))}
 
-          {isOpen && (
-            <PayPopup
-              off={openModal}
-              userInfo={userinfo}
-              receivables={receivables}
-            />
-          )}
+          {isOpen && <PayPopup off={openModal} userInfo={userinfo} receivables={receivables} />}
         </ul>
       </PmyItemsBox>
     );
@@ -924,8 +812,7 @@ const MmyItemsBox = styled.section`
         overflow: hidden;
         border-radius: 12px;
         border: 20px solid transparent;
-        background-image: linear-gradient(to right, red 0%, orange 100%),
-          linear-gradient(to right, red 0%, orange 100%);
+        background-image: linear-gradient(to right, red 0%, orange 100%), linear-gradient(to right, red 0%, orange 100%);
         background-origin: border-box;
         background-clip: content-box, border-box;
 
@@ -934,6 +821,7 @@ const MmyItemsBox = styled.section`
           height: 100%;
           object-fit: contain;
           position: absolute;
+          border: 20px solid transparent;
         }
         .topBar {
           display: flex;
@@ -1148,7 +1036,7 @@ const MmyItemsBox = styled.section`
         height: 100%;
         object-fit: contain;
         position: absolute;
-        border-radius: 12px;
+        border-radius: 50px;
       }
       .topBarBal {
         display: flex;
@@ -1231,8 +1119,7 @@ const PmyItemsBox = styled.section`
         overflow: hidden;
         border-radius: 12px;
         border: 20px solid transparent;
-        background-image: linear-gradient(red, red),
-          linear-gradient(to right, red 0%, orange 100%);
+        background-image: linear-gradient(red, red), linear-gradient(to right, red 0%, orange 100%);
         background-origin: border-box;
         background-clip: content-box, border-box;
         @media screen and (max-width: 1440px) {
@@ -1245,6 +1132,7 @@ const PmyItemsBox = styled.section`
           object-fit: contain;
           position: absolute;
           border-radius: 12px;
+          border: 20px solid transparent;
         }
         .topBar {
           display: flex;
@@ -1402,6 +1290,8 @@ const PmyItemsBox = styled.section`
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+            border-radius: 12px;
+            border: 20px solid transparent;
           }
           .topBar {
             height: unset;
@@ -1528,8 +1418,7 @@ const PmyItemsBox = styled.section`
         overflow: hidden;
         border-radius: 12px;
         border: 20px solid transparent;
-        background-image: linear-gradient(to right, red 0%, orange 100%),
-          linear-gradient(to right, red 0%, orange 100%);
+        background-image: linear-gradient(to right, red 0%, orange 100%), linear-gradient(to right, red 0%, orange 100%);
         background-origin: border-box;
         background-clip: content-box, border-box;
         @media screen and (max-width: 1440px) {
@@ -1684,6 +1573,7 @@ const PmyItemsBox = styled.section`
             height: 400px;
             top: 50%;
             left: 50%;
+
             transform: translate(-50%, -50%);
           }
           .topBar {
