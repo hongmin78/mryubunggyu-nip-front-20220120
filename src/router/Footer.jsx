@@ -37,7 +37,7 @@ export default function Footer() {
 
         {pdfPopup && (
           <>
-            <PdfPopup />
+            <PdfPopup type="introduction" />
             <PopupBg blur off={setPdfPopup} />
           </>
         )}
@@ -48,15 +48,14 @@ export default function Footer() {
       <>
         <PfooterBox style={{ background: isStaking && "unset" }}>
           <div className="innerBox">
-					<p className="copyright" style={{ color: isStaking && "#DBDEE2" }}>              
-							Customer Support
-							<br/>
-<br/>
-cs_jp@nftinfinity.world
-							<br/>
-							<br/>
-							cs_ph@nftinfinity.world
-
+            <p className="copyright" style={{ color: isStaking && "#DBDEE2" }}>
+              Customer Support
+              <br />
+              <br />
+              cs_jp@nftinfinity.world
+              <br />
+              <br />
+              cs_ph@nftinfinity.world
             </p>
 
             <p className="copyright" style={{ color: isStaking && "#DBDEE2" }}>
@@ -74,7 +73,7 @@ cs_jp@nftinfinity.world
 
         {pdfPopup && (
           <>
-            <PdfPopup />
+            <PdfPopup type="introduction" />
             <PopupBg blur off={setPdfPopup} />
           </>
         )}

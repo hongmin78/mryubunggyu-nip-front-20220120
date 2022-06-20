@@ -261,42 +261,71 @@ export default function MyItems() {
                 </div>
 
                 <div className="saleBox">
-                  <div className="time">
-                    <p className="key">Bought</p>
+                  <div className="key">
+                    <p className="price">Current price</p>
+                    <p className="time">Bought</p>
+                  </div>
+
+                  <div className="value">
+                    <strong className="price">100 USDT</strong>
+
                     {/* <ul className="timeList">
-                      <li>{tickDate?.days()}일</li>
-                      <li>{tickDate?.hours()}시간</li>
-                      <li>{tickDate?.minutes()}분</li>
-                      <li>{tickDate?.seconds()}초</li>
+                      <li>{moment(tickTimer).days()}일</li>
+                      <li>{moment(tickTimer).hours()}시간</li>
+                      <li>{moment(tickTimer).month()}분</li>
+                      <li>{moment(tickTimer).second()}초</li>
                     </ul> */}
                   </div>
-                </div>
 
-                <ul className="priceBox">
-                  <li>
-                    <p className="key">Current price</p>
-                    <strong className="price">100 USDT</strong>
-                  </li>
-                  {/* <li>
+                  <ul className="priceBox">
+                    <li>
+                      <p className="key">Current price</p>
+                      <p className="value">100 USDT</p>
+                    </li>
+                    {/* <li>
                     <p className="key">Transaction price</p>
-                    <p className="value">688 USDT</p>
+                    <p className="value">100 USDT</p>
                   </li> */}
-                  <li
-                    onClick={(evt) => {
-                      window.open(txscanurl);
-                    }}
-                  >
-                    {/* <p className="key">TxHash</p>
+                    <li
+                      onClick={(evt) => {
+                        window.open(txscanurl);
+                      }}
+                    >
+                      {/* <p className="key">TxHash</p>
                     <p className="value">{txhash}</p> */}
-                  </li>
-                </ul>
+                    </li>
+                  </ul>
+                </div>
 
                 <button
                   className="actionBtn"
                   disabled={tickTimer !== 0 ? true : false}
                   onClick={() => navigate("/resell")}
                 >
-                  Sell
+                  Purchased
+                </button>
+
+                <p className="description">
+                  The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days
+                  and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
+                  completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all transactions
+                  in your account will be suspended. It operates normally after applying a penalty of 10% of the winning
+                  bid amount.
+                </p>
+              </div>
+            )}
+            {ticketInfo == null && (
+              <div className="infoBox">
+                <div className="titleBox">
+                  <strong className="title">
+                    Need a buy <hr />
+                    "Lucky Ticket"
+                  </strong>
+                </div>
+                <div className="saleBox"></div>
+
+                <button className="actionBtn" onClick={() => navigate("/staking")}>
+                  Buy
                 </button>
 
                 <p className="description">
@@ -327,7 +356,7 @@ export default function MyItems() {
 
                   <div className="infoBox">
                     <div className="titleBox">
-                      <strong className="title">{item.itemdata.titlename}</strong>
+                      <strong className="title">{item.itemdata?.titlename}</strong>
                     </div>
 
                     <div className="ownedBox">
@@ -601,7 +630,7 @@ export default function MyItems() {
 
                   <div className="infoBox">
                     <div className="titleBox">
-                      <strong className="title">{item.itemdata.titlename}</strong>
+                      <strong className="title">#{item.itemdata.titlename}</strong>
                     </div>
 
                     <div className="ownedBox">

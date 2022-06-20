@@ -19,6 +19,7 @@ import Properties from "../components/itemDetail/Properties";
 import { useSelector } from "react-redux";
 import Header from "../components/header/Header";
 import PopupBg from "../components/PopupBg";
+
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { LOGGER, getmyaddress, onclickcopy, PARSER, conv_jdata_arrkeyvalue } from "../util/common";
@@ -404,16 +405,31 @@ export default function AuctionDetail() {
               <strong className="title">Transaction History</strong>
             </article>
 
-            {transaction?.map((itm, i) => (
-              <ul key={i} style={{ fontSize: "23px", marginTop: "30px" }}>
-                <list>
-                  <img style={{ width: "70px", paddingRight: "30px" }} src={person} />
-                </list>
-                <list>{strDot(itm.username, 15)}/</list>
-                <list>{itm.createdat?.split("T")[0]}/</list>
-                <list>{putCommaAtPrice(parseInt(itemdata?.circulations?.price))} USDT</list>
-              </ul>
-            ))}
+            <ul className="historyList">
+              {transaction.map((itm, index) => (
+                <Fragment key={index}>
+                  {index ? (
+                    <div className="sideBarBox">
+                      <span className="sideBar" />
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+                  <li>
+                    <span className="iconBox">
+                      <img src={I_tagWhite} alt="" />
+                    </span>
+
+                    <div className="contBox">
+                      <p className="cont">
+                        {strDot(itm.username, 15)} / {putCommaAtPrice(parseInt(itemdata?.circulations?.price))} USDT{" "}
+                      </p>
+                      <p className="time">{itm.createdat?.split("T")[0]}</p>
+                    </div>
+                  </li>
+                </Fragment>
+              ))}
+            </ul>
 
             <ul className="historyList">
               {itemdata?.itemhistories &&
