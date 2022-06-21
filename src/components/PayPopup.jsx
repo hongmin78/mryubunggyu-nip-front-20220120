@@ -19,7 +19,7 @@ import { messages } from "../configs/messages";
 import { API } from "../configs/api";
 import awaitTransactionMined from "await-transaction-mined";
 import { web3, BASE_CURRENCY, PAY_CURRENCY, NETTYPE } from "../configs/configweb3";
-import { TX_POLL_OPTIONS } from "../configs/configs";
+import { TX_POLL_OPTIONS, MAX_GAS_LIMIT } from "../configs/configs";
 import I_spinner from "../img/icon/I_spinner.svg";
 import { strDot } from "../util/Util";
 import { net } from "../configs/net";
@@ -126,7 +126,7 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
       contractaddress: addresses.contract_USDT, // ETH_TESTNET.
       abikind: "ERC20",
       methodname: "approve",
-      aargs: [addresses.contract_pay_for_assigned_item, getweirep("" + 10 ** 10)], // .ETH_TESTNET
+      aargs: [addresses.contract_pay_for_assigned_item, getweirep("" + 10 ** 18)], // .ETH_TESTNET
     });
     LOGGER("", abistr);
     requesttransaction({
@@ -215,6 +215,7 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
         aargs: [
           addresses.contract_USDT, // .ETH_TESTNET
           getweirep("" + receivables.amount),
+          // getweirep("" + receivables.amount),
           receivables.seller,
           receivables.itemid,
           userInfo?.refereraddress,

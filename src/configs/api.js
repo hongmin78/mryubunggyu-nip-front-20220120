@@ -43,8 +43,7 @@ const API = {
   API_GET_OFFERS: `${URL}/queries/itembalances/itemid`,
   API_GET_TRANSACTIONS: `${URL}/queries/transactionstotrack/itemid`,
   API_GET_ITEMS_DETAIL: `${URL}/items/item`,
-  API_QUERY_STRING: (_value) =>
-    `${URL}/queries/singlerow/settings/key_/${_value}`,
+  API_QUERY_STRING: (_value) => `${URL}/queries/singlerow/settings/key_/${_value}`,
   API_POST_SALE: `${URL}/orders`,
   API_ALL_ITEMS_MARKET: URL + "/queries/orders",
 };
