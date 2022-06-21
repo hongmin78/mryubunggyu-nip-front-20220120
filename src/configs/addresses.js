@@ -26,7 +26,7 @@ const jaddresses = {
     // contract_pay_for_assigned_item: "0xda90f3b82c531f32af791fa3a3e7a67b36aa0844",
     // contract_pay_for_assigned_item:
     //   "0x966C6627Ae93F01C4CE4bed607348690645F251D", //release 0520
-    contract_pay_for_assigned_item: "0x33D8324E06018Ce7688b6A8315c5a99A4c2A8cb4", //release 0621
+    contract_pay_for_assigned_item: "0x6fb460F0B9CEDad97Fa396228DEf6ade84201517", //release 0621
     payment_for_delinquency: "0xc7b12c6b2c0214ed60cfc1e2f3efdd6d83b58f29",
   },
 };
