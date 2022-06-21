@@ -46,6 +46,7 @@ const API = {
   API_QUERY_STRING: (_value) => `${URL}/queries/singlerow/settings/key_/${_value}`,
   API_POST_SALE: `${URL}/orders`,
   API_ALL_ITEMS_MARKET: URL + "/queries/orders",
+  API_BANNERS: `${URL}/queries/rows/banners/isinuse/1/0/500/id/ASC`,
 };
 
 export { API };

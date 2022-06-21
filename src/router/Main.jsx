@@ -59,7 +59,7 @@ export default function Main() {
   let [premiumitemlist, setpremiumitemlist] = useState([]);
   const [typestrPay, setTypestrPay] = useState([]);
   const [pdfPopup, setPdfPopup] = useState(false);
-
+  const [banners, setBanners] = useState([]);
   const dispatch = useDispatch();
 
   console.log("auctionListFirst", auctionListFirst);
@@ -69,6 +69,16 @@ export default function Main() {
       behavior: "smooth",
     });
   }
+
+  useEffect(() => {
+    axios
+      .get(API.API_BANNERS + `?nettype=${net}`, {})
+      .then((res) => {
+        console.log("banners", res);
+        setBanners(res.data.list);
+      })
+      .catch((err) => console.log(err));
+  }, []);
 
   useEffect(() => {
     setTimeout(() => {
@@ -168,25 +178,27 @@ export default function Main() {
   }, []);
 
   useEffect(() => {
-    if (!headLineRef.current) return;
-    const wrapWidth = headLineRef.current.offsetWidth;
-    const contWidth = headLineRef.current.children[0].offsetWidth;
-    const itemNumByPage = Math.floor(wrapWidth / contWidth);
+    if (banners.length > 0) {
+      if (!headLineRef.current) return;
+      const wrapWidth = headLineRef.current.offsetWidth;
+      const contWidth = headLineRef.current.children[0].offsetWidth;
+      const itemNumByPage = Math.floor(wrapWidth / contWidth);
 
-    if (headLineRef.current?.scrollTo) {
-      if (headLineIndex === 0) {
-        headLineRef.current.scrollTo({
-          left: 0,
-          behavior: "smooth",
-        });
-      } else {
-        headLineRef.current.scrollTo({
-          left: contWidth * itemNumByPage * headLineIndex,
-          behavior: "smooth",
-        });
+      if (headLineRef.current?.scrollTo) {
+        if (headLineIndex === 0) {
+          headLineRef.current.scrollTo({
+            left: 0,
+            behavior: "smooth",
+          });
+        } else {
+          headLineRef.current.scrollTo({
+            left: contWidth * itemNumByPage * headLineIndex,
+            behavior: "smooth",
+          });
+        }
       }
     }
-  }, [headLineIndex]);
+  }, [headLineIndex, banners]);
 
   useEffect(() => {
     swiperListener(firstAuctionRef, firstAuctionIndex);
@@ -219,7 +231,7 @@ export default function Main() {
         <MmainBox>
           <section className="headLineContainer">
             <ul ref={headLineRef}>
-              {headLineList.map((value, index) => (
+              {banners.map((value, index) => (
                 <li key={index}>
                   <div className="innerBox">
                     <span className="interview">
@@ -240,13 +252,13 @@ export default function Main() {
             </ul>
             <button
               className="preBtn indexBtn"
-              onClick={() => onClickPreBtn(headLineRef, headLineList, headLineIndex, setHeadLineIndex)}
+              onClick={() => onClickPreBtn(headLineRef, banners, headLineIndex, setHeadLineIndex)}
             >
               <img src={I_ltArwWhite} alt="" />
             </button>
             <button
               className="nextBtn indexBtn"
-              onClick={() => onClickNextBtn(headLineRef, headLineList, headLineIndex, setHeadLineIndex)}
+              onClick={() => onClickNextBtn(headLineRef, banners, headLineIndex, setHeadLineIndex)}
             >
               <img src={I_rtArwWhite} alt="" />
             </button>
@@ -444,7 +456,7 @@ export default function Main() {
         <PmainBox>
           <section className="headLineContainer">
             <ul ref={headLineRef}>
-              {headLineList?.map((value, index) => (
+              {banners?.map((value, index) => (
                 <li key={index}>
                   <article className="leftBox">
                     <span className="interview">
@@ -461,19 +473,19 @@ export default function Main() {
 
                     <p className="bottomText">ON THE FRONTIER OF NFTS.</p>
                   </article>
-                  <img className="mainImg" src={E_staking} alt="" />
+                  <img className="mainImg" src={value.imageurlpc ? value.imageurlpc : E_staking} alt="" />
                 </li>
               ))}
             </ul>
             <button
               className="preBtn indexBtn"
-              onClick={() => onClickPreBtn(headLineRef, headLineList, headLineIndex, setHeadLineIndex)}
+              onClick={() => onClickPreBtn(headLineRef, banners, headLineIndex, setHeadLineIndex)}
             >
               <img src={I_ltArwWhite} alt="" />
             </button>
             <button
               className="nextBtn indexBtn"
-              onClick={() => onClickNextBtn(headLineRef, headLineList, headLineIndex, setHeadLineIndex)}
+              onClick={() => onClickNextBtn(headLineRef, banners, headLineIndex, setHeadLineIndex)}
             >
               <img src={I_rtArwWhite} alt="" />
             </button>
@@ -1087,6 +1099,7 @@ const PmainBox = styled.div`
         }
 
         .mainImg {
+          margin-left: 10px;
           height: 100%;
         }
       }
@@ -1352,5 +1365,5 @@ const PmainBox = styled.div`
   }
 `;
 
-const headLineList = [1, 2, 3, 4];
+const banners = [1, 2, 3, 4];
 const ticketList = [1, 2, 3, 4, 5, 6, 7, 8];
