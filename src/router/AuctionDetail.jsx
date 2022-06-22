@@ -262,36 +262,50 @@ export default function AuctionDetail() {
             <article className="titleBox">
               <strong className="title">Transaction History</strong>
             </article>
+            <ul className="historyList">
+              {transaction?.map((itm, index) => (
+                <Fragment key={index}>
+                  {index ? (
+                    <div className="sideBarBox">
+                      <span className="sideBar" />
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+                  <li>
+                    <span className="iconBox">
+                      <img src={I_tagWhite} alt="" />
+                    </span>
 
-            {transaction &&
-              transaction?.map((itm, i) => (
-                <ul key={i} style={{ fontSize: "3vw", marginTop: "2vw" }}>
-                  <list>
-                    <img style={{ width: "8vw", paddingRight: "1vw", paddingLeft: "1vw" }} src={person} />
-                  </list>
-                  <list>{strDot(itm.username, 4, 10)}/</list>
-                  <list>{itm.createdat?.split("T")[0]}/</list>
-                  <list>{putCommaAtPrice(parseInt(itemdata?.circulations?.price))} USDT</list>
-                </ul>
+                    <div className="contBox">
+                      <p className="cont">
+                        {strDot(itm.username, 15)} / {putCommaAtPrice(parseInt(itemdata?.circulations?.price))} USDT{" "}
+                      </p>
+                      <p className="time">{itm.createdat?.split("T")[0]}</p>
+                    </div>
+                  </li>
+                </Fragment>
               ))}
+            </ul>
           </section>
-
           <section className="moreBox">
             <strong className="title">More from this collection</strong>
 
             <div className="listBox">
               <div className="posBox">
                 <ul className="itemList" ref={moreRef}>
-                  {moreCollection?.map(
-                    (cont, index) =>
-                      index < GET_CONTENTS_DEF && (
-                        <Fragment key={index}>
-                          <AuctionItem0228 data={cont} index={index} />
-                        </Fragment>
-                      )
-                  )}
+                  {moreCollection.map((cont, index) => (
+                    <Fragment key={index}>
+                      <AuctionItem0228 data={cont} index={index} />
+                    </Fragment>
+                  ))}
                 </ul>
-                <button className="nextBtn" onClick={onClickAuctionNextBtn(moreRef, moreCollection, moreIndex)}>
+                <button
+                  className="nextBtn"
+                  onClick={() => {
+                    onClickAuctionNextBtn();
+                  }}
+                >
                   <img src={I_rtArw} alt="" />
                 </button>
               </div>
@@ -406,7 +420,7 @@ export default function AuctionDetail() {
             </article>
 
             <ul className="historyList">
-              {transaction.map((itm, index) => (
+              {transaction?.map((itm, index) => (
                 <Fragment key={index}>
                   {index ? (
                     <div className="sideBarBox">

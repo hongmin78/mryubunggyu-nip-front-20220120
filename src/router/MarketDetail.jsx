@@ -97,9 +97,7 @@ export default function MarketDetail() {
       } else {
         moreRef.current.scrollTo({
           left: isMobile
-            ? moreRef.current.scrollLeft +
-              moreRef.current.children[moreIndex].getBoundingClientRect().left -
-              20
+            ? moreRef.current.scrollLeft + moreRef.current.children[moreIndex].getBoundingClientRect().left - 20
             : contWidth * itemNumByPage * moreIndex + itemNumByPage * 40,
           behavior: "smooth",
         });
@@ -107,30 +105,23 @@ export default function MarketDetail() {
     }
   }, [moreIndex]);
   const getitem = (_) => {
-    axios
-      .get(API.API_ITEMDETAIL + `/${params.itemid}?nettype=${net}`)
-      .then((resp) => {
-        LOGGER("BYLjMqzlfl", resp.data);
-        let { status, respdata } = resp.data;
-        if (status == "OK") {
-          console.log("$item_detail", respdata);
-          setitemdata(respdata);
-        }
-      });
+    axios.get(API.API_ITEMDETAIL + `/${params.itemid}?nettype=${net}`).then((resp) => {
+      LOGGER("BYLjMqzlfl", resp.data);
+      let { status, respdata } = resp.data;
+      if (status == "OK") {
+        console.log("$item_detail", respdata);
+        setitemdata(respdata);
+      }
+    });
   };
   const getotheritems = (_) => {
-    axios
-      .get(
-        API.API_PREMIUMITEMS +
-          `/items/group_/kingkong/0/128/id/DESC?nettype=${net}`
-      )
-      .then((resp) => {
-        LOGGER("", resp.data);
-        let { status, list } = resp.data;
-        if (status == "OK") {
-          setmarketPlaceList(list);
-        }
-      });
+    axios.get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC?nettype=${net}`).then((resp) => {
+      LOGGER("", resp.data);
+      let { status, list } = resp.data;
+      if (status == "OK") {
+        setmarketPlaceList(list);
+      }
+    });
   };
   useEffect((_) => {
     getitem();
@@ -158,20 +149,14 @@ export default function MarketDetail() {
                         <img src={toggleLike ? I_heartO : I_heart} alt="" />
                       </button>
 
-                      <button
-                        className="moreBtn hoverBtn"
-                        onClick={() => setShowCopyBtn(true)}
-                      >
+                      <button className="moreBtn hoverBtn" onClick={() => setShowCopyBtn(true)}>
                         <img src={I_3dot} alt="" />
                       </button>
                     </div>
 
                     {showCopyBtn && (
                       <>
-                        <button
-                          className="copyBtn displayBtn"
-                          onClick={() => setShowCopyBtn(false)}
-                        >
+                        <button className="copyBtn displayBtn" onClick={() => setShowCopyBtn(false)}>
                           <img src={I_clip} alt="" />
                           Copy Link
                         </button>
@@ -180,9 +165,7 @@ export default function MarketDetail() {
                     )}
                   </div>
 
-                  <strong className="title">
-                    King Kong {itemdata?.titlename}{" "}
-                  </strong>
+                  <strong className="title">King Kong {itemdata?.titlename} </strong>
                 </div>
 
                 <div className="ownedBox">
@@ -195,20 +178,11 @@ export default function MarketDetail() {
                     <p className="key">Current price</p>
                     <strong className="value">
                       {/* {itemdata?.group_ == "kong" ? "100" : ITEM_PRICE_DEF} USDT */}
-                      {itemdata && itemdata.itembalances?.buyprice} USDT
+                      {itemdata && itemdata.itembalances?.buyprice} 372USDT
                     </strong>
                   </div>
 
-                  <div className="time">
-                    <p className="key">Ending in</p>
-
-                    <ul className="timeList">
-                      <li>00</li>
-                      <li>12</li>
-                      <li>59</li>
-                      <li>09</li>
-                    </ul>
-                  </div>
+                  <div className="time">{/* <p className="key">Ending in</p> */}</div>
                 </div>
               </div>
 
@@ -241,18 +215,18 @@ export default function MarketDetail() {
             <article className="titleBox">
               <strong className="title">Transaction History</strong>
             </article>
-
+            {/* 
             <ul className="historyList">
               {D_transactionHistory.map((cont, index) => (
                 <Fragment key={index}>
                   {index ? (
-                    <div key={0} className="sideBarBox">
+                    <div className="sideBarBox">
                       <span className="sideBar" />
                     </div>
                   ) : (
                     <></>
                   )}
-                  <li key={index}>
+                  <li>
                     <span className="iconBox">
                       <img src={cont.img} alt="" />
                     </span>
@@ -264,7 +238,7 @@ export default function MarketDetail() {
                   </li>
                 </Fragment>
               ))}
-            </ul>
+            </ul> */}
           </section>
 
           <section className="moreBox">
@@ -315,8 +289,7 @@ export default function MarketDetail() {
               <div className="itemInfoBox">
                 <div className="titleBox">
                   <strong className="title">
-                    {itemdata && itemdata.itembalances?.group_.toUpperCase()}{" "}
-                    {itemdata?.titlename}
+                    {itemdata && itemdata.itembalances?.group_.toUpperCase()} {itemdata?.titlename}
                   </strong>
 
                   <div className="btnBox">
@@ -332,18 +305,12 @@ export default function MarketDetail() {
                     </div>
 
                     <div className="posBox">
-                      <button
-                        className="moreBtn hoverBtn"
-                        onClick={() => setShowCopyBtn(true)}
-                      >
+                      <button className="moreBtn hoverBtn" onClick={() => setShowCopyBtn(true)}>
                         <img src={I_3dot} alt="" />
                       </button>
 
                       <div className="hoverBox">
-                        <button
-                          className="copyBtn displayBtn"
-                          onClick={() => setShowCopyBtn(false)}
-                        >
+                        <button className="copyBtn displayBtn" onClick={() => setShowCopyBtn(false)}>
                           <img src={I_clip} alt="" />
                           Copy Link
                         </button>
@@ -360,21 +327,14 @@ export default function MarketDetail() {
                 <div className="saleBox">
                   <div className="key">
                     <p className="price">Current price</p>
-                    <p className="time">Ending in</p>
+                    {/* <p className="time">Ending in</p> */}
                   </div>
 
                   <div className="value">
                     <strong className="price">
                       {/* {itemdata?.group_ == "kong" ? "100" : ITEM_PRICE_DEF} USDT */}
-                      {itemdata && itemdata.itembalances?.buyprice} USDT
+                      {itemdata && itemdata.itembalances?.buyprice} 372USDT
                     </strong>
-
-                    <ul className="timeList">
-                      <li>00</li>
-                      <li>12</li>
-                      <li>59</li>
-                      <li>09</li>
-                    </ul>
                   </div>
                 </div>
 
@@ -413,7 +373,7 @@ export default function MarketDetail() {
               <strong className="title">Transaction History</strong>
             </article>
 
-            <ul className="historyList">
+            {/* <ul className="historyList">
               {D_transactionHistory.map((cont, index) => (
                 <Fragment key={index}>
                   {index ? (
@@ -435,7 +395,7 @@ export default function MarketDetail() {
                   </li>
                 </Fragment>
               ))}
-            </ul>
+            </ul> */}
           </section>
 
           <section className="moreBox">

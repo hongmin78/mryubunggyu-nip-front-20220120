@@ -74,7 +74,6 @@ export default function Main() {
     axios
       .get(API.API_BANNERS + `?nettype=${net}`, {})
       .then((res) => {
-        console.log("banners", res);
         setBanners(res.data.list);
       })
       .catch((err) => console.log(err));
@@ -123,6 +122,18 @@ export default function Main() {
     }, 1500);
   }, []);
 
+  function shuffleArray(array) {
+    let i = array.length - 1;
+    for (; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const temp = array[i];
+      array[i] = array[j];
+
+      array[j] = temp;
+    }
+    return array;
+  }
+
   function fetchitems() {
     axios
 
@@ -132,6 +143,7 @@ export default function Main() {
         let { status, list } = res.data;
         if (status == "OK") {
           let roundNumber1 = list.filter((item) => item.roundnumber > 0);
+          roundNumber1 = shuffleArray(roundNumber1);
           setAuctionListFirst(roundNumber1.slice(0, 64));
           setAuctionListSecond(roundNumber1.slice(64));
         }
@@ -150,6 +162,15 @@ export default function Main() {
         setTypestrPay(resp.data.list);
       }
     });
+  }
+
+  function shufflearray(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var temp = array[i];
+      array[i] = array[j];
+      array[j] = temp;
+    }
   }
 
   useEffect(() => {
@@ -231,7 +252,7 @@ export default function Main() {
         <MmainBox>
           <section className="headLineContainer">
             <ul ref={headLineRef}>
-              {banners.map((value, index) => (
+              {banners?.map((value, index) => (
                 <li key={index}>
                   <div className="innerBox">
                     <span className="interview">
@@ -266,7 +287,7 @@ export default function Main() {
 
           <section className="issueContainer">
             <ul className="issueList" ref={issueRef}>
-              {[1, 2, 3, 4].map((cont, index) => (
+              {typestrPay.map((cont, index) => (
                 <li className="issueBox" key={index}>
                   <div className="infoBox">
                     <div className="profBox">
@@ -274,8 +295,9 @@ export default function Main() {
                       <p className="nickname">{strDot(cont.username, 4, 10)}</p>
                     </div>
                     <div className="timeBox">
-                      {moment(new Date()).diff(moment(cont.createdat), "days")}
-                      days ago
+                      {moment(new Date()).diff(moment(cont.createdat), "days") === 0
+                        ? "Today"
+                        : `${moment(new Date()).diff(moment(cont.createdat), "days")} days ago`}
                     </div>
                   </div>
                   <p className="cont">at {parseInt(cont.buyprice).toFixed(2)} USDT</p>
@@ -315,35 +337,13 @@ export default function Main() {
                         </Fragment>
                       ))}
                   </ul>
-                  <button className="nextBtn">
-                    <img src={I_rtArw} alt="" />
-                  </button>
                 </div>
-              </div>
-            </article>
-
-            <article className="marketplaceBox itemListBox" style={{ display: "none" }}>
-              <strong className="title">MarketPlace</strong>
-              <div className="posBox">
-                <ul className="itemList" ref={marketRef}>
-                  {marketPlaceList.map((cont, index) => (
-                    <Fragment key={index}>
-                      <MarketItem data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
-                    </Fragment>
-                  ))}
-                </ul>
-                <button
-                  className="nextBtn"
-                  onClick={() => onClickNextBtn(marketRef, auctionListFirst, marketIndex, setMarketIndex)}
-                >
-                  <img src={I_rtArw} alt="" />
-                </button>
               </div>
             </article>
 
             <article className="marketplaceBox itemListBox">
               <strong className="title">Marketplace</strong>
-              <div className="posBox">
+              {/* <div className="posBox">
                 <ul className="itemList" ref={premiumref}>
                   {premiumitemlist.map((cont, index) => (
                     <Fragment key={index}>
@@ -357,7 +357,7 @@ export default function Main() {
                 >
                   <img src={I_rtArw} alt="" />
                 </button>
-              </div>
+              </div> */}
             </article>
 
             <article className="ticketBox itemListBox">
@@ -526,7 +526,7 @@ export default function Main() {
                       </Fragment>
                     ))}
                   </ul>
-                  {auctionListFirst.length > 0 && (
+                  {auctionListFirst.length > 4 && (
                     <button
                       className="nextBtn"
                       onClick={() =>
@@ -547,7 +547,7 @@ export default function Main() {
                         </Fragment>
                       ))}
                   </ul>
-                  {auctionListSecond.length > 0 && (
+                  {auctionListSecond.length > 4 && (
                     <button
                       className="nextBtn"
                       onClick={() =>
@@ -583,7 +583,7 @@ export default function Main() {
             <article className="marketplaceBox itemListBox">
               <strong className="title">Marketplace</strong>
               <div className="posBox">
-                <ul className="itemList" ref={premiumref}>
+                {/* <ul className="itemList" ref={premiumref}>
                   {premiumitemlist.map((cont, index) => (
                     <Fragment key={index}>
                       <MarketItem0227 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
@@ -595,7 +595,7 @@ export default function Main() {
                   onClick={() => onClickNextBtn(premiumref, premiumitemlist, premiumIndex, setPremiumIndex)}
                 >
                   <img src={I_rtArw} alt="" />
-                </button>
+                </button> */}
               </div>
             </article>
 
