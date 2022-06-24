@@ -12,7 +12,7 @@ export default function PdfPopup({ type }) {
                 src={
                   require(`../doc/nip_wp${
                     i + 1 < 10 ? "0" + i + 1 : i + 1
-                  }.png`).default
+                  }.png`).default || null
                 }
                 alt=""
                 key={i}
@@ -29,7 +29,7 @@ export default function PdfPopup({ type }) {
                 src={
                   require(`../doc/nftinfinity_manual/nip_wp${
                     i + 1 < 10 ? "0" + (i + 1) : i + 1
-                  }.png`).default
+                  }.png`).default || null
                 }
                 alt=""
                 key={i}
