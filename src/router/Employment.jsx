@@ -46,6 +46,191 @@ export default function Employment() {
     }
   };
 
+  // const employHandler = () => {
+  //   if (selectedItems.length == 0) {
+  //     SetErrorBar("You have to select tokens first!");
+  //     return;
+  //   }
+
+  //   let myaddress = getmyaddress(wallet);
+  //   if (myaddress) {
+  //   } else {
+  //     return;
+  //   }
+  //   dispatch(setSpinner(true));
+
+  //   const tostringitems = selectedItems.map((el) => {
+  //     return String(el);
+  //   });
+  //   let maxfee = calc_gas_limit();
+  //   console.log("tostringitems", tostringitems);
+  //   let abistring;
+  //   if (selectedItems.length > 1) {
+  //     abistring = getabistr_forfunction({
+  //       contractaddress: contractEmployer,
+  //       abikind: "STAKING",
+  //       methodname: "deposit_batch",
+  //       aargs: [contract, tostringitems],
+  //     });
+  //   } else {
+  //     abistring = getabistr_forfunction({
+  //       contractaddress: contractEmployer,
+  //       abikind: "STAKING",
+  //       methodname: "deposit",
+  //       aargs: [contract, tostringitems[0]],
+  //     });
+  //   }
+  //   console.log(abistring);
+
+  //   requestTransaction(
+  //     {
+  //       from: myaddress,
+  //       to: contractEmployer,
+  //       data: abistring,
+  //       value: "0x00",
+  //       gas: maxfee,
+  //     },
+  //     wallet
+  //   ).then((resp) => {
+  //     setSelectedItems([]);
+  //     setSelectedItemIds([]);
+  //     setchecked(undefined);
+  //     console.log("$EMPLOY_res", resp);
+  //     if (resp) {
+  //     } else {
+  //       SetErrorBar("User denied");
+  //       dispatch(setSpinner(false));
+  //       setchecked(false);
+  //       setchecked(undefined);
+  //       return;
+  //     }
+  //     SetErrorBar("Employed");
+  //     querytokenbalance(contract, contractEmployer);
+  //     queryemploytokenbalance(contract, contractEmployer);
+  //     setchecked(false);
+  //     setchecked(undefined);
+  //     dispatch(setSpinner(false));
+  //     let txhash;
+  //     if (wallet == "metamask") {
+  //       txhash = resp;
+  //     } else if (wallet == "klaytn") {
+  //       let { transactionHash } = resp;
+  //       txhash = transactionHash;
+  //     }
+  //     axios
+  //       .post(API.API_TXS + `/${txhash}`, {
+  //         txhash: txhash,
+  //         username: myaddress,
+  //         typestr: "EMPLOYMENT_EMPLOY",
+  //         auxdata: {
+  //           user_action: "EMPLOYMENT_EMPLOY",
+  //           contract_type: contractType, // .ETH_TESTNET
+  //           contract_address: contract, // .ETH_TESTNET
+  //           to_token_contract: contractEmployer,
+  //           my_address: myaddress,
+  //           tokenIds: tostringitems,
+  //           itemIds: selectedItemIds,
+  //           maxfee, // :  MAX_GAS_LIMIT
+  //           appver,
+  //           nettype: net,
+  //         },
+  //       })
+  //       .then((res) => {
+  //         console.log("onclickstake reported!", res);
+  //       })
+  //       .catch((err) => console.log(err));
+  //     awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
+  //       setIsApproved(true);
+  //       console.log("minedtxreceipt", minedtxreceipt);
+  //     });
+  //   });
+  // };
+
+  // const unEmployHandler = () => {
+  //   if (selectedItems.length == 0) {
+  //     SetErrorBar("You have to select tokens first!");
+  //     return;
+  //   }
+  //   let myaddress = getmyaddress(wallet);
+  //   if (myaddress) {
+  //   } else {
+  //     return;
+  //   }
+  //   dispatch(setSpinner(true));
+  //   const abistring = getabistr_forfunction({
+  //     contractaddress: contractEmployer,
+  //     abikind: "STAKING",
+  //     methodname: "withdraw_batch",
+  //     aargs: [contract, selectedItems, myaddress],
+  //   });
+  //   const tostringitems = selectedItems.map((el) => {
+  //     return String(el);
+  //   });
+  //   let maxfee = calc_gas_limit();
+  //   requestTransaction(
+  //     {
+  //       from: myaddress,
+  //       to: contractEmployer,
+  //       data: abistring,
+  //       value: "0x00",
+  //       gas: maxfee,
+  //     },
+  //     wallet
+  //   ).then((resp) => {
+  //     console.log("stake", resp);
+  //     setSelectedItems([]);
+  //     setSelectedItemIds([]);
+  //     setchecked(undefined);
+  //     if (resp) {
+  //     } else {
+  //       SetErrorBar("User denied");
+  //       dispatch(setSpinner(false));
+  //       setchecked(false);
+  //       setchecked(undefined);
+  //       return;
+  //     }
+  //     SetErrorBar("Unemployed");
+  //     setchecked(false);
+  //     setchecked(undefined);
+  //     dispatch(setSpinner(false));
+  //     querytokenbalance(contract, contractEmployer);
+  //     queryemploytokenbalance(contract, contractEmployer);
+  //     let txhash;
+  //     if (wallet == "metamask") {
+  //       txhash = resp;
+  //     } else if (wallet == "klaytn") {
+  //       let { transactionHash } = resp;
+  //       txhash = transactionHash;
+  //     }
+  //     axios
+  //       .post(API.API_TXS + `/${txhash}`, {
+  //         txhash: txhash,
+  //         username: myaddress,
+  //         typestr: "EMPLOYMENT_UNEMPLOY",
+  //         auxdata: {
+  //           user_action: "EMPLOYMENT_UNEMPLOY",
+  //           contract_type: contractType, // .ETH_TESTNET
+  //           contract_address: contract, // .ETH_TESTNET
+  //           to_token_contract: contractEmployer,
+  //           my_address: myaddress,
+  //           tokenIds: tostringitems,
+  //           itemIds: selectedItemIds,
+  //           maxfee, // : MAX_GAS_LIMIT
+  //           appver,
+  //           nettype: net,
+  //         },
+  //       })
+  //       .then((res) => {
+  //         console.log("onclickwithdraw reported!", res);
+  //       })
+  //       .catch((err) => console.log(err));
+  //     awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
+  //       setIsApproved(true);
+  //       console.log("minedtxreceipt", minedtxreceipt);
+  //     });
+  //   });
+  // };
+
   useEffect(() => {
     fetchData();
   }, []);
