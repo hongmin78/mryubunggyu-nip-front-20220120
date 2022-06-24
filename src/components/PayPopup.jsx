@@ -29,12 +29,13 @@ import {
   PAY_CURRENCY,
   NETTYPE,
 } from "../configs/configweb3";
-import { TX_POLL_OPTIONS } from "../configs/configs";
+import { TX_POLL_OPTIONS, MAX_GAS_LIMIT } from "../configs/configs";
 import I_spinner from "../img/icon/I_spinner.svg";
 import { strDot } from "../util/Util";
 import { net } from "../configs/net";
 const MODE_DEV_PROD = "PROD";
 export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
+  console.log("userInfo", userInfo);
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
   const [termChk, setTermChk] = useState(false);
@@ -80,6 +81,7 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
         }
       })
       .catch((err) => console.log(err));
+
     const fetchdata = async (_) => {
       axios.get(API.API_TICKERS + `?nettype=${net}`).then((resp) => {
         LOGGER("MDmEMQ5xde", resp.data);
@@ -122,37 +124,7 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
         LOGGER("mybalance", resp);
         setmybalance(getethrep(resp, 4));
       });
-      // query_noarg({
-      //   contractaddress: addresses.contract_st ake, // ETH_TESTNET.
-      //   abikind: "ST AKE",
-      //   methodname: "_tvl",
-      // }).then((resp) => {
-      //   LOGGER("", resp);
-      //   settvl(getethrep(resp));
-      // });
 
-      // query_with_arg({
-      //   contractaddress: addresses.contract_admin,
-      //   abikind: "ADMIN",
-      //   methodname: "_st akeplans",
-      //   aargs: [addresses.contract_USDT],
-      // }).then((resp) => {
-      //   LOGGER("HSudcIgxuB", resp);
-      //   if (resp) {
-      //   } else {
-      //     return;
-      //   }
-      //   setMIN_ST AKE_AMOUNT(getethrep(resp[4]));
-      // });
-      // false &&
-      //   query_with_arg({
-      //     contractaddress: addresses.contract_st ake, // .ETH_TESTNET
-      //     abikind: "ST AKE",
-      //     methodname: "_tvl_nft",
-      //   }).then((resp) => {
-      //     LOGGER("", resp);
-      //     //				settvlnft ( resp )
-      //   });
       query_eth_balance(myaddress).then((resp) => {
         LOGGER("rmgUxgo5ye", resp);
         setmyethbalance((+getethrep(resp)).toFixed(DECIMALS_DISP_DEF));
@@ -172,7 +144,7 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
       methodname: "approve",
       aargs: [
         addresses.contract_pay_for_assigned_item,
-        getweirep("" + 10 ** 10),
+        getweirep("" + 10 ** 18),
       ], // .ETH_TESTNET
     });
     LOGGER("", abistr);
@@ -236,13 +208,16 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
     LOGGER("YFVGAF0sBJ");
     let myaddress = getmyaddress();
     // LOGGER("eYJAgMYkR5", myaddress);
-    if (mybalance >= DueAmount) {
+    console.log("mybalance", mybalance);
+    console.log("DueAmount", DueAmount);
+    if (parseInt(mybalance) >= parseInt(DueAmount)) {
     } else {
       SetErrorBar(messages.MSG_BALANCE_NOT_ENOUGH);
       setDone(false);
       setisloader_01(false);
       return;
     }
+
     console.log(
       "$INPUTS",
       addresses.contract_USDT, // .ETH_TESTNET
@@ -261,7 +236,7 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
         aargs: [
           addresses.contract_USDT, // .ETH_TESTNET
           getweirep("" + receivables.amount),
-          // receivables.amount >= 120 ? seller : receivables.amount
+          // getweirep("" + receivables.amount),
           receivables.seller,
           receivables.itemid,
           userInfo?.refereraddress,
@@ -315,7 +290,6 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
               setDone(false);
               setisloader_01(false);
               off();
-              window.location.reload();
             });
         } catch (err) {
           SetErrorBar(messages.MSG_USER_DENIED_TX);

@@ -10,12 +10,7 @@ import MarketItem from "../components/MarketItem";
 import MarketItem0227 from "../components/MarketItem0227";
 import Header from "../components/header/Header";
 import { useSelector } from "react-redux";
-import {
-  getStyle,
-  onClickNextBtn,
-  onClickPreBtn,
-  swiperListener,
-} from "../util/Util";
+import { getStyle, onClickNextBtn, onClickPreBtn, swiperListener } from "../util/Util";
 import FaqItem from "../components/FaqCont";
 import { useNavigate } from "react-router-dom";
 import SetErrorBar from "../util/SetErrorBar";
@@ -36,6 +31,8 @@ import { setDelinquencyAmount } from "../util/store/commonSlice";
 import moment from "moment";
 import { strDot } from "../util/Util";
 import { net } from "../configs/net";
+import PopupBg from "../components/PopupBg";
+import PdfPopup from "../components/PdfPopup";
 
 export default function Main() {
   const navigate = useNavigate();
@@ -61,7 +58,8 @@ export default function Main() {
   const [likeObj, setLikeObj] = useState({});
   let [premiumitemlist, setpremiumitemlist] = useState([]);
   const [typestrPay, setTypestrPay] = useState([]);
-
+  const [pdfPopup, setPdfPopup] = useState(false);
+  const [banners, setBanners] = useState([]);
   const dispatch = useDispatch();
 
   console.log("auctionListFirst", auctionListFirst);
@@ -73,15 +71,21 @@ export default function Main() {
   }
 
   useEffect(() => {
+    axios
+      .get(API.API_BANNERS + `?nettype=${net}`, {})
+      .then((res) => {
+        setBanners(res.data.list);
+      })
+      .catch((err) => console.log(err));
+  }, []);
+
+  useEffect(() => {
     setTimeout(() => {
       let address = getmyaddress();
       let myaddress = address;
       console.log("address", address);
       axios
-        .get(
-          `${API.API_DELINQUENCY}/${address}/0/10/id/DESC` +
-            `?nettype=${net}&itemdetail=1`
-        )
+        .get(`${API.API_DELINQUENCY}/${address}/0/10/id/DESC` + `?nettype=${net}&itemdetail=1`)
         .then((res) => {
           console.log("RES", res);
           let { status } = res.data;
@@ -118,35 +122,39 @@ export default function Main() {
     }, 1500);
   }, []);
 
+  function shuffleArray(array) {
+    let i = array.length - 1;
+    for (; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const temp = array[i];
+      array[i] = array[j];
+
+      array[j] = temp;
+    }
+    return array;
+  }
+
   function fetchitems() {
     axios
 
-      .get(
-        API.API_COMMONITEMS +
-          `/items/group_/kong/0/128/roundnumber/DESC?nettype=${net}` +
-          `&itemdetail=1`
-      )
+      .get(API.API_COMMONITEMS + `/items/group_/kong/0/128/roundnumber/DESC?nettype=${net}` + `&itemdetail=1`)
       .then((res) => {
         console.log("@query kong: ", res.data);
         let { status, list } = res.data;
         if (status == "OK") {
           let roundNumber1 = list.filter((item) => item.roundnumber > 0);
+          roundNumber1 = shuffleArray(roundNumber1);
           setAuctionListFirst(roundNumber1.slice(0, 64));
           setAuctionListSecond(roundNumber1.slice(64));
         }
       });
-    axios
-      .get(
-        API.API_PREMIUMITEMS +
-          `/items/group_/kingkong/0/128/id/DESC?nettype=${net}`
-      )
-      .then((resp) => {
-        LOGGER("De0Mlt93PT", resp.data);
-        let { status, list } = resp.data;
-        if (status == "OK") {
-          setpremiumitemlist(list);
-        }
-      });
+    axios.get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC?nettype=${net}`).then((resp) => {
+      LOGGER("De0Mlt93PT", resp.data);
+      let { status, list } = resp.data;
+      if (status == "OK") {
+        setpremiumitemlist(list);
+      }
+    });
     axios.get(API.API_TYPESTR + `?nettype=${net}`).then((resp) => {
       LOGGER("itemBalance", resp.data);
       let { status, payload } = resp.data;
@@ -154,6 +162,15 @@ export default function Main() {
         setTypestrPay(resp.data.list);
       }
     });
+  }
+
+  function shufflearray(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var temp = array[i];
+      array[i] = array[j];
+      array[j] = temp;
+    }
   }
 
   useEffect(() => {
@@ -167,9 +184,7 @@ export default function Main() {
         if (issueRef.current?.scrollTo) {
           if (issueIndex < D_issueList.length) {
             issueRef.current.scrollTo({
-              top:
-                contHeight * issueIndex +
-                issueIndex * getStyle(issueRef, "gap"),
+              top: contHeight * issueIndex + issueIndex * getStyle(issueRef, "gap"),
               behavior: "smooth",
             });
           } else {
@@ -184,25 +199,27 @@ export default function Main() {
   }, []);
 
   useEffect(() => {
-    if (!headLineRef.current) return;
-    const wrapWidth = headLineRef.current.offsetWidth;
-    const contWidth = headLineRef.current.children[0].offsetWidth;
-    const itemNumByPage = Math.floor(wrapWidth / contWidth);
+    if (banners.length > 0) {
+      if (!headLineRef.current) return;
+      const wrapWidth = headLineRef.current.offsetWidth;
+      const contWidth = headLineRef.current.children[0].offsetWidth;
+      const itemNumByPage = Math.floor(wrapWidth / contWidth);
 
-    if (headLineRef.current?.scrollTo) {
-      if (headLineIndex === 0) {
-        headLineRef.current.scrollTo({
-          left: 0,
-          behavior: "smooth",
-        });
-      } else {
-        headLineRef.current.scrollTo({
-          left: contWidth * itemNumByPage * headLineIndex,
-          behavior: "smooth",
-        });
+      if (headLineRef.current?.scrollTo) {
+        if (headLineIndex === 0) {
+          headLineRef.current.scrollTo({
+            left: 0,
+            behavior: "smooth",
+          });
+        } else {
+          headLineRef.current.scrollTo({
+            left: contWidth * itemNumByPage * headLineIndex,
+            behavior: "smooth",
+          });
+        }
       }
     }
-  }, [headLineIndex]);
+  }, [headLineIndex, banners]);
 
   useEffect(() => {
     swiperListener(firstAuctionRef, firstAuctionIndex);
@@ -235,7 +252,7 @@ export default function Main() {
         <MmainBox>
           <section className="headLineContainer">
             <ul ref={headLineRef}>
-              {headLineList.map((value, index) => (
+              {banners?.map((value, index) => (
                 <li key={index}>
                   <div className="innerBox">
                     <span className="interview">
@@ -245,8 +262,8 @@ export default function Main() {
                     <p className="title">Pak on the frontier of NFTs.</p>
 
                     <p className="explain">
-                      The acclaimed anonymous art entity has been pioneering in
-                      digital spaces for decades. Here’s what’s next.
+                      The acclaimed anonymous art entity has been pioneering in digital spaces for decades. Here’s
+                      what’s next.
                     </p>
 
                     <p className="bottomText">ON THE FRONTIER OF NFTS.</p>
@@ -256,27 +273,13 @@ export default function Main() {
             </ul>
             <button
               className="preBtn indexBtn"
-              onClick={() =>
-                onClickPreBtn(
-                  headLineRef,
-                  headLineList,
-                  headLineIndex,
-                  setHeadLineIndex
-                )
-              }
+              onClick={() => onClickPreBtn(headLineRef, banners, headLineIndex, setHeadLineIndex)}
             >
               <img src={I_ltArwWhite} alt="" />
             </button>
             <button
               className="nextBtn indexBtn"
-              onClick={() =>
-                onClickNextBtn(
-                  headLineRef,
-                  headLineList,
-                  headLineIndex,
-                  setHeadLineIndex
-                )
-              }
+              onClick={() => onClickNextBtn(headLineRef, banners, headLineIndex, setHeadLineIndex)}
             >
               <img src={I_rtArwWhite} alt="" />
             </button>
@@ -284,7 +287,7 @@ export default function Main() {
 
           <section className="issueContainer">
             <ul className="issueList" ref={issueRef}>
-              {[1, 2, 3, 4].map((cont, index) => (
+              {typestrPay.map((cont, index) => (
                 <li className="issueBox" key={index}>
                   <div className="infoBox">
                     <div className="profBox">
@@ -292,13 +295,12 @@ export default function Main() {
                       <p className="nickname">{strDot(cont.username, 4, 10)}</p>
                     </div>
                     <div className="timeBox">
-                      {moment(new Date()).diff(moment(cont.createdat), "days")}
-                      days ago
+                      {moment(new Date()).diff(moment(cont.createdat), "days") === 0
+                        ? "Today"
+                        : `${moment(new Date()).diff(moment(cont.createdat), "days")} days ago`}
                     </div>
                   </div>
-                  <p className="cont">
-                    at {parseInt(cont.buyprice).toFixed(2)} USDT
-                  </p>
+                  <p className="cont">at {parseInt(cont.buyprice).toFixed(2)} USDT</p>
                 </li>
               ))}
             </ul>
@@ -313,24 +315,14 @@ export default function Main() {
                   <ul className="itemList" ref={firstAuctionRef}>
                     {auctionListFirst.map((cont, index) => (
                       <Fragment key={index}>
-                        <AuctionItem0228
-                          data={cont}
-                          index={index}
-                          likeObj={likeObj}
-                          setLikeObj={setLikeObj}
-                        />
+                        <AuctionItem0228 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
                       </Fragment>
                     ))}
                   </ul>
                   <button
                     className="nextBtn"
                     onClick={() =>
-                      onClickNextBtn(
-                        firstAuctionRef,
-                        auctionListFirst,
-                        firstAuctionIndex,
-                        setFirstAuctionIndex
-                      )
+                      onClickNextBtn(firstAuctionRef, auctionListFirst, firstAuctionIndex, setFirstAuctionIndex)
                     }
                   >
                     <img src={I_rtArw} alt="" />
@@ -341,85 +333,31 @@ export default function Main() {
                     {auctionListSecond.length > 0 &&
                       auctionListSecond.map((cont, index) => (
                         <Fragment key={index}>
-                          <AuctionItem0228
-                            data={cont}
-                            index={index}
-                            likeObj={likeObj}
-                            setLikeObj={setLikeObj}
-                          />
+                          <AuctionItem0228 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
                         </Fragment>
                       ))}
                   </ul>
-                  <button className="nextBtn">
-                    <img src={I_rtArw} alt="" />
-                  </button>
                 </div>
-              </div>
-            </article>
-
-            <article
-              className="marketplaceBox itemListBox"
-              style={{ display: "none" }}
-            >
-              <strong className="title">MarketPlace</strong>
-              <div className="posBox">
-                <ul className="itemList" ref={marketRef}>
-                  {marketPlaceList.map((cont, index) => (
-                    <Fragment key={index}>
-                      <MarketItem
-                        data={cont}
-                        index={index}
-                        likeObj={likeObj}
-                        setLikeObj={setLikeObj}
-                      />
-                    </Fragment>
-                  ))}
-                </ul>
-                <button
-                  className="nextBtn"
-                  onClick={() =>
-                    onClickNextBtn(
-                      marketRef,
-                      auctionListFirst,
-                      marketIndex,
-                      setMarketIndex
-                    )
-                  }
-                >
-                  <img src={I_rtArw} alt="" />
-                </button>
               </div>
             </article>
 
             <article className="marketplaceBox itemListBox">
               <strong className="title">Marketplace</strong>
-              <div className="posBox">
+              {/* <div className="posBox">
                 <ul className="itemList" ref={premiumref}>
                   {premiumitemlist.map((cont, index) => (
                     <Fragment key={index}>
-                      <MarketItem0227
-                        data={cont}
-                        index={index}
-                        likeObj={likeObj}
-                        setLikeObj={setLikeObj}
-                      />
+                      <MarketItem0227 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
                     </Fragment>
                   ))}
                 </ul>
                 <button
                   className="nextBtn"
-                  onClick={() =>
-                    onClickNextBtn(
-                      premiumref,
-                      premiumitemlist,
-                      premiumIndex,
-                      setPremiumIndex
-                    )
-                  }
+                  onClick={() => onClickNextBtn(premiumref, premiumitemlist, premiumIndex, setPremiumIndex)}
                 >
                   <img src={I_rtArw} alt="" />
                 </button>
-              </div>
+              </div> */}
             </article>
 
             <article className="ticketBox itemListBox">
@@ -436,10 +374,7 @@ export default function Main() {
 
                       <img src={E_staking} alt="" />
 
-                      <button
-                        className="stakeBtn"
-                        onClick={() => navigate("/staking")}
-                      >
+                      <button className="stakeBtn" onClick={() => navigate("/staking")}>
                         Buy Now
                       </button>
                     </li>
@@ -447,14 +382,7 @@ export default function Main() {
                 </ul>
                 <button
                   className="nextBtn"
-                  onClick={() =>
-                    onClickNextBtn(
-                      ticketRef,
-                      ticketList,
-                      ticketIndex,
-                      setTicketIndex
-                    )
-                  }
+                  onClick={() => onClickNextBtn(ticketRef, ticketList, ticketIndex, setTicketIndex)}
                 >
                   <img src={I_rtArw} alt="" />
                 </button>
@@ -465,7 +393,7 @@ export default function Main() {
               <strong className="title">Tips for Nip users</strong>
 
               <ul className="tipList">
-                <li>
+                <li onClick={() => setPdfPopup(true)}>
                   <img src={B_tip1} alt="" />
                   <p>Before Participating in NFT Collection</p>
                 </li>
@@ -484,6 +412,13 @@ export default function Main() {
               </ul>
             </article>
 
+            {pdfPopup && (
+              <>
+                <PdfPopup type={`manual`} />
+                <PopupBg blur off={setPdfPopup} />
+              </>
+            )}
+
             <article className="faqBox itemListBox">
               <strong className="title">FAQ</strong>
 
@@ -496,20 +431,10 @@ export default function Main() {
                   ))}
                 </ul>
                 <div className="pageBtnBox">
-                  <button
-                    className="preBtn"
-                    onClick={() =>
-                      onClickPreBtn(faqRef, D_faqList, faqIndex, setFaqIndex)
-                    }
-                  >
+                  <button className="preBtn" onClick={() => onClickPreBtn(faqRef, D_faqList, faqIndex, setFaqIndex)}>
                     <img src={I_ltArwWhite} alt="" />
                   </button>
-                  <button
-                    className="nextBtn"
-                    onClick={() =>
-                      onClickNextBtn(faqRef, D_faqList, faqIndex, setFaqIndex)
-                    }
-                  >
+                  <button className="nextBtn" onClick={() => onClickNextBtn(faqRef, D_faqList, faqIndex, setFaqIndex)}>
                     <img src={I_rtArwWhite} alt="" />
                   </button>
                 </div>
@@ -531,7 +456,7 @@ export default function Main() {
         <PmainBox>
           <section className="headLineContainer">
             <ul ref={headLineRef}>
-              {headLineList?.map((value, index) => (
+              {banners?.map((value, index) => (
                 <li key={index}>
                   <article className="leftBox">
                     <span className="interview">
@@ -541,40 +466,26 @@ export default function Main() {
                     <div className="titleBox">
                       <p className="title">Pak on the frontier of NFTs.</p>
                       <p className="explain">
-                        The acclaimed anonymous art entity has been pioneering
-                        in digital spaces for decades. Here’s what’s next.
+                        The acclaimed anonymous art entity has been pioneering in digital spaces for decades. Here’s
+                        what’s next.
                       </p>
                     </div>
 
                     <p className="bottomText">ON THE FRONTIER OF NFTS.</p>
                   </article>
-                  <img className="mainImg" src={E_staking} alt="" />
+                  <img className="mainImg" src={value.imageurlpc ? value.imageurlpc : E_staking} alt="" />
                 </li>
               ))}
             </ul>
             <button
               className="preBtn indexBtn"
-              onClick={() =>
-                onClickPreBtn(
-                  headLineRef,
-                  headLineList,
-                  headLineIndex,
-                  setHeadLineIndex
-                )
-              }
+              onClick={() => onClickPreBtn(headLineRef, banners, headLineIndex, setHeadLineIndex)}
             >
               <img src={I_ltArwWhite} alt="" />
             </button>
             <button
               className="nextBtn indexBtn"
-              onClick={() =>
-                onClickNextBtn(
-                  headLineRef,
-                  headLineList,
-                  headLineIndex,
-                  setHeadLineIndex
-                )
-              }
+              onClick={() => onClickNextBtn(headLineRef, banners, headLineIndex, setHeadLineIndex)}
             >
               <img src={I_rtArwWhite} alt="" />
             </button>
@@ -591,20 +502,12 @@ export default function Main() {
                     </div>
                     {/* <div className="timeBox">At__{cont.createdat.split("T")[0]}</div> */}
                     <div className="timeBox">
-                      {moment(new Date()).diff(
-                        moment(cont.createdat),
-                        "days"
-                      ) === 0
+                      {moment(new Date()).diff(moment(cont.createdat), "days") === 0
                         ? "Today"
-                        : `${moment(new Date()).diff(
-                            moment(cont.createdat),
-                            "days"
-                          )} days ago`}
+                        : `${moment(new Date()).diff(moment(cont.createdat), "days")} days ago`}
                     </div>
                   </div>
-                  <p className="cont">
-                    at {parseInt(cont.buyprice).toFixed(2)} USDT
-                  </p>
+                  <p className="cont">at {parseInt(cont.buyprice).toFixed(2)} USDT</p>
                 </li>
               ))}
             </ul>
@@ -619,25 +522,15 @@ export default function Main() {
                   <ul className="itemList" ref={firstAuctionRef}>
                     {auctionListFirst.map((cont, index) => (
                       <Fragment key={index}>
-                        <AuctionItem0228
-                          data={cont}
-                          index={index}
-                          likeObj={likeObj}
-                          setLikeObj={setLikeObj}
-                        />
+                        <AuctionItem0228 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
                       </Fragment>
                     ))}
                   </ul>
-                  {auctionListFirst.length > 0 && (
+                  {auctionListFirst.length > 4 && (
                     <button
                       className="nextBtn"
                       onClick={() =>
-                        onClickNextBtn(
-                          firstAuctionRef,
-                          auctionListFirst,
-                          firstAuctionIndex,
-                          setFirstAuctionIndex
-                        )
+                        onClickNextBtn(firstAuctionRef, auctionListFirst, firstAuctionIndex, setFirstAuctionIndex)
                       }
                     >
                       <img src={I_rtArw} alt="" />
@@ -650,25 +543,15 @@ export default function Main() {
                     {auctionListSecond.length > 0 &&
                       auctionListSecond.map((cont, index) => (
                         <Fragment key={index}>
-                          <AuctionItem0228
-                            data={cont}
-                            index={index}
-                            likeObj={likeObj}
-                            setLikeObj={setLikeObj}
-                          />
+                          <AuctionItem0228 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
                         </Fragment>
                       ))}
                   </ul>
-                  {auctionListSecond.length > 0 && (
+                  {auctionListSecond.length > 4 && (
                     <button
                       className="nextBtn"
                       onClick={() =>
-                        onClickNextBtn(
-                          secondAuctionRef,
-                          auctionListSecond,
-                          secondAuctionIndex,
-                          setSecondAuctionIndex
-                        )
+                        onClickNextBtn(secondAuctionRef, auctionListSecond, secondAuctionIndex, setSecondAuctionIndex)
                       }
                     >
                       <img src={I_rtArw} alt="" />
@@ -678,34 +561,19 @@ export default function Main() {
               </div>
             </article>
 
-            <article
-              className="marketplaceBox itemListBox"
-              style={{ display: "none" }}
-            >
+            <article className="marketplaceBox itemListBox" style={{ display: "none" }}>
               <strong className="title">MarketPlace</strong>
               <div className="posBox">
                 <ul className="itemList" ref={marketRef}>
                   {marketPlaceList.map((cont, index) => (
                     <Fragment key={index}>
-                      <MarketItem
-                        data={cont}
-                        index={index}
-                        likeObj={likeObj}
-                        setLikeObj={setLikeObj}
-                      />
+                      <MarketItem data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
                     </Fragment>
                   ))}
                 </ul>
                 <button
                   className="nextBtn"
-                  onClick={() =>
-                    onClickNextBtn(
-                      marketRef,
-                      auctionListFirst,
-                      marketIndex,
-                      setMarketIndex
-                    )
-                  }
+                  onClick={() => onClickNextBtn(marketRef, auctionListFirst, marketIndex, setMarketIndex)}
                 >
                   <img src={I_rtArw} alt="" />
                 </button>
@@ -715,31 +583,19 @@ export default function Main() {
             <article className="marketplaceBox itemListBox">
               <strong className="title">Marketplace</strong>
               <div className="posBox">
-                <ul className="itemList" ref={premiumref}>
+                {/* <ul className="itemList" ref={premiumref}>
                   {premiumitemlist.map((cont, index) => (
                     <Fragment key={index}>
-                      <MarketItem0227
-                        data={cont}
-                        index={index}
-                        likeObj={likeObj}
-                        setLikeObj={setLikeObj}
-                      />
+                      <MarketItem0227 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
                     </Fragment>
                   ))}
                 </ul>
                 <button
                   className="nextBtn"
-                  onClick={() =>
-                    onClickNextBtn(
-                      premiumref,
-                      premiumitemlist,
-                      premiumIndex,
-                      setPremiumIndex
-                    )
-                  }
+                  onClick={() => onClickNextBtn(premiumref, premiumitemlist, premiumIndex, setPremiumIndex)}
                 >
                   <img src={I_rtArw} alt="" />
-                </button>
+                </button> */}
               </div>
             </article>
 
@@ -757,10 +613,7 @@ export default function Main() {
 
                       <img src={E_staking} alt="" />
 
-                      <button
-                        className="stakeBtn"
-                        onClick={() => navigate("/staking")}
-                      >
+                      <button className="stakeBtn" onClick={() => navigate("/staking")}>
                         Buy Now
                       </button>
                     </li>
@@ -768,14 +621,7 @@ export default function Main() {
                 </ul>
                 <button
                   className="nextBtn"
-                  onClick={() =>
-                    onClickNextBtn(
-                      ticketRef,
-                      ticketList,
-                      ticketIndex,
-                      setTicketIndex
-                    )
-                  }
+                  onClick={() => onClickNextBtn(ticketRef, ticketList, ticketIndex, setTicketIndex)}
                 >
                   <img src={I_rtArw} alt="" />
                 </button>
@@ -786,7 +632,7 @@ export default function Main() {
               <strong className="title">Tips for Nip users</strong>
 
               <ul className="tipList">
-                <li>
+                <li onClick={() => setPdfPopup(true)}>
                   <img src={B_tip1} alt="" />
                   <p>Before Participating in NFT Collection</p>
                 </li>
@@ -804,6 +650,12 @@ export default function Main() {
                 </li>
               </ul>
             </article>
+            {pdfPopup && (
+              <>
+                <PdfPopup type="manual" />
+                <PopupBg blur off={setPdfPopup} />
+              </>
+            )}
 
             <article className="faqBox itemListBox">
               <strong className="title">FAQ</strong>
@@ -817,20 +669,10 @@ export default function Main() {
                   ))}
                 </ul>
                 <div className="pageBtnBox">
-                  <button
-                    className="preBtn"
-                    onClick={() =>
-                      onClickPreBtn(faqRef, D_faqList, faqIndex, setFaqIndex)
-                    }
-                  >
+                  <button className="preBtn" onClick={() => onClickPreBtn(faqRef, D_faqList, faqIndex, setFaqIndex)}>
                     <img src={I_ltArwWhite} alt="" />
                   </button>
-                  <button
-                    className="nextBtn"
-                    onClick={() =>
-                      onClickNextBtn(faqRef, D_faqList, faqIndex, setFaqIndex)
-                    }
-                  >
+                  <button className="nextBtn" onClick={() => onClickNextBtn(faqRef, D_faqList, faqIndex, setFaqIndex)}>
                     <img src={I_rtArwWhite} alt="" />
                   </button>
                 </div>
@@ -1257,6 +1099,7 @@ const PmainBox = styled.div`
         }
 
         .mainImg {
+          margin-left: 10px;
           height: 100%;
         }
       }
@@ -1522,5 +1365,5 @@ const PmainBox = styled.div`
   }
 `;
 
-const headLineList = [1, 2, 3, 4];
+const banners = [1, 2, 3, 4];
 const ticketList = [1, 2, 3, 4, 5, 6, 7, 8];

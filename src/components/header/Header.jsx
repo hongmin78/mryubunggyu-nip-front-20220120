@@ -44,17 +44,15 @@ export default function Header() {
         SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
         return;
       }
-      axios
-        .get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`)
-        .then((resp) => {
-          LOGGER("API_ticketInfo", resp.data);
+      axios.get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`).then((resp) => {
+        LOGGER("API_ticketInfo", resp.data);
 
-          let { status, respdata } = resp.data;
-          if (status == "OK" && respdata !== null) {
-            setTickInfo(respdata);
-            awaitWallet();
-          }
-        });
+        let { status, respdata } = resp.data;
+        if (status == "OK" && respdata !== null) {
+          setTickInfo(respdata);
+          awaitWallet();
+        }
+      });
     }, 1000);
   }, []);
 
@@ -78,9 +76,7 @@ export default function Header() {
       return;
     }
     LOGGER("", myaddress);
-    let resp = await axios.get(
-      API.API_USERINFO + `/${myaddress}?nettype=${net}`
-    );
+    let resp = await axios.get(API.API_USERINFO + `/${myaddress}?nettype=${net}`);
     LOGGER("rBojncz0CD", resp.data);
     let { status, respdata } = resp.data;
     if (status == "OK") {
@@ -143,11 +139,7 @@ export default function Header() {
       <>
         <MheaderBox style={{ background: isStaking && "unset" }}>
           <button className="logoBox" onClick={() => navigate("/")}>
-            <img
-              className="logoImg"
-              src={isStaking ? I_headerLogoWhite : I_headerLogo}
-              alt=""
-            />
+            <img className="logoImg" src={isStaking ? I_headerLogoWhite : I_headerLogo} alt="" />
           </button>
 
           <button className="menuBtn" onClick={() => setMenuPopup(true)}>
@@ -155,7 +147,7 @@ export default function Header() {
           </button>
         </MheaderBox>
 
-        {menuPopup && <MmenuPopup off={setMenuPopup} mybalance={mybalance} />}
+        {menuPopup && <MmenuPopup off={setMenuPopup} mybalance={mybalance} ticketInfo={ticketInfo} />}
       </>
     );
   } else {
@@ -163,11 +155,7 @@ export default function Header() {
       <PheaderBox style={{ background: isStaking && "unset" }}>
         <section className="innerBox">
           <button className="logoBox" onClick={() => navigate("/")}>
-            <img
-              className="logoImg"
-              src={isStaking ? I_headerLogoWhite : I_headerLogo}
-              alt=""
-            />
+            <img className="logoImg" src={isStaking ? I_headerLogoWhite : I_headerLogo} alt="" />
           </button>
 
           <article className="rightBox">
@@ -199,7 +187,8 @@ export default function Header() {
               <button
                 style={{ color: isStaking && "#fff" }}
                 onClick={() => {
-                  onclick_staked_val_btn("/employment");
+                  // onclick_staked_val_btn("/employment");
+                  SetErrorBar("Getting Ready");
                 }}
               >
                 Employment

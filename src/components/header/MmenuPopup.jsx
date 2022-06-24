@@ -8,11 +8,19 @@ import I_market from "../../img/icon/I_market.svg";
 import I_book from "../../img/icon/I_book.svg";
 import I_person from "../../img/icon/I_person.svg";
 import { strDot } from "../../util/Util";
+import SetErrorBar from "../../util/SetErrorBar";
 
-export default function MmenuPopup({ off, mybalance }) {
+export default function MmenuPopup({ off, mybalance, ticketInfo }) {
   const navigate = useNavigate();
 
   const isLogin = useSelector((state) => state.common.isLogin);
+  const onclick_staked_val_btn = (currentValue) => {
+    if (ticketInfo) {
+      navigate(currentValue);
+    } else {
+      SetErrorBar("You need purchased lucky ticket");
+    }
+  };
 
   return (
     <MmenuPopupBox onClick={() => off()}>
@@ -34,10 +42,7 @@ export default function MmenuPopup({ off, mybalance }) {
               <span className="address">{strDot(isLogin, 4, 4)}</span>
             </button>
           ) : (
-            <button
-              className="connectBtn"
-              onClick={() => navigate("/connectwallet")}
-            >
+            <button className="connectBtn" onClick={() => navigate("/connectwallet")}>
               Connect Wallet
             </button>
           )}
@@ -52,14 +57,11 @@ export default function MmenuPopup({ off, mybalance }) {
               <img src={I_rocket} alt="" />
               <p>Lucky Ticket</p>
             </button>
-            <button className="auctionBtn" onClick={() => navigate("/auction")}>
+            <button className="auctionBtn" onClick={() => onclick_staked_val_btn("/auction")}>
               <img src={I_openBox} alt="" />
               <p>Subscription Auction</p>
             </button>
-            <button
-              className="marketPlaceBtn"
-              onClick={() => navigate("/market")}
-            >
+            <button className="marketPlaceBtn" onClick={() => onclick_staked_val_btn("/market")}>
               <img src={I_market} alt="" />
               <p>Marketplece</p>
             </button>
@@ -67,7 +69,7 @@ export default function MmenuPopup({ off, mybalance }) {
               <img src={I_book} alt="" />
               <p>FAQ</p>
             </button>
-            <button className="mypageBtn" onClick={() => navigate("/mypage")}>
+            <button className="mypageBtn" onClick={() => onclick_staked_val_btn("/mypage")}>
               <img src={I_person} alt="" />
               <p>Mypage</p>
             </button>
