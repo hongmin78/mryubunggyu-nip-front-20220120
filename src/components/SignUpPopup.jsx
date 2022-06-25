@@ -9,7 +9,11 @@ import { chkValidEmail } from "../util/Util";
 import { signup, getRequestEmail } from "../api/Signup";
 import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
-import { generaterandomstr_charset, LOGGER, getmyaddress } from "../util/common";
+import {
+  generaterandomstr_charset,
+  LOGGER,
+  getmyaddress,
+} from "../util/common";
 import axios from "axios";
 import { API } from "../configs/api";
 import { TIME_PAGE_TRANSITION_DEF } from "../configs/configs";
@@ -43,8 +47,11 @@ export default function SignUpPopup({ walletAddress }) {
     localStorage.setItem("MAIL_CHECK", false);
     let myaddress = getmyaddress();
     axios
-      .post(API.API_EMAIL_REQUEST+"?nettype="+net, { email, walletAddress: myaddress,
-        nettype: net, })
+      .post(API.API_EMAIL_REQUEST + "?nettype=" + net, {
+        email,
+        walletAddress: myaddress,
+        nettype: net,
+      })
       .then((resp) => {
         // SetErrorBar(res.data);
         LOGGER("", resp.data);
@@ -94,7 +101,11 @@ export default function SignUpPopup({ walletAddress }) {
   }, []);
 
   const disableConfirm =
-    !(email && pw && pwConfrim && agreeList[0] && agreeList[1] && isemailrequested && emailCodeState) ||
+    !(
+      (email && pw && pwConfrim && agreeList[0] && agreeList[1])
+      // isemailrequested &&
+      // emailCodeState
+    ) ||
     emailAlarm ||
     pwAlarm;
   function onClickAgreeList(index) {
@@ -114,18 +125,18 @@ export default function SignUpPopup({ walletAddress }) {
       SetErrorBar(messages.MSG_EMAIL_INVALID);
       return;
     }
-    if (isemailrequested) {
-    } else {
-      SetErrorBar(messages.MSG_PLEASE_REQUEST_EMAIL_VERIFY_CODE);
-      return;
-    }
+    // if (isemailrequested) {
+    // } else {
+    //   SetErrorBar(messages.MSG_PLEASE_REQUEST_EMAIL_VERIFY_CODE);
+    //   return;
+    // }
     if (referral) {
     } else {
       SetErrorBar(messages.MSG_PLEASE_INPUT + " referer code");
       return;
     }
     await axios
-      .post(API.API_SIGNUP+`?nettype=${net}`, {
+      .post(API.API_SIGNUP + `?nettype=${net}`, {
         walletAddress,
         email,
         password: pw,
@@ -188,7 +199,12 @@ export default function SignUpPopup({ walletAddress }) {
             <p className="contTitle">Address</p>
             <div className="inputContainer">
               <div className="inputBox">
-                <input style={{ color: "#bbb" }} type="" value={myaddress} disabled />
+                <input
+                  style={{ color: "#bbb" }}
+                  type=""
+                  value={myaddress}
+                  disabled
+                />
               </div>
             </div>
           </li>
@@ -202,10 +218,10 @@ export default function SignUpPopup({ walletAddress }) {
               />
 
               {emailAlarm && <p className="alarm">{emailAlarm}</p>}
-
+              {/* 
               <button className="registrationBtn" onClick={clickRegistrationBtn}>
                 Registration
-              </button>
+              </button> */}
             </div>
           </li>
 
@@ -213,7 +229,12 @@ export default function SignUpPopup({ walletAddress }) {
             <p className="contTitle">Password</p>
             <div className="inputContainer">
               <div className="inputBox">
-                <input type="" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="Password" />
+                <input
+                  type=""
+                  value={pw}
+                  onChange={(e) => setPw(e.target.value)}
+                  placeholder="Password"
+                />
               </div>
             </div>
           </li>
@@ -272,7 +293,9 @@ export default function SignUpPopup({ walletAddress }) {
               <img src={I_chkWhite} alt="" />
             </button>
             <p>
-              Subscribe <u onClick={() => navigate("/term")}>Terms of Service</u> &#40;required&#41;
+              Subscribe{" "}
+              <u onClick={() => navigate("/term")}>Terms of Service</u>{" "}
+              &#40;required&#41;
             </p>
           </li>
 
@@ -284,7 +307,10 @@ export default function SignUpPopup({ walletAddress }) {
             >
               <img src={I_chkWhite} alt="" />
             </button>
-            <p>Personal lnformation Collection and Usage Agreement &#40;required&#41;</p>
+            <p>
+              Personal lnformation Collection and Usage Agreement
+              &#40;required&#41;
+            </p>
           </li>
         </ul>
 
@@ -292,7 +318,11 @@ export default function SignUpPopup({ walletAddress }) {
           <button className="cancelBtn" onClick={() => navigate("/")}>
             Cancel
           </button>
-          <button className="confirmBtn" disabled={disableConfirm} onClick={onClickSignUpBtn}>
+          <button
+            className="confirmBtn"
+            disabled={disableConfirm}
+            onClick={onClickSignUpBtn}
+          >
             Sign up
           </button>
         </ul>
@@ -308,7 +338,12 @@ export default function SignUpPopup({ walletAddress }) {
             <p className="contTitle">Address</p>
             <div className="inputContainer">
               <div className="inputBox">
-                <input style={{ color: "#bbb" }} type="" value={myaddress} disabled />
+                <input
+                  style={{ color: "#bbb" }}
+                  type=""
+                  value={myaddress}
+                  disabled
+                />
               </div>
             </div>
           </li>
@@ -324,17 +359,20 @@ export default function SignUpPopup({ walletAddress }) {
                   disabled={mailcheck}
                 />
 
-                {pending ? (
+                {/* {pending ? (
                   <button>{mailcheck ? "VERIFIED" : "PENDING"}</button>
                 ) : (
-                  <button className="registrationBtn" onClick={clickRegistrationBtn}>
+                  <button
+                    className="registrationBtn"
+                    onClick={clickRegistrationBtn}
+                  >
                     Registration
                   </button>
-                )}
+                )} */}
               </div>
               {emailAlarm && <p className="alarm">{emailAlarm}</p>}
 
-              <div className="inputBox">
+              {/* <div className="inputBox">
                 <input
                   onChange={(e) => setEmailCodeNumber(e.target.value)}
                   onClick={() => {}}
@@ -343,20 +381,14 @@ export default function SignUpPopup({ walletAddress }) {
                 {emailCodeState ? (
                   <button>{emailCodeState ? "SUCCESS" : "FAIL"}</button>
                 ) : (
-                  <button className="registrationBtn" onClick={onClickEmailAuthBtn}>
+                  <button
+                    className="registrationBtn"
+                    onClick={onClickEmailAuthBtn}
+                  >
                     Click Check
                   </button>
                 )}
-              </div>
-            </div>
-          </li>
-
-          <li>
-            <p className="contTitle">Password</p>
-            <div className="inputContainer">
-              <div className="inputBox">
-                <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="Password" />
-              </div>
+              </div> */}
             </div>
           </li>
 
@@ -366,9 +398,23 @@ export default function SignUpPopup({ walletAddress }) {
               <div className="inputBox">
                 <input
                   type="password"
+                  value={pw}
+                  onChange={(e) => setPw(e.target.value)}
+                  placeholder="Password"
+                />
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <p className="contTitle">Password Confirmation</p>
+            <div className="inputContainer">
+              <div className="inputBox">
+                <input
+                  type="password"
                   value={pwConfrim}
                   onChange={(e) => setPwConfirm(e.target.value)}
-                  placeholder="Password confirmation"
+                  placeholder="Password Confirmation"
                 />
               </div>
 
@@ -407,11 +453,16 @@ export default function SignUpPopup({ walletAddress }) {
 
         <ul className="agreeList">
           <li>
-            <button className={agreeList[0] ? "chkBtn on" : "chkBtn"} onClick={() => onClickAgreeList(0)}>
+            <button
+              className={agreeList[0] ? "chkBtn on" : "chkBtn"}
+              onClick={() => onClickAgreeList(0)}
+            >
               <img src={I_chkWhite} alt="" />
             </button>
             <p>
-              Subscribe <u onClick={() => navigate("/term")}>Terms of Service</u> &#40;required&#41;
+              Subscribe{" "}
+              <u onClick={() => navigate("/term")}>Terms of Service</u>{" "}
+              &#40;required&#41;
             </p>
           </li>
 
@@ -423,7 +474,10 @@ export default function SignUpPopup({ walletAddress }) {
             >
               <img src={I_chkWhite} alt="" />
             </button>
-            <p>Personal lnformation Collection and Usage Agreement &#40;required&#41;</p>
+            <p>
+              Personal lnformation Collection and Usage Agreement
+              &#40;required&#41;
+            </p>
           </li>
         </ul>
 
@@ -436,7 +490,11 @@ export default function SignUpPopup({ walletAddress }) {
           >
             Cancel
           </button>
-          <button className="confirmBtn" disabled={disableConfirm} onClick={onClickSignUpBtn}>
+          <button
+            className="confirmBtn"
+            disabled={disableConfirm}
+            onClick={onClickSignUpBtn}
+          >
             Sign up
           </button>
         </ul>
