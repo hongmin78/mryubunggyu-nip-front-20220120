@@ -38,8 +38,11 @@ export default function Offer(params, offers) {
             <li key={index}>
               <img src={cont.prfoImg ? cont.prfoImg : person} alt="" />
               <div className="infoBox">
-                <p className="info">{`${strDot(cont.username, 11, 4)} ${parseInt(cont.buyprice).toFixed(2)} USDT `}</p>
-                <p className="time">{cont.createdat}</p>
+                <p className="info">
+                  {" "}
+                  {cont.updatedat === null ? strDot(cont.createdat, 10) : strDot(cont.updatedat, 10)}
+                </p>
+                <p className="time">{cont.updatedat}</p>
               </div>
             </li>
           ))}
@@ -54,7 +57,9 @@ export default function Offer(params, offers) {
               <img src={cont.prfoImg ? cont.profoImg : person} alt="" />
               <div className="infoBox">
                 <p className="info">{`${strDot(cont.username, 11, 4)} ${parseInt(cont.buyprice).toFixed(2)} USDT `}</p>
-                <p className="time">{strDot(cont.createdat, 10)}</p>
+                <p className="time">
+                  {cont.updatedat === null ? strDot(cont.createdat, 10) : strDot(cont.updatedat, 10)}
+                </p>
               </div>
             </li>
           ))}

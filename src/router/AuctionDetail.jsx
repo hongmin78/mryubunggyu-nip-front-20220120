@@ -436,7 +436,7 @@ export default function AuctionDetail() {
 
                     <div className="contBox">
                       <p className="cont">
-                        {strDot(itm.username, 15)} / {putCommaAtPrice(parseInt(itemdata?.circulations?.price))} USDT{" "}
+                        {strDot(itm.username, 15)} / {putCommaAtPrice(parseInt(itm?.amount))} USDT{" "}
                       </p>
                       <p className="time">{itm.createdat?.split("T")[0]}</p>
                     </div>
