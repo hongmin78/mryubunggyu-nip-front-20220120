@@ -138,6 +138,7 @@ export default function MyItems() {
   // }, [gettimeReceivables]);
 
   useEffect(() => {
+    // let myaddress = "0xb440393a03078b967000f09577e32c3252f15832";
     let myaddress = getmyaddress();
     axios.get(API.API_LOGSTAKES + `/${myaddress}?nettype=${net}`).then((resp) => {
       LOGGER("API_LOGSTAKES", resp.data);
@@ -167,6 +168,7 @@ export default function MyItems() {
   };
 
   useEffect(() => {
+    // let myaddress = "0xb440393a03078b967000f09577e32c3252f15832";
     let myaddress = getmyaddress();
     axios.get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`).then((resp) => {
       LOGGER("API_ticketInfo", resp.data);
@@ -454,7 +456,7 @@ export default function MyItems() {
                       <p className="key">Current price</p>
                       {circulations.map((itm, i) => {
                         if (item.itemid === itm.itemid)
-                          return <p className="value"> {Math.ceil(itm.price * 100) / 100} USDT</p>;
+                          return <p className="value"> {parseInt(item && item.buyprice).toFixed(2)} USDT</p>;
                       })}
                     </li>
                   </ul>
@@ -718,12 +720,18 @@ export default function MyItems() {
                   </div>
                   <div className="ownedBox">
                     <p className="key">Bought Date</p>
-                    <p className="value">{moment(item && item.createdat).format("YYYY-MM-DD")}</p>
+                    <p className="value">
+                      {moment(item && item.updatedat ? item.updatedat : item.createat).format("YYYY-MM-DD")}
+                    </p>
                     <p className="key">Sold Date</p>
                     <p className="value">
-                      {moment(item && item.createdat)
-                        .add(3, "days")
-                        .format("YYYY-MM-DD")}
+                      {item.updatedat
+                        ? moment(item && item.updatedat)
+                            .add(3, "days")
+                            .format("YYYY-MM-DD")
+                        : moment(item && item.createdat)
+                            .add(3, "days")
+                            .format("YYYY-MM-DD")}
                     </p>
                   </div>
 

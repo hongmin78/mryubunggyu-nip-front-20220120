@@ -38,6 +38,7 @@ export default function Header() {
 
   useEffect(() => {
     setTimeout(() => {
+      // let myaddress = "0xb440393a03078b967000f09577e32c3252f15832";
       let myaddress = getmyaddress();
       if (myaddress) {
       } else {
@@ -57,6 +58,7 @@ export default function Header() {
   }, []);
 
   const awaitWallet = () => {
+    // let myaddress = "0xb440393a03078b967000f09577e32c3252f15832";
     let myaddress = getmyaddress();
     setTimeout(() => {
       if (myaddress) {
@@ -69,6 +71,7 @@ export default function Header() {
   };
 
   const fetchdataStaked = async () => {
+    // let myaddress = "0xb440393a03078b967000f09577e32c3252f15832";
     let myaddress = getmyaddress();
     if (myaddress) {
     } else {
@@ -85,6 +88,7 @@ export default function Header() {
     }
   };
   const fetchdata = (_) => {
+    // let myaddress = "0xb440393a03078b967000f09577e32c3252f15832";
     let myaddress = getmyaddress();
     if (myaddress) {
     } else {
