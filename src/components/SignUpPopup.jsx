@@ -43,8 +43,11 @@ export default function SignUpPopup({ walletAddress }) {
     localStorage.setItem("MAIL_CHECK", false);
     let myaddress = getmyaddress();
     axios
-      .post(API.API_EMAIL_REQUEST+"?nettype="+net, { email, walletAddress: myaddress,
-        nettype: net, })
+      .post(API.API_EMAIL_REQUEST + "?nettype=" + net, {
+        email,
+        walletAddress: myaddress,
+        nettype: net,
+      })
       .then((resp) => {
         // SetErrorBar(res.data);
         LOGGER("", resp.data);
@@ -94,7 +97,11 @@ export default function SignUpPopup({ walletAddress }) {
   }, []);
 
   const disableConfirm =
-    !(email && pw && pwConfrim && agreeList[0] && agreeList[1] && isemailrequested && emailCodeState) ||
+    !(
+      (email && pw && pwConfrim && agreeList[0] && agreeList[1])
+      // isemailrequested &&
+      // emailCodeState
+    ) ||
     emailAlarm ||
     pwAlarm;
   function onClickAgreeList(index) {
@@ -114,18 +121,18 @@ export default function SignUpPopup({ walletAddress }) {
       SetErrorBar(messages.MSG_EMAIL_INVALID);
       return;
     }
-    if (isemailrequested) {
-    } else {
-      SetErrorBar(messages.MSG_PLEASE_REQUEST_EMAIL_VERIFY_CODE);
-      return;
-    }
+    // if (isemailrequested) {
+    // } else {
+    //   SetErrorBar(messages.MSG_PLEASE_REQUEST_EMAIL_VERIFY_CODE);
+    //   return;
+    // }
     if (referral) {
     } else {
       SetErrorBar(messages.MSG_PLEASE_INPUT + " referer code");
       return;
     }
     await axios
-      .post(API.API_SIGNUP+`?nettype=${net}`, {
+      .post(API.API_SIGNUP + `?nettype=${net}`, {
         walletAddress,
         email,
         password: pw,
@@ -202,10 +209,10 @@ export default function SignUpPopup({ walletAddress }) {
               />
 
               {emailAlarm && <p className="alarm">{emailAlarm}</p>}
-
+              {/* 
               <button className="registrationBtn" onClick={clickRegistrationBtn}>
                 Registration
-              </button>
+              </button> */}
             </div>
           </li>
 
@@ -324,17 +331,20 @@ export default function SignUpPopup({ walletAddress }) {
                   disabled={mailcheck}
                 />
 
-                {pending ? (
+                {/* {pending ? (
                   <button>{mailcheck ? "VERIFIED" : "PENDING"}</button>
                 ) : (
-                  <button className="registrationBtn" onClick={clickRegistrationBtn}>
+                  <button
+                    className="registrationBtn"
+                    onClick={clickRegistrationBtn}
+                  >
                     Registration
                   </button>
-                )}
+                )} */}
               </div>
               {emailAlarm && <p className="alarm">{emailAlarm}</p>}
 
-              <div className="inputBox">
+              {/* <div className="inputBox">
                 <input
                   onChange={(e) => setEmailCodeNumber(e.target.value)}
                   onClick={() => {}}
@@ -343,11 +353,14 @@ export default function SignUpPopup({ walletAddress }) {
                 {emailCodeState ? (
                   <button>{emailCodeState ? "SUCCESS" : "FAIL"}</button>
                 ) : (
-                  <button className="registrationBtn" onClick={onClickEmailAuthBtn}>
+                  <button
+                    className="registrationBtn"
+                    onClick={onClickEmailAuthBtn}
+                  >
                     Click Check
                   </button>
                 )}
-              </div>
+              </div> */}
             </div>
           </li>
 
@@ -361,14 +374,14 @@ export default function SignUpPopup({ walletAddress }) {
           </li>
 
           <li>
-            <p className="contTitle">Password</p>
+            <p className="contTitle">Password Confirmation</p>
             <div className="inputContainer">
               <div className="inputBox">
                 <input
                   type="password"
                   value={pwConfrim}
                   onChange={(e) => setPwConfirm(e.target.value)}
-                  placeholder="Password confirmation"
+                  placeholder="Password Confirmation"
                 />
               </div>
 
