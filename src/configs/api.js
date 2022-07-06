@@ -4,8 +4,8 @@ import { net } from "./net";
 
 let URL;
 const url = {
-  ETH_TESTNET: "https://nftinfinity.world:34925",
-  BSC_MAINNET: "https://nftinfinity.world:34825",
+  ETH_TESTNET: "https://nftinfinity.world:34935",
+  BSC_MAINNET: "https://nftinfinity.world:34835",
 };
 
 URL = url[net];
