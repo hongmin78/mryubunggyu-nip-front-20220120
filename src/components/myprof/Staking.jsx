@@ -145,9 +145,9 @@ export default function Staking() {
                         <p>{cont.amount}&nbsp;USDT</p>
                       </span>
 
-                      <span>{moment(cont.createdat).format("YYYY-MM-DD hh:mm:ss")}</span>
+                      <span>{cont.createdat.split(".", 1)}</span>
 
-                      <span>{moment(cont.createdat).add(90, "day").format("YYYY-MM-DD hh:mm:ss")}</span>
+                      <span>{moment(cont.createdat).add(90, "day").format("YYYY-MM-DDThh:mm:ss")}</span>
 
                       <span>
                         <button className="unstakeBtn" onClick={() => {}}>
