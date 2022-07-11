@@ -155,9 +155,7 @@ export default function MyItems() {
 
   useEffect(
     (_) => {
-      setTimeout((_) => {
-        fetchdata();
-      }, 1000);
+      fetchdata();
     },
     [isOpen]
   );
@@ -721,7 +719,7 @@ export default function MyItems() {
                   <div className="ownedBox">
                     <p className="key">Bought Date</p>
                     <p className="value">
-                      {moment(item && item.updatedat ? item.updatedat : item.createat).format("YYYY-MM-DD")}
+                      {item && item.updatedat ? item.updatedat.split("T", 1) : item.createdat.split("T", 1)}
                     </p>
                     <p className="key">Sold Date</p>
                     <p className="value">
