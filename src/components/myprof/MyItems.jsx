@@ -145,6 +145,8 @@ export default function MyItems() {
       let { status, respdata } = resp.data;
       if (status == "OK") {
         setGetTickTimer(respdata?.createdat);
+        // setTickTimer(moment(respdata?.createdat).add(90, "days").format("YYYY-MM-DD"));
+        setTickTimer("2022-08-04");
       }
     });
 
@@ -553,15 +555,24 @@ export default function MyItems() {
                 </div>
 
                 <div className="saleBox">
+                  <div className="ownedBox">
+                    <p className="key">Bought Date</p>
+                    <p className="value">{ticketInfo && ticketInfo.createdat.split("T", 1)}</p>
+                    <p className="key">Expire Date</p>
+                    <p className="value">
+                      {ticketInfo &&
+                        moment(ticketInfo && ticketInfo.createdat)
+                          .add(90, "days")
+                          .format("YYYY-MM-DD")}
+                    </p>
+                  </div>
                   <div className="key">
                     <p className="price">Current price</p>
-                    <p className="time">Bought</p>
                   </div>
-
                   <div className="value">
                     <strong className="price">100 USDT</strong>
-
-                    {/* <ul className="timeList">
+                    {/* 
+                    <ul className="timeList">
                       <li>{moment(tickTimer).days()}일</li>
                       <li>{moment(tickTimer).hours()}시간</li>
                       <li>{moment(tickTimer).month()}분</li>
@@ -591,10 +602,14 @@ export default function MyItems() {
 
                 <button
                   className="actionBtn"
-                  disabled={tickTimer !== 0 ? true : false}
-                  onClick={() => navigate("/resell")}
+                  disabled={
+                    moment(ticketInfo.createdat).add(90, "days").format("YYYY-MM-DD") === tickTimer ? false : true
+                  }
+                  onClick={() => navigate(`/resell/${ticketInfo.username}/ticket`, { state: ticketInfo })}
                 >
-                  Purchased
+                  {moment(ticketInfo.createdat).add(90, "days").format("YYYY-MM-DD") === tickTimer
+                    ? "Sell"
+                    : "Purchased"}
                 </button>
 
                 <p className="description">

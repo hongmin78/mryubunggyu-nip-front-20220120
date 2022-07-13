@@ -7,7 +7,7 @@ import E_item3 from "../img/mypage/E_item3.png";
 import PopupBg from "../components/PopupBg";
 import SelectPopup from "../components/SelectPopup";
 import { D_expDateList, D_startDateList } from "../data/Dresell";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useParams } from "react-router";
 import { useSelector } from "react-redux";
 import DetailHeader from "../components/header/DetailHeader";
@@ -18,6 +18,7 @@ import { API } from "../configs/api";
 import { getmyaddress } from "../util/common";
 import { messages } from "../configs/messages";
 import SetErrorBar from "../util/SetErrorBar";
+import ticketImg from "../img/staking/E_prof1.png";
 import moment from "moment";
 import { addresses } from "../configs/addresses";
 import { getabistr_forfunction, query_with_arg } from "../util/contract-calls";
@@ -25,12 +26,13 @@ import { requesttransaction } from "../services/metamask";
 import awaitTransactionMined from "await-transaction-mined";
 import { web3 } from "../configs/configweb3-ropsten";
 import { TX_POLL_OPTIONS } from "../configs/configs";
+import { getethrep, getweirep } from "../util/eth";
 
 export default function Resell() {
   const navigate = useNavigate();
 
   const isMobile = useSelector((state) => state.common.isMobile);
-
+  const ticketInfo = useLocation().state;
   const [bid, setBid] = useState("");
   const [startDate, setStartDate] = useState("");
   const [startPopup, setStartPopup] = useState(false);
@@ -39,6 +41,7 @@ export default function Resell() {
   let [userInfo, setUserInfo] = useState();
   let [itemDetail, setItemDetail] = useState();
   const { id } = useParams();
+  const { type } = useParams();
   const [saleType, setSaleType] = useState("COMMON");
   const [isApprovedForAll, setApprovalForAll] = useState(false);
   let [spinner, setSpinner] = useState(false);
@@ -51,32 +54,40 @@ export default function Resell() {
         SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
         return;
       }
-      const resp = await axios.get(
-        API.API_USERINFO + `/${myaddress}?nettype=${net}`
-      );
+      const resp = await axios.get(API.API_USERINFO + `/${myaddress}?nettype=${net}`);
       if (resp.data && resp.data.respdata) {
         let { respdata } = resp.data;
         setUserInfo(respdata);
       }
-      console.log("$userinfo", resp);
     } catch (err) {
       console.log(err);
     }
   };
 
   const queryItemDetail = async () => {
-    try {
-      const resp = await axios.get(
-        API.API_GET_ITEMS_DETAIL + `/${id}?nettype=${net}`
-      );
-      if (resp.data && resp.data.respdata) {
-        let { respdata } = resp.data;
-        console.log("$itemdetail_ITEMDETAIL", respdata);
-        setItemDetail(respdata);
-        queryApprovalForAll(respdata);
+    if (type === "kingkong") {
+      try {
+        const resp = await axios.get(API.API_GET_ITEMS_DETAIL + `/${id}?nettype=${net}`);
+        if (resp.data && resp.data.respdata) {
+          let { respdata } = resp.data;
+          console.log("$itemdetail_ITEMDETAIL", respdata);
+          setItemDetail(respdata);
+        }
+      } catch (err) {
+        console.log(err);
       }
-    } catch (err) {
-      console.log(err);
+    }
+    if (type === "ticket") {
+      try {
+        const resp = await axios.get(API.API_LOGSTAKES + `/${id}?nettype=${net}`);
+        if (resp.data && resp.data.respdata) {
+          let { respdata } = resp.data;
+          console.log("$itemdetail_ITEMDETAIL", respdata);
+          setItemDetail(respdata);
+        }
+      } catch (err) {
+        console.log(err);
+      }
     }
   };
 
@@ -99,16 +110,25 @@ export default function Resell() {
         ticket: {
           contractaddress: addresses.contract_erc1155_ticket_sales_minter,
           abikind: "ERC1155_TICKET_MINTER",
-          methodname: "_operatorApprovals",
+          methodname: "isApprovedForAll",
           aargs: [myaddress, addresses.contract_erc1155_ticket_sales],
         },
       };
 
-      query_with_arg(options_arg[item.group_]).then((resp) => {
-        console.log("$sell-isApprovedForAll?", resp);
-        setApprovalForAll(resp);
-        setSpinner(false);
-      });
+      if (type === "kingkong") {
+        query_with_arg(options_arg[type]).then((resp) => {
+          console.log("$sell-isApprovedForAll?", resp);
+          setApprovalForAll(resp);
+          setSpinner(false);
+        });
+      }
+      if (type === "ticket") {
+        query_with_arg(options_arg[type]).then((resp) => {
+          console.log("$sell-ticket-isApprovedForAll?", resp);
+          setApprovalForAll(resp);
+          setSpinner(false);
+        });
+      }
     } catch (err) {
       console.log(err);
     }
@@ -123,56 +143,85 @@ export default function Resell() {
       return;
     }
     setSpinner(true);
-    let abistr = getabistr_forfunction({
-      contractaddress: addresses.contract_erc1155,
-      abikind: "ERC1155",
-      methodname: "setApprovalForAll",
-      aargs: [addresses.contract_erc1155_sales, true],
-    });
-    requesttransaction({
-      from: myaddress,
-      to: addresses.contract_erc1155,
-      data: abistr,
-      value: "0x00",
-    }).then((resp) => {
-      if (resp) {
-      } else {
-        SetErrorBar(messages.MSG_USER_DENIED_TX);
-        return;
-      }
-      let txhash = resp;
+    if (type === "kingkong") {
+      let abistr = getabistr_forfunction({
+        contractaddress: addresses.contract_erc1155,
+        abikind: "ERC1155",
+        methodname: "setApprovalForAll",
+        aargs: [addresses.contract_erc1155_sales, true],
+      });
+      requesttransaction({
+        from: myaddress,
+        to: addresses.contract_erc1155,
+        data: abistr,
+        value: "0x00",
+      }).then((resp) => {
+        if (resp) {
+        } else {
+          SetErrorBar(messages.MSG_USER_DENIED_TX);
+          return;
+        }
+        let txhash = resp;
 
-      awaitTransactionMined
-        .awaitTx(web3, txhash, TX_POLL_OPTIONS)
-        .then(async (minedtxreceipt) => {
+        awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
           console.log(minedtxreceipt);
           SetErrorBar(messages.MSG_TX_FINALIZED);
           queryApprovalForAll();
           setSpinner(false);
         });
+      });
+    }
+    if (type === "ticket") {
+      console.log("120391203192u0319u2309");
+      let abistr = getabistr_forfunction({
+        contractaddress: addresses.contract_erc1155_ticket_sales_minter,
+        abikind: "ERC1155_TICKET_MINTER",
+        methodname: "isApprovedForAll",
+        aargs: [myaddress, addresses.contract_erc1155_ticket_sales],
+      });
+      requesttransaction({
+        from: myaddress,
+        to: addresses.contract_erc1155_ticket_sales_minter,
+        data: abistr,
+        value: "0x00",
+      }).then((resp) => {
+        if (resp) {
+        } else {
+          SetErrorBar(messages.MSG_USER_DENIED_TX);
+          return;
+        }
+        let txhash = resp;
 
-      // axios
-      //   .post(API.API_TXS + `/${txhash}`, {
-      //     txhash,
-      //     username: myaddress,
-      //     typestr: typestr,
-      //     auxdata: {
-      //       contract_type: "ERC721",
-      //       myaddress: myaddress,
-      //       fromcontract: data.contractaddress,
-      //       tocontract: operator,
-      //     },
-      //   })
-      //   .then((resp) => {
-      //     LOGGER("", resp.data);
-      //   })
-      //   .catch(LOGGER);
-    });
+        awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
+          console.log(minedtxreceipt);
+          SetErrorBar(messages.MSG_TX_FINALIZED);
+          queryApprovalForAll();
+          setSpinner(false);
+        });
+      });
+    }
   };
 
-  const postSell = () => {
+  const postSell = async () => {
     // const expiration = moment.unix(+expDate) - moment.unix(+startDate);
     // console.log("$expiration", expiration);
+    let myaddress = getmyaddress();
+    let sign;
+    let msg;
+    if (type === "ticket") {
+      msg = web3.utils.soliditySha3(itemDetail.id, getweirep("" + 100), addresses.AKD, myaddress);
+      sign = web3.eth.accounts.sign(msg, myaddress);
+    }
+    if (type === "kingkong") {
+      msg = web3.utils.soliditySha3(
+        itemDetail.itembalances?.id,
+        getweirep("" + itemDetail.itembalances?.buyprice),
+        addresses.AKD,
+        myaddress
+      );
+      sign = web3.eth.accounts.sign(msg, myaddress);
+    }
+
     const options_data = {
       kingkong: {
         tokenid: itemDetail.id,
@@ -183,7 +232,7 @@ export default function Resell() {
         //   .add(+expiration, "days")
         //   .unix(),
         // expiry: moment().add(1659587638, "days").unix(),
-        expiry: 1659587638,
+        expiry: 4119051884,
         paymeansaddress: addresses.contract_USDT,
         contractaddress: addresses.contract_admin,
         paymeansname: "USDT",
@@ -195,36 +244,37 @@ export default function Resell() {
         //   signature: sign,
         //   msg,
         // },
-        expirystr: 1659587638,
+        expirystr: 4119051884,
         nettype: net,
         seller: itemDetail.itembalances?.username,
         typestr: saleType,
+        type: "KINGKONG",
       },
       ticket: {
-        tokenid: itemDetail.itembalances?.id,
-        itemid: itemDetail.itembalances?.itemid,
-        username: itemDetail.itembalances?.username,
-        price: itemDetail.itembalances?.buyprice,
+        tokenid: itemDetail?.id,
+        username: itemDetail?.username,
+        price: 100,
         // expiry: moment()
         //   .add(+expiration, "days")
         //   .unix(),
         // expiry: moment().add(1659587638, "days").unix(),
-        expiry: 1659587638,
+        expiry: 4119051884,
         paymeansaddress: addresses.contract_USDT,
         contractaddress: addresses.contract_erc1155_ticket_sales_minter,
-        paymeansname: itemDetail.itembalances?.paymeans,
+        paymeansname: "USDT",
         saletype: saleType === "COMMON" ? 1 : saleType === "AUCTION" ? 2 : 0,
         saletypestr: saleType,
         salestatusstr: saleType,
         salestatus: 1, // "on sale",
-        // jsignature: {
-        //   signature: sign,
-        //   msg,
-        // },
-        expirystr: 1659587638,
+        jsignature: {
+          signature: sign,
+          msg,
+        },
+        expirystr: 4119051884,
         nettype: net,
-        seller: itemDetail.itembalances?.username,
+        seller: itemDetail?.username,
         typestr: saleType,
+        type: "TICKET",
       },
     };
     // if (
@@ -233,17 +283,33 @@ export default function Resell() {
     //   "20" ||
     //   "30"
     // ) {
-    axios
-      .post(API.API_POST_SALE, options_data[itemDetail.itembalances?.group_])
-      .then((res) => {
-        console.log(res);
-        SetErrorBar("Item has been posted!");
-        // reload();
-      })
-      .catch((err) => console.log(err));
-    // } else {
-    //   SetErrorBar("Failed to provide all information.");
-    // }
+
+    if (type === "kingkong") {
+      axios
+        .post(API.API_POST_SALE, options_data[itemDetail.itembalances?.group_])
+        .then((res) => {
+          console.log(res);
+          SetErrorBar("Item has been posted!");
+          // reload();
+        })
+        .catch((err) => console.log(err));
+      // } else {
+      //   SetErrorBar("Failed to provide all information.");
+      // }
+    }
+    if (type === "ticket") {
+      axios
+        .post(API.API_POST_SALE, options_data["ticket"])
+        .then((res) => {
+          console.log(res);
+          SetErrorBar("Item has been posted!");
+          // reload();
+        })
+        .catch((err) => console.log(err));
+      // } else {
+      //   SetErrorBar("Failed to provide all information.");
+      // }
+    }
   };
 
   useEffect(() => {
@@ -251,6 +317,7 @@ export default function Resell() {
     setTimeout(() => {
       queryItemDetail();
       getUserInfo();
+      queryApprovalForAll();
     }, 1200);
   }, []);
 
@@ -263,7 +330,7 @@ export default function Resell() {
 
           <article className="sellSec">
             <div className="topBar">
-              <p className="title">Series Kong #112</p>
+              <p className="title"> {type === "ticket" ? `Lucky Ticket #${ticketInfo.id}` : `Series Kong #112`}</p>
             </div>
 
             <ul className="sellBox">
@@ -274,8 +341,7 @@ export default function Resell() {
                 </p>
 
                 <p className="explain">
-                  The auction begins. If the bid is more than 10 USDT, the bid
-                  will be awarded at 19:05 on July 17, 2022
+                  The auction begins. If the bid is more than 10 USDT, the bid will be awarded at 19:05 on July 17, 2022
                 </p>
 
                 <div className="priceBox">
@@ -306,9 +372,8 @@ export default function Resell() {
 
                     <div className="hovPopup">
                       <p>
-                        You can always accept a sale even if you are offered a
-                        price that is higher than your minimum bid and lower
-                        than your target bid.
+                        You can always accept a sale even if you are offered a price that is higher than your minimum
+                        bid and lower than your target bid.
                       </p>
                     </div>
                   </span>
@@ -318,14 +383,12 @@ export default function Resell() {
                   <input
                     value={bid}
                     onChange={(e) => setBid(e.target.value)}
-                    placeholder="Enter Minimum bid"
+                    placeholder={type === "ticket" ? "Ticket Minimun bid 90$" : "Enter Minimum bid"}
                   />
                   <strong className="unit">USDT</strong>
                 </div>
 
-                <p className="explain">
-                  Suggested: 0%, 10%, 20%. Maximum is 25%
-                </p>
+                <p className="explain">Suggested: 0%, 10%, 20%. Maximum is 25%</p>
               </li>
 
               <li className="startDateBox dateBox contBox">
@@ -353,10 +416,7 @@ export default function Resell() {
               <li className="expirationDateBox dateBox contBox">
                 <p className="title">Expiration Date</p>
                 <div className="posBox">
-                  <div
-                    className="inputBox"
-                    onClick={() => setExpDatePopup(true)}
-                  >
+                  <div className="inputBox" onClick={() => setExpDatePopup(true)}>
                     <input value={expDate} placeholder="Select Date" />
                     <img src={I_dnArw} alt="" />
                   </div>
@@ -374,10 +434,7 @@ export default function Resell() {
                   )}
                 </div>
 
-                <p className="explain">
-                  When the expiration time is reached, the sale price is
-                  automatically lt ends.
-                </p>
+                <p className="explain">When the expiration time is reached, the sale price is automatically lt ends.</p>
               </li>
 
               <li className="instructionBox contBox">
@@ -385,27 +442,23 @@ export default function Resell() {
 
                 <div className="textBox">
                   <p>
-                    When you sell items for the first time in your account, you
-                    need to go through the contract approval process
+                    When you sell items for the first time in your account, you need to go through the contract approval
+                    process
                   </p>
 
                   <ul className="processList">
                     <li>
                       <p>
-                        - If you are trading for the first time, you will need
-                        to reset your account. The process of sending 0 USDT to
-                        verify that the account is a valid account proceeds.
+                        - If you are trading for the first time, you will need to reset your account. The process of
+                        sending 0 USDT to verify that the account is a valid account proceeds.
                       </p>
                     </li>
                     <li>
-                      <p>
-                        - Please complete the signature to create a sales list.
-                      </p>
+                      <p>- Please complete the signature to create a sales list.</p>
                     </li>
                     <li>
                       <p>
-                        - Gas fee is paid only for the first time, and
-                        subsequent listings are supported free of charge.
+                        - Gas fee is paid only for the first time, and subsequent listings are supported free of charge.
                       </p>
                     </li>
                   </ul>
@@ -443,9 +496,8 @@ export default function Resell() {
 
                     <div className="hovPopup">
                       <p>
-                        You can always accept a sale even if you are offered a
-                        price that is higher than your minimum bid and lower
-                        than your target bid.
+                        You can always accept a sale even if you are offered a price that is higher than your minimum
+                        bid and lower than your target bid.
                       </p>
                     </div>
                   </span>
@@ -455,28 +507,19 @@ export default function Resell() {
                   <input
                     value={bid}
                     onChange={(e) => setBid(e.target.value)}
-                    placeholder="Enter Minimum bid"
+                    placeholder={type === "ticket" ? "Minimun bid 90 USDT" : "Enter Minimum bid"}
                   />
                   <strong className="unit">USDT</strong>
                 </div>
 
-                <p className="explain">
-                  Suggested: 0%, 10%, 20%. Maximum is 25%
-                </p>
+                <p className="explain">Suggested: 0%, 10%, 20%. Maximum is 25%</p>
               </li>
               <li className="dateContainer contBox">
                 <div className="startDateBox dateBox">
                   <p className="title">Starting Date</p>
                   <div className="posBox">
-                    <div
-                      className="inputBox"
-                      onClick={() => setStartPopup(true)}
-                    >
-                      <input
-                        value={startDate}
-                        disabled
-                        placeholder="Select Date"
-                      />
+                    <div className="inputBox" onClick={() => setStartPopup(true)}>
+                      <input value={startDate} disabled placeholder="Select Date" />
                       <img src={I_dnArw} alt="" />
                     </div>
 
@@ -497,15 +540,8 @@ export default function Resell() {
                 <div className="expirationDateBox dateBox">
                   <p className="title">Expiration Date</p>
                   <div className="posBox">
-                    <div
-                      className="inputBox"
-                      onClick={() => setExpDatePopup(true)}
-                    >
-                      <input
-                        value={expDate}
-                        disabled
-                        placeholder="Select Date"
-                      />
+                    <div className="inputBox" onClick={() => setExpDatePopup(true)}>
+                      <input value={expDate} disabled placeholder="Select Date" />
                       <img src={I_dnArw} alt="" />
                     </div>
 
@@ -528,39 +564,35 @@ export default function Resell() {
 
                 <div className="textBox">
                   <p>
-                    When you sell items for the first time in your account, you
-                    need to go through the contract approval process
+                    When you sell items for the first time in your account, you need to go through the contract approval
+                    process
                   </p>
 
                   <ul className="processList">
                     <li>
                       <p>
-                        - If you are trading for the first time, you will need
-                        to reset your account. The process of sending 0 USDT to
-                        verify that the account is a valid account proceeds.
+                        - If you are trading for the first time, you will need to reset your account. The process of
+                        sending 0 USDT to verify that the account is a valid account proceeds.
                       </p>
                     </li>
                     <li>
-                      <p>
-                        - Please complete the signature to create a sales list.
-                      </p>
+                      <p>- Please complete the signature to create a sales list.</p>
                     </li>
                     <li>
                       <p>
-                        - Gas fee is paid only for the first time, and
-                        subsequent listings are supported free of charge.
+                        - Gas fee is paid only for the first time, and subsequent listings are supported free of charge.
                       </p>
                     </li>
                   </ul>
                 </div>
               </li>{" "}
               <div className="employment">
-                <button className="actionBtn" onClick={() => {}}>
+                {/* <button className="actionBtn" onClick={() => {}}>
                   Employ
                 </button>
                 <button className="actionBtn" onClick={() => {}}>
                   UnEmploy
-                </button>
+                </button> */}
               </div>
               {isApprovedForAll ? (
                 <button className="actionBtn" onClick={() => postSell()}>
@@ -576,16 +608,15 @@ export default function Resell() {
 
           <ul className="itemSec">
             <li className="itemBox">
-              {itemDetail && itemDetail.url ? (
+              {type === "ticket" ? (
+                <img style={{ width: "8vw" }} src={ticketImg} alt="" />
+              ) : itemDetail && itemDetail.url ? (
                 <img className="itemImg" src={itemDetail.url} alt="" />
               ) : (
                 <img className="itemImg" src="" alt="broken_image" />
               )}
-              <p className="title">
-                Series{" "}
-                {itemDetail && itemDetail.itembalances?.group_.toUpperCase()}{" "}
-                #112
-              </p>
+              <p className="title"> {type === "ticket" ? `Lucky Ticket #${ticketInfo.id}` : `Series Kong #112`}</p>
+              {/* <p className="title">Series {itemDetail && itemDetail.itembalances?.group_.toUpperCase()} #112</p> */}
             </li>
 
             <li className="transactionBox">

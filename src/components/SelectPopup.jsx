@@ -9,7 +9,7 @@ export default function SelectPopup({ off, dataList, select, setFunc }) {
       <MselectPopupBox className="sortPopup" onClick={() => off()}>
         {dataList.map((cont, index) => (
           <li key={index} onClick={() => setFunc(cont.title)}>
-            {cont.title}
+            {cont}
           </li>
         ))}
       </MselectPopupBox>
@@ -24,7 +24,7 @@ export default function SelectPopup({ off, dataList, select, setFunc }) {
               setFunc(cont);
             }}
           >
-            {cont.title}
+            {cont}
           </li>
         ))}
       </PselectPopupBox>
@@ -50,10 +50,11 @@ const MselectPopupBox = styled.ul`
     font-weight: 500;
     border-radius: 2.22vw;
     cursor: pointer;
+    color: #000;
 
     &:hover {
-      color: #fff;
-      background: #000;
+      color: #000;
+      background: #fff;
     }
   }
 `;
@@ -77,10 +78,11 @@ const PselectPopupBox = styled.ul`
     font-weight: 500;
     border-radius: 8px;
     cursor: pointer;
+    color: #000;
 
     &:hover {
-      color: #fff;
-      background: #000;
+      color: #000;
+      background: #fff;
     }
   }
 `;

@@ -13,7 +13,7 @@ import { abi as abierc1155sales } from "../contracts/abi-erc1155Sale";
 import { LOGGER } from "./common";
 import sha256 from "js-sha256";
 // import { getweirep } from '../utils/eth'
-// import { DebugMode } from '../configs/configs'
+// import { DebugMode } from "../configs/configs";
 const jcontracts = {};
 const MAP_STR_ABI = {
   ERC20: abierc20,
@@ -37,6 +37,7 @@ const getabistr_forfunction = (jargs) => {
     contract = new web3.eth.Contract(MAP_STR_ABI[abikind], contractaddress);
     jcontracts[sig] = contract;
   }
+
   return contract.methods[methodname](...aargs).encodeABI();
 };
 // contract.methods.incomingQueue(0).ca ll(); –
@@ -69,7 +70,7 @@ const query_noarg = (jargs) => {
 const query_with_arg = (jargs) => {
   // {contractaddress , methodname , aargs }=jargs
   let { contractaddress, abikind, methodname, aargs } = jargs;
-  console.log(contractaddress);
+  console.log("jargs", jargs);
   let contract;
   contractaddress = contractaddress.toLowerCase();
   let sig = sha256(contractaddress + methodname);

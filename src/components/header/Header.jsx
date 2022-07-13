@@ -191,8 +191,7 @@ export default function Header() {
               <button
                 style={{ color: isStaking && "#fff" }}
                 onClick={() => {
-                  // onclick_staked_val_btn("/employment");
-                  SetErrorBar("Getting Ready");
+                  onclick_staked_val_btn("/employment");
                 }}
               >
                 Employment
