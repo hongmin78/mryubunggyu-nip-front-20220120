@@ -84,7 +84,6 @@ export default function Header() {
     let { status, respdata } = resp.data;
     if (status == "OK") {
       setisstaked(respdata.isstaked ? true : false);
-      console.log("dddd", respdata);
     }
   };
   const fetchdata = (_) => {

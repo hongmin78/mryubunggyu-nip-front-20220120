@@ -95,8 +95,7 @@ const generaterandomstr_charset = (length, charsetcode) => {
   } else if (charsetcode == "notconfusing") {
     characters = "2345679BCDEGHKLQSUZadehiopqstu";
   } else {
-    characters =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   }
   var charactersLength = characters.length;
   let result = "";
@@ -173,9 +172,7 @@ const getmyaddress = (_) => {
     return walletConnector._accounts[0];
   } else { */
 
-  window.ethereum &&
-    window.ethereum.selectedAddress &&
-    LOGGER(window.ethereum.selectedAddress);
+  window.ethereum && window.ethereum.selectedAddress && LOGGER(window.ethereum.selectedAddress);
   return window.ethereum ? window.ethereum.selectedAddress : null;
   //  }
 };
@@ -233,9 +230,7 @@ const getdiffindays = (time1, time0) => {
     return diffindays == 1 ? `${diffindays} day ago` : `${diffindays} days ago`;
   } else {
     let diffinhours = time1.diff(time0, "hours");
-    return diffinhours == 1
-      ? `${diffinhours} hour ago`
-      : `${diffinhours} hours ago`;
+    return diffinhours == 1 ? `${diffinhours} hour ago` : `${diffinhours} hours ago`;
   }
 };
 const get_lasttoken_url = (_) => {

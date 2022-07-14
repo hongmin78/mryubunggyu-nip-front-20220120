@@ -104,8 +104,9 @@ export default function MarketDetail() {
       }
     }
   }, [moreIndex]);
+  console.log("params?.uuid", params?.itemid);
   const getitem = (_) => {
-    axios.get(API.API_ITEMDETAIL + `/${params.itemid}?nettype=${net}`).then((resp) => {
+    axios.get(API.API_SINGLE_ORDER + `/${params?.itemid}?nettype=${net}`).then((resp) => {
       LOGGER("BYLjMqzlfl", resp.data);
       let { status, respdata } = resp.data;
       if (status == "OK") {
@@ -115,7 +116,7 @@ export default function MarketDetail() {
     });
   };
   const getotheritems = (_) => {
-    axios.get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC?nettype=${net}`).then((resp) => {
+    axios.get(API.API_ALL_ITEMS_MARKET + `/status/1/0/100/id/DESC?nettype=${net}`).then((resp) => {
       LOGGER("", resp.data);
       let { status, list } = resp.data;
       if (status == "OK") {
@@ -133,7 +134,11 @@ export default function MarketDetail() {
         <Header />
         <MmarketDetailBox>
           <section className="itemInfoContainer">
-            <img className="itemImg" src={itemdata?.url} alt="" />
+            {itemdata?.url ? (
+              <img className="itemImg" src={itemdata?.url} alt="" />
+            ) : (
+              <img className="itemImg" src={E_staking} alt="" />
+            )}
 
             <article className="infoBox">
               <div className="itemInfoBox">
@@ -164,13 +169,14 @@ export default function MarketDetail() {
                       </>
                     )}
                   </div>
-
-                  <strong className="title">King Kong {itemdata?.titlename} </strong>
+                  <strong className="title">
+                    {itemdata?.type === "ticket" ? `##LUCKY TICKET ${itemdata?.tokenid}` : null}{" "}
+                  </strong>
                 </div>
 
                 <div className="ownedBox">
                   <p className="key">Owned by</p>
-                  <p className="value">@andyfeltham</p>
+                  <p className="value">@{itemdata?.type === "ticket" ? `${itemdata?.seller}` : null}</p>
                 </div>
 
                 <div className="saleBox">
@@ -178,7 +184,7 @@ export default function MarketDetail() {
                     <p className="key">Current price</p>
                     <strong className="value">
                       {/* {itemdata?.group_ == "kong" ? "100" : ITEM_PRICE_DEF} USDT */}
-                      {itemdata && itemdata.itembalances?.buyprice} 372USDT
+                      {itemdata?.type === "ticket" ? `${itemdata?.price}` : `${itemdata.itembalances?.buyprice}`} USDT
                     </strong>
                   </div>
 
@@ -253,9 +259,11 @@ export default function MarketDetail() {
                     </Fragment>
                   ))}
                 </ul>
-                <button className="nextBtn" onClick={onClickAuctionNextBtn}>
-                  <img src={I_rtArw} alt="" />
-                </button>
+                {marketPlaceList.length > 4 ? (
+                  <button className="nextBtn" onClick={onClickAuctionNextBtn}>
+                    <img src={I_rtArw} alt="" />
+                  </button>
+                ) : null}
               </div>
             </div>
           </section>
@@ -289,9 +297,8 @@ export default function MarketDetail() {
               <div className="itemInfoBox">
                 <div className="titleBox">
                   <strong className="title">
-                    {itemdata && itemdata.itembalances?.group_.toUpperCase()} {itemdata?.titlename}
+                    {itemdata?.type === "ticket" ? `##LUCKY TICKET ${itemdata?.tokenid}` : null}
                   </strong>
-
                   <div className="btnBox">
                     <div className="posBox">
                       <button
@@ -315,13 +322,22 @@ export default function MarketDetail() {
                           Copy Link
                         </button>
                       </div>
+                      {showCopyBtn && (
+                        <>
+                          <button className="copyBtn displayBtn" onClick={() => setShowCopyBtn(false)}>
+                            <img src={I_clip} alt="" />
+                            Copy Link
+                          </button>
+                          <PopupBg off={setShowCopyBtn} />
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
 
                 <div className="ownedBox">
                   <p className="key">Owned by</p>
-                  <p className="value">@andyfeltham</p>
+                  <p className="value">@{itemdata?.type === "ticket" ? `${itemdata?.seller}` : null}</p>
                 </div>
 
                 <div className="saleBox">
@@ -333,7 +349,7 @@ export default function MarketDetail() {
                   <div className="value">
                     <strong className="price">
                       {/* {itemdata?.group_ == "kong" ? "100" : ITEM_PRICE_DEF} USDT */}
-                      {itemdata && itemdata.itembalances?.buyprice} 372USDT
+                      {itemdata?.type === "ticket" ? `${itemdata?.price}` : null} USDT
                     </strong>
                   </div>
                 </div>
@@ -410,9 +426,11 @@ export default function MarketDetail() {
                     </Fragment>
                   ))}
                 </ul>
-                <button className="nextBtn" onClick={onClickAuctionNextBtn}>
-                  <img src={I_rtArw} alt="" />
-                </button>
+                {marketPlaceList.length > 4 ? (
+                  <button className="nextBtn" onClick={onClickAuctionNextBtn}>
+                    <img src={I_rtArw} alt="" />
+                  </button>
+                ) : null}
               </div>
             </div>
           </section>

@@ -6,7 +6,6 @@ import Footer from "./Footer";
 import PopupBg from "../components/PopupBg";
 import MarketItem from "../components/MarketItem";
 import MarketItem0227 from "../components/MarketItem0227";
-
 import { D_marketItemList, D_sortList } from "../data/Dmarket";
 import SelectPopup from "../components/SelectPopup";
 import { useSelector } from "react-redux";
@@ -37,7 +36,7 @@ export default function Market() {
   // };
   const fetchData = async () => {
     try {
-      const res = await axios.get(API.API_ALL_ITEMS_MARKET + `/active/1/0/100/id/DESC?nettype=${net}`);
+      const res = await axios.get(API.API_ALL_ITEMS_MARKET + `/status/1/0/100/id/DESC?nettype=${net}`);
       if (res.data && res.data.list) {
         let { list } = res.data;
         console.log("$market_items", res);

@@ -38,6 +38,8 @@ export default function Resell() {
   const [startPopup, setStartPopup] = useState(false);
   const [expDate, setExpDate] = useState("");
   const [expDatePopup, setExpDatePopup] = useState(false);
+  const [sign, setSign] = useState();
+
   let [userInfo, setUserInfo] = useState();
   let [itemDetail, setItemDetail] = useState();
   const { id } = useParams();
@@ -72,6 +74,7 @@ export default function Resell() {
           let { respdata } = resp.data;
           console.log("$itemdetail_ITEMDETAIL", respdata);
           setItemDetail(respdata);
+          queryApprovalForAll(respdata);
         }
       } catch (err) {
         console.log(err);
@@ -84,6 +87,7 @@ export default function Resell() {
           let { respdata } = resp.data;
           console.log("$itemdetail_ITEMDETAIL", respdata);
           setItemDetail(respdata);
+          queryApprovalForAll(respdata);
         }
       } catch (err) {
         console.log(err);
@@ -202,102 +206,89 @@ export default function Resell() {
     }
   };
 
-  const postSell = async () => {
-    // const expiration = moment.unix(+expDate) - moment.unix(+startDate);
-    // console.log("$expiration", expiration);
+  const onClickSignRequest = async () => {
     let myaddress = getmyaddress();
-    let sign;
-    let msg;
-    if (type === "ticket") {
-      msg = web3.utils.soliditySha3(itemDetail.id, getweirep("" + 100), addresses.AKD, myaddress);
-      sign = web3.eth.accounts.sign(msg, myaddress);
-    }
-    if (type === "kingkong") {
-      msg = web3.utils.soliditySha3(
-        itemDetail.itembalances?.id,
-        getweirep("" + itemDetail.itembalances?.buyprice),
-        addresses.AKD,
-        myaddress
-      );
-      sign = web3.eth.accounts.sign(msg, myaddress);
-    }
+    const { ethereum } = window; //    const exampleMessage = "Test `personal_sign` message";
+    const from = myaddress; // store.isLogin;
+    let msg; // = `0x${Buffer.from(exampleMessage, "utf8").toString("hex")}`;
+    msg = `Ticket id:${itemDetail.id}, ${getweirep(bid)},Contract address :${
+      addresses.contract_erc1155_ticket_sales
+    }, wallet: ${myaddress}`;
 
-    const options_data = {
-      kingkong: {
-        tokenid: itemDetail.id,
-        itemid: itemDetail.itembalances?.itemid,
-        username: userInfo?.username,
-        price: itemDetail.itembalances?.buyprice,
-        // expiry: moment()
-        //   .add(+expiration, "days")
-        //   .unix(),
-        // expiry: moment().add(1659587638, "days").unix(),
-        expiry: 4119051884,
-        paymeansaddress: addresses.contract_USDT,
-        contractaddress: addresses.contract_admin,
-        paymeansname: "USDT",
-        saletype: saleType === "COMMON" ? 1 : saleType === "AUCTION" ? 2 : 0,
-        saletypestr: saleType,
-        salestatusstr: saleType,
-        salestatus: 1, // "on sale",
-        // jsignature: {
-        //   signature: sign,
-        //   msg,
-        // },
-        expirystr: 4119051884,
-        nettype: net,
-        seller: itemDetail.itembalances?.username,
-        typestr: saleType,
-        type: "KINGKONG",
-      },
-      ticket: {
-        tokenid: itemDetail?.id,
-        username: itemDetail?.username,
-        price: 100,
-        // expiry: moment()
-        //   .add(+expiration, "days")
-        //   .unix(),
-        // expiry: moment().add(1659587638, "days").unix(),
-        expiry: 4119051884,
-        paymeansaddress: addresses.contract_USDT,
-        contractaddress: addresses.contract_erc1155_ticket_sales_minter,
-        paymeansname: "USDT",
-        saletype: saleType === "COMMON" ? 1 : saleType === "AUCTION" ? 2 : 0,
-        saletypestr: saleType,
-        salestatusstr: saleType,
-        salestatus: 1, // "on sale",
-        jsignature: {
-          signature: sign,
-          msg,
+    const sign = await ethereum.request({
+      method: "personal_sign",
+      params: [msg, from],
+    });
+
+    setSign(sign);
+    return sign;
+  };
+
+  const postSell = async () => {
+    let respsign = await onClickSignRequest();
+    console.log("res", respsign);
+
+    if (respsign) {
+      let myaddress = getmyaddress();
+      let msg = `Ticket id:${itemDetail.id}, ${getweirep(bid)},Contract address :${
+        addresses.contract_erc1155_ticket_sales
+      }, wallet: ${myaddress}`;
+      let options_data = {
+        kingkong: {
+          tokenid: itemDetail.id,
+          itemid: itemDetail.itembalances?.itemid,
+          username: userInfo?.username,
+          price: itemDetail.itembalances?.buyprice,
+          // expiry: moment()
+          //   .add(+expiration, "days")
+          //   .unix(),
+          // expiry: moment().add(1659587638, "days").unix(),
+          expiry: 4119051884,
+          paymeansaddress: addresses.contract_USDT,
+          contractaddress: addresses.contract_admin,
+          paymeansname: "USDT",
+          saletype: saleType === "COMMON" ? 1 : saleType === "AUCTION" ? 2 : 0,
+          saletypestr: saleType,
+          salestatusstr: saleType,
+          salestatus: 1, // "on sale",
+          jsignature: {
+            signature: sign,
+            msg,
+          },
+          expirystr: 4119051884,
+          nettype: net,
+          seller: itemDetail.itembalances?.username,
+          typestr: saleType,
+          type: "kingkong",
         },
-        expirystr: 4119051884,
-        nettype: net,
-        seller: itemDetail?.username,
-        typestr: saleType,
-        type: "TICKET",
-      },
-    };
-    // if (
-    //   (price !== null && saleType === "COMMON") ||
-    //   ("AUCTION" && days === "14") ||
-    //   "20" ||
-    //   "30"
-    // ) {
+        ticket: {
+          username: itemDetail?.username,
+          contractaddress: addresses.contract_erc1155_ticket_sales_minter,
+          tokenid: itemDetail?.id,
+          price: bid,
+          // expiry: moment()
+          //   .add(+expiration, "days")
+          //   .unix(),
+          // expiry: moment().add(1659587638, "days").unix(),
+          expiry: 4119051884,
+          paymeansaddress: addresses.contract_USDT,
+          paymeansname: "USDT",
+          saletype: saleType === "COMMON" ? 1 : saleType === "AUCTION" ? 2 : 0,
+          saletypestr: saleType,
+          salestatusstr: saleType,
+          salestatus: 1, // "on sale",
+          jsignature: {
+            signature: sign,
+            msg,
+          },
+          expirystr: 4119051884,
+          nettype: net,
+          seller: itemDetail?.username,
+          typestr: saleType,
+          type: "ticket",
+        },
+      };
 
-    if (type === "kingkong") {
-      axios
-        .post(API.API_POST_SALE, options_data[itemDetail.itembalances?.group_])
-        .then((res) => {
-          console.log(res);
-          SetErrorBar("Item has been posted!");
-          // reload();
-        })
-        .catch((err) => console.log(err));
-      // } else {
-      //   SetErrorBar("Failed to provide all information.");
-      // }
-    }
-    if (type === "ticket") {
       axios
         .post(API.API_POST_SALE, options_data["ticket"])
         .then((res) => {
@@ -309,6 +300,23 @@ export default function Resell() {
       // } else {
       //   SetErrorBar("Failed to provide all information.");
       // }
+
+      //   if (type === "kingkong") {
+      //     await axios
+      //       .post(API.API_POST_SALE, options_data[itemDetail.itembalances?.group_])
+      //       .then((res) => {
+      //         console.log(res);
+      //         SetErrorBar("Item has been posted!");
+      //         // reload();
+      //       })
+      //       .catch((err) => console.log(err));
+      //     // } else {
+      //     //   SetErrorBar("Failed to provide all information.");
+      //     // }
+      //   }
+      //   if (type === "ticket") {
+
+      //   }
     }
   };
 
@@ -317,7 +325,6 @@ export default function Resell() {
     setTimeout(() => {
       queryItemDetail();
       getUserInfo();
-      queryApprovalForAll();
     }, 1200);
   }, []);
 
@@ -349,15 +356,7 @@ export default function Resell() {
                   <ul className="priceList">
                     <li>
                       <p className="key">platform fee</p>
-                      <p className="value">2.5%</p>
-                    </li>
-                    <li>
-                      <p className="key">royalty</p>
-                      <p className="value">5%</p>
-                    </li>
-                    <li className="total">
-                      <p className="key">total</p>
-                      <p className="value">7.5%</p>
+                      <p className="value">2.88%</p>
                     </li>
                   </ul>
                 </div>
@@ -391,7 +390,7 @@ export default function Resell() {
                 <p className="explain">Suggested: 0%, 10%, 20%. Maximum is 25%</p>
               </li>
 
-              <li className="startDateBox dateBox contBox">
+              {/* <li className="startDateBox dateBox contBox">
                 <p className="title">Starting Date</p>
                 <div className="posBox">
                   <div className="inputBox" onClick={() => setStartPopup(true)}>
@@ -411,9 +410,9 @@ export default function Resell() {
                     </>
                   )}
                 </div>
-              </li>
+              </li> */}
 
-              <li className="expirationDateBox dateBox contBox">
+              {/* <li className="expirationDateBox dateBox contBox">
                 <p className="title">Expiration Date</p>
                 <div className="posBox">
                   <div className="inputBox" onClick={() => setExpDatePopup(true)}>
@@ -435,7 +434,7 @@ export default function Resell() {
                 </div>
 
                 <p className="explain">When the expiration time is reached, the sale price is automatically lt ends.</p>
-              </li>
+              </li> */}
 
               <li className="instructionBox contBox">
                 <p className="title">Instruction</p>
@@ -505,8 +504,15 @@ export default function Resell() {
 
                 <div className="inputBox">
                   <input
+                    style={{ width: "100%" }}
                     value={bid}
                     onChange={(e) => setBid(e.target.value)}
+                    onBlur={(e) => {
+                      if (parseInt(bid) < 90) {
+                        setBid("");
+                        SetErrorBar("Ticket minumum bid 90 USDT");
+                      }
+                    }}
                     placeholder={type === "ticket" ? "Minimun bid 90 USDT" : "Enter Minimum bid"}
                   />
                   <strong className="unit">USDT</strong>
@@ -514,7 +520,7 @@ export default function Resell() {
 
                 <p className="explain">Suggested: 0%, 10%, 20%. Maximum is 25%</p>
               </li>
-              <li className="dateContainer contBox">
+              {/* <li className="dateContainer contBox">
                 <div className="startDateBox dateBox">
                   <p className="title">Starting Date</p>
                   <div className="posBox">
@@ -558,7 +564,7 @@ export default function Resell() {
                     )}
                   </div>
                 </div>
-              </li>
+              </li> */}
               <li className="instructionBox contBox">
                 <p className="title">Instruction</p>
 
@@ -627,13 +633,7 @@ export default function Resell() {
             </li>
 
             <li className="priceBox">
-              <p className="title">Fees</p>
-
-              <ul className="priceList">
-                <li>platform fee</li>
-                <li>royalty</li>
-                <li className="total">total</li>
-              </ul>
+              <p className="title">Fees : 2.88%</p>
             </li>
           </ul>
         </PresellBox>

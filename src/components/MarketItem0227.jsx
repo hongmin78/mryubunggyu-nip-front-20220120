@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import E_staking from "../img/common/E_staking.png";
 import moment from "moment";
+import marketLogo from "../img/icon/marketlogo.png";
 
 export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
   const navigate = useNavigate();
@@ -18,31 +19,24 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
     setLikeObj({ ...dataObj });
   }
 
-  function contentsReload(id) {
-    window.location.href = `/#/market/detail/${id}`;
-    window.location.reload();
-    window.scrollTo(0, 0);
-  }
+  console.log("data", data);
 
   if (isMobile)
     return (
       <Mitem
         className="item"
         onClick={() => {
-          contentsReload(data?.itemid);
+          navigate(`/market/detail/${data.uuid}`);
         }}
       >
         <div className="topBar">
           <div className="profBox">
-            <img src={data.url} alt="" />
+            <img src={marketLogo} alt="" />
             <p className="address">{strDot(data?.username, 5, 4)}</p>
           </div>
 
           {likeObj && (
-            <button
-              className="likeBtn"
-              onClick={(e) => onClickItemLike(e, index)}
-            >
+            <button className="likeBtn" onClick={(e) => onClickItemLike(e, index)}>
               <img src={likeObj[index] ? I_heartO : I_heart} alt="" />
               <p
                 className="count"
@@ -56,7 +50,11 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
           )}
         </div>
 
-        <img className="itemImg" src={data?.url} alt="" />
+        {data.item?.url ? (
+          <img className="itemImg" src={data.item?.url} alt="" />
+        ) : (
+          <img className="itemImg" src={E_staking} alt="" />
+        )}
 
         <div className="infoBox">
           <p className="title">{data?.titlename}</p>
@@ -82,20 +80,17 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
       <Pitem
         className="item"
         onClick={() => {
-          contentsReload(data?.itemid);
+          navigate(`/market/detail/${data.uuid}`);
         }}
       >
         <div className="topBar">
           <div className="profBox">
-            <img src={data.url} alt="" />
+            <img src={marketLogo} alt="" />
             <p className="address">{strDot(data?.username, 5, 4)}</p>
           </div>
 
           {likeObj && (
-            <button
-              className="likeBtn"
-              onClick={(e) => onClickItemLike(e, index)}
-            >
+            <button className="likeBtn" onClick={(e) => onClickItemLike(e, index)}>
               <img src={likeObj[index] ? I_heartO : I_heart} alt="" />
               <p
                 className="count"

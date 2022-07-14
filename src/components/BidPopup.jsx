@@ -7,13 +7,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import {
-  LOGGER,
-  getmyaddress,
-  onclickcopy,
-  PARSER,
-  conv_jdata_arrkeyvalue,
-} from "../util/common";
+import { LOGGER, getmyaddress, onclickcopy, PARSER, conv_jdata_arrkeyvalue } from "../util/common";
 import { API } from "../configs/api";
 import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
@@ -60,14 +54,22 @@ export default function BidPopup({ off, itemdata }) {
       },
     };
 
-    console.log("$itemdata", itemdata);
-
-    query_with_arg(options_arg[itemdata.group_]).then((resp) => {
-      console.log("$allowance_usdt: ", resp);
-      setAllowance(getethrep("" + resp));
-      SetErrorBar(`Allowance: ${getethrep("" + resp)}`);
-      setSpinner(false);
-    });
+    if (itemdata?.type === "kingkong") {
+      query_with_arg(options_arg["kingkong"]).then((resp) => {
+        console.log("$allowance_usdt: ", resp);
+        setAllowance(getethrep("" + resp));
+        SetErrorBar(`Allowance: ${getethrep("" + resp)}`);
+        setSpinner(false);
+      });
+    }
+    if (itemdata?.type === "ticket") {
+      query_with_arg(options_arg["ticket"]).then((resp) => {
+        console.log("$allowance_usdt: ", resp);
+        setAllowance(getethrep("" + resp));
+        SetErrorBar(`Allowance: ${getethrep("" + resp)}`);
+        setSpinner(false);
+      });
+    }
   };
 
   const approve = async () => {
@@ -94,42 +96,63 @@ export default function BidPopup({ off, itemdata }) {
           contractaddress: addresses.contract_USDT,
           abikind: "ERC20",
           methodname: "approve",
-          aargs: [
-            addresses.contract_erc1155_ticket_sales,
-            getweirep("" + 10000_0000),
-          ],
+          aargs: [addresses.contract_erc1155_ticket_sales, getweirep("" + 10000_0000)],
         },
       },
     };
+    if (itemdata?.type === "ticket") {
+      let abistr = getabistr_forfunction(options_arg["ticket"].abistr);
 
-    let abistr = getabistr_forfunction(
-      options_arg[itemdata.itembalances?.group_].abistr
-    );
+      requesttransaction({
+        from: myaddress,
+        to: addresses.contract_USDT,
+        data: abistr,
+        value: "0x00",
+      }).then((resp) => {
+        console.log("respppp", resp);
+        if (resp) {
+        } else {
+          SetErrorBar(messages.MSG_USER_DENIED_TX);
+          return;
+        }
 
-    requesttransaction({
-      from: myaddress,
-      to: addresses.contract_USDT,
-      data: abistr,
-      value: "0x00",
-    }).then((resp) => {
-      if (resp) {
-      } else {
-        SetErrorBar(messages.MSG_USER_DENIED_TX);
-        return;
-      }
+        let txhash = resp;
 
-      let txhash = resp;
-
-      awaitTransactionMined
-        .awaitTx(web3, txhash, TX_POLL_OPTIONS)
-        .then(async (minedtxreceipt) => {
+        awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
           console.log(minedtxreceipt);
           SetErrorBar(messages.MSG_TX_FINALIZED);
           queryAllowance();
           setSpinner(false);
         });
-      console.log("txhash", txhash);
-    });
+        console.log("txhash_ticket", txhash);
+      });
+    }
+    if (itemdata?.type === "kingkong") {
+      let abistr = getabistr_forfunction(options_arg["kingkong"].abistr);
+
+      requesttransaction({
+        from: myaddress,
+        to: addresses.contract_USDT,
+        data: abistr,
+        value: "0x00",
+      }).then((resp) => {
+        if (resp) {
+        } else {
+          SetErrorBar(messages.MSG_USER_DENIED_TX);
+          return;
+        }
+
+        let txhash = resp;
+
+        awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
+          console.log(minedtxreceipt);
+          SetErrorBar(messages.MSG_TX_FINALIZED);
+          queryAllowance();
+          setSpinner(false);
+        });
+        console.log("txhash_kingkong", txhash);
+      });
+    }
   };
 
   const onClickBuy = async () => {
@@ -197,22 +220,23 @@ export default function BidPopup({ off, itemdata }) {
       ticket: {
         operator_contract: addresses.contract_erc1155_ticket_sales,
         typestr: "BUY_NFT_ITEM",
-        amount: itemdata.itembalances?.buyprice,
+        amount: itemdata?.price,
         auxdata: {
           user_action: "BUY_NFT_ITEM",
           contract_type: "contract_erc1155_ticket_sales", // .ETH_TESTNET
-          contractaddress: addresses.item_order_details?.contractaddress, // .ETH_TESTNET
+          contractaddress: addresses.itemData?.contractaddress, // .ETH_TESTNET
           my_address: myaddress,
           authorRoyalty: "250",
-          itemid: itemdata.itembalances?.itemid,
-          tokenid: itemdata.itembalances?.id,
+          tokenid: itemdata?.tokenid,
           author: "",
-          paymeansaddress: itemdata.item_order_details?.paymeansaddress,
-          amount: itemdata.itembalances?.buyprice,
-          uuid: itemdata.item_order_details?.uuid,
-          paymeansname: itemdata.item_order_details?.paymeans,
-          nettype: itemdata.item_order_details.nettype,
+          paymeansaddress: itemdata?.paymeansaddress,
+          amount: itemdata?.price,
+          uuid: itemdata?.uuid,
+          paymeansname: itemdata?.paymeans,
+          nettype: net,
         },
+        buyer: myaddress,
+        seller: myaddress,
         abistr: {
           contractaddress: addresses.contract_erc1155_ticket_sales,
           abikind: "TICKETNFT",
@@ -233,49 +257,95 @@ export default function BidPopup({ off, itemdata }) {
         },
       },
     };
-
-    let abistr = await getabistr_forfunction(
-      options_abistr[itemdata?.itembalances.group_].abistr
-    );
-    console.log("", abistr);
-    requesttransaction({
-      from: myaddress,
-      to: options_abistr[itemdata?.itembalances.group_].operator_contract,
-      data: abistr,
-      value: "0x00",
-    }).then((resp) => {
-      console.log("asdofijdf", resp);
-      if (resp) {
-      } else {
-        console.log("USER DENIED TX");
-        SetErrorBar(messages.MSG_USER_DENIED_TX);
-        setSpinner(false);
-        off();
-        return;
-      }
-      SetErrorBar(messages.MSG_DONE_SENDING_TX_REQ);
-      setSpinner(false);
-      let txhash = resp;
-
-      console.log("txhash", txhash);
-      axios
-        .post(API.API_TXS + `/${txhash}`, {
-          txhash,
-          username: myaddress,
-          typestr: options_abistr[itemdata?.itembalances.group_].typestr,
-          amount: options_abistr[itemdata?.itembalances.group_].amount,
-          auxdata: options_abistr[itemdata?.itembalances.group_].auxdata,
-        })
-        .then((res) => {
-          LOGGER("BUY_NFT_ITEM", resp);
+    if (itemdata?.type === "kingking") {
+      let abistr = await getabistr_forfunction(options_abistr["kingkong"].abistr);
+      console.log("", abistr);
+      requesttransaction({
+        from: myaddress,
+        to: options_abistr["kingkong"].operator_contract,
+        data: abistr,
+        value: "0x00",
+      }).then((resp) => {
+        console.log("asdofijdf", resp);
+        if (resp) {
+        } else {
+          console.log("USER DENIED TX");
+          SetErrorBar(messages.MSG_USER_DENIED_TX);
+          setSpinner(false);
           off();
-        })
-        .catch((err) => console.log(err));
-    });
+          return;
+        }
+        SetErrorBar(messages.MSG_DONE_SENDING_TX_REQ);
+        setSpinner(false);
+        let txhash = resp;
+
+        console.log("txhash", txhash);
+        axios
+          .post(API.API_TXS + `/${txhash}`, {
+            txhash,
+            username: myaddress,
+            typestr: options_abistr["kingkong"].typestr,
+            amount: options_abistr["kingkong"].amount,
+            auxdata: options_abistr["kingkong"].auxdata,
+          })
+          .then((res) => {
+            LOGGER("BUY_NFT_ITEM", resp);
+            off();
+          })
+          .catch((err) => console.log(err));
+      });
+    }
+    if (itemdata?.type === "ticket") {
+      let abistr = await getabistr_forfunction(options_abistr["ticket"].abistr);
+      console.log("", abistr);
+      requesttransaction({
+        from: myaddress,
+        to: options_abistr["ticket"].operator_contract,
+        data: abistr,
+        value: "0x00",
+      }).then((resp) => {
+        console.log("asdofijdf", resp);
+        if (resp) {
+        } else {
+          console.log("USER DENIED TX");
+          SetErrorBar(messages.MSG_USER_DENIED_TX);
+          setSpinner(false);
+          off();
+          return;
+        }
+        SetErrorBar(messages.MSG_DONE_SENDING_TX_REQ);
+        setSpinner(false);
+        let txhash = resp;
+
+        console.log("txhash", txhash);
+        axios
+          .post(API.API_TXS + `/${txhash}`, {
+            txhash,
+            username: myaddress,
+            typestr: options_abistr["ticket"].typestr,
+            amount: options_abistr["ticket"].amount,
+            auxdata: options_abistr["ticket"].auxdata,
+          })
+          .then((res) => {
+            axios
+              .put(API.API_TXS + `/${txhash}`, {
+                txhash,
+                username: myaddress,
+                typestr: options_abistr["ticket"].typestr,
+                amount: options_abistr["ticket"].amount,
+                auxdata: options_abistr["ticket"].auxdata,
+              })
+              .then((res) => {
+                LOGGER("BUY_NFT_ITEM", resp);
+                off();
+              });
+          })
+          .catch((err) => console.log(err));
+      });
+    }
   };
 
   useEffect(() => {
-    console.log("$itemdata", itemdata);
     setSpinner(true);
     setTimeout(() => {
       queryAllowance();
@@ -303,9 +373,10 @@ export default function BidPopup({ off, itemdata }) {
             <div className="inputBox">
               <input
                 type="number"
-                value={price}
+                value={itemdata?.price}
                 onChange={(e) => setPrice(e.target.value)}
                 placeholder="0"
+                readOnly
               />
               <span className="unit">USDT</span>
             </div>
@@ -313,23 +384,20 @@ export default function BidPopup({ off, itemdata }) {
             <ul className="priceList">
               <li>
                 <p className="key">Your bidding balance</p>
-                <p className="value">0 USDT</p>
+                <p className="value">{itemdata?.price} USDT</p>
               </li>
-              <li>
-                <p className="key">Fee</p>
-                <p className="value">0 USDT</p>
-              </li>
+
               <li>
                 <p className="key">Total</p>
-                <p className="value">0 USDT</p>
+                <p className="value">{itemdata?.price} USDT</p>
               </li>
             </ul>
           </div>
 
           <div className="confrimBox">
             <p className="explain">
-              Placing this bid will start a 24 hour auction for the artwork.
-              Once a bid is placed, it cannot be withdrawn.
+              Placing this bid will start a 24 hour auction for the artwork. Once a bid is placed, it cannot be
+              withdrawn.
             </p>
             <button className="confirmBtn" onClick={() => navigate(-1)}>
               Bid amount is required
@@ -351,11 +419,7 @@ export default function BidPopup({ off, itemdata }) {
 
         <article className="contBox">
           <div className="itemBox">
-            {itemdata?.url ? (
-              <img src={itemdata?.url} alt="" />
-            ) : (
-              <img src={E_staking} alt="" />
-            )}
+            {itemdata?.url ? <img src={itemdata?.url} alt="" /> : <img src={E_staking} alt="" />}
             <p>You are about to purchase a King Kong {itemdata?.titlename}</p>
           </div>
 
@@ -363,9 +427,10 @@ export default function BidPopup({ off, itemdata }) {
             <div className="inputBox">
               <input
                 type="number"
-                value={price}
+                value={itemdata?.price}
                 onChange={(e) => setPrice(e.target.value)}
                 placeholder="0"
+                readOnly
               />
               <span className="unit">USDT</span>
             </div>
@@ -373,15 +438,12 @@ export default function BidPopup({ off, itemdata }) {
             <ul className="priceList">
               <li>
                 <p className="key">Your bidding balance</p>
-                <p className="value">0 USDT</p>
+                <p className="value">{itemdata?.price} USDT</p>
               </li>
-              <li>
-                <p className="key">Fee</p>
-                <p className="value">0 USDT</p>
-              </li>
+
               <li>
                 <p className="key">Total</p>
-                <p className="value">0 USDT</p>
+                <p className="value">{itemdata?.price} USDT</p>
               </li>
             </ul>
           </div>
@@ -390,19 +452,11 @@ export default function BidPopup({ off, itemdata }) {
             <div>
               <div className="confrimBox">
                 {allowance > 0 ? (
-                  <button
-                    disabled={spinner}
-                    className="confirmBtn"
-                    onClick={() => onClickBuy()}
-                  >
+                  <button disabled={spinner} className="confirmBtn" onClick={() => onClickBuy()}>
                     {spinner ? <div id="loading"></div> : "Buy"}
                   </button>
                 ) : (
-                  <button
-                    disabled={spinner}
-                    className="confirmBtn"
-                    onClick={() => approve()}
-                  >
+                  <button disabled={spinner} className="confirmBtn" onClick={() => approve()}>
                     {spinner ? <div id="loading"></div> : "Approve"}
                   </button>
                 )}
@@ -411,8 +465,8 @@ export default function BidPopup({ off, itemdata }) {
           ) : (
             <div className="confrimBox">
               <p className="explain">
-                Placing this bid will start a 24 hour auction for the artwork.
-                Once a bid is placed, it cannot be withdrawn.
+                Placing this bid will start a 24 hour auction for the artwork. Once a bid is placed, it cannot be
+                withdrawn.
               </p>
               <button className="confirmBtn" onClick={() => off()}>
                 Bid amount is required
