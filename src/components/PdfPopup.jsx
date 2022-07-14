@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import adasdasd from "../doc/nftinfinty_guide/nip_wp01.png";
 
 export default function PdfPopup({ type }) {
   console.log("type", type);
@@ -6,14 +7,10 @@ export default function PdfPopup({ type }) {
     <>
       {type === "introduction" && (
         <PdfPopupBox>
-          {new Array(19).fill("*").forEach((el, i) => {
+          {new Array(19).fill("*").map((el, i) => {
             return (
               <img
-                src={
-                  require(`../doc/nip_wp${
-                    i + 1 < 10 ? "0" + i + 1 : i + 1
-                  }.png`).default
-                }
+                src={require(`../doc/nftinfinty_guide/nip_wp${i + 1 < 10 ? "0" + (i + 1) : i + 1}.png`).default}
                 alt=""
                 key={i}
               />
@@ -26,11 +23,7 @@ export default function PdfPopup({ type }) {
           {new Array(17).fill("*").map((el, i) => {
             return (
               <img
-                src={
-                  require(`../doc/nftinfinity_manual/nip_wp${
-                    i + 1 < 10 ? "0" + (i + 1) : i + 1
-                  }.png`).default
-                }
+                src={require(`../doc/nftinfinity_manual/nip_wp${i + 1 < 10 ? "0" + (i + 1) : i + 1}.png`).default}
                 alt=""
                 key={i}
               />
