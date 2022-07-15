@@ -29,6 +29,7 @@ export default function BidPopup({ off, itemdata }) {
   const [saleStatus] = useState(1);
   const [allowance, setAllowance] = useState(0);
   let [spinner, setSpinner] = useState(false);
+  let [mybalance, setmybalance] = useState();
 
   const queryAllowance = () => {
     let myaddress = getmyaddress();
@@ -165,17 +166,14 @@ export default function BidPopup({ off, itemdata }) {
     }
     setSpinner(true);
     console.log(
-      "$abistr_forfunction",
-      addresses.contract_erc1155, // target contractaddress
-      itemdata.itembalances?.itemid, // itemid
-      "1", // amounttomint
-      "0", // decimals
-      "250", // authorroyalty
-      itemdata.itembalances?.username, // authoraddress
-      "1", // amounttobuy
-      getweirep("" + itemdata.itembalances?.buyprice), // amounttopay
-      itemdata.itembalances?.paymeansaddress, // paymeansaddress
-      itemdata.itembalances?.username // sellersaddress
+      "$buyInfo",
+      addresses.contract_erc1155_ticket_sales, // target contractaddress
+      getweirep("" + itemdata?.price), // amounttopay
+      myaddress,
+      addresses.contract_erc1155_ticket_sales_minter, // target contractaddress
+      itemdata.tokenid,
+      itemdata.tokenid,
+      itemdata?.seller // sellersaddress
     );
 
     const options_abistr = {
@@ -211,7 +209,7 @@ export default function BidPopup({ off, itemdata }) {
             "250", // authorroyalty
             itemdata.itembalances?.username, // authoraddress
             "1", // amounttobuy
-            getweirep("" + itemdata.itembalances?.buyprice), // amounttopay
+            // getweirep("" + itemdata.itembalances?.buyprice), // amounttopay
             itemdata.itembalances?.paymeansaddress, // paymeansaddress
             itemdata.itembalances?.username, // sellersaddress
           ],
@@ -220,10 +218,17 @@ export default function BidPopup({ off, itemdata }) {
       ticket: {
         operator_contract: addresses.contract_erc1155_ticket_sales,
         typestr: "BUY_NFT_ITEM",
-        amount: itemdata?.price,
+        amount: 1,
+        uuid: itemdata?.uuid,
+        username: myaddress,
+        buyer: myaddress,
+        seller: myaddress,
+        saletype: 0,
+        price: itemdata?.price,
+        type: itemdata?.type,
         auxdata: {
           user_action: "BUY_NFT_ITEM",
-          contract_type: "contract_erc1155_ticket_sales", // .ETH_TESTNET
+          contract_type: "ERC1155TicketSale", // .ETH_TESTNET
           contractaddress: addresses.itemData?.contractaddress, // .ETH_TESTNET
           my_address: myaddress,
           authorRoyalty: "250",
@@ -235,28 +240,43 @@ export default function BidPopup({ off, itemdata }) {
           paymeansname: itemdata?.paymeans,
           nettype: net,
         },
-        buyer: myaddress,
-        seller: myaddress,
+
         abistr: {
-          contractaddress: addresses.contract_erc1155_ticket_sales,
-          abikind: "TICKETNFT",
-          methodname: "stake_featuring_transferfrom",
+          // contractaddress: addresses.contract_erc1155_ticket_sales,
+          contractaddress: addresses.contract_erc1155_sales,
+          abikind: "ERC1155Sale",
+          methodname: "mint_and_match_single_simple_legacy",
           // eslint-disable-next-line no-sparse-arrays
           aargs: [
-            // addresses.contract_erc1155, // target contractaddress
-            // itemdata.itembalances?.itemid, // itemid
-            // "1", // amounttomint
-            // "0", // decimals
-            // "250", // authorroyalty
-            // itemdata.itembalances?.username, // authoraddress
-            // "1", // amounttobuy
-            // getweirep("" + itemdata.itembalances?.buyprice), // amounttopay
-            // itemdata.itembalances?.paymeansaddress, // paymeansaddress
-            // itemdata.itembalances?.username, // sellersaddress
+            // addresses.contract_erc1155_ticket_sales_minter, // target contractaddress
+            addresses.contract_erc1155, // target contractaddress
+            "qwertyyyyy",
+            "1", // amounttomint
+            "0", // decimals
+            "250", // authorroyalty
+            "0x25a905c956d9f56fdd55b9f4f1c160d632fa5ec3",
+            "1",
+            getweirep("" + 10),
+            addresses.contract_USDT, // sellersaddress
+            "0x25a905c956d9f56fdd55b9f4f1c160d632fa5ec3", // target contractaddress
           ],
         },
       },
     };
+    console.log(
+      "aargs",
+      // addresses.contract_erc1155_ticket_sales_minter, // target contractaddress
+      addresses.contract_erc1155, // target contractaddress
+      "qwertyyyyy",
+      "1", // amounttomint
+      "0", // decimals
+      "250", // authorroyalty
+      "0x25a905c956d9f56fdd55b9f4f1c160d632fa5ec3",
+      "1",
+      getweirep("" + 10),
+      addresses.contract_USDT, // sellersaddress
+      "0x25a905c956d9f56fdd55b9f4f1c160d632fa5ec3" // target contractaddress
+    );
     if (itemdata?.type === "kingking") {
       let abistr = await getabistr_forfunction(options_abistr["kingkong"].abistr);
       console.log("", abistr);
@@ -266,7 +286,7 @@ export default function BidPopup({ off, itemdata }) {
         data: abistr,
         value: "0x00",
       }).then((resp) => {
-        console.log("asdofijdf", resp);
+        console.log("TXHASH------", resp);
         if (resp) {
         } else {
           console.log("USER DENIED TX");
@@ -345,10 +365,37 @@ export default function BidPopup({ off, itemdata }) {
     }
   };
 
+  const fetchdata = (_) => {
+    // let myaddress = "0xb440393a03078b967000f09577e32c3252f15832";
+    let myaddress = getmyaddress();
+    if (myaddress) {
+    } else {
+      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+      return;
+    }
+    LOGGER("MXZfykw8Mw", myaddress);
+
+    if (myaddress) {
+      query_with_arg({
+        contractaddress: addresses.contract_USDT, // ETH_TESTNET.
+        abikind: "ERC20",
+        methodname: "balanceOf",
+        aargs: [myaddress],
+      }).then((resp) => {
+        LOGGER("Ce4mDMhjbS", resp);
+        setmybalance(getethrep(resp));
+      });
+    } else {
+      return;
+    }
+    console.log("asdoiajsod", addresses.contract_USDT, [myaddress]); // ETH_TESTNET.
+  };
+
   useEffect(() => {
     setSpinner(true);
     setTimeout(() => {
       queryAllowance();
+      fetchdata();
     }, 1200);
   }, []);
 
@@ -382,6 +429,10 @@ export default function BidPopup({ off, itemdata }) {
             </div>
 
             <ul className="priceList">
+              <li>
+                <p className="key">Your USDT</p>
+                <p className="value">{mybalance} USDT</p>
+              </li>
               <li>
                 <p className="key">Your bidding balance</p>
                 <p className="value">{itemdata?.price} USDT</p>
@@ -436,6 +487,10 @@ export default function BidPopup({ off, itemdata }) {
             </div>
 
             <ul className="priceList">
+              <li>
+                <p className="key">Your USDT</p>
+                <p className="value">{mybalance} USDT</p>
+              </li>
               <li>
                 <p className="key">Your bidding balance</p>
                 <p className="value">{itemdata?.price} USDT</p>

@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 // XXX import "./Interfaces/IERC1155.sol";
 // XXX import "./Interfaces/IERC1155Receiver.sol";
 // XXX import "./extensions/IERC1155MetadataURI.sol";
+
 // XXX import "../../utils/Address.sol";
 // XXX import "../../utils/Context.sol";
 // XXX import "../../utils/introspection/ERC165.sol";
@@ -727,4 +728,8 @@ interface IERC1155Receiver is IERC165 {
 		_acting_contracts[_address] = _status ;
 	}
 
+  
+
 }
+
+

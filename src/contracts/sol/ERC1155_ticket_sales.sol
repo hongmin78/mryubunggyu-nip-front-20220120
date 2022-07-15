@@ -1,5 +1,6 @@
 // pragma solidity ^0.8.0;
 pragma solidity>=0.8.0;
+import "hardhat/console.sol";
 // import "./ERC1155.sol"; 
 // import "./presets/ERC1155PresetMinterPauser.sol" ;
 // import "./IERC1155.sol" ;
@@ -216,7 +217,7 @@ contract ERC1155Sales is  // Mint 	, Sale 	,
 		 string _itemid ; //1 //		, uint256 _tokenid // 2 ignored for now
 		 uint256 _amounttomint ;// 2 
 		 uint256 _decimals ;// 3
-     uint256 _author_royalty; // 4 //        , uint256 _decimals // 5  //		, address _paymeans // 6
+         uint256 _author_royalty; // 4 //        , uint256 _decimals // 5  //		, address _paymeans // 6
 		 address _author ;// 5
 	}
 	struct Sale_info {
@@ -237,11 +238,12 @@ contract ERC1155Sales is  // Mint 	, Sale 	,
 		_is_function_mint_and_match_single_simple_legacy = _status ;
 	}
 	function mint_and_match_single_simple_legacy (
+
 		address _target_erc1155_contract // 0
 		, string memory _itemid //1 //		, uint256 _tokenid // 2 ignored for now
 		, uint256 _amounttomint // 2 
 		, uint256 _decimals // 3
-    , uint256 _author_royalty // 4 //        , uint256 _decimals // 5  //		, address _paymeans // 6
+        , uint256 _author_royalty // 4 //        , uint256 _decimals // 5  //		, address _paymeans // 6
 		, address _author // 5
 		, uint256 _amounttobuy // 6
 		, uint256 _amounttopay // 7 //		, uint256 _pr ice // 7
@@ -250,7 +252,10 @@ contract ERC1155Sales is  // Mint 	, Sale 	,
 //		, address _to // 9
 //		, address _referer // 10
 	) public payable {
+
+  console.log("sadjifoajsdf");
 //		require( _t o != address(0) , "ERR() invalid beneficiary" );
+         console.log("1");
 		require ( _is_function_mint_and_match_single_simple_legacy , "ERR() function not accessible");
 		require( _seller != address(0) , "ERR() invalid seller" );
 		uint256 tokenid ; // 10
@@ -263,24 +268,13 @@ contract ERC1155Sales is  // Mint 	, Sale 	,
 			, _decimals // 0 // _decimals
 			, "0x00"
 			) ;
+            console.log("2");
 		} else {
+            console.log("3");
 		}
 		/******* settlement */ //		
 		uint256 remaining_amount;  // order_buy.asset_amount_bid[0] ;
-		if ( _paymeansaddress == address(0) ) {
-			require( msg.value >= _amounttopay , "ERR() declared value inconsistent") ;
- 			remaining_amount = _amounttopay ; // msg.value ;
-		}
-		else {
-			if( IERC20( _paymeansaddress ).transferFrom ( msg.sender , address( this ), _amounttopay )){}
-			else { revert("ERR() price not met"); }
-			remaining_amount = _amounttopay ;
-		}
-//			uint256 msg.value = msg.value; // order_buy.asset_amount_bid [ 0 ] ; // msg.value ;
-	//		if( remaining_amount >= order_sell.asset_amount_ask [ 0]  ){} // asset_price[ 1 ]
-		//	else { revert( "ERR() price not met" ); return; }
-			/****  admin */
-		uint256 admin_fee_rate = 288 ;
+        uint256 admin_fee_rate = 288 ;
 //			if(_admin_fee_rate > 0 ){	admin_fee_rate = _admin_fee_rate ; }
 //			else {}   
 
@@ -290,31 +284,44 @@ contract ERC1155Sales is  // Mint 	, Sale 	,
 				makepayment ( _paymeansaddress 
 					, admin_fee_amount
 					, vault ) ;
-/**				emit DepositToVault(
-					address(this)
-					, admin_fee_amount
-					, uint256(SEND_TYPES.ADMIN_FEE_SPOT) 
-					, vault
-				); */
+          console.log("6");
 				remaining_amount -= admin_fee_amount ;
 			} else {}
+		if ( _paymeansaddress == address(0) ) {
+                      console.log("4");
+			require( msg.value >= _amounttopay , "ERR() declared value inconsistent") ;
+ 			remaining_amount = _amounttopay ; // msg.value ;
+		}
+		else {
+			if( IERC20( _paymeansaddress ).transferFrom ( msg.sender , address( this ), remaining_amount )){}
+			else { revert("ERR() price not met"); }
+			remaining_amount = _amounttopay ;
+                      console.log("5");
+		}
+//			uint256 msg.value = msg.value; // order_buy.asset_amount_bid [ 0 ] ; // msg.value ;
+	//		if( remaining_amount >= order_sell.asset_amount_ask [ 0]  ){} // asset_price[ 1 ]
+		//	else { revert( "ERR() price not met" ); return; }
+			/****  admin */
+		
 			/**** referer */
 //			uint referer_feerate = 100 ; // _referer_feerate ;
 
 			/***** royalty */
 //				uint256 tokenid = _tokenid ;// IERC1155 (  ). ; // order_sell.asset_id_bid [ 0 ] ;
-			uint author_royalty_rate = IERC1155 ( _target_erc1155_contract )._author_royalty ( tokenid ) ;
-				if ( author_royalty_rate > 0 ) {
+			// uint author_royalty_rate = IERC1155 ( _target_erc1155_contract )._author_royalty ( tokenid ) ;
+				// if ( author_royalty_rate > 0 ) {
+                        
 //					address author = IERC1155 ( _target_erc1155_contract )._author ( tokenid ) ;
-					_author = IERC1155 ( _target_erc1155_contract )._author ( tokenid ) ;
-					if (_author == address(0)){}
-					else {
-						uint256 author_royalty_amount = _amounttopay * author_royalty_rate / 10000 ;
+					// _author = IERC1155 ( _target_erc1155_contract )._author ( tokenid ) ;
+					// if (_author == address(0)){}
+					// else {
+					// 	uint256 author_royalty_amount = _amounttopay * author_royalty_rate / 10000 ;
 //						uint pay_author_when = IAdmin_nft( _admincontract)._PAY_AUTHOR_IMMEDIATE_OR_PERIODIC() ;
-						makepayment ( _paymeansaddress
-							, author_royalty_amount
-							, _author
-						)  ;
+						// makepayment ( _paymeansaddress
+						// 	, author_royalty_amount
+						// 	, _author
+						// )  ;
+                        //           console.log("8");
 							// payable( _author ).call { value : author_royalty_amount } ( "" ) ;
 /** 						emit PaidFee (
 							address(this)
@@ -332,10 +339,10 @@ contract ERC1155Sales is  // Mint 	, Sale 	,
 								, vault_contract
 							) ;
 						} */
-						remaining_amount -= author_royalty_amount ;
-					}
-				}
-				else {}			
+				// 		remaining_amount -= author_royalty_amount ;
+				// 	}
+				// }
+				// else {}			
 			/***** remaining of sales proceeds */
 //			payable ( _seller ).call { value : remaining_amount } ("") ;
 			makepayment ( _paymeansaddress 
@@ -368,56 +375,5 @@ contract ERC1155Sales is  // Mint 	, Sale 	,
 			) ;
 		} else {}
 	}
-/*	function mint_and_take_ownership (
-		Mint memory _mintinfo
-		, Sale memory _saleinfo
-		, string memory signaturemint
-		, string memory signaturesale
-//		, Bid memory _bidinfo
-	) public payable {
-		address minter = _mintinfo._minter ; // IERC1155 ()
-		address target_contract = _mintinfo._target_contract;
-		address seller =  _saleinfo._seller ;
-		address buyer = msg.sender ;
-		uint256 tokenid ; // = IERC1155( target_contract ).get_next_tokenid_counter();
-		if ( IERC1155( target_contract )._map_itemid_tokenid ( _mintinfo._itemid ) == 0 ){ // how can we tell if item has been minted or not
-			tokenid = IERC1155( target_contract ).get_next_tokenid_counter();
-			IERC1155( target_contract ).mint (
-					minter
-				, tokenid // get_current_tokenid_counter ( )
-				, _mintinfo._amount
-				, "0x00" // , IERC1155 (_mintinfo._targ et_contract).increment_tokencount_assign ()
-			) ; // fun ction mint(address to, uint256 id, uint256 amount, bytes memory data) public virtual {
-		}
-		uint256 price = _saleinfo._price ;
-		address payment_token = _saleinfo._payment_token ;
-		
-		if ( payment_token == address(0) ) {
-			if ( msg.value >= price ){}
-			else { revert("ERR() price not met-eth"); }
-		} else {
-			if ( IERC20( payment_token ).transferFrom ( buyer , address(this) , price ) ){}
-			else { revert("ERR() price not met-erc20") ;}
-		}
-		IERC1155( target_contract ).safeTransferFrom ( seller 
-			, address( this )
-			, tokenid
-			, _saleinfo._amount
-            , "0x00"
-		);
-		
-		IERC1155( target_contract ).safeTransferFrom( address( this)
-			, buyer
-			, tokenid
-			, _saleinfo._amount
-    , "0x00"
 
-		) ;
-		if ( payment_token == address(0) ) {
-			payable( seller ).call { value : price } ( "" );
-		}
-		else {
-			IERC20( payment_token ).transfer( seller , price ) ;
-		}
-	} */
 }

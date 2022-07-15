@@ -41,7 +41,7 @@ export default function MyItems() {
   const [isstaked, setisstaked] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [receivables, setReceivables] = useState();
-
+  const [tokenId, setTokenId] = useState();
   let [itemData, setItemData] = useState([]);
   let [itemBalData, setItemBalData] = useState([]);
 
@@ -115,6 +115,7 @@ export default function MyItems() {
             aargs: [myitemhash],
           });
           LOGGER("GEVKU97nIv", mytokenid);
+          setTokenId(mytokenid);
         } catch (err) {
           LOGGER(err);
           mytokenid = null;
@@ -546,7 +547,7 @@ export default function MyItems() {
             {ticketInfo && (
               <div className="infoBox">
                 <div className="titleBox">
-                  <strong className="title">Lucky Ticket #{ticketInfo.id}</strong>
+                  <strong className="title">Lucky Ticket #{tokenId}</strong>
                 </div>
 
                 <div className="ownedBox">
@@ -602,14 +603,15 @@ export default function MyItems() {
 
                 <button
                   className="actionBtn"
-                  disabled={
-                    moment(ticketInfo.createdat).add(90, "days").format("YYYY-MM-DD") === tickTimer ? false : true
-                  }
-                  onClick={() => navigate(`/resell/${ticketInfo.username}/ticket`, { state: ticketInfo })}
+                  // disabled={
+                  //   moment(ticketInfo.createdat).add(90, "days").format("YYYY-MM-DD") === tickTimer ? false : true
+                  // }
+                  onClick={() => navigate(`/resell/${ticketInfo.username}/ticket/${tokenId}`, { state: ticketInfo })}
                 >
-                  {moment(ticketInfo.createdat).add(90, "days").format("YYYY-MM-DD") === tickTimer
+                  {/* {moment(ticketInfo.createdat).add(90, "days").format("YYYY-MM-DD") === tickTimer
                     ? "Sell"
-                    : "Purchased"}
+                    : "Purchased"} */}
+                  SELL
                 </button>
 
                 <p className="description">

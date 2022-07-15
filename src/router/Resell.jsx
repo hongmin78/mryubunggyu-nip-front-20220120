@@ -44,6 +44,7 @@ export default function Resell() {
   let [itemDetail, setItemDetail] = useState();
   const { id } = useParams();
   const { type } = useParams();
+  const { tokenId } = useParams();
   const [saleType, setSaleType] = useState("COMMON");
   const [isApprovedForAll, setApprovalForAll] = useState(false);
   let [spinner, setSpinner] = useState(false);
@@ -170,18 +171,16 @@ export default function Resell() {
         awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
           console.log(minedtxreceipt);
           SetErrorBar(messages.MSG_TX_FINALIZED);
-          queryApprovalForAll();
           setSpinner(false);
         });
       });
     }
     if (type === "ticket") {
-      console.log("120391203192u0319u2309");
       let abistr = getabistr_forfunction({
         contractaddress: addresses.contract_erc1155_ticket_sales_minter,
         abikind: "ERC1155_TICKET_MINTER",
-        methodname: "isApprovedForAll",
-        aargs: [myaddress, addresses.contract_erc1155_ticket_sales],
+        methodname: "setApprovalForAll",
+        aargs: [addresses.contract_erc1155_ticket_sales, true],
       });
       requesttransaction({
         from: myaddress,
@@ -199,7 +198,6 @@ export default function Resell() {
         awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
           console.log(minedtxreceipt);
           SetErrorBar(messages.MSG_TX_FINALIZED);
-          queryApprovalForAll();
           setSpinner(false);
         });
       });
@@ -227,7 +225,7 @@ export default function Resell() {
   const postSell = async () => {
     let respsign = await onClickSignRequest();
     console.log("res", respsign);
-
+    setSpinner(true);
     if (respsign) {
       let myaddress = getmyaddress();
       let msg = `Ticket id:${itemDetail.id}, ${getweirep(bid)},Contract address :${
@@ -264,7 +262,7 @@ export default function Resell() {
         ticket: {
           username: itemDetail?.username,
           contractaddress: addresses.contract_erc1155_ticket_sales_minter,
-          tokenid: itemDetail?.id,
+          tokenid: tokenId,
           price: bid,
           // expiry: moment()
           //   .add(+expiration, "days")
@@ -289,34 +287,42 @@ export default function Resell() {
         },
       };
 
-      axios
-        .post(API.API_POST_SALE, options_data["ticket"])
-        .then((res) => {
-          console.log(res);
-          SetErrorBar("Item has been posted!");
-          // reload();
-        })
-        .catch((err) => console.log(err));
-      // } else {
-      //   SetErrorBar("Failed to provide all information.");
       // }
 
-      //   if (type === "kingkong") {
-      //     await axios
-      //       .post(API.API_POST_SALE, options_data[itemDetail.itembalances?.group_])
-      //       .then((res) => {
-      //         console.log(res);
-      //         SetErrorBar("Item has been posted!");
-      //         // reload();
-      //       })
-      //       .catch((err) => console.log(err));
-      //     // } else {
-      //     //   SetErrorBar("Failed to provide all information.");
-      //     // }
-      //   }
-      //   if (type === "ticket") {
+      if (type === "kingkong") {
+        await axios
+          .post(API.API_POST_SALE, options_data[itemDetail.itembalances?.group_])
+          .then((res) => {
+            console.log(res);
+            SetErrorBar("Item has been posted!");
+            // reload();
+            if (res.data.status === "OK") {
+              SetErrorBar("Item has been posted!");
+              setSpinner(false);
+              navigate("/market");
+            }
+          })
+          .catch((err) => console.log(err));
+        // } else {
+        //   SetErrorBar("Failed to provide all information.");
+        // }
+      }
+      if (type === "ticket") {
+        axios
+          .post(API.API_POST_SALE, options_data["ticket"])
+          .then((res) => {
+            console.log(res);
 
-      //   }
+            if (res.data.status === "OK") {
+              SetErrorBar("Item has been posted!");
+              setSpinner(false);
+              navigate("/market");
+            }
+          })
+          .catch((err) => console.log(err));
+      }
+    } else {
+      SetErrorBar("Failed to provide all information.");
     }
   };
 
@@ -337,7 +343,7 @@ export default function Resell() {
 
           <article className="sellSec">
             <div className="topBar">
-              <p className="title"> {type === "ticket" ? `Lucky Ticket #${ticketInfo.id}` : `Series Kong #112`}</p>
+              <p className="title"> {type === "ticket" ? `Lucky Ticket #${tokenId}` : `Series Kong #112`}</p>
             </div>
 
             <ul className="sellBox">
@@ -389,52 +395,6 @@ export default function Resell() {
 
                 <p className="explain">Suggested: 0%, 10%, 20%. Maximum is 25%</p>
               </li>
-
-              {/* <li className="startDateBox dateBox contBox">
-                <p className="title">Starting Date</p>
-                <div className="posBox">
-                  <div className="inputBox" onClick={() => setStartPopup(true)}>
-                    <input value={startDate} placeholder="Select Date" />
-                    <img src={I_dnArw} alt="" />
-                  </div>
-
-                  {startPopup && (
-                    <>
-                      <SelectPopup
-                        off={setStartPopup}
-                        dataList={D_startDateList}
-                        select={startDate}
-                        setFunc={setStartDate}
-                      />
-                      <PopupBg off={setStartPopup} />
-                    </>
-                  )}
-                </div>
-              </li> */}
-
-              {/* <li className="expirationDateBox dateBox contBox">
-                <p className="title">Expiration Date</p>
-                <div className="posBox">
-                  <div className="inputBox" onClick={() => setExpDatePopup(true)}>
-                    <input value={expDate} placeholder="Select Date" />
-                    <img src={I_dnArw} alt="" />
-                  </div>
-
-                  {expDatePopup && (
-                    <>
-                      <SelectPopup
-                        off={setExpDatePopup}
-                        dataList={D_expDateList}
-                        select={expDate}
-                        setFunc={setExpDate}
-                      />
-                      <PopupBg off={setExpDatePopup} />
-                    </>
-                  )}
-                </div>
-
-                <p className="explain">When the expiration time is reached, the sale price is automatically lt ends.</p>
-              </li> */}
 
               <li className="instructionBox contBox">
                 <p className="title">Instruction</p>
@@ -520,51 +480,6 @@ export default function Resell() {
 
                 <p className="explain">Suggested: 0%, 10%, 20%. Maximum is 25%</p>
               </li>
-              {/* <li className="dateContainer contBox">
-                <div className="startDateBox dateBox">
-                  <p className="title">Starting Date</p>
-                  <div className="posBox">
-                    <div className="inputBox" onClick={() => setStartPopup(true)}>
-                      <input value={startDate} disabled placeholder="Select Date" />
-                      <img src={I_dnArw} alt="" />
-                    </div>
-
-                    {startPopup && (
-                      <>
-                        <SelectPopup
-                          off={setStartPopup}
-                          dataList={D_startDateList}
-                          select={startDate}
-                          setFunc={setStartDate}
-                        />
-                        <PopupBg off={setStartPopup} />
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                <div className="expirationDateBox dateBox">
-                  <p className="title">Expiration Date</p>
-                  <div className="posBox">
-                    <div className="inputBox" onClick={() => setExpDatePopup(true)}>
-                      <input value={expDate} disabled placeholder="Select Date" />
-                      <img src={I_dnArw} alt="" />
-                    </div>
-
-                    {expDatePopup && (
-                      <>
-                        <SelectPopup
-                          off={setExpDatePopup}
-                          dataList={D_expDateList}
-                          select={expDate}
-                          setFunc={setExpDate}
-                        />
-                        <PopupBg off={setExpDatePopup} />
-                      </>
-                    )}
-                  </div>
-                </div>
-              </li> */}
               <li className="instructionBox contBox">
                 <p className="title">Instruction</p>
 
@@ -621,7 +536,7 @@ export default function Resell() {
               ) : (
                 <img className="itemImg" src="" alt="broken_image" />
               )}
-              <p className="title"> {type === "ticket" ? `Lucky Ticket #${ticketInfo.id}` : `Series Kong #112`}</p>
+              <p className="title"> {type === "ticket" ? `Lucky Ticket #${tokenId}` : `Series Kong #112`}</p>
               {/* <p className="title">Series {itemDetail && itemDetail.itembalances?.group_.toUpperCase()} #112</p> */}
             </li>
 

@@ -185,7 +185,7 @@ function App() {
           <Route path="/mypage" element={<Mypage />} />
           <Route path="/editprof" element={<EditProf />} />
 
-          <Route path="/resell/:id/:type" element={<Resell />} />
+          <Route path="/resell/:id/:type/:tokenId" element={<Resell />} />
           <Route path="/test" element={<Test />} />
         </Routes>
       </HashRouter>
