@@ -51,7 +51,7 @@ export default function BidPopup({ off, itemdata }) {
         contractaddress: addresses.contract_USDT,
         abikind: "ERC20",
         methodname: "allowance",
-        aargs: [myaddress, addresses.contract_erc1155_ticket_sales],
+        aargs: [myaddress, addresses.contract_erc1155_sales],
       },
     };
 
@@ -97,7 +97,7 @@ export default function BidPopup({ off, itemdata }) {
           contractaddress: addresses.contract_USDT,
           abikind: "ERC20",
           methodname: "approve",
-          aargs: [addresses.contract_erc1155_ticket_sales, getweirep("" + 10000_0000)],
+          aargs: [addresses.contract_erc1155_sales, getweirep("" + 10000_0000)],
         },
       },
     };
@@ -216,8 +216,8 @@ export default function BidPopup({ off, itemdata }) {
         },
       },
       ticket: {
-        operator_contract: addresses.contract_erc1155_ticket_sales,
-        typestr: "BUY_NFT_ITEM",
+        operator_contract: addresses.contract_erc1155_sales,
+        typestr: "BUY_NFT_ITEM_TICKET",
         amount: 1,
         uuid: itemdata?.uuid,
         username: myaddress,
@@ -227,7 +227,7 @@ export default function BidPopup({ off, itemdata }) {
         price: itemdata?.price,
         type: itemdata?.type,
         auxdata: {
-          user_action: "BUY_NFT_ITEM",
+          user_action: "BUY_NFT_ITEM_TICKET",
           contract_type: "ERC1155TicketSale", // .ETH_TESTNET
           contractaddress: addresses.itemData?.contractaddress, // .ETH_TESTNET
           my_address: myaddress,
@@ -250,33 +250,20 @@ export default function BidPopup({ off, itemdata }) {
           aargs: [
             // addresses.contract_erc1155_ticket_sales_minter, // target contractaddress
             addresses.contract_erc1155, // target contractaddress
-            "qwertyyyyy",
+            `${itemdata?.tokenid}`,
             "1", // amounttomint
             "0", // decimals
-            "250", // authorroyalty
-            "0x25a905c956d9f56fdd55b9f4f1c160d632fa5ec3",
+            "0", // authorroyalty
+            itemdata?.seller,
             "1",
-            getweirep("" + 10),
+            getweirep("" + itemdata?.price),
             addresses.contract_USDT, // sellersaddress
-            "0x25a905c956d9f56fdd55b9f4f1c160d632fa5ec3", // target contractaddress
+            itemdata?.seller, // target contractaddress
           ],
         },
       },
     };
-    console.log(
-      "aargs",
-      // addresses.contract_erc1155_ticket_sales_minter, // target contractaddress
-      addresses.contract_erc1155, // target contractaddress
-      "qwertyyyyy",
-      "1", // amounttomint
-      "0", // decimals
-      "250", // authorroyalty
-      "0x25a905c956d9f56fdd55b9f4f1c160d632fa5ec3",
-      "1",
-      getweirep("" + 10),
-      addresses.contract_USDT, // sellersaddress
-      "0x25a905c956d9f56fdd55b9f4f1c160d632fa5ec3" // target contractaddress
-    );
+
     if (itemdata?.type === "kingking") {
       let abistr = await getabistr_forfunction(options_abistr["kingkong"].abistr);
       console.log("", abistr);
@@ -300,19 +287,21 @@ export default function BidPopup({ off, itemdata }) {
         let txhash = resp;
 
         console.log("txhash", txhash);
-        axios
-          .post(API.API_TXS + `/${txhash}`, {
-            txhash,
-            username: myaddress,
-            typestr: options_abistr["kingkong"].typestr,
-            amount: options_abistr["kingkong"].amount,
-            auxdata: options_abistr["kingkong"].auxdata,
-          })
-          .then((res) => {
-            LOGGER("BUY_NFT_ITEM", resp);
-            off();
-          })
-          .catch((err) => console.log(err));
+        if (txhash) {
+          axios
+            .post(API.API_TXS + `/${txhash}`, {
+              txhash,
+              username: myaddress,
+              typestr: options_abistr["kingkong"].typestr,
+              amount: options_abistr["kingkong"].amount,
+              auxdata: options_abistr["kingkong"].auxdata,
+            })
+            .then((res) => {
+              LOGGER("BUY_NFT_ITEM", resp);
+              off();
+            })
+            .catch((err) => console.log(err));
+        }
       });
     }
     if (itemdata?.type === "ticket") {
@@ -324,8 +313,51 @@ export default function BidPopup({ off, itemdata }) {
         data: abistr,
         value: "0x00",
       }).then((resp) => {
-        console.log("asdofijdf", resp);
+        console.log("txhash", resp);
+        let txhash = resp;
         if (resp) {
+          axios
+            .post(API.API_TXS + `/${txhash}`, {
+              txhash,
+              username: myaddress,
+              typestr: options_abistr["ticket"].typestr,
+              amount: options_abistr["ticket"].amount,
+              auxdata: options_abistr["ticket"].auxdata,
+            })
+            .then((res) => {
+              axios
+                .put(API.API_UPDATE_ORDERS, {
+                  matcher_contract: options_abistr["ticket"].operator_contract,
+                  typestr: options_abistr["ticket"].typestr,
+                  amount: options_abistr["ticket"].amount,
+                  uuid: itemdata?.uuid,
+                  username: myaddress,
+                  buyer: options_abistr["ticket"].buyer,
+                  paymeansaddress: addresses.contract_USDT,
+                  paymeansname: "USDT",
+                  seller: options_abistr["ticket"].seller,
+                  saletype: 0,
+                  price: itemdata?.price,
+                  nettype: net,
+                  auxdata: options_abistr["ticket"].auxdata,
+                  type: itemdata?.type,
+                  txhash: txhash,
+                  tokenid: itemdata?.tokenid,
+                  oldseller: itemdata?.seller,
+                })
+                .then((res) => {
+                  LOGGER("BUY_NFT_ITEM", resp);
+                  SetErrorBar(messages.MSG_TX_REQUEST_SENT);
+                  awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
+                    LOGGER("minedtxreceipt", minedtxreceipt);
+                    off();
+                    navigate("/market");
+                    setSpinner(false);
+                    off();
+                  });
+                });
+            })
+            .catch((err) => console.log(err));
         } else {
           console.log("USER DENIED TX");
           SetErrorBar(messages.MSG_USER_DENIED_TX);
@@ -334,33 +366,8 @@ export default function BidPopup({ off, itemdata }) {
           return;
         }
         SetErrorBar(messages.MSG_DONE_SENDING_TX_REQ);
-        setSpinner(false);
-        let txhash = resp;
 
         console.log("txhash", txhash);
-        axios
-          .post(API.API_TXS + `/${txhash}`, {
-            txhash,
-            username: myaddress,
-            typestr: options_abistr["ticket"].typestr,
-            amount: options_abistr["ticket"].amount,
-            auxdata: options_abistr["ticket"].auxdata,
-          })
-          .then((res) => {
-            axios
-              .put(API.API_TXS + `/${txhash}`, {
-                txhash,
-                username: myaddress,
-                typestr: options_abistr["ticket"].typestr,
-                amount: options_abistr["ticket"].amount,
-                auxdata: options_abistr["ticket"].auxdata,
-              })
-              .then((res) => {
-                LOGGER("BUY_NFT_ITEM", resp);
-                off();
-              });
-          })
-          .catch((err) => console.log(err));
       });
     }
   };
@@ -388,11 +395,12 @@ export default function BidPopup({ off, itemdata }) {
     } else {
       return;
     }
-    console.log("asdoiajsod", addresses.contract_USDT, [myaddress]); // ETH_TESTNET.
   };
 
   useEffect(() => {
     setSpinner(true);
+    console.log("asodifjaosdijf", itemdata);
+
     setTimeout(() => {
       queryAllowance();
       fetchdata();

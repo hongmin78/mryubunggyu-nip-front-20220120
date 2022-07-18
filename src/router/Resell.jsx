@@ -113,10 +113,10 @@ export default function Resell() {
           aargs: [myaddress, addresses.contract_erc1155_sales],
         },
         ticket: {
-          contractaddress: addresses.contract_erc1155_ticket_sales_minter,
-          abikind: "ERC1155_TICKET_MINTER",
+          contractaddress: addresses.contract_erc1155,
+          abikind: "ERC1155",
           methodname: "isApprovedForAll",
-          aargs: [myaddress, addresses.contract_erc1155_ticket_sales],
+          aargs: [myaddress, addresses.contract_erc1155_sales],
         },
       };
 
@@ -177,14 +177,14 @@ export default function Resell() {
     }
     if (type === "ticket") {
       let abistr = getabistr_forfunction({
-        contractaddress: addresses.contract_erc1155_ticket_sales_minter,
-        abikind: "ERC1155_TICKET_MINTER",
+        contractaddress: addresses.contract_erc1155,
+        abikind: "ERC1155",
         methodname: "setApprovalForAll",
-        aargs: [addresses.contract_erc1155_ticket_sales, true],
+        aargs: [addresses.contract_erc1155_sales, true],
       });
       requesttransaction({
         from: myaddress,
-        to: addresses.contract_erc1155_ticket_sales_minter,
+        to: addresses.contract_erc1155,
         data: abistr,
         value: "0x00",
       }).then((resp) => {
@@ -516,7 +516,7 @@ export default function Resell() {
                 </button> */}
               </div>
               {isApprovedForAll ? (
-                <button className="actionBtn" onClick={() => postSell()}>
+                <button className="actionBtn" disabled={bid !== "" ? false : true} onClick={() => postSell()}>
                   {spinner ? <div id="loading"></div> : "Sell"}
                 </button>
               ) : (

@@ -30,6 +30,7 @@ const API = {
   API_RECEIVABLES: `${URL}/queries/receivables/username`,
   API_DELINQUENCY: `${URL}/queries/rows/delinquencies/username`,
   API_ITEMBALANCES: `${URL}/queries/itembalances/username`,
+  API_QUERY_ORDERS: `${URL}/queries/orders/username`,
   API_GETUSER: `${URL}/user/info`,
   API_GETTIME: `${URL}/queries/singlerow/settings/key_/BALLOT_NEXT_ROUND_START`,
   API_TYPESTR: `${URL}/queries/itembalances`,

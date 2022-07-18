@@ -57,11 +57,11 @@ export default function MmenuPopup({ off, mybalance, ticketInfo }) {
               <img src={I_rocket} alt="" />
               <p>Lucky Ticket</p>
             </button>
-            <button className="auctionBtn" onClick={() => onclick_staked_val_btn("/auction")}>
+            <button className="auctionBtn" onClick={() => navigate("/auction")}>
               <img src={I_openBox} alt="" />
               <p>Subscription Auction</p>
             </button>
-            <button className="marketPlaceBtn" onClick={() => onclick_staked_val_btn("/market")}>
+            <button className="marketPlaceBtn" onClick={() => navigate("/market")}>
               <img src={I_market} alt="" />
               <p>Marketplece</p>
             </button>
@@ -69,7 +69,7 @@ export default function MmenuPopup({ off, mybalance, ticketInfo }) {
               <img src={I_book} alt="" />
               <p>FAQ</p>
             </button>
-            <button className="mypageBtn" onClick={() => onclick_staked_val_btn("/mypage")}>
+            <button className="mypageBtn" onClick={() => navigate("/mypage")}>
               <img src={I_person} alt="" />
               <p>Mypage</p>
             </button>

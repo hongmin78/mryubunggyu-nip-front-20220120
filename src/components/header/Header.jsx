@@ -182,7 +182,7 @@ export default function Header() {
               <button
                 style={{ color: isStaking && "#fff" }}
                 onClick={() => {
-                  onclick_staked_val_btn("/market");
+                  navigate("/market");
                 }}
               >
                 Marketplace
@@ -190,7 +190,8 @@ export default function Header() {
               <button
                 style={{ color: isStaking && "#fff" }}
                 onClick={() => {
-                  onclick_staked_val_btn("/employment");
+                  // onclick_staked_val_btn("/employment");
+                  SetErrorBar("Will soon");
                 }}
               >
                 Employment
@@ -207,11 +208,7 @@ export default function Header() {
                   background: isStaking && "#fff",
                 }}
                 onClick={() => {
-                  if (isstaked) {
-                    setHeaderPopup(!headerPopup);
-                  } else {
-                    SetErrorBar("You need purchased tickets");
-                  }
+                  setHeaderPopup(!headerPopup);
                 }}
               >
                 <span className="balanceBox">

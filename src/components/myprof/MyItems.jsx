@@ -44,7 +44,7 @@ export default function MyItems() {
   const [tokenId, setTokenId] = useState();
   let [itemData, setItemData] = useState([]);
   let [itemBalData, setItemBalData] = useState([]);
-
+  let [myItems, setMyitems] = useState([]);
   let [txscanurl, settxscanurl] = useState();
 
   let [userinfo, setuserinfo] = useState(null);
@@ -94,6 +94,13 @@ export default function MyItems() {
           //        console.log(res.data);
           //      setMoreCollection(res.data);
         });
+      axios.get(API.API_QUERY_ORDERS + `/${myaddress}?nettype=${net}`).then((resp) => {
+        LOGGER("Buy my item", resp.data.payload);
+        let { status, payload } = resp.data;
+        if (status == "OK") {
+          setMyitems(resp.data.payload.rowdata);
+        }
+      });
     });
 
     //true
@@ -530,7 +537,7 @@ export default function MyItems() {
                 </div>
                 <div className="saleBox"></div>
 
-                <button className="actionBtn" onClick={() => navigate("/staking")}>
+                <button className="actionBtn" onClick={() => navigate("/main")}>
                   Buy
                 </button>
 
@@ -571,7 +578,7 @@ export default function MyItems() {
                     <p className="price">Current price</p>
                   </div>
                   <div className="value">
-                    <strong className="price">100 USDT</strong>
+                    <strong className="price">{ticketInfo.amount} USDT</strong>
                     {/* 
                     <ul className="timeList">
                       <li>{moment(tickTimer).days()}일</li>
@@ -584,7 +591,7 @@ export default function MyItems() {
                   <ul className="priceBox">
                     <li>
                       <p className="key">Current price</p>
-                      <p className="value">100 USDT</p>
+                      <p className="value">{ticketInfo.amount} USDT</p>
                     </li>
                     {/* <li>
                     <p className="key">Transaction price</p>
