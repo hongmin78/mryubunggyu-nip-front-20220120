@@ -578,7 +578,7 @@ export default function MyItems() {
                     <p className="price">Current price</p>
                   </div>
                   <div className="value">
-                    <strong className="price">{ticketInfo.amount} USDT</strong>
+                    <strong className="price">{ticketInfo.price} USDT</strong>
                     {/* 
                     <ul className="timeList">
                       <li>{moment(tickTimer).days()}일</li>
@@ -591,7 +591,7 @@ export default function MyItems() {
                   <ul className="priceBox">
                     <li>
                       <p className="key">Current price</p>
-                      <p className="value">{ticketInfo.amount} USDT</p>
+                      <p className="value">{ticketInfo.price} USDT</p>
                     </li>
                     {/* <li>
                     <p className="key">Transaction price</p>
