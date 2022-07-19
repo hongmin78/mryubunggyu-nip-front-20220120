@@ -104,7 +104,7 @@ export default function AuctionDetail() {
       LOGGER("transction", resp.data);
       let { status, respdata } = resp.data;
       if (status === "OK") {
-        setTranSaction(resp.data.list);
+        setTranSaction(resp.data.list.splice(1, resp.data.list.length - 1));
       }
     });
   };
