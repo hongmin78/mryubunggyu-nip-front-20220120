@@ -66,16 +66,18 @@ export default function Resell() {
       console.log(err);
     }
   };
-
+  console.log("type", type);
   const queryItemDetail = async () => {
     if (type === "kingkong") {
       try {
-        const resp = await axios.get(API.API_GET_ITEMS_DETAIL + `/${id}?nettype=${net}`);
+        const resp = await axios.get(API.API_GET_ITEMS_DETAIL + `/${tokenId}?nettype=${net}`);
         if (resp.data && resp.data.respdata) {
           let { respdata } = resp.data;
           console.log("$itemdetail_ITEMDETAIL", respdata);
-          setItemDetail(respdata);
-          queryApprovalForAll(respdata);
+          if (resp.data.status === "OK") {
+            setItemDetail(respdata);
+            queryApprovalForAll(respdata);
+          }
         }
       } catch (err) {
         console.log(err);
@@ -87,8 +89,10 @@ export default function Resell() {
         if (resp.data && resp.data.respdata) {
           let { respdata } = resp.data;
           console.log("$itemdetail_ITEMDETAIL", respdata);
-          setItemDetail(respdata);
-          queryApprovalForAll(respdata);
+          if (resp.data.status === "OK") {
+            setItemDetail(respdata);
+            queryApprovalForAll(respdata);
+          }
         }
       } catch (err) {
         console.log(err);
@@ -121,14 +125,14 @@ export default function Resell() {
       };
 
       if (type === "kingkong") {
-        query_with_arg(options_arg[type]).then((resp) => {
+        query_with_arg(options_arg["kingkong"]).then((resp) => {
           console.log("$sell-isApprovedForAll?", resp);
           setApprovalForAll(resp);
           setSpinner(false);
         });
       }
       if (type === "ticket") {
-        query_with_arg(options_arg[type]).then((resp) => {
+        query_with_arg(options_arg["ticket"]).then((resp) => {
           console.log("$sell-ticket-isApprovedForAll?", resp);
           setApprovalForAll(resp);
           setSpinner(false);
@@ -209,7 +213,7 @@ export default function Resell() {
     const { ethereum } = window; //    const exampleMessage = "Test `personal_sign` message";
     const from = myaddress; // store.isLogin;
     let msg; // = `0x${Buffer.from(exampleMessage, "utf8").toString("hex")}`;
-    msg = `Ticket id:${itemDetail.id}, ${getweirep(bid)},Contract address :${
+    msg = `Token id:${itemDetail.id}, ${getweirep(bid)},Contract address :${
       addresses.contract_erc1155_ticket_sales
     }, wallet: ${myaddress}`;
 
@@ -228,22 +232,18 @@ export default function Resell() {
     setSpinner(true);
     if (respsign) {
       let myaddress = getmyaddress();
-      let msg = `Ticket id:${itemDetail.id}, ${getweirep(bid)},Contract address :${
+      let msg = `Token id:${itemDetail.id}, ${getweirep(bid)},Contract address :${
         addresses.contract_erc1155_ticket_sales
       }, wallet: ${myaddress}`;
       let options_data = {
         kingkong: {
-          tokenid: itemDetail.id,
-          itemid: itemDetail.itembalances?.itemid,
           username: userInfo?.username,
-          price: itemDetail.itembalances?.buyprice,
-          // expiry: moment()
-          //   .add(+expiration, "days")
-          //   .unix(),
-          // expiry: moment().add(1659587638, "days").unix(),
+          contractaddress: addresses.contract_admin,
+          tokenid: itemDetail?.id,
+          price: bid,
+          itemid: itemDetail?.itemid,
           expiry: 4119051884,
           paymeansaddress: addresses.contract_USDT,
-          contractaddress: addresses.contract_admin,
           paymeansname: "USDT",
           saletype: saleType === "COMMON" ? 1 : saleType === "AUCTION" ? 2 : 0,
           saletypestr: saleType,
@@ -264,10 +264,7 @@ export default function Resell() {
           contractaddress: addresses.contract_erc1155,
           tokenid: tokenId,
           price: bid,
-          // expiry: moment()
-          //   .add(+expiration, "days")
-          //   .unix(),
-          // expiry: moment().add(1659587638, "days").unix(),
+
           expiry: 4119051884,
           paymeansaddress: addresses.contract_USDT,
           paymeansname: "USDT",
@@ -291,7 +288,7 @@ export default function Resell() {
 
       if (type === "kingkong") {
         await axios
-          .post(API.API_POST_SALE, options_data[itemDetail.itembalances?.group_])
+          .post(API.API_POST_SALE, options_data["kingkong"])
           .then((res) => {
             console.log(res);
             SetErrorBar("Item has been posted!");
@@ -343,7 +340,10 @@ export default function Resell() {
 
           <article className="sellSec">
             <div className="topBar">
-              <p className="title"> {type === "ticket" ? `Lucky Ticket #${tokenId}` : `Series Kong #112`}</p>
+              <p className="title">
+                {" "}
+                {type === "ticket" ? `Lucky Ticket #${tokenId}` : `King Kong #${itemDetail.titlename}`}
+              </p>
             </div>
 
             <ul className="sellBox">
@@ -468,7 +468,7 @@ export default function Resell() {
                     value={bid}
                     onChange={(e) => setBid(e.target.value)}
                     onBlur={(e) => {
-                      if (parseInt(bid) < 90) {
+                      if (type === "ticket" && parseInt(bid) < 90) {
                         setBid("");
                         SetErrorBar("Ticket minumum bid 90 USDT");
                       }
@@ -536,7 +536,10 @@ export default function Resell() {
               ) : (
                 <img className="itemImg" src="" alt="broken_image" />
               )}
-              <p className="title"> {type === "ticket" ? `Lucky Ticket #${tokenId}` : `Series Kong #112`}</p>
+              <p className="title">
+                {" "}
+                {type === "ticket" ? `Lucky Ticket #${tokenId}` : `King Kong #${itemDetail?.titlename}`}
+              </p>
               {/* <p className="title">Series {itemDetail && itemDetail.itembalances?.group_.toUpperCase()} #112</p> */}
             </li>
 

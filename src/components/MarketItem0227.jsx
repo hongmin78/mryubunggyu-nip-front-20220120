@@ -13,7 +13,7 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj, issta
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
 
-  console.log("data123123123", data);
+  console.log("data123123123", isstaked);
 
   function onClickItemLike(e, index) {
     e.stopPropagation();
@@ -30,7 +30,7 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj, issta
         className="item"
         onClick={() => {
           data.type !== "ticket"
-            ? navigate(`/market/detail/${data.uuid}`)
+            ? navigate(`/market/detail/${data.itemid}`)
             : isstaked
             ? SetErrorBar(messages.MSG_YOU_ALREADY_HAVE_STAKED)
             : navigate(`/market/detail/${data.uuid}`);
@@ -88,10 +88,10 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj, issta
         className="item"
         onClick={() => {
           data.type !== "ticket"
-            ? navigate(`/market/detail/${data.uuid}`)
+            ? navigate(`/market/detail/${data.itemid}`, { state: data })
             : isstaked
             ? SetErrorBar(messages.MSG_YOU_ALREADY_HAVE_STAKED)
-            : navigate(`/market/detail/${data.uuid}`);
+            : navigate(`/market/detail/${data.uuid}`, { state: data });
         }}
       >
         <div className="topBar">
@@ -131,7 +131,7 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj, issta
             <li style={{ color: "#fff" }}>
               <p>{data.price} USDT</p>
 
-              <p>{moment(data.createdat).fromNow()}</p>
+              <p>{data.updatedat === null ? moment(data.createdat).fromNow() : moment(data.updatedat).fromNow()}</p>
             </li>
           </ul>
         </div>

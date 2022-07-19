@@ -150,15 +150,18 @@ export default function Main() {
           setAuctionListSecond(roundNumber1.slice(64));
         }
       });
-    axios.get(API.API_USERINFO + `/${myaddress}?nettype=${net}`).then((resp) => {
-      LOGGER("rBojncz0CD", resp.data);
-      let { status, respdata } = resp.data;
-      if (status == "OK") {
-        setisstaked(respdata.isstaked ? true : false);
-      } else {
-        false && SetErrorBar("FYI: YOU NEED TO STAKE ");
-      }
-    });
+    if (myaddress) {
+      axios.get(API.API_USERINFO + `/${myaddress}?nettype=${net}`).then((resp) => {
+        LOGGER("rBojncz0CD", resp.data);
+        let { status, respdata } = resp.data;
+        if (status == "OK") {
+          setisstaked(respdata.isstaked);
+        } else {
+          false && SetErrorBar("FYI: YOU NEED TO STAKE ");
+        }
+      });
+    }
+
     axios.get(API.API_TYPESTR + `?nettype=${net}`).then((resp) => {
       LOGGER("itemBalance", resp.data);
       let { status, payload } = resp.data;

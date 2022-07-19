@@ -31,6 +31,8 @@ export default function BidPopup({ off, itemdata }) {
   let [spinner, setSpinner] = useState(false);
   let [mybalance, setmybalance] = useState();
 
+  console.log("itemdata", itemdata);
+
   const queryAllowance = () => {
     let myaddress = getmyaddress();
     if (myaddress) {
@@ -170,7 +172,7 @@ export default function BidPopup({ off, itemdata }) {
       addresses.contract_erc1155_ticket_sales, // target contractaddress
       getweirep("" + itemdata?.price), // amounttopay
       myaddress,
-      addresses.contract_erc1155_ticket_sales_minter, // target contractaddress
+      addresses.contract_erc1155_sales, // target contractaddress
       itemdata.tokenid,
       itemdata.tokenid,
       itemdata?.seller // sellersaddress
@@ -180,38 +182,47 @@ export default function BidPopup({ off, itemdata }) {
       kingkong: {
         operator_contract: addresses.contract_erc1155_sales,
         typestr: "BUY_NFT_ITEM",
-        amount: itemdata.itembalances?.buyprice,
+        itemid: itemdata?.itemid,
+        amount: 1,
+        uuid: itemdata?.uuid,
+        username: myaddress,
+        buyer: myaddress,
+        seller: myaddress,
+        saletype: 0,
+        price: itemdata?.price,
+        type: itemdata?.type,
         auxdata: {
           user_action: "BUY_NFT_ITEM",
           contract_type: "ERC1155Sale", // .ETH_TESTNET
           contractaddress: addresses.contract_erc1155_sales, // .ETH_TESTNET
           my_address: myaddress,
-          authorRoyalty: "250",
-          itemid: itemdata.itembalances?.itemid,
+          authorRoyalty: "0",
+          itemid: itemdata?.item?.itemid,
           tokenid: itemdata.itembalances?.id,
           author: "",
-          paymeansaddress: itemdata.itembalances?.paymeansaddress,
-          amount: itemdata.itembalances?.buyprice,
-          uuid: itemdata.order_detail?.uuid,
-          paymeansname: itemdata.itembalances?.paymeans,
+          paymeansaddress: itemdata?.itembalances?.paymeansaddress,
+          amount: "1",
+          uuid: itemdata?.uuid,
+          paymeansname: itemdata?.itembalances?.paymeans,
           nettype: net,
         },
         abistr: {
-          contractaddress: addresses.contract_erc1155,
+          contractaddress: addresses.contract_erc1155_sales,
           abikind: "ERC1155Sale",
           methodname: "mint_and_match_single_simple_legacy",
           // eslint-disable-next-line no-sparse-arrays
           aargs: [
+            // addresses.contract_erc1155_ticket_sales_minter, // target contractaddress
             addresses.contract_erc1155, // target contractaddress
-            itemdata.itembalances?.itemid, // itemid
+            `${itemdata?.tokenid}`,
             "1", // amounttomint
             "0", // decimals
-            "250", // authorroyalty
-            itemdata.itembalances?.username, // authoraddress
-            "1", // amounttobuy
-            // getweirep("" + itemdata.itembalances?.buyprice), // amounttopay
-            itemdata.itembalances?.paymeansaddress, // paymeansaddress
-            itemdata.itembalances?.username, // sellersaddress
+            "0", // authorroyalty
+            itemdata?.seller,
+            "1",
+            getweirep("" + itemdata?.price),
+            addresses.contract_USDT, // sellersaddress
+            itemdata?.seller, // target contractaddress
           ],
         },
       },
@@ -231,7 +242,7 @@ export default function BidPopup({ off, itemdata }) {
           contract_type: "ERC1155TicketSale", // .ETH_TESTNET
           contractaddress: addresses.itemData?.contractaddress, // .ETH_TESTNET
           my_address: myaddress,
-          authorRoyalty: "250",
+          authorRoyalty: "0",
           tokenid: itemdata?.tokenid,
           author: "",
           paymeansaddress: itemdata?.paymeansaddress,
@@ -264,7 +275,7 @@ export default function BidPopup({ off, itemdata }) {
       },
     };
 
-    if (itemdata?.type === "kingking") {
+    if (itemdata?.type === "kingkong") {
       let abistr = await getabistr_forfunction(options_abistr["kingkong"].abistr);
       console.log("", abistr);
       requesttransaction({
@@ -283,7 +294,7 @@ export default function BidPopup({ off, itemdata }) {
           return;
         }
         SetErrorBar(messages.MSG_DONE_SENDING_TX_REQ);
-        setSpinner(false);
+
         let txhash = resp;
 
         console.log("txhash", txhash);
@@ -295,10 +306,42 @@ export default function BidPopup({ off, itemdata }) {
               typestr: options_abistr["kingkong"].typestr,
               amount: options_abistr["kingkong"].amount,
               auxdata: options_abistr["kingkong"].auxdata,
+              contractaddress: options_abistr["kingkong"].operator_contract,
+              auxdata: options_abistr["kingkong"].auxdata,
             })
             .then((res) => {
-              LOGGER("BUY_NFT_ITEM", resp);
-              off();
+              axios
+                .put(API.API_UPDATE_ORDERS, {
+                  matcher_contract: options_abistr["kingkong"].operator_contract,
+                  typestr: options_abistr["kingkong"].typestr,
+                  amount: options_abistr["kingkong"].amount,
+                  uuid: itemdata?.uuid,
+                  username: myaddress,
+                  buyer: options_abistr["kingkong"].buyer,
+                  paymeansaddress: addresses.contract_USDT,
+                  paymeansname: "USDT",
+                  seller: options_abistr["kingkong"].seller,
+                  saletype: 0,
+                  price: itemdata?.price,
+                  nettype: net,
+                  auxdata: options_abistr["kingkong"].auxdata,
+                  type: itemdata?.type,
+                  txhash: txhash,
+                  tokenid: itemdata?.tokenid,
+                  oldseller: itemdata?.seller,
+                  itemid: options_abistr["kingkong"].itemid,
+                })
+                .then((res) => {
+                  LOGGER("BUY_NFT_ITEM", resp);
+                  SetErrorBar(messages.MSG_TX_REQUEST_SENT);
+                  awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
+                    LOGGER("minedtxreceipt", minedtxreceipt);
+                    off();
+                    navigate("/market");
+                    setSpinner(false);
+                    off();
+                  });
+                });
             })
             .catch((err) => console.log(err));
         }
@@ -323,6 +366,7 @@ export default function BidPopup({ off, itemdata }) {
               typestr: options_abistr["ticket"].typestr,
               amount: options_abistr["ticket"].amount,
               auxdata: options_abistr["ticket"].auxdata,
+              contractaddress: options_abistr["ticket"].operator_contract,
             })
             .then((res) => {
               axios
@@ -478,8 +522,13 @@ export default function BidPopup({ off, itemdata }) {
 
         <article className="contBox">
           <div className="itemBox">
-            {itemdata?.url ? <img src={itemdata?.url} alt="" /> : <img src={E_staking} alt="" />}
-            <p>You are about to purchase a King Kong {itemdata?.titlename}</p>
+            {itemdata.type === "kingkong" ? <img src={itemdata?.item.url} alt="" /> : <img src={E_staking} alt="" />}
+            <p>
+              {" "}
+              {itemdata?.type === "ticket"
+                ? `##LUCKY TICKET ${itemdata?.tokenid}`
+                : `King Kong #${itemdata?.item.titlename}`}{" "}
+            </p>
           </div>
 
           <div className="priceBox">

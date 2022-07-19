@@ -53,7 +53,6 @@ export default function MyItems() {
   const [ticketInfo, setTickInfo] = useState();
   const [itemDataInfo, setItemDataInfo] = useState();
   const [circulations, setCirculations] = useState([]);
-  console.log("itemDataInfo", itemDataInfo);
 
   const fetchdata = async (_) => {
     let myaddress = getmyaddress();
@@ -78,8 +77,8 @@ export default function MyItems() {
 
     axios.get(API.API_ITEMBALANCES + `/${myaddress}?nettype=${net}`).then((res) => {
       let { list, status } = res.data;
-      LOGGER("getITEmBALANCES", res.data);
-      if (status === "OK" && list?.length) {
+
+      if (status === "OK" && list?.length > 0) {
         setItemBalData(list);
         LOGGER("ITEMBALANCES", list);
       }
@@ -95,10 +94,15 @@ export default function MyItems() {
           //      setMoreCollection(res.data);
         });
       axios.get(API.API_QUERY_ORDERS + `/${myaddress}?nettype=${net}`).then((resp) => {
-        LOGGER("Buy my item", resp.data.payload);
-        let { status, payload } = resp.data;
+        LOGGER("Buy my item", resp.data);
+        let { status, list, payload } = resp.data;
         if (status == "OK") {
-          setMyitems(resp.data.payload.rowdata);
+          if (payload?.rowdata) {
+            setMyitems(payload.rowdata);
+          }
+          if (list) {
+            setMyitems(list);
+          }
         }
       });
     });
@@ -579,45 +583,25 @@ export default function MyItems() {
                   </div>
                   <div className="value">
                     <strong className="price">{ticketInfo.price} USDT</strong>
-                    {/* 
-                    <ul className="timeList">
-                      <li>{moment(tickTimer).days()}일</li>
-                      <li>{moment(tickTimer).hours()}시간</li>
-                      <li>{moment(tickTimer).month()}분</li>
-                      <li>{moment(tickTimer).second()}초</li>
-                    </ul> */}
                   </div>
-
                   <ul className="priceBox">
                     <li>
                       <p className="key">Current price</p>
                       <p className="value">{ticketInfo.price} USDT</p>
                     </li>
-                    {/* <li>
-                    <p className="key">Transaction price</p>
-                    <p className="value">100 USDT</p>
-                  </li> */}
+
                     <li
                       onClick={(evt) => {
                         window.open(txscanurl);
                       }}
-                    >
-                      {/* <p className="key">TxHash</p>
-                    <p className="value">{txhash}</p> */}
-                    </li>
+                    ></li>
                   </ul>
                 </div>
 
                 <button
                   className="actionBtn"
-                  // disabled={
-                  //   moment(ticketInfo.createdat).add(90, "days").format("YYYY-MM-DD") === tickTimer ? false : true
-                  // }
                   onClick={() => navigate(`/resell/${ticketInfo.username}/ticket/${tokenId}`, { state: ticketInfo })}
                 >
-                  {/* {moment(ticketInfo.createdat).add(90, "days").format("YYYY-MM-DD") === tickTimer
-                    ? "Sell"
-                    : "Purchased"} */}
                   SELL
                 </button>
 
@@ -667,20 +651,9 @@ export default function MyItems() {
                     </div>
 
                     <div className="saleBox">
-                      <div className="key">
-                        {/* <p className="price">Current price</p> */}
-                        {/* <p className="time">Ending in</p> */}
-                      </div>
-
+                      <div className="key"></div>
                       <div className="value">
                         <strong className="price">{parseInt(item.amount).toFixed(2)} USDT</strong>
-
-                        {/* <ul className="timeList">
-                          <li>{timeReceivables && timeReceivables.days()}일</li>
-                          <li>{timeReceivables && timeReceivables.hour()}시간</li>
-                          <li>{timeReceivables && timeReceivables.minutes()}분</li>
-                          <li>{timeReceivables && timeReceivables.second()}초</li>
-                        </ul> */}
                       </div>
 
                       <ul className="priceBox">
@@ -714,8 +687,8 @@ export default function MyItems() {
               );
             })}
 
-          {itemBalData.length !== 0 &&
-            itemBalData.map((item, index) => (
+          {itemBalData?.length !== 0 &&
+            itemBalData?.map((item, index) => (
               <li key={index} className="swapBox">
                 <div className="imgBoxBal">
                   {item && item.itemdata?.url ? (
@@ -740,53 +713,47 @@ export default function MyItems() {
                     <p className="key">Owned by</p>
                     <p className="value">@{item && item.username}</p>
                   </div>
-                  <div className="ownedBox">
-                    <p className="key">Bought Date</p>
-                    <p className="value">
-                      {item && item.updatedat ? item.updatedat.split("T", 1) : item.createdat.split("T", 1)}
-                    </p>
-                    <p className="key">Sold Date</p>
-                    <p className="value">
-                      {item.updatedat
-                        ? moment(item && item.updatedat)
-                            .add(3, "days")
-                            .format("YYYY-MM-DD")
-                        : moment(item && item.createdat)
-                            .add(3, "days")
-                            .format("YYYY-MM-DD")}
-                    </p>
-                  </div>
+
+                  {item.group_ !== "kingkong" ? (
+                    <div className="ownedBox">
+                      <p className="key">Bought Date</p>
+                      <p className="value">
+                        {item && item.updatedat ? item.updatedat.split("T", 1) : item.createdat.split("T", 1)}
+                      </p>{" "}
+                      <p className="key">Sold Date</p>
+                      <p className="value">
+                        {item.updatedat
+                          ? moment(item && item.updatedat)
+                              .add(3, "days")
+                              .format("YYYY-MM-DD")
+                          : moment(item && item.createdat)
+                              .add(3, "days")
+                              .format("YYYY-MM-DD")}
+                      </p>
+                    </div>
+                  ) : null}
 
                   <div className="saleBox">
                     <div className="key"></div>
-                    {/* <div className="value">
-                      <ul className="timeList">
-                        <li>{timeMoment && timeMoment.day()}일</li>
-                        <li>{timeMoment && timeMoment.hour()}시간</li>
-                        <li>{timeMoment && timeMoment.minutes()}분</li>
-                        <li>{timeMoment && timeMoment.second()}초</li>
-                      </ul>
-                    </div> */}
-
                     <ul className="priceBox">
-                      {/* {circulations?.map((itm, i) => {
-                          if (item?.itemid === itm.itemid)
-                            return (
-                              <p className="value">
-                                {" "}
-                                {parseInt(itm.price).toFixed(2)} USDT
-                              </p>
-                            );
-                        })} */}
-
                       <li key={index}>
                         <p className="key">Current price</p>
                         <p className="value"> {parseInt(item && item.buyprice).toFixed(2)} USDT</p>
                       </li>
                       {item.group_ == "kingkong" && (
-                        <button className="actionBtn" onClick={() => navigate("/resell/" + item.itemid)}>
-                          Sell
-                        </button>
+                        <>
+                          <button
+                            className="actionBtn"
+                            onClick={() =>
+                              navigate(`/resell/${item?.username}/kingkong/${item.itemid}`, { state: item[index] })
+                            }
+                          >
+                            Sell
+                          </button>
+                          <button className="actionBtn_two" onClick={() => navigate("/resell/" + item.itemid)}>
+                            Stake
+                          </button>
+                        </>
                       )}
                     </ul>
                   </div>
@@ -795,12 +762,85 @@ export default function MyItems() {
                     The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days
                     and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
                     completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all
-                    transactions in your account will be suspended. It operates normally after applying a penalty of 10%
-                    of the winning bid amount.
+                    transactions in youasdfasdfasdfasdfsadfasdfr account will be suspended. It operates normally after
+                    applying a penalty of 10% of the winning bid amount.
                   </p>
                 </div>
               </li>
             ))}
+          {myItems.length !== 0 &&
+            myItems.map((item, index) => {
+              if (item.isprivate === 1) {
+                return (
+                  <li key={index} className="swapBox">
+                    <div className="imgBoxBal">
+                      {item && item.itemdata?.url ? (
+                        <img className="itemImgBal" src={item.itemdata.url} alt="" />
+                      ) : (
+                        <img className="itemImgBal" src={E_staking} alt="" />
+                      )}
+
+                      <div className="topBarBal">
+                        <button className="likeBtnBal" onClick={() => {}}>
+                          <img src={I_heartO} alt="" />
+                          <p>22</p>
+                        </button>
+                      </div>
+                    </div>
+                    <div className="infoBox">
+                      <div className="titleBox">
+                        <strong className="title">{item && item.itemdata?.titlename}</strong>
+                      </div>
+
+                      <div className="ownedBox">
+                        <p className="key">Owned by</p>
+                        <p className="value">@{item && item.username}</p>
+                      </div>
+
+                      <div className="ownedBox">
+                        <p className="key">Bought Date</p>
+                        <p className="value">
+                          {item && item.updatedat ? item.updatedat.split("T", 1) : item.createdat.split("T", 1)}
+                        </p>{" "}
+                      </div>
+
+                      <div className="saleBox">
+                        <div className="key"></div>
+                        <ul className="priceBox">
+                          <li key={index}>
+                            <p className="key">Current price</p>
+                            <p className="value"> {parseInt(item && item.price).toFixed(2)} USDT</p>
+                          </li>
+                          {item.type == "kingkong" && (
+                            <>
+                              <button
+                                className="actionBtn"
+                                onClick={() =>
+                                  navigate(`/resell/${item?.username}/kingkong/${item.itemid}`, { state: item[index] })
+                                }
+                              >
+                                Sell
+                              </button>
+                              <button className="actionBtn_two" onClick={() => navigate("/resell/" + item.itemid)}>
+                                Stake
+                              </button>
+                            </>
+                          )}
+                        </ul>
+                      </div>
+
+                      <p className="description">
+                        The NFT purchased by participating in the subscription auction generates 12% of profits after 3
+                        days and is sold random. In addition, the results are announced at 9:00 AM, and the transaction
+                        is completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all
+                        transactions in youasdfasdfasdfasdfsadfasdfr account will be suspended. It operates normally
+                        after applying a penalty of 10% of the winning bid amount.
+                      </p>
+                    </div>
+                  </li>
+                );
+              }
+            })}
 
           {isOpen && <PayPopup off={openModal} userInfo={userinfo} receivables={receivables} />}
         </ul>
@@ -1326,6 +1366,21 @@ const PmyItemsBox = styled.section`
           width: 100%;
           height: 60px;
           margin: 60px 0 0 0;
+          font-size: 20px;
+          font-weight: 500;
+          line-height: 20px;
+          color: #fff;
+          font-family: "Poppins", sans-serif;
+          background: #000;
+          border-radius: 12px;
+        }
+        .actionBtn_two {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+          height: 60px;
+          margin: 20px 0 0 0;
           font-size: 20px;
           font-weight: 500;
           line-height: 20px;

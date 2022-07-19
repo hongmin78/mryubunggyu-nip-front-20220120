@@ -47,11 +47,6 @@ export default function Market() {
       let { status, respdata } = resp.data;
       if (status == "OK") {
         setisstaked(respdata.isstaked ? true : false);
-        if (respdata.isstaked) {
-          SetErrorBar(messages.MSG_YOU_ALREADY_HAVE_STAKED);
-        } else {
-          false && SetErrorBar("FYI: YOU NEED TO STAKE ");
-        }
       }
     }
   };

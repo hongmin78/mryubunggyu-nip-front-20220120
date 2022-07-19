@@ -18,7 +18,7 @@ import E_staking from "../img/common/E_staking.png";
 import BidPopup from "../components/BidPopup";
 import PopupBg from "../components/PopupBg";
 import { useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import Header from "../components/header/Header";
 import axios from "axios";
 import { API } from "../configs/api"; // import API from "../api/API";
@@ -29,6 +29,7 @@ import { messages } from "../configs/messages";
 import { net } from "../configs/net";
 export default function MarketDetail() {
   const navigate = useNavigate();
+  const data = useLocation().state;
   const params = useParams();
   const moreRef = useRef();
   const isMobile = useSelector((state) => state.common.isMobile);
@@ -40,6 +41,9 @@ export default function MarketDetail() {
   let [itemdata, setitemdata] = useState();
   let [marketPlaceList, setmarketPlaceList] = useState([]);
   const [saleStatus, setSaleStatus] = useState(1);
+  let [isstaked, setisstaked] = useState();
+
+  console.log("itemdataasdfasdfasdfasd", data);
 
   const onclicklike = (_) => {
     let myaddress = getmyaddress();
@@ -106,14 +110,16 @@ export default function MarketDetail() {
   }, [moreIndex]);
   console.log("params?.uuid", params?.itemid);
   const getitem = (_) => {
-    axios.get(API.API_SINGLE_ORDER + `/${params?.itemid}?nettype=${net}`).then((resp) => {
-      LOGGER("BYLjMqzlfl", resp.data);
-      let { status, respdata } = resp.data;
-      if (status == "OK") {
-        console.log("$item_detail", respdata);
-        setitemdata(respdata);
-      }
-    });
+    let myaddress = getmyaddress();
+    if (myaddress) {
+      axios.get(API.API_USERINFO + `/${myaddress}?nettype=${net}`).then((resp) => {
+        LOGGER("rBojncz0CD", resp.data);
+        let { status, respdata } = resp.data;
+        if (status == "OK") {
+          setisstaked(respdata.isstaked);
+        }
+      });
+    }
   };
   const getotheritems = (_) => {
     axios.get(API.API_ALL_ITEMS_MARKET + `/status/1/0/100/id/DESC?nettype=${net}`).then((resp) => {
@@ -124,18 +130,21 @@ export default function MarketDetail() {
       }
     });
   };
-  useEffect((_) => {
-    getitem();
-    getotheritems();
-  }, []);
+  useEffect(
+    (_) => {
+      getitem();
+      getotheritems();
+    },
+    [params?.itemid]
+  );
   if (isMobile)
     return (
       <>
         <Header />
         <MmarketDetailBox>
           <section className="itemInfoContainer">
-            {itemdata?.url ? (
-              <img className="itemImg" src={itemdata?.url} alt="" />
+            {data?.type === "kingkong" ? (
+              <img className="itemImg" src={data?.item.url} alt="" />
             ) : (
               <img className="itemImg" src={E_staking} alt="" />
             )}
@@ -170,13 +179,15 @@ export default function MarketDetail() {
                     )}
                   </div>
                   <strong className="title">
-                    {itemdata?.type === "ticket" ? `##LUCKY TICKET ${itemdata?.tokenid}` : null}{" "}
+                    {itemdata?.type === "ticket"
+                      ? `##LUCKY TICKET ${itemdata?.tokenid}`
+                      : `King Kong #${data?.item.titlename}`}{" "}
                   </strong>
                 </div>
 
                 <div className="ownedBox">
                   <p className="key">Owned by</p>
-                  <p className="value">@{itemdata?.type === "ticket" ? `${itemdata?.seller}` : null}</p>
+                  <p className="value">@{itemdata?.type === "ticket" ? `${itemdata?.seller}` : `${data?.seller}`}</p>
                 </div>
 
                 <div className="saleBox">
@@ -184,11 +195,9 @@ export default function MarketDetail() {
                     <p className="key">Current price</p>
                     <strong className="value">
                       {/* {itemdata?.group_ == "kong" ? "100" : ITEM_PRICE_DEF} USDT */}
-                      {itemdata?.type === "ticket" ? `${itemdata?.price}` : `${itemdata.itembalances?.buyprice}`} USDT
+                      {itemdata?.type === "ticket" ? `${itemdata?.price}` : `${data?.price}`} USDT
                     </strong>
                   </div>
-
-                  <div className="time">{/* <p className="key">Ending in</p> */}</div>
                 </div>
               </div>
 
@@ -255,7 +264,7 @@ export default function MarketDetail() {
                 <ul className="itemList" ref={moreRef}>
                   {marketPlaceList.map((cont, index) => (
                     <Fragment key={index}>
-                      <MarketItem0227 data={cont} index={index} />
+                      <MarketItem0227 data={cont} index={index} isstaked={isstaked} />
                     </Fragment>
                   ))}
                 </ul>
@@ -287,8 +296,8 @@ export default function MarketDetail() {
         <Header />
         <PmarketDetailBox>
           <section className="itemInfoContainer">
-            {itemdata?.url ? (
-              <img className="itemImg" src={itemdata?.url} alt="" />
+            {data?.type === "kingkong" ? (
+              <img className="itemImg" src={data?.item.url} alt="" />
             ) : (
               <img className="itemImg" src={E_staking} alt="" />
             )}
@@ -297,7 +306,7 @@ export default function MarketDetail() {
               <div className="itemInfoBox">
                 <div className="titleBox">
                   <strong className="title">
-                    {itemdata?.type === "ticket" ? `##LUCKY TICKET ${itemdata?.tokenid}` : null}
+                    {data?.type === "ticket" ? `##LUCKY TICKET ${data?.tokenid}` : `King Kong #${data?.item.titlename}`}{" "}
                   </strong>
                   <div className="btnBox">
                     <div className="posBox">
@@ -337,7 +346,7 @@ export default function MarketDetail() {
 
                 <div className="ownedBox">
                   <p className="key">Owned by</p>
-                  <p className="value">@{itemdata?.type === "ticket" ? `${itemdata?.seller}` : null}</p>
+                  <p className="value">@{data?.type === "ticket" ? `${data?.seller}` : `${data?.seller}`}</p>
                 </div>
 
                 <div className="saleBox">
@@ -349,7 +358,7 @@ export default function MarketDetail() {
                   <div className="value">
                     <strong className="price">
                       {/* {itemdata?.group_ == "kong" ? "100" : ITEM_PRICE_DEF} USDT */}
-                      {itemdata?.type === "ticket" ? `${itemdata?.price}` : null} USDT
+                      {itemdata?.type === "ticket" ? `${data?.price}` : `${data?.price}`} USDT
                     </strong>
                   </div>
                 </div>
@@ -422,7 +431,7 @@ export default function MarketDetail() {
                 <ul className="itemList" ref={moreRef}>
                   {marketPlaceList.map((cont, index) => (
                     <Fragment key={index}>
-                      <MarketItem0227 data={cont} index={index} />
+                      <MarketItem0227 data={cont} index={index} isstaked={isstaked} />
                     </Fragment>
                   ))}
                 </ul>
@@ -437,7 +446,7 @@ export default function MarketDetail() {
 
           {bidPopup && (
             <>
-              <BidPopup off={setBidPopup} itemdata={itemdata} />
+              <BidPopup off={setBidPopup} itemdata={data} />
               <PopupBg blur off={setBidPopup} />
             </>
           )}
