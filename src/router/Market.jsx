@@ -11,10 +11,11 @@ import SelectPopup from "../components/SelectPopup";
 import { useSelector } from "react-redux";
 import Header from "../components/header/Header";
 import { API } from "../configs/api";
-import { LOGGER } from "../util/common";
+import { LOGGER, getmyaddress } from "../util/common";
 import axios from "axios";
 import { net } from "../configs/net";
-
+import SetErrorBar from "../util/SetErrorBar";
+import { messages } from "../configs/messages";
 export default function Market() {
   const searchBoxRef = useRef();
   const sortBtnRef = useRef();
@@ -25,15 +26,8 @@ export default function Market() {
   const [likeObj, setLikeObj] = useState({});
   const [limit, setLimit] = useState(8);
   let [D_marketItemList, setD_marketItemList] = useState([]);
-  // const fetchdata = () => {
-  //   axios.get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC?nettype=${net}`).then((resp) => {
-  //     LOGGER("", resp.data);
-  //     let { status, list } = resp.data;
-  //     if (status == "OK") {
-  //       setD_marketItemList(list);
-  //     }
-  //   });
-  // };
+  let [isstaked, setisstaked] = useState();
+
   const fetchData = async () => {
     try {
       const res = await axios.get(API.API_ALL_ITEMS_MARKET + `/status/1/0/100/id/DESC?nettype=${net}`);
@@ -44,6 +38,21 @@ export default function Market() {
       }
     } catch (err) {
       console.log(err);
+    }
+    let myaddress = getmyaddress();
+    LOGGER("myaddress", myaddress);
+    if (myaddress) {
+      let resp = await axios.get(API.API_USERINFO + `/${myaddress}?nettype=${net}`);
+      LOGGER("rBojncz0CD", resp.data);
+      let { status, respdata } = resp.data;
+      if (status == "OK") {
+        setisstaked(respdata.isstaked ? true : false);
+        if (respdata.isstaked) {
+          SetErrorBar(messages.MSG_YOU_ALREADY_HAVE_STAKED);
+        } else {
+          false && SetErrorBar("FYI: YOU NEED TO STAKE ");
+        }
+      }
     }
   };
 
@@ -162,7 +171,13 @@ export default function Market() {
               if (index < limit)
                 return (
                   <Fragment key={index}>
-                    <MarketItem0227 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
+                    <MarketItem0227
+                      data={cont}
+                      index={index}
+                      likeObj={likeObj}
+                      setLikeObj={setLikeObj}
+                      isstaked={isstaked}
+                    />
                   </Fragment>
                 );
               else return <Fragment key={index} />;

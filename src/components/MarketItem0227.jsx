@@ -7,10 +7,13 @@ import { useSelector } from "react-redux";
 import E_staking from "../img/common/E_staking.png";
 import moment from "moment";
 import marketLogo from "../img/icon/marketlogo.png";
-
-export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
+import { messages } from "../configs/messages";
+import SetErrorBar from "../util/SetErrorBar";
+export default function MarketItem0227({ data, index, likeObj, setLikeObj, isstaked }) {
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
+
+  console.log("data123123123", data);
 
   function onClickItemLike(e, index) {
     e.stopPropagation();
@@ -26,7 +29,11 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
       <Mitem
         className="item"
         onClick={() => {
-          navigate(`/market/detail/${data.uuid}`);
+          data.type !== "ticket"
+            ? navigate(`/market/detail/${data.uuid}`)
+            : isstaked
+            ? SetErrorBar(messages.MSG_YOU_ALREADY_HAVE_STAKED)
+            : navigate(`/market/detail/${data.uuid}`);
         }}
       >
         <div className="topBar">
@@ -50,7 +57,7 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
           )}
         </div>
 
-        {data.item?.url ? (
+        {data.type !== "ticket" ? (
           <img className="itemImg" src={data.item?.url} alt="" />
         ) : (
           <img className="itemImg" src={E_staking} alt="" />
@@ -80,7 +87,11 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
       <Pitem
         className="item"
         onClick={() => {
-          navigate(`/market/detail/${data.uuid}`);
+          data.type !== "ticket"
+            ? navigate(`/market/detail/${data.uuid}`)
+            : isstaked
+            ? SetErrorBar(messages.MSG_YOU_ALREADY_HAVE_STAKED)
+            : navigate(`/market/detail/${data.uuid}`);
         }}
       >
         <div className="topBar">
@@ -104,7 +115,7 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
           )}
         </div>
 
-        {data.item?.url ? (
+        {data.type !== "ticket" ? (
           <img className="itemImg" src={data.item?.url} alt="" />
         ) : (
           <img className="itemImg" src={E_staking} alt="" />

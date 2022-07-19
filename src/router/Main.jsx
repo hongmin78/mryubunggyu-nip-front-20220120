@@ -61,6 +61,7 @@ export default function Main() {
   const [pdfPopup, setPdfPopup] = useState(false);
   const [banners, setBanners] = useState([]);
   let [D_marketItemList, setD_marketItemList] = useState([]);
+  let [isstaked, setisstaked] = useState();
   const dispatch = useDispatch();
 
   console.log("auctionListFirst", auctionListFirst);
@@ -136,6 +137,7 @@ export default function Main() {
   }
 
   function fetchitems() {
+    let myaddress = getmyaddress();
     axios
       .get(API.API_COMMONITEMS + `/items/group_/kong/0/128/roundnumber/DESC?nettype=${net}` + `&itemdetail=1`)
       .then((res) => {
@@ -148,13 +150,15 @@ export default function Main() {
           setAuctionListSecond(roundNumber1.slice(64));
         }
       });
-    // axios.get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC?nettype=${net}`).then((resp) => {
-    //   LOGGER("De0Mlt93PT", resp.data);
-    //   let { status, list } = resp.data;
-    //   if (status == "OK") {
-    //     setpremiumitemlist(list);
-    //   }
-    // });
+    axios.get(API.API_USERINFO + `/${myaddress}?nettype=${net}`).then((resp) => {
+      LOGGER("rBojncz0CD", resp.data);
+      let { status, respdata } = resp.data;
+      if (status == "OK") {
+        setisstaked(respdata.isstaked ? true : false);
+      } else {
+        false && SetErrorBar("FYI: YOU NEED TO STAKE ");
+      }
+    });
     axios.get(API.API_TYPESTR + `?nettype=${net}`).then((resp) => {
       LOGGER("itemBalance", resp.data);
       let { status, payload } = resp.data;
@@ -348,7 +352,13 @@ export default function Main() {
                 <ul className="itemList" ref={premiumref}>
                   {premiumitemlist.map((cont, index) => (
                     <Fragment key={index}>
-                      <MarketItem0227 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
+                      <MarketItem0227
+                        data={cont}
+                        index={index}
+                        likeObj={likeObj}
+                        setLikeObj={setLikeObj}
+                        isstaked={isstaked}
+                      />
                     </Fragment>
                   ))}
                 </ul>
@@ -570,7 +580,13 @@ export default function Main() {
                 <ul className="itemList" ref={premiumref}>
                   {premiumitemlist.map((cont, index) => (
                     <Fragment key={index}>
-                      <MarketItem0227 data={cont} index={index} likeObj={likeObj} setLikeObj={setLikeObj} />
+                      <MarketItem0227
+                        data={cont}
+                        index={index}
+                        likeObj={likeObj}
+                        setLikeObj={setLikeObj}
+                        isstaked={isstaked}
+                      />
                     </Fragment>
                   ))}
                 </ul>
