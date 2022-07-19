@@ -261,7 +261,7 @@ export default function Resell() {
         },
         ticket: {
           username: itemDetail?.username,
-          contractaddress: addresses.contract_erc1155_ticket_sales_minter,
+          contractaddress: addresses.contract_erc1155,
           tokenid: tokenId,
           price: bid,
           // expiry: moment()

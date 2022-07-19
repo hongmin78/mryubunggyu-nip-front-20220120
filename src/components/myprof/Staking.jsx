@@ -58,7 +58,7 @@ export default function Staking() {
                       <ul className="dataList">
                         <li>
                           <p className="key">Staking Amount</p>
-                          <p>{cont.amount}&nbsp;USDT</p>
+                          <p>{cont.price}&nbsp;USDT</p>
                         </li>
                         <li>
                           <p className="key">Start</p>
@@ -69,10 +69,10 @@ export default function Staking() {
                           <p className="value">{moment(cont.createdat).add(90, "day").format("YYYY-MM-DD hh:mm:ss")}</p>
                         </li>
                       </ul>
-
+                      {/* 
                       <button className="unstakeBtn" onClick={() => {}}>
                         Unstake
-                      </button>
+                      </button> */}
                     </li>
                   ))}
               </ul>
@@ -142,18 +142,18 @@ export default function Staking() {
                       </span>
 
                       <span>
-                        <p>{cont.amount}&nbsp;USDT</p>
+                        <p>{cont.price}&nbsp;USDT</p>
                       </span>
 
                       <span>{cont.createdat.split(".", 1)}</span>
 
                       <span>{moment(cont.createdat).add(90, "day").format("YYYY-MM-DDThh:mm:ss")}</span>
 
-                      <span>
+                      {/* <span>
                         <button className="unstakeBtn" onClick={() => {}}>
                           Unstake
                         </button>
-                      </span>
+                      </span> */}
                     </li>
                   ))}
               </ul>

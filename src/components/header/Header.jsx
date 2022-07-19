@@ -191,7 +191,8 @@ export default function Header() {
                 style={{ color: isStaking && "#fff" }}
                 onClick={() => {
                   // onclick_staked_val_btn("/employment");
-                  SetErrorBar("Will soon");
+                  navigate("/employment");
+                  // SetErrorBar("Will soon");
                 }}
               >
                 Employment

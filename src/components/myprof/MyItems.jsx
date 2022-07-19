@@ -246,7 +246,7 @@ export default function MyItems() {
                 </div>
                 <div className="saleBox"></div>
 
-                <button className="actionBtn" onClick={() => navigate("/staking")}>
+                <button className="actionBtn" onClick={() => navigate("/")}>
                   Buy
                 </button>
 
@@ -334,7 +334,7 @@ export default function MyItems() {
                 </div>
                 <div className="saleBox"></div>
 
-                <button className="actionBtn" onClick={() => navigate("/staking")}>
+                <button className="actionBtn" onClick={() => navigate("/")}>
                   Buy
                 </button>
 
@@ -537,7 +537,7 @@ export default function MyItems() {
                 </div>
                 <div className="saleBox"></div>
 
-                <button className="actionBtn" onClick={() => navigate("/main")}>
+                <button className="actionBtn" onClick={() => navigate("/")}>
                   Buy
                 </button>
 

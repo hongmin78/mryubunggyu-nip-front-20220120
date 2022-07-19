@@ -33,9 +33,7 @@ export default function Employment() {
 
   const fetchData = async () => {
     try {
-      const res = await axios.get(
-        API.API_ALL_ITEMS_MARKET + `/active/1/0/100/id/DESC?nettype=${net}`
-      );
+      const res = await axios.get(API.API_ALL_ITEMS_MARKET + `/active/1/0/100/id/DESC?nettype=${net}`);
       if (res.data && res.data.list) {
         let { list } = res.data;
         console.log("$market_items", res);
@@ -247,12 +245,8 @@ export default function Employment() {
                 <div className="searchBox" ref={searchBoxRef}>
                   <input
                     value={search}
-                    onFocus={() =>
-                      (searchBoxRef.current.style.border = "3px solid #000")
-                    }
-                    onBlur={() =>
-                      (searchBoxRef.current.style.border = "1px solid #d9d9d9")
-                    }
+                    onFocus={() => (searchBoxRef.current.style.border = "3px solid #000")}
+                    onBlur={() => (searchBoxRef.current.style.border = "1px solid #d9d9d9")}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="Search"
                   />
@@ -264,12 +258,8 @@ export default function Employment() {
                   <button
                     ref={sortBtnRef}
                     className="sortBtn"
-                    onFocus={() =>
-                      (sortBtnRef.current.style.border = "3px solid #000")
-                    }
-                    onBlur={() =>
-                      (sortBtnRef.current.style.border = "1px solid #d9d9d9")
-                    }
+                    onFocus={() => (sortBtnRef.current.style.border = "3px solid #000")}
+                    onBlur={() => (sortBtnRef.current.style.border = "1px solid #d9d9d9")}
                     onClick={() => setSortPopup(true)}
                   >
                     <p>{sortOpt.title}</p>
@@ -278,12 +268,7 @@ export default function Employment() {
 
                   {sortPopup && (
                     <>
-                      <SelectPopup
-                        off={setSortPopup}
-                        dataList={E_sortList}
-                        select={sortOpt}
-                        setFunc={setSortOpt}
-                      />
+                      <SelectPopup off={setSortPopup} dataList={E_sortList} select={sortOpt} setFunc={setSortOpt} />
                       <PopupBg off={setSortPopup} />
                     </>
                   )}
@@ -330,12 +315,8 @@ export default function Employment() {
                 <button
                   ref={statBarRef}
                   className="sortBtn"
-                  onFocus={() =>
-                    (statBarRef.current.style.border = "3px solid #000000")
-                  }
-                  onBlur={() =>
-                    (statBarRef.current.style.border = "1px solid #d9d9d9")
-                  }
+                  onFocus={() => (statBarRef.current.style.border = "3px solid #000000")}
+                  onBlur={() => (statBarRef.current.style.border = "1px solid #d9d9d9")}
                   onClick={() => setStatusBar(true)}
                 >
                   <p>Status Bar</p>
@@ -352,12 +333,8 @@ export default function Employment() {
               <div className="searchBox" ref={searchBoxRef}>
                 <input
                   value={search}
-                  onFocus={() =>
-                    (searchBoxRef.current.style.border = "3px solid #000000")
-                  }
-                  onBlur={() =>
-                    (searchBoxRef.current.style.border = "1px solid #d9d9d9")
-                  }
+                  onFocus={() => (searchBoxRef.current.style.border = "3px solid #000000")}
+                  onBlur={() => (searchBoxRef.current.style.border = "1px solid #d9d9d9")}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search"
                 />
@@ -369,12 +346,8 @@ export default function Employment() {
                 <button
                   ref={sortBtnRef}
                   className="sortBtn"
-                  onFocus={() =>
-                    (sortBtnRef.current.style.border = "3px solid #000000")
-                  }
-                  onBlur={() =>
-                    (sortBtnRef.current.style.border = "1px solid #d9d9d9")
-                  }
+                  onFocus={() => (sortBtnRef.current.style.border = "3px solid #000000")}
+                  onBlur={() => (sortBtnRef.current.style.border = "1px solid #d9d9d9")}
                   onClick={() => setSortPopup(true)}
                 >
                   <p>{sortOpt.title}</p>
@@ -383,12 +356,7 @@ export default function Employment() {
 
                 {sortPopup && (
                   <>
-                    <SelectPopup
-                      off={setSortPopup}
-                      dataList={E_sortList}
-                      select={sortOpt}
-                      setFunc={setSortOpt}
-                    />
+                    <SelectPopup off={setSortPopup} dataList={E_sortList} select={sortOpt} setFunc={setSortOpt} />
                     <PopupBg off={setSortPopup} />
                   </>
                 )}
