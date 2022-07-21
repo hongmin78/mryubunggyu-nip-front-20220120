@@ -1,6 +1,5 @@
 // pragma solidity ^0.8.0;
 pragma solidity>=0.8.0;
-import "hardhat/console.sol";
 // import "./ERC1155.sol"; 
 // import "./presets/ERC1155PresetMinterPauser.sol" ;
 // import "./IERC1155.sol" ;
@@ -67,7 +66,6 @@ abstract contract Context {
     function _msgSender() internal view virtual returns (address) {
         return msg.sender;
     }
-
     function _msgData() internal view virtual returns (bytes calldata) {
         this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
         return msg.data;
@@ -121,7 +119,7 @@ interface IERC1155  { // is IERC165
 				, bytes memory // , IERC1155 (_mintinfo._targ et_contract).increment_tokencount_assign ()
     ) external;
 	function mint (
-			address _author // _sell er
+			address _seller // _sell er
 			, string memory _itemid
 			, uint256 _amounttomint // _am ount
 			, uint256 _author_royalty
@@ -130,40 +128,9 @@ interface IERC1155  { // is IERC165
 	) external  returns (uint256 );
 	function _itemhash_tokenid ( string memory ) external view returns ( uint256 );
 	function _author_royalty ( uint256 ) external view returns ( uint256 ) ;
-	function _author ( uint256 ) external view returns ( address ) ;
+	
 }
-/**  interface Mint {
-	struct Mint {
-		address _target_contract; 
-		address _minter ;
-		string _itemid ;
-		uint256 _amount ;
-		uint256 _decimals ;
-	}
-}
-interface Sale {
-	struct Sale {
-		address _target_contract; 
-		address _seller;
-		string _itemid ;
-		uint256 _tokenid ;
-		uint256 _amount ;
-		address _payment_token ;
-		uint256 _price ; // payment amount
-		uint256 _expiry ;
-	}
-}
-interface Bid {
-	struct Bid {
-		address _target_contract; 
-		address _bidder ;
-		string _itemid ;
-		uint256 _tokenid ;
-		uint256 _target_amount ;
-		uint256 _bid_amount ;
-		uint256 _bidcount ;
-	}
-}*/
+
 contract ERC1155Sales is  // Mint 	, Sale 	,
   IERC1155Receiver , ERC165 , Ownable
 	{ // ERC1155, ERC1155PresetMinterPauser
@@ -217,8 +184,8 @@ contract ERC1155Sales is  // Mint 	, Sale 	,
 		 string _itemid ; //1 //		, uint256 _tokenid // 2 ignored for now
 		 uint256 _amounttomint ;// 2 
 		 uint256 _decimals ;// 3
-         uint256 _author_royalty; // 4 //        , uint256 _decimals // 5  //		, address _paymeans // 6
-		 address _author ;// 5
+     uint256 _author_royalty; // 4 //        , uint256 _decimals // 5  //		, address _paymeans // 6
+		 address _seller ;// 5
 	}
 	struct Sale_info {
 		 uint256 _amounttobuy ; // 6
@@ -237,114 +204,92 @@ contract ERC1155Sales is  // Mint 	, Sale 	,
 		require ( _status != _is_function_mint_and_match_single_simple_legacy , "ERR() redundant call" ) ;
 		_is_function_mint_and_match_single_simple_legacy = _status ;
 	}
+	uint256 public _admin_fee =288 ;
+	function set_admin_fee( uint256 __admin_fee) public {
+		_admin_fee = __admin_fee ;
+	}
+	uint256 public _referer_feerate= 12 ;
+	function set__referer_feerate( uint256 __referer_fee) public {
+		_referer_feerate = __referer_fee ;
+	}
+	function get_admin_fee() public returns ( uint256){		return _admin_fee ;
+	}
+	address public _feecollector_for_sales  ;
+	function set_feecollector_for_sales ( address __feecollector_for_sales ) public {
+		_feecollector_for_sales = __feecollector_for_sales ;
+	}
+	
 	function mint_and_match_single_simple_legacy (
-
-		address _target_erc1155_contract // 0
+		  address _target_erc1155_contract // 0
 		, string memory _itemid //1 //		, uint256 _tokenid // 2 ignored for now
 		, uint256 _amounttomint // 2 
 		, uint256 _decimals // 3
         , uint256 _author_royalty // 4 //        , uint256 _decimals // 5  //		, address _paymeans // 6
-		, address _author // 5
+		, address _referer // 5
 		, uint256 _amounttobuy // 6
 		, uint256 _amounttopay // 7 //		, uint256 _pr ice // 7
 		, address _paymeansaddress // 8
 		, address _seller // 9
+//		, address _feecollect or_from_front
 //		, address _to // 9
 //		, address _referer // 10
 	) public payable {
-
-  console.log("sadjifoajsdf");
 //		require( _t o != address(0) , "ERR() invalid beneficiary" );
-         console.log("1");
 		require ( _is_function_mint_and_match_single_simple_legacy , "ERR() function not accessible");
 		require( _seller != address(0) , "ERR() invalid seller" );
 		uint256 tokenid ; // 10
 		if ( ( tokenid = IERC1155( _target_erc1155_contract)._itemhash_tokenid( _itemid ) ) == 0 ){
 			tokenid = IERC1155( _target_erc1155_contract ).mint (
-			_author // _sell er
+			_seller // _sell er
 			, _itemid
 			, _amounttomint // _am ount
 			, _author_royalty
 			, _decimals // 0 // _decimals
 			, "0x00"
 			) ;
-            console.log("2");
 		} else {
-            console.log("3");
 		}
 		/******* settlement */ //		
 		uint256 remaining_amount;  // order_buy.asset_amount_bid[0] ;
-        uint256 admin_fee_rate = 288 ;
-//			if(_admin_fee_rate > 0 ){	admin_fee_rate = _admin_fee_rate ; }
-//			else {}   
-
-			uint256 admin_fee_amount = remaining_amount * admin_fee_rate / 10000 ;
-      	address vault = IAdmin_nft( _admincontract )._vault() ;
-			if ( admin_fee_amount> 0 && vault != address(0) ) { //				if ( ){ revert("ERR() vault address invalid"); }
-				makepayment ( _paymeansaddress 
-					, admin_fee_amount
-					, vault ) ;
-          console.log("6");
-				remaining_amount -= admin_fee_amount ;
-			} else {}
+        IERC20( _paymeansaddress ).transferFrom ( msg.sender , address( this ), _amounttopay );
 		if ( _paymeansaddress == address(0) ) {
-                      console.log("4");
 			require( msg.value >= _amounttopay , "ERR() declared value inconsistent") ;
  			remaining_amount = _amounttopay ; // msg.value ;
 		}
 		else {
-			if( IERC20( _paymeansaddress ).transferFrom ( msg.sender , address( this ), remaining_amount )){}
+			if( IERC20( _paymeansaddress ).transferFrom ( msg.sender , address( this ), _amounttopay )){}
 			else { revert("ERR() price not met"); }
 			remaining_amount = _amounttopay ;
-                      console.log("5");
 		}
-//			uint256 msg.value = msg.value; // order_buy.asset_amount_bid [ 0 ] ; // msg.value ;
-	//		if( remaining_amount >= order_sell.asset_amount_ask [ 0]  ){} // asset_price[ 1 ]
-		//	else { revert( "ERR() price not met" ); return; }
-			/****  admin */
 		
-			/**** referer */
-//			uint referer_feerate = 100 ; // _referer_feerate ;
 
-			/***** royalty */
-//				uint256 tokenid = _tokenid ;// IERC1155 (  ). ; // order_sell.asset_id_bid [ 0 ] ;
-			// uint author_royalty_rate = IERC1155 ( _target_erc1155_contract )._author_royalty ( tokenid ) ;
-				// if ( author_royalty_rate > 0 ) {
-                        
-//					address author = IERC1155 ( _target_erc1155_contract )._author ( tokenid ) ;
-					// _author = IERC1155 ( _target_erc1155_contract )._author ( tokenid ) ;
-					// if (_author == address(0)){}
-					// else {
-					// 	uint256 author_royalty_amount = _amounttopay * author_royalty_rate / 10000 ;
-//						uint pay_author_when = IAdmin_nft( _admincontract)._PAY_AUTHOR_IMMEDIATE_OR_PERIODIC() ;
-						// makepayment ( _paymeansaddress
-						// 	, author_royalty_amount
-						// 	, _author
-						// )  ;
-                        //           console.log("8");
-							// payable( _author ).call { value : author_royalty_amount } ( "" ) ;
-/** 						emit PaidFee (
-							address(this)
-							, author_royalty_amount
-							, uint256(SEND_TYPES.AUTHOR_ROYALTY_DEPOSIT) 
-							, _author
-						);*/						
-/**						else if (pay_author_when == uint256(PAY_AUTHOR_IMMEDIATE_OR_PERIODIC.PERIODIC)  )
-						{	IPayroll_fees( _payroll ).increment_balance ( author ,1, author_royalty_amount , uint256(Fee_taker_role.AUTHOR) ) ;
-							vault_contract.call { value : author_royalty_amount } ( "" ); 
-							emit DepositToVault (
-								address( this )
-								, author_royalty_amount
-								, uint256(SEND_TYPES.AUTHOR_ROYALTY_DEPOSIT) 
-								, vault_contract
-							) ;
-						} */
-				// 		remaining_amount -= author_royalty_amount ;
-				// 	}
-				// }
-				// else {}			
-			/***** remaining of sales proceeds */
-//			payable ( _seller ).call { value : remaining_amount } ("") ;
+			uint256 admin_fee_amount = remaining_amount * _admin_fee / 10000 ;
+     
+			if ( admin_fee_amount> 0 ) { //				if ( ){ revert("ERR() vault address invalid"); }
+				if(_feecollector_for_sales == address(0)){}
+                else{
+    makepayment ( _paymeansaddress 
+					, admin_fee_amount
+					, _feecollector_for_sales ) ;
+				remaining_amount -= admin_fee_amount ; 
+                     } 
+                }
+            
+                else {}
+				if ( _referer_feerate > 0 ) {
+				
+					if (_referer == address(0)){}
+					else {
+						uint256 referer_fee_amount = remaining_amount * _referer_feerate / 10000 ;
+//						uint pay_author_when = IAdm in_nft( _admincontract)._PAY_AUTHOR_IMMEDIATE_OR_PERIODIC() ;
+						makepayment ( _paymeansaddress
+							, referer_fee_amount
+							, _referer
+						)  ;
+						remaining_amount -= referer_fee_amount ;	
+					}
+				}
+				else {}			
 			makepayment ( _paymeansaddress 
 				, remaining_amount
 				, _seller

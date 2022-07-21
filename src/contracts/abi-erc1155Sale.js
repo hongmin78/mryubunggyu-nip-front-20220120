@@ -31,7 +31,33 @@ export const abi = [
   },
   {
     inputs: [],
+    name: "_admin_fee",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "_admincontract",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "_feecollector_for_sales",
     outputs: [
       {
         internalType: "address",
@@ -82,6 +108,32 @@ export const abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "_referer_feerate",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "get_admin_fee",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "address",
@@ -110,7 +162,7 @@ export const abi = [
       },
       {
         internalType: "address",
-        name: "_author",
+        name: "_referer",
         type: "address",
       },
       {
@@ -170,7 +222,7 @@ export const abi = [
           },
           {
             internalType: "address",
-            name: "_author",
+            name: "_seller",
             type: "address",
           },
         ],
@@ -312,12 +364,51 @@ export const abi = [
   {
     inputs: [
       {
+        internalType: "uint256",
+        name: "__referer_fee",
+        type: "uint256",
+      },
+    ],
+    name: "set__referer_feerate",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "__admin_fee",
+        type: "uint256",
+      },
+    ],
+    name: "set_admin_fee",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "address",
         name: "_address",
         type: "address",
       },
     ],
     name: "set_admincontract",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "__feecollector_for_sales",
+        type: "address",
+      },
+    ],
+    name: "set_feecollector_for_sales",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

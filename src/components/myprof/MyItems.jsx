@@ -14,9 +14,9 @@ import SelectPopup from "../SelectPopup";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { API } from "../../configs/api";
-import { query_with_arg } from "../../util/contract-calls";
+import { query_with_arg, getabistr_forfunction } from "../../util/contract-calls";
 import { addresses } from "../../configs/addresses";
-import { TIME_FETCH_MYADDRESS_DEF } from "../../configs/configs";
+import { TIME_FETCH_MYADDRESS_DEF, TX_POLL_OPTIONS } from "../../configs/configs";
 import { getmyaddress, LOGGER } from "../../util/common";
 import { web3 } from "../../configs/configweb3-bscmainnet";
 import { abi } from "../../contracts/abi-staker-20220414";
@@ -26,11 +26,10 @@ import moment from "moment";
 import PayPopup from "../PayPopup";
 import { net } from "../../configs/net";
 import { nettype } from "../../configs/configweb3-ropsten";
+import SetErrorBar from "../../util/SetErrorBar";
+import { requesttransaction } from "../../services/metamask";
+import awaitTransactionMined from "await-transaction-mined";
 
-const MAP_NETTYPE_SCAN = {
-  ETH_TESTNET: "https://etherscan.io",
-  BSC_MAINNET: "https://bscscan.com",
-};
 export default function MyItems() {
   const navigate = useNavigate();
   const sortBtnRef = useRef();
@@ -45,14 +44,13 @@ export default function MyItems() {
   let [itemData, setItemData] = useState([]);
   let [itemBalData, setItemBalData] = useState([]);
   let [myItems, setMyitems] = useState([]);
-  let [txscanurl, settxscanurl] = useState();
-
   let [userinfo, setuserinfo] = useState(null);
   const [getTickTimer, setGetTickTimer] = useState();
   const [tickTimer, setTickTimer] = useState();
   const [ticketInfo, setTickInfo] = useState();
-  const [itemDataInfo, setItemDataInfo] = useState();
   const [circulations, setCirculations] = useState([]);
+  let [spinner, setSpinner] = useState(false);
+  const [isApproved, setIsApproved] = useState(false);
 
   const fetchdata = async (_) => {
     let myaddress = getmyaddress();
@@ -63,6 +61,18 @@ export default function MyItems() {
         let { respdata } = resp.data;
         LOGGER("myticket", resp.data);
         setuserinfo(respdata);
+      }
+    });
+    axios.get(API.API_QUERY_ORDERS + `/${myaddress}?nettype=${net}`).then((resp) => {
+      LOGGER("Buy my item", resp.data);
+      let { status, list, payload } = resp.data;
+      if (status == "OK") {
+        if (payload?.rowdata) {
+          setMyitems(payload.rowdata);
+        }
+        if (list) {
+          setMyitems(list);
+        }
       }
     });
 
@@ -93,16 +103,14 @@ export default function MyItems() {
           //        console.log(res.data);
           //      setMoreCollection(res.data);
         });
-      axios.get(API.API_QUERY_ORDERS + `/${myaddress}?nettype=${net}`).then((resp) => {
-        LOGGER("Buy my item", resp.data);
-        let { status, list, payload } = resp.data;
-        if (status == "OK") {
-          if (payload?.rowdata) {
-            setMyitems(payload.rowdata);
-          }
-          if (list) {
-            setMyitems(list);
-          }
+
+      let myaddress = getmyaddress();
+      axios.get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`).then((resp) => {
+        LOGGER("API_ticketInfo", resp.data);
+
+        let { status, respdata } = resp.data;
+        if (status == "OK" && respdata !== null) {
+          setTickInfo(respdata);
         }
       });
     });
@@ -135,36 +143,17 @@ export default function MyItems() {
       });
   };
 
-  console.log("asdiofjaosdijfasdf", itemData);
-
-  // useEffect(() => {
-  //   setInterval(() => {
-  //     getTimeMoment && setTimeMoment(moment(moment.unix(getTimeMoment) - moment()));
-  //   }, 1000);
-  // }, [getTimeMoment]);
-
-  // useEffect(() => {
-  //   setInterval(() => {
-  //     gettimeReceivables && setTimeReceivables(moment(moment.unix(gettimeReceivables) - moment()));
-  //   }, 1000);
-  // }, [gettimeReceivables]);
-
   useEffect(() => {
-    // let myaddress = "0xb440393a03078b967000f09577e32c3252f15832";
     let myaddress = getmyaddress();
     axios.get(API.API_LOGSTAKES + `/${myaddress}?nettype=${net}`).then((resp) => {
       LOGGER("API_LOGSTAKES", resp.data);
       let { status, respdata } = resp.data;
       if (status == "OK") {
         setGetTickTimer(respdata?.createdat);
-        // setTickTimer(moment(respdata?.createdat).add(90, "days").format("YYYY-MM-DD"));
+
         setTickTimer("2022-08-04");
       }
     });
-
-    // setInterval(() => {
-    //   getTickTimer && setTickTimer(moment(getTickTimer).add(90, "days") - moment());
-    // }, 1000);
   }, [getTickTimer]);
 
   useEffect(
@@ -173,24 +162,71 @@ export default function MyItems() {
     },
     [isOpen]
   );
-  const date = moment().unix();
 
   const openModal = () => {
     setIsOpen((prevState) => !prevState);
   };
 
-  useEffect(() => {
-    // let myaddress = "0xb440393a03078b967000f09577e32c3252f15832";
+  const onclick_staking = () => {
     let myaddress = getmyaddress();
-    axios.get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`).then((resp) => {
-      LOGGER("API_ticketInfo", resp.data);
-
-      let { status, respdata } = resp.data;
-      if (status == "OK" && respdata !== null) {
-        setTickInfo(respdata);
-      }
+    if (myaddress) {
+    } else {
+      return;
+    }
+    setSpinner(true);
+    let abistring;
+    abistring = getabistr_forfunction({
+      contractaddress: addresses.contract_erc1155,
+      abikind: "STAKING",
+      methodname: "deposit_batch",
+      aargs: [
+        //kip17토큰컨트렉터, itemData.id
+      ],
     });
-  }, []);
+    requesttransaction({
+      from: myaddress,
+      to: myaddress, //스테이킹컨트렉터,
+      data: abistring,
+      value: "0x00",
+    }).then((resp) => {
+      console.log("$EMPLOY_res", resp);
+      if (resp) {
+      } else {
+        SetErrorBar("User denied");
+        setSpinner(false);
+        return;
+      }
+      SetErrorBar("Staked");
+      setSpinner(false);
+      let txhash;
+      txhash = resp;
+
+      // axios
+      //   .post(API.API_TXS + `/${txhash}`, {
+      //     txhash: txhash,
+      //     username: myaddress,
+      //     typestr: "KING_KONG_STAKED",
+      //     auxdata: {
+      //       user_action: "KING_KONG_STAKED",
+      //       contract_type: addresses.contract_erc1155, // .ETH_TESTNET
+      //       contract_address: addresses.contract_erc1155, // .ETH_TESTNET
+      //       to_token_contract: addresses.contract_erc1155,
+      //       my_address: myaddress,
+      //       tokenIds: addresses.contract_erc1155,
+
+      //       nettype: net,
+      //     },
+      //   })
+      //   .then((res) => {
+      //     console.log("onclickstake reported!", res);
+      //   })
+      //   .catch((err) => console.log(err));
+      // awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
+      //   setIsApproved(true);
+      //   console.log("minedtxreceipt", minedtxreceipt);
+      // });
+    });
+  };
 
   if (isMobile)
     return (
@@ -282,31 +318,12 @@ export default function MyItems() {
 
                   <div className="value">
                     <strong className="price">100 USDT</strong>
-
-                    {/* <ul className="timeList">
-                      <li>{moment(tickTimer).days()}일</li>
-                      <li>{moment(tickTimer).hours()}시간</li>
-                      <li>{moment(tickTimer).month()}분</li>
-                      <li>{moment(tickTimer).second()}초</li>
-                    </ul> */}
                   </div>
 
                   <ul className="priceBox">
                     <li>
                       <p className="key">Current price</p>
                       <p className="value">100 USDT</p>
-                    </li>
-                    {/* <li>
-                    <p className="key">Transaction price</p>
-                    <p className="value">100 USDT</p>
-                  </li> */}
-                    <li
-                      onClick={(evt) => {
-                        window.open(txscanurl);
-                      }}
-                    >
-                      {/* <p className="key">TxHash</p>
-                    <p className="value">{txhash}</p> */}
                     </li>
                   </ul>
                 </div>
@@ -589,12 +606,6 @@ export default function MyItems() {
                       <p className="key">Current price</p>
                       <p className="value">{ticketInfo.price} USDT</p>
                     </li>
-
-                    <li
-                      onClick={(evt) => {
-                        window.open(txscanurl);
-                      }}
-                    ></li>
                   </ul>
                 </div>
 
@@ -669,7 +680,6 @@ export default function MyItems() {
                       onClick={() => {
                         setReceivables(item);
                         openModal();
-                        setItemDataInfo(item.itemdata);
                       }}
                     >
                       Pay
@@ -770,7 +780,7 @@ export default function MyItems() {
             ))}
           {myItems.length !== 0 &&
             myItems.map((item, index) => {
-              if (item.isprivate === 1) {
+              if (item.isprivate === 1 && item.type === "kingkong") {
                 return (
                   <li key={index} className="swapBox">
                     <div className="imgBoxBal">

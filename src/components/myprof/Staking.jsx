@@ -5,7 +5,7 @@ import { D_recommendList } from "../../data/DmyPage";
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { strDot } from "../../util/Util";
-import { D_rewardHeader, D_rewardList, D_vaultHeader, D_vaultList } from "../../data/Dstaking";
+import { D_rewardHeader, D_rewardList, D_vaultHeader, D_vaultList, D_stakeHeader } from "../../data/Dstaking";
 import { getmyaddress, LOGGER } from "../../util/common";
 import axios from "axios";
 import moment from "moment";
@@ -69,10 +69,10 @@ export default function Staking() {
                           <p className="value">{moment(cont.createdat).add(90, "day").format("YYYY-MM-DD hh:mm:ss")}</p>
                         </li>
                       </ul>
-                      {/* 
+
                       <button className="unstakeBtn" onClick={() => {}}>
                         Unstake
-                      </button> */}
+                      </button>
                     </li>
                   ))}
               </ul>
@@ -121,6 +121,69 @@ export default function Staking() {
   else
     return (
       <PstakingBox>
+        <ul className="contList">
+          <li className="vaultsBox">
+            <strong className="contTitle">Staking Status</strong>
+
+            <div className="listBox">
+              <ul className="listHeader">
+                {D_stakeHeader.map((cont, index) => (
+                  <li key={index}>{cont}</li>
+                ))}
+              </ul>
+
+              <ul className="list">
+                <li>
+                  <span style={{ marginLeft: 40 }}>
+                    <p>10 NFT</p>
+                  </span>
+                  <span>
+                    <p>0.00 Nips</p>
+                  </span>
+                  <span>5%</span>
+                </li>
+              </ul>
+            </div>
+          </li>
+
+          {/* <li className="rewardBox">
+            <strong className="contTitle">Earned Rewards</strong>
+
+            <div className="listBox">
+              <ul className="listHeader">
+                {D_rewardHeader.map((cont, index) => (
+                  <li key={index}>{cont}</li>
+                ))}
+              </ul>
+
+              <ul className="list">
+                {D_rewardList.map((cont, index) => (
+                  <li key={index}>
+                    <span>
+                      <img src={cont.img} alt="" />
+                      <p>{cont.name}</p>
+                    </span>
+
+                    <span>
+                      <p>{cont.amount}&nbsp;USDT</p>
+                    </span>
+
+                    <span>{cont.apy}%</span>
+
+                    <span>{cont.cycle}</span>
+
+                    <span>
+                      <p>{cont.earned} NIP</p>
+                      <button className="claimBtn" onClick={() => {}}>
+                        Claim
+                      </button>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </li> */}
+        </ul>
         <ul className="contList">
           <li className="vaultsBox">
             <strong className="contTitle">Vaults</strong>
@@ -365,6 +428,7 @@ const PstakingBox = styled.section`
           .list li span {
             &:nth-of-type(3) {
               width: 255px;
+              margin-left: 50px;
             }
 
             &:nth-of-type(5) {

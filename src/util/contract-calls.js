@@ -21,19 +21,18 @@ const MAP_STR_ABI = {
   STAKE: abistake,
   ADMIN: abiadmin,
   TICKETNFT: abiticketnft,
-
   PAY: abipay,
   DELINQUENT: abidelinquent,
   ERC1155Sale: abierc1155sales,
   ERC1155: abierc1155,
-  ERC1155Ticket: abierc1155ticket,
-  ERC1155TicketSale: abierc1155ticketsale,
 };
 const getabistr_forfunction = (jargs) => {
+  console.log("jargs", jargs);
   let { contractaddress, abikind, methodname, aargs } = jargs;
   let contract;
   contractaddress = contractaddress.toLowerCase();
   let sig = sha256(contractaddress + methodname);
+  console.log("sig", sig);
   if (jcontracts[sig]) {
     contract = jcontracts[sig];
   } else {

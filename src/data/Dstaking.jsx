@@ -4,6 +4,8 @@ import E_prof3 from "../img/staking/E_prof3.png";
 
 const D_vaultHeader = ["Stake", "Staking Amount", "Start", "Ended", ""];
 
+const D_stakeHeader = ["Total Staking Token", "Total Claimed Reward", "Estimated Apr"];
+
 const D_vaultList = [
   {
     img: E_prof1,
@@ -49,4 +51,4 @@ const D_rewardList = [
   },
 ];
 
-export { D_vaultHeader, D_vaultList, D_rewardHeader, D_rewardList };
+export { D_vaultHeader, D_vaultList, D_rewardHeader, D_rewardList, D_stakeHeader };

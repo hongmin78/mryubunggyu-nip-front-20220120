@@ -30,8 +30,9 @@ export default function BidPopup({ off, itemdata }) {
   const [allowance, setAllowance] = useState(0);
   let [spinner, setSpinner] = useState(false);
   let [mybalance, setmybalance] = useState();
+  let [userinfo, setuserinfo] = useState(null);
 
-  console.log("itemdata", itemdata);
+  console.log("userinfo", userinfo);
 
   const queryAllowance = () => {
     let myaddress = getmyaddress();
@@ -259,17 +260,16 @@ export default function BidPopup({ off, itemdata }) {
           methodname: "mint_and_match_single_simple_legacy",
           // eslint-disable-next-line no-sparse-arrays
           aargs: [
-            // addresses.contract_erc1155_ticket_sales_minter, // target contractaddress
             addresses.contract_erc1155, // target contractaddress
             `${itemdata?.tokenid}`,
             "1", // amounttomint
-            "0", // decimals
-            "0", // authorroyalty
-            itemdata?.seller,
+            "0", // _decimals
+            "0",
+            userinfo?.username,
             "1",
             getweirep("" + itemdata?.price),
             addresses.contract_USDT, // sellersaddress
-            itemdata?.seller, // target contractaddress
+            itemdata?.seller,
           ],
         },
       },
@@ -420,6 +420,16 @@ export default function BidPopup({ off, itemdata }) {
     // let myaddress = "0xb440393a03078b967000f09577e32c3252f15832";
     let myaddress = getmyaddress();
     if (myaddress) {
+      axios.get(API.API_USERINFO + `/${myaddress}?nettype=${net}`).then((resp) => {
+        if (resp.data && resp.data.respdata) {
+          let { respdata } = resp.data;
+          LOGGER("myticket", resp.data);
+          respdata.referer &&
+            axios.get(API.API_SINGLE_REFFERER + `/${respdata.referer}?nettype=${net}`).then((resp) => {
+              setuserinfo(resp.data.respdata);
+            });
+        }
+      });
     } else {
       SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
       return;
@@ -443,7 +453,6 @@ export default function BidPopup({ off, itemdata }) {
 
   useEffect(() => {
     setSpinner(true);
-    console.log("asodifjaosdijf", itemdata);
 
     setTimeout(() => {
       queryAllowance();

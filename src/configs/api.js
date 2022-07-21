@@ -36,6 +36,7 @@ const API = {
   API_TYPESTR: `${URL}/queries/itembalances`,
   API_LOGSTAKES: `${URL}/queries/singlerow/logstakes/username`,
   API_SINGLE_ORDER: `${URL}/queries/singlerow/orders/uuid`,
+  API_SINGLE_REFFERER: `${URL}/queries/singlerow/users/myreferercode`,
   API_REFERER: `${URL}/queries/rows/refererfeepayments/referercode`,
   API_KEY_TIME_STAMP: `${URL}/queries/singlerow/settings/key_/FRONT_END_LATEST_VER_TIMESTAMP`,
   API_GET_TICK_INFO: `${URL}/queries/singlerow/logstakes/username`,

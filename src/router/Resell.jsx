@@ -101,6 +101,7 @@ export default function Resell() {
   };
 
   const queryApprovalForAll = async (item) => {
+    setSpinner(true);
     try {
       let myaddress = getmyaddress();
       if (myaddress) {
@@ -145,13 +146,13 @@ export default function Resell() {
 
   const approveForAll = () => {
     let myaddress = getmyaddress();
+    setSpinner(true);
     if (myaddress) {
     } else {
       SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
       setSpinner(false);
       return;
     }
-    setSpinner(true);
     if (type === "kingkong") {
       let abistr = getabistr_forfunction({
         contractaddress: addresses.contract_erc1155,
@@ -166,6 +167,7 @@ export default function Resell() {
         value: "0x00",
       }).then((resp) => {
         if (resp) {
+          setSpinner(false);
         } else {
           SetErrorBar(messages.MSG_USER_DENIED_TX);
           return;
@@ -193,6 +195,7 @@ export default function Resell() {
         value: "0x00",
       }).then((resp) => {
         if (resp) {
+          setSpinner(false);
         } else {
           SetErrorBar(messages.MSG_USER_DENIED_TX);
           return;

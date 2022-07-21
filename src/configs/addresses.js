@@ -12,13 +12,17 @@ const jaddresses = {
     // payment_for_delinquency: "0x2cdb6d037cc0a9e5480f9071b4a00f20055057a7",
     payment_for_delinquency: "0x3a21780372d2bf9be278906295984a9799bea2a8",
     contract_ticketnft: "0x60123597c04bB08655e027B3398D0BD336ad68C6",
-    contract_erc1155_sales: "0x701B224c3E0CBF57d16C857D588A38F30FF3E82a", // 2022.06.05 11:20pm latest release
-    contract_erc1155: "0xE437A4F3E2b69331CEd5B816682f2653530000DC", // 2022.06.05 latest release
     // ticket sales contracts
+    // contract_erc1155_sales: "0x701B224c3E0CBF57d16C857D588A38F30FF3E82a", // 2022.06.05 11:20pm latest release
+    // contract_erc1155: "0xE437A4F3E2b69331CEd5B816682f2653530000DC", // 2022.06.05 latest release
+    contract_erc1155_sales: "0x32F5b0Bf75675e00EA6E630880d84F75dF3f22ac", // 2022.06.05 11:20pm latest release
+    contract_erc1155: "0xf3f9ae90dadb021bb9bacf53bc0fbf9f3f963ef2", // 2022.06.05 latest release
+    //kingkong
     // contract_erc1155_ticket_sales_minter: "0x14B60B05973781ca781491b56c292d75d1e6bB71", // 2022.07.13 release
     // contract_erc1155_ticket_sales_minter: "0x45C0EE7b417A71c4a6F69b2d5F06F7DBBB93c34d", // 2022.07.13 release
     // contract_erc1155_ticket_sales: "0x7da775c5bfcf197d306212d3f7ebc99730659c76",
     // contract_erc1155_ticket_sales: "0xf0a185a05367dE0D296109cA0c0E81CdFDd09f41",
+    // 0x249834e1a739C6a27f064c037F78e6E6a22bc355
   },
   BSC_MAINNET: {
     contract_USDT: "0x55d398326f99059fF775485246999027B3197955", // owner : 0x83f714ad20e34748516e8367faf143abde6c3783
