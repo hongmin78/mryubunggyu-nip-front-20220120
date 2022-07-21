@@ -6,17 +6,9 @@ export default function PdfPopup({ type }) {
     <>
       {type === "introduction" && (
         <PdfPopupBox>
-          {new Array(19).fill("*").forEach((el, i) => {
+          {new Array(19).fill("*").map((el, i) => {
             return (
-              <img
-                src={
-                  require(`../doc/nip_wp${
-                    i + 1 < 10 ? "0" + i + 1 : i + 1
-                  }.png`).default
-                }
-                alt=""
-                key={i}
-              />
+              <img src={require(`../doc/nip_wp${i + 1 < 10 ? "0" + (i + 1) : i + 1}.png`).default} alt="" key={i} />
             );
           })}
         </PdfPopupBox>
@@ -26,11 +18,7 @@ export default function PdfPopup({ type }) {
           {new Array(17).fill("*").map((el, i) => {
             return (
               <img
-                src={
-                  require(`../doc/nftinfinity_manual/nip_wp${
-                    i + 1 < 10 ? "0" + (i + 1) : i + 1
-                  }.png`).default
-                }
+                src={require(`../doc/nftinfinity_manual/nip_wp${i + 1 < 10 ? "0" + (i + 1) : i + 1}.png`).default}
                 alt=""
                 key={i}
               />
