@@ -1,91 +1,158 @@
 import styled from "styled-components";
 import I_x from "../img/icon/I_x.svg";
-// import { useState } from "react";
-import { Fragment, useEffect, useRef, useState } from "react";
-import E_detailItem from "../img/market/E_detailItem.png";
+import I_tIcon from "../img/icon/I_tIcon.png";
+import I_chkWhite from "../img/icon/I_chkWhite.svg";
+import { putCommaAtPrice } from "../util/Util";
+import { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
+import PopupBg from "./PopupBg";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useParams } from "react-router-dom";
-import { LOGGER, getmyaddress, onclickcopy, PARSER, conv_jdata_arrkeyvalue } from "../util/common";
-import { API } from "../configs/api";
+import { getabistr_forfunction, query_with_arg, query_noarg, query_eth_balance } from "../util/contract-calls";
+import { addresses } from "../configs/addresses";
+import { DECIMALS_DISP_DEF } from "../configs/configs"; // DueAmount,
+import { LOGGER, getmyaddress, getobjtype } from "../util/common";
+import { getweirep, getethrep } from "../util/eth";
+import { requesttransaction } from "../services/metamask";
 import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
-import { net } from "../configs/net";
-import { getabistr_forfunction, query_with_arg } from "../util/contract-calls";
-import E_staking from "../img/common/E_staking.png";
-import { addresses } from "../configs/addresses";
-import { getethrep, getweirep } from "../util/eth";
-import { requesttransaction } from "../services/metamask";
+import { API } from "../configs/api";
 import awaitTransactionMined from "await-transaction-mined";
-import { web3 } from "../configs/configweb3-ropsten";
-import { TX_POLL_OPTIONS } from "../configs/configs";
+import { web3, BASE_CURRENCY, PAY_CURRENCY, NETTYPE } from "../configs/configweb3";
+import { TX_POLL_OPTIONS, MAX_GAS_LIMIT } from "../configs/configs";
+import I_spinner from "../img/icon/I_spinner.svg";
+import { strDot } from "../util/Util";
+import { net } from "../configs/net";
+import E_staking from "../img/common/E_staking.png";
 
-export default function BidPopup({ off, itemdata }) {
-  const params = useParams();
+const MODE_DEV_PROD = "PROD";
+export default function BidPopup({ off, userInfo, receivables, itemdata }) {
+  console.log("marketPlaceList", itemdata);
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
-  const [price, setPrice] = useState("");
-  const [saleStatus] = useState(1);
-  const [allowance, setAllowance] = useState(0);
-  let [spinner, setSpinner] = useState(false);
+  const [termChk, setTermChk] = useState(false);
+  let [myaddress, setmyaddress] = useState(getmyaddress());
   let [mybalance, setmybalance] = useState();
+  let [isallowanceok, setisallowanceok] = useState(false);
+  let [allowanceamount, setallowanceamount] = useState();
+  let [approve, setApprove] = useState(false);
+  // let [st akedbalance, setsta kedbalance] = useState();
+  let [tvl, settvl] = useState();
+  let [tickerusdt, settickerusdt] = useState(1);
+  let [myethbalance, setmyethbalance] = useState();
+  let [done, setDone] = useState(false);
+  let spinnerHref = useRef();
+  let spinnerHref_approve = useRef();
+  let [isloader_00, setisloader_00] = useState(false);
+  let [isloader_01, setisloader_01] = useState(false);
+  let [DueAmount, setDueAmount] = useState(parseInt(itemdata?.price));
+  let [refererFeeRate, setRefererFeeRate] = useState("");
   let [userinfo, setuserinfo] = useState(null);
 
-  console.log("userinfo", userinfo);
+  useEffect((_) => {
+    const spinner = spinnerHref.current; // document.querySelector("Spinner");
+    spinner.animate([{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], {
+      duration: 1000,
+      iterations: Infinity,
+    });
+    const spinner_approve = spinnerHref_approve.current; // document.querySelector("Spinner");
+    spinner_approve.animate([{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], {
+      duration: 1000,
+      iterations: Infinity,
+    });
+    axios
+      .get(API.API_QUERY_STRING("SALE_REFERER_FEE_RATE") + `?nettype=${net}`)
+      .then((res) => {
+        if (res.data && res.data.respdata) {
+          console.log("$fee_rate", res);
+          let { value_ } = res.data.respdata;
+          setRefererFeeRate(value_);
+        }
+      })
+      .catch((err) => console.log(err));
 
-  const queryAllowance = () => {
-    let myaddress = getmyaddress();
-    if (myaddress) {
-    } else {
-      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
-      setSpinner(false);
-      return;
-    }
+    const fetchdata = async (_) => {
+      let myaddress = getmyaddress();
 
-    const options_arg = {
-      kingkong: {
-        contractaddress: addresses.contract_USDT,
+      axios.get(API.API_USERINFO + `/${myaddress}?nettype=${net}`).then((resp) => {
+        if (resp.data && resp.data.respdata) {
+          let { respdata } = resp.data;
+          LOGGER("myticket", resp.data);
+          respdata.referer &&
+            axios.get(API.API_SINGLE_REFFERER + `/${respdata.referer}?nettype=${net}`).then((resp) => {
+              setuserinfo(resp.data.respdata);
+            });
+        }
+      });
+
+      const options_arg = {
+        kingkong: {
+          contractaddress: addresses.contract_USDT,
+          abikind: "ERC20",
+          methodname: "allowance",
+          aargs: [myaddress, addresses.contract_erc1155_sales],
+        },
+        ticket: {
+          contractaddress: addresses.contract_USDT,
+          abikind: "ERC20",
+          methodname: "allowance",
+          aargs: [myaddress, addresses.contract_erc1155_sales],
+        },
+      };
+
+      if (itemdata?.type === "kingkong") {
+        query_with_arg(options_arg["kingkong"]).then((resp) => {
+          let allowanceineth = getethrep(resp);
+
+          LOGGER("8LYRxjNp8k_kingkong", resp, allowanceineth);
+          setallowanceamount(allowanceineth);
+          //				setallowanceamount ( 100 )
+          if (allowanceineth > 0) {
+            setisallowanceok(false);
+          } else {
+          }
+        });
+      }
+
+      if (itemdata?.type === "ticket") {
+        query_with_arg(options_arg["ticket"]).then((resp) => {
+          let allowanceineth = getethrep(resp);
+
+          LOGGER("8LYRxjNp8k_ticket", resp, allowanceineth);
+          setallowanceamount(allowanceineth);
+          //				setallowanceamount ( 100 )
+          if (allowanceineth > 0) {
+            setisallowanceok(false);
+          } else {
+          }
+        });
+      }
+
+      query_with_arg({
+        contractaddress: addresses.contract_USDT, // ETH_TESTNET.
         abikind: "ERC20",
-        methodname: "allowance",
-        aargs: [myaddress, addresses.contract_erc1155_sales],
-      },
-      ticket: {
-        contractaddress: addresses.contract_USDT,
-        abikind: "ERC20",
-        methodname: "allowance",
-        aargs: [myaddress, addresses.contract_erc1155_sales],
-      },
+        methodname: "balanceOf",
+        aargs: [myaddress],
+      }).then((resp) => {
+        LOGGER("mybalance", resp);
+        setmybalance(getethrep(resp, 4));
+      });
+
+      query_eth_balance(myaddress).then((resp) => {
+        LOGGER("rmgUxgo5ye", resp);
+        setmyethbalance((+getethrep(resp)).toFixed(DECIMALS_DISP_DEF));
+      });
     };
+    setTimeout(() => {
+      fetchdata();
+    }, 1500);
+  }, []);
 
-    if (itemdata?.type === "kingkong") {
-      query_with_arg(options_arg["kingkong"]).then((resp) => {
-        console.log("$allowance_usdt: ", resp);
-        setAllowance(getethrep("" + resp));
-        SetErrorBar(`Allowance: ${getethrep("" + resp)}`);
-        setSpinner(false);
-      });
-    }
-    if (itemdata?.type === "ticket") {
-      query_with_arg(options_arg["ticket"]).then((resp) => {
-        console.log("$allowance_usdt: ", resp);
-        setAllowance(getethrep("" + resp));
-        SetErrorBar(`Allowance: ${getethrep("" + resp)}`);
-        setSpinner(false);
-      });
-    }
-  };
-
-  const approve = async () => {
+  const onclick_approve = async (_) => {
+    LOGGER("");
+    setisloader_00(true);
     let myaddress = getmyaddress();
-    if (myaddress) {
-    } else {
-      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
-      setSpinner(false);
-      return;
-    }
 
-    setSpinner(true);
     const options_arg = {
       kingkong: {
         abistr: {
@@ -104,80 +171,78 @@ export default function BidPopup({ off, itemdata }) {
         },
       },
     };
+
     if (itemdata?.type === "ticket") {
       let abistr = getabistr_forfunction(options_arg["ticket"].abistr);
-
       requesttransaction({
         from: myaddress,
         to: addresses.contract_USDT,
         data: abistr,
         value: "0x00",
       }).then((resp) => {
-        console.log("respppp", resp);
         if (resp) {
         } else {
           SetErrorBar(messages.MSG_USER_DENIED_TX);
+          setisloader_00(false);
           return;
         }
 
         let txhash = resp;
+        SetErrorBar(messages.MSG_TX_REQUEST_SENT);
+        axios
+          .post(API.API_TXS + `/${txhash}`, {
+            txhash,
+            username: myaddress,
+            typestr: "APPROVE",
+            amount: options_arg["ticket"].amount,
+            auxdata: options_arg["ticket"].auxdata,
+            contractaddress: options_arg["ticket"].operator_contract,
+            nettype: net,
+          })
+          .then((resp) => {
+            LOGGER("APPROVE RESP", resp);
+            SetErrorBar(messages.MSG_TX_REQUEST_SENT);
+          });
 
-        awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
-          console.log(minedtxreceipt);
+        awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then((minedtxreceipt) => {
+          LOGGER("minedtxreceipt", minedtxreceipt);
           SetErrorBar(messages.MSG_TX_FINALIZED);
-          queryAllowance();
-          setSpinner(false);
+          setApprove(true);
+          query_with_arg({
+            contractaddress: addresses.contract_USDT, // .ETH_TESTNET
+            abikind: "ERC20",
+            methodname: "allowance",
+            aargs: [myaddress, addresses.contract_erc1155_sales], // ETH_TESTNET.
+          }).then((resp) => {
+            let allowanceineth = getethrep(resp);
+            LOGGER("gCwXF6Jjkh", resp, allowanceineth);
+            setallowanceamount(allowanceineth); //				setallowanceamount ( 100 )
+            setisloader_00(false);
+            if (allowanceineth > 0) {
+              setisallowanceok(false);
+              setisloader_00(false);
+            } else {
+            }
+          });
         });
         console.log("txhash_ticket", txhash);
       });
     }
-    if (itemdata?.type === "kingkong") {
-      let abistr = getabistr_forfunction(options_arg["kingkong"].abistr);
-
-      requesttransaction({
-        from: myaddress,
-        to: addresses.contract_USDT,
-        data: abistr,
-        value: "0x00",
-      }).then((resp) => {
-        if (resp) {
-        } else {
-          SetErrorBar(messages.MSG_USER_DENIED_TX);
-          return;
-        }
-
-        let txhash = resp;
-
-        awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
-          console.log(minedtxreceipt);
-          SetErrorBar(messages.MSG_TX_FINALIZED);
-          queryAllowance();
-          setSpinner(false);
-        });
-        console.log("txhash_kingkong", txhash);
-      });
-    }
   };
 
-  const onClickBuy = async () => {
+  const onclick_buy = async (_) => {
+    setDone(true);
+    setisloader_01(true);
+    LOGGER("YFVGAF0sBJ");
     let myaddress = getmyaddress();
-    if (myaddress) {
+
+    if (parseInt(mybalance) >= parseInt(DueAmount)) {
     } else {
-      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
-      setSpinner(false);
+      SetErrorBar(messages.MSG_BALANCE_NOT_ENOUGH);
+      setDone(false);
+      setisloader_01(false);
       return;
     }
-    setSpinner(true);
-    console.log(
-      "$buyInfo",
-      addresses.contract_erc1155_ticket_sales, // target contractaddress
-      getweirep("" + itemdata?.price), // amounttopay
-      myaddress,
-      addresses.contract_erc1155_sales, // target contractaddress
-      itemdata.tokenid,
-      itemdata.tokenid,
-      itemdata?.seller // sellersaddress
-    );
 
     const options_abistr = {
       kingkong: {
@@ -215,7 +280,7 @@ export default function BidPopup({ off, itemdata }) {
           aargs: [
             // addresses.contract_erc1155_ticket_sales_minter, // target contractaddress
             addresses.contract_erc1155, // target contractaddress
-            `${itemdata?.tokenid}`,
+            `${itemdata?.id}`,
             "1", // amounttomint
             "0", // decimals
             "0", // authorroyalty
@@ -261,7 +326,7 @@ export default function BidPopup({ off, itemdata }) {
           // eslint-disable-next-line no-sparse-arrays
           aargs: [
             addresses.contract_erc1155, // target contractaddress
-            `${itemdata?.tokenid}`,
+            `${itemdata?.id}`,
             "1", // amounttomint
             "0", // _decimals
             "0",
@@ -275,476 +340,282 @@ export default function BidPopup({ off, itemdata }) {
       },
     };
 
-    if (itemdata?.type === "kingkong") {
-      let abistr = await getabistr_forfunction(options_abistr["kingkong"].abistr);
-      console.log("", abistr);
-      requesttransaction({
-        from: myaddress,
-        to: options_abistr["kingkong"].operator_contract,
-        data: abistr,
-        value: "0x00",
-      }).then((resp) => {
-        console.log("TXHASH------", resp);
-        if (resp) {
-        } else {
-          console.log("USER DENIED TX");
-          SetErrorBar(messages.MSG_USER_DENIED_TX);
-          setSpinner(false);
-          off();
-          return;
-        }
-        SetErrorBar(messages.MSG_DONE_SENDING_TX_REQ);
-
-        let txhash = resp;
-
-        console.log("txhash", txhash);
-        if (txhash) {
-          axios
-            .post(API.API_TXS + `/${txhash}`, {
-              txhash,
-              username: myaddress,
-              typestr: options_abistr["kingkong"].typestr,
-              amount: options_abistr["kingkong"].amount,
-              auxdata: options_abistr["kingkong"].auxdata,
-              contractaddress: options_abistr["kingkong"].operator_contract,
-              auxdata: options_abistr["kingkong"].auxdata,
-            })
-            .then((res) => {
-              axios
-                .put(API.API_UPDATE_ORDERS, {
-                  matcher_contract: options_abistr["kingkong"].operator_contract,
-                  typestr: options_abistr["kingkong"].typestr,
-                  amount: options_abistr["kingkong"].amount,
-                  uuid: itemdata?.uuid,
-                  username: myaddress,
-                  buyer: options_abistr["kingkong"].buyer,
-                  paymeansaddress: addresses.contract_USDT,
-                  paymeansname: "USDT",
-                  seller: options_abistr["kingkong"].seller,
-                  saletype: 0,
-                  price: itemdata?.price,
-                  nettype: net,
-                  auxdata: options_abistr["kingkong"].auxdata,
-                  type: itemdata?.type,
-                  txhash: txhash,
-                  tokenid: itemdata?.tokenid,
-                  oldseller: itemdata?.seller,
-                  itemid: options_abistr["kingkong"].itemid,
-                })
-                .then((res) => {
-                  LOGGER("BUY_NFT_ITEM", resp);
-                  SetErrorBar(messages.MSG_TX_REQUEST_SENT);
-                  awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
-                    LOGGER("minedtxreceipt", minedtxreceipt);
-                    off();
-                    navigate("/market");
-                    setSpinner(false);
-                    off();
-                  });
-                });
-            })
-            .catch((err) => console.log(err));
-        }
-      });
-    }
     if (itemdata?.type === "ticket") {
       let abistr = await getabistr_forfunction(options_abistr["ticket"].abistr);
       console.log("", abistr);
-      requesttransaction({
-        from: myaddress,
-        to: options_abistr["ticket"].operator_contract,
-        data: abistr,
-        value: "0x00",
-      }).then((resp) => {
-        console.log("txhash", resp);
-        let txhash = resp;
-        if (resp) {
+      const callreqtx = async () => {
+        let resp;
+        try {
+          resp = await requesttransaction({
+            from: myaddress,
+            to: addresses.contract_erc1155_sales, // .ETH_TESTNET
+            data: abistr,
+          });
+          if (resp) {
+          } else {
+            SetErrorBar(messages.MSG_USER_DENIED_TX);
+            setDone(false);
+            setisloader_01(false);
+            return;
+          }
+          let txhash = resp;
           axios
-            .post(API.API_TXS + `/${txhash}`, {
+            .post(API.API_TXS + `/${txhash}?nettype=${net}`, {
               txhash,
               username: myaddress,
+              itemid: itemdata?.itemid,
+              tokenid: itemdata?.itemid,
+              uuid: itemdata?.uuid,
               typestr: options_abistr["ticket"].typestr,
               amount: options_abistr["ticket"].amount,
               auxdata: options_abistr["ticket"].auxdata,
               contractaddress: options_abistr["ticket"].operator_contract,
             })
-            .then((res) => {
-              axios
-                .put(API.API_UPDATE_ORDERS, {
-                  matcher_contract: options_abistr["ticket"].operator_contract,
-                  typestr: options_abistr["ticket"].typestr,
-                  amount: options_abistr["ticket"].amount,
-                  uuid: itemdata?.uuid,
-                  username: myaddress,
-                  buyer: options_abistr["ticket"].buyer,
-                  paymeansaddress: addresses.contract_USDT,
-                  paymeansname: "USDT",
-                  seller: options_abistr["ticket"].seller,
-                  saletype: 0,
-                  price: itemdata?.price,
-                  nettype: net,
-                  auxdata: options_abistr["ticket"].auxdata,
-                  type: itemdata?.type,
-                  txhash: txhash,
-                  tokenid: itemdata?.tokenid,
-                  oldseller: itemdata?.seller,
-                })
-                .then((res) => {
-                  LOGGER("BUY_NFT_ITEM", resp);
-                  SetErrorBar(messages.MSG_TX_REQUEST_SENT);
-                  awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
-                    LOGGER("minedtxreceipt", minedtxreceipt);
-                    off();
-                    navigate("/market");
-                    setSpinner(false);
-                    off();
-                  });
-                });
-            })
-            .catch((err) => console.log(err));
-        } else {
-          console.log("USER DENIED TX");
-          SetErrorBar(messages.MSG_USER_DENIED_TX);
-          setSpinner(false);
-          off();
-          return;
-        }
-        SetErrorBar(messages.MSG_DONE_SENDING_TX_REQ);
-
-        console.log("txhash", txhash);
-      });
-    }
-  };
-
-  const fetchdata = (_) => {
-    // let myaddress = "0xb440393a03078b967000f09577e32c3252f15832";
-    let myaddress = getmyaddress();
-    if (myaddress) {
-      axios.get(API.API_USERINFO + `/${myaddress}?nettype=${net}`).then((resp) => {
-        if (resp.data && resp.data.respdata) {
-          let { respdata } = resp.data;
-          LOGGER("myticket", resp.data);
-          respdata.referer &&
-            axios.get(API.API_SINGLE_REFFERER + `/${respdata.referer}?nettype=${net}`).then((resp) => {
-              setuserinfo(resp.data.respdata);
+            .then((resp) => {
+              LOGGER("", resp);
+              axios.put(API.API_UPDATE_ORDERS, {
+                matcher_contract: options_abistr["ticket"].operator_contract,
+                typestr: options_abistr["ticket"].typestr,
+                amount: options_abistr["ticket"].amount,
+                uuid: itemdata?.uuid,
+                username: myaddress,
+                buyer: options_abistr["ticket"].buyer,
+                paymeansaddress: addresses.contract_USDT,
+                paymeansname: "USDT",
+                seller: options_abistr["ticket"].seller,
+                saletype: 0,
+                price: itemdata?.price,
+                nettype: net,
+                auxdata: options_abistr["ticket"].auxdata,
+                type: itemdata?.type,
+                txhash: txhash,
+                tokenid: itemdata?.itemid,
+                oldseller: itemdata?.seller,
+              });
+              SetErrorBar(messages.MSG_TX_REQUEST_SENT);
             });
+          /***** */
+          awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
+            LOGGER("minedtxreceipt", minedtxreceipt);
+            SetErrorBar(messages.MSG_TX_FINALIZED);
+            setDone(false);
+            setisloader_01(false);
+            off();
+            navigate("/market");
+          });
+        } catch (err) {
+          SetErrorBar(messages.MSG_USER_DENIED_TX);
+          setDone(false);
+          setisloader_01(false);
+          LOGGER();
         }
-      });
+      };
+      callreqtx();
     } else {
-      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
-      return;
-    }
-    LOGGER("MXZfykw8Mw", myaddress);
-
-    if (myaddress) {
-      query_with_arg({
-        contractaddress: addresses.contract_USDT, // ETH_TESTNET.
-        abikind: "ERC20",
-        methodname: "balanceOf",
-        aargs: [myaddress],
-      }).then((resp) => {
-        LOGGER("Ce4mDMhjbS", resp);
-        setmybalance(getethrep(resp));
-      });
-    } else {
-      return;
+      SetErrorBar("Fail");
     }
   };
-
-  useEffect(() => {
-    setSpinner(true);
-
-    setTimeout(() => {
-      queryAllowance();
-      fetchdata();
-    }, 1200);
-  }, []);
 
   if (isMobile)
     return (
-      <MbidPopupBox>
-        <article className="topBar">
-          <span className="blank" />
-          <p className="title">Place a bid</p>
-          <button className="exitBtn" onClick={() => navigate(-1)}>
-            <img src={I_x} alt="" />
-          </button>
-        </article>
+      <>
+        <MstakingPopupBox>
+          <article className="topBar">
+            <span className="blank" />
+            <p className="title">Pay</p>
+            <button className="exitBtn" onClick={() => navigate(-1)}>
+              <img src={I_x} alt="" />
+            </button>
+          </article>
 
-        <article className="contBox">
-          <div className="itemBox">
-            <img src={itemdata?.url} alt="" />
-            <p>You are about to purchase a Kingkong #12</p>
-          </div>
+          <article className="contBox">
+            <div className="infoBox">
+              <div className="coinBox">
+                <span className="coinImgBox">
+                  <img src={I_tIcon} alt="" />
+                </span>
 
-          <div className="priceBox">
-            <div className="inputBox">
-              <input
-                type="number"
-                value={itemdata?.price}
-                onChange={(e) => setPrice(e.target.value)}
-                placeholder="0"
-                readOnly
-              />
-              <span className="unit">USDT</span>
+                <ul className="priceList">
+                  <li className="price">{DueAmount} USDT</li>
+                  <li className="exchange">
+                    ${+DueAmount && tickerusdt ? putCommaAtPrice(+DueAmount * +tickerusdt) : null}
+                  </li>
+                </ul>
+              </div>
+
+              <ul className="dataList">
+                <li>
+                  <p className="key">Your address</p>
+                  <p className="value">{strDot(myaddress, 6, 0)}</p>
+                </li>
+                <li>
+                  <p className="key">Your USDT balance</p>
+                  <p className="value">{mybalance} USDT</p>
+                </li>
+                <li style={allowanceamount && +allowanceamount ? { display: "block" } : {}}>
+                  <p className="key">Allowance</p>
+                  <p className="value">{allowanceamount} USDT</p>
+                </li>
+                <li>
+                  <p className="key">Your {BASE_CURRENCY} balance</p>
+                  <p className="value">
+                    {myethbalance} {BASE_CURRENCY}
+                  </p>
+                </li>
+              </ul>
             </div>
 
-            <ul className="priceList">
-              <li>
-                <p className="key">Your USDT</p>
-                <p className="value">{mybalance} USDT</p>
-              </li>
-              <li>
-                <p className="key">Your bidding balance</p>
-                <p className="value">{itemdata?.price} USDT</p>
-              </li>
+            <div className="confirmBox">
+              <div className="termBox"></div>
 
-              <li>
-                <p className="key">Total</p>
-                <p className="value">{itemdata?.price} USDT</p>
-              </li>
-            </ul>
-          </div>
+              <button
+                className="confirmBtn"
+                onClick={() => {
+                  onclick_approve();
+                }}
+                style={approve ? { display: "none" } : { display: "inline" }}
+              >
+                Approve!
+                <img
+                  ref={spinnerHref}
+                  src={I_spinner}
+                  alt=""
+                  style={{
+                    display: isloader_00 ? "block" : "none",
+                    width: "18px",
+                    position: "absolute",
+                    margin: "0 0 0 64px",
+                  }}
+                />
+              </button>
 
-          <div className="confrimBox">
-            <p className="explain">
-              Placing this bid will start a 24 hour auction for the artwork. Once a bid is placed, it cannot be
-              withdrawn.
-            </p>
-            <button className="confirmBtn" onClick={() => navigate(-1)}>
-              Bid amount is required
-            </button>
-          </div>
-        </article>
-      </MbidPopupBox>
+              <div>
+                {" "}
+                <button
+                  className="confirmBtn"
+                  disabled={approve === false ? true : false}
+                  onClick={() => {
+                    onclick_buy();
+                    false && navigate(-1);
+                  }}
+                >
+                  Pay
+                </button>
+              </div>
+            </div>
+          </article>
+        </MstakingPopupBox>
+        <PopupBg blur />
+      </>
     );
   else
     return (
-      <PbidPopupBox>
+      <PstakingPopupBox>
         <article className="topBar">
           <span className="blank" />
-          <p className="title">{saleStatus == 1 ? "Buy now" : "Place bid"}</p>
+          <p className="title">Pay</p>
           <button className="exitBtn" onClick={() => off()}>
             <img src={I_x} alt="" />
           </button>
         </article>
 
         <article className="contBox">
-          <div className="itemBox">
-            {itemdata.type === "kingkong" ? <img src={itemdata?.item.url} alt="" /> : <img src={E_staking} alt="" />}
-            <p>
-              {" "}
-              {itemdata?.type === "ticket"
-                ? `##LUCKY TICKET ${itemdata?.tokenid}`
-                : `King Kong #${itemdata?.item.titlename}`}{" "}
-            </p>
-          </div>
+          <div className="infoBox">
+            <div className="coinBox">
+              <span className="coinImgBox">
+                {itemdata.type === "kingkong" ? (
+                  <img src={itemdata?.item.url} alt="" />
+                ) : (
+                  <img src={E_staking} alt="" />
+                )}
+              </span>
 
-          <div className="priceBox">
-            <div className="inputBox">
-              <input
-                type="number"
-                value={itemdata?.price}
-                onChange={(e) => setPrice(e.target.value)}
-                placeholder="0"
-                readOnly
-              />
-              <span className="unit">USDT</span>
+              <ul className="priceList">
+                <li className="price">{DueAmount} USDT</li>
+                <li className="exchange">
+                  ${+DueAmount && tickerusdt ? putCommaAtPrice(+DueAmount * +tickerusdt) : null}
+                </li>
+              </ul>
             </div>
 
-            <ul className="priceList">
+            <ul className="dataList">
               <li>
-                <p className="key">Your USDT</p>
+                <p className="key">Your address</p>
+                <p className="value">{strDot(myaddress, 8, 0)} </p>
+              </li>
+              <li>
+                <p className="key">Your USDT balance</p>
                 <p className="value">{mybalance} USDT</p>
               </li>
-              <li>
-                <p className="key">Your bidding balance</p>
-                <p className="value">{itemdata?.price} USDT</p>
+              <li style={allowanceamount ? { display: "block" } : {}}>
+                <p className="key">Allowance:</p>
+                <p className="value">{allowanceamount} USDT</p>
               </li>
-
               <li>
-                <p className="key">Total</p>
-                <p className="value">{itemdata?.price} USDT</p>
+                <p className="key">Your {BASE_CURRENCY} balance</p>
+                <p className="value">
+                  {myethbalance} {BASE_CURRENCY}
+                </p>
               </li>
             </ul>
           </div>
 
-          {saleStatus == 1 ? (
-            <div>
-              <div className="confrimBox">
-                {allowance > 0 ? (
-                  <button disabled={spinner} className="confirmBtn" onClick={() => onClickBuy()}>
-                    {spinner ? <div id="loading"></div> : "Buy"}
-                  </button>
-                ) : (
-                  <button disabled={spinner} className="confirmBtn" onClick={() => approve()}>
-                    {spinner ? <div id="loading"></div> : "Approve"}
-                  </button>
-                )}
-              </div>
+          <div className="confirmBox">
+            <div className="termBox">
+              <span className="value"></span>
             </div>
-          ) : (
-            <div className="confrimBox">
-              <p className="explain">
-                Placing this bid will start a 24 hour auction for the artwork. Once a bid is placed, it cannot be
-                withdrawn.
-              </p>
-              <button className="confirmBtn" onClick={() => off()}>
-                Bid amount is required
-              </button>
-            </div>
-          )}
+
+            <button
+              className="confirmBtn"
+              onClick={() => {
+                onclick_approve();
+              }}
+              style={approve ? { display: "none" } : { display: "inline" }}
+            >
+              Approve
+              <img
+                ref={spinnerHref_approve}
+                src={I_spinner}
+                alt=""
+                style={{
+                  display: isloader_00 ? "block" : "none",
+                  width: "18px",
+                  top: "20px",
+                  right: "150px",
+                  top: "20px",
+                  position: "absolute",
+                }}
+              />
+            </button>
+
+            <button
+              className="confirmBtn"
+              disabled={approve === false ? true : false || done === true}
+              onClick={() => {
+                onclick_buy();
+              }}
+            >
+              {done ? "Pending" : "Confirm"}
+              <img
+                ref={spinnerHref}
+                src={I_spinner}
+                alt=""
+                style={{
+                  display: isloader_01 ? "block" : "none",
+                  width: "18px",
+                  right: "140px",
+                  position: "absolute",
+                }}
+              />
+            </button>
+          </div>
         </article>
-      </PbidPopupBox>
+      </PstakingPopupBox>
     );
 }
 
-const MbidPopupBox = styled.section`
-  width: 88.9vw;
-  max-height: 80vh;
-  @media screen and (max-height: 190vw) {
-    overflow-y: scroll;
-  }
-
-  padding: 0;
-  border-radius: 5.55vw;
-  background: #fff;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  position: fixed;
-  z-index: 6;
-
-  .topBar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 16.66vw;
-    padding: 0 7.22vw;
-
-    .title {
-      font-size: 5vw;
-      font-weight: 600;
-      line-height: 5vw;
-    }
-
-    .blank,
-    .exitBtn img {
-      width: 4.16vw;
-    }
-  }
-
-  .contBox {
-    padding: 7.77vw 5.55vw 9.16vw;
-
-    .itemBox {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4.16vw;
-      font-size: 4.44vw;
-
-      img {
-        width: 21.11vw;
-        height: 21.11vw;
-        object-fit: cover;
-      }
-    }
-
-    .priceBox {
-      display: flex;
-      flex-direction: column;
-      gap: 7.22vw;
-      margin: 5.55vw 0 0 0;
-
-      .inputBox {
-        display: flex;
-        align-items: center;
-        width: 100%;
-        height: 16.66vw;
-        padding: 2.77vw 2.77vw 2.77vw 6.66vw;
-        background: #fff;
-        border-radius: 3.33vw;
-        box-shadow: 0px 3px 20px rgba(0, 0, 0, 0.2);
-
-        * {
-          font-weight: 700;
-        }
-
-        input {
-          flex: 1;
-          height: 100%;
-          font-size: 6.66vw;
-          min-width: 0;
-
-          &::placeholder {
-            color: #d9d9d9;
-          }
-        }
-
-        .unit {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 100%;
-          padding: 0 4.44vw;
-          font-size: 6.66vw;
-          color: #fff;
-          background: #000;
-          border-radius: 2.77vw;
-        }
-      }
-
-      .priceList {
-        display: flex;
-        flex-direction: column;
-        gap: 3.61vw;
-
-        li {
-          display: flex;
-          justify-content: space-between;
-          font-size: 3.88vw;
-          font-weight: 500;
-
-          .key {
-            color: #7a7a7a;
-          }
-        }
-      }
-    }
-
-    .confrimBox {
-      display: flex;
-      flex-direction: column;
-      gap: 3.33vw;
-      margin: 6.66vw 0 0 0;
-
-      .explain {
-        font-size: 3.61vw;
-        text-align: center;
-      }
-
-      .confirmBtn {
-        height: 13.88vw;
-        font-size: 5vw;
-        font-weight: 500;
-        font-family: "Poppins", sans-serif;
-        color: #fff;
-        background: #000;
-        border-radius: 3.33vw;
-
-        /* &:disabled {
-          color: #7a7a7a;
-          background: #e1e1e1;
-        } */
-      }
-    }
-  }
-`;
-
-const PbidPopupBox = styled.section`
-  width: 540px;
-  padding: 0;
+const MstakingPopupBox = styled.section`
+  width: 88.88vw;
   border-radius: 20px;
   background: #fff;
   top: 50%;
@@ -752,146 +623,267 @@ const PbidPopupBox = styled.section`
   transform: translate(-50%, -50%);
   position: fixed;
   z-index: 6;
+  overflow: hidden;
+  .topBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 15.55vw;
+    padding: 0 5.55vw;
+    .title {
+      font-size: 5vw;
+      font-weight: 600;
+      line-height: 5vw;
+    }
+    .blank,
+    .exitBtn img {
+      width: 4.44vw;
+    }
+  }
+  .contBox {
+    display: flex;
+    flex-direction: column;
+    gap: 4.44vw;
+    padding: 3.61vw 5.55vw 7.77vw 5.55vw;
+    * {
+      font-family: "Roboto", sans-serif;
+    }
+    .infoBox {
+      display: flex;
+      flex-direction: column;
+      gap: 4.16vw;
+      .coinBox {
+        display: flex;
+        align-items: center;
+        gap: 4.16vw;
+        height: 24.44vw;
+        padding: 0 4.72vw;
+        background: #f6f6f6;
+        border-radius: 3.33vw;
+        .coinImgBox {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 13.88vw;
+          height: 13.88vw;
+          padding: 3.61vw;
+          border-radius: 50%;
+          background: #fff;
+          box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+          img {
+            width: 100%;
+            object-fit: contain;
+          }
+        }
+        .priceList {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          font-size: 5vw;
+          line-height: 5vw;
+          .price {
+            font-weight: 600;
+          }
+          .exchange {
+            font-weight: 500;
+            color: #7a7a7a;
+          }
+        }
+      }
+      .dataList {
+        display: flex;
+        flex-direction: column;
+        gap: 3.61vw;
+        font-size: 4.44vw;
+        font-weight: 500;
+        color: #7a7a7a;
+        li {
+          display: flex;
+          flex-direction: column;
+          gap: 0.8vw;
+          .key {
+            color: #aeaeae;
+          }
+        }
+      }
+    }
+    .confirmBox {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      .termBox {
+        display: flex;
+        flex-direction: column;
+        gap: 4.44vw;
+        * {
+          font-size: 4.44vw;
+          line-height: 4.44vw;
+        }
+        .value {
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          gap: 5vw;
+          button {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            .chkBtn {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              width: 6.11vw;
+              height: 6.11vw;
+              border: 1.4px solid #000;
+              border-radius: 1.11vw;
+            }
+          }
+        }
+      }
+      .confirmBtn {
+        height: 13.88vw;
+        font-size: 5.55vw;
+        font-weight: 500;
+        color: #fff;
+        background: #000;
+        border-radius: 3.33vw;
+      }
+    }
+  }
+`;
 
+const PstakingPopupBox = styled.section`
+  width: 540px;
+  border-radius: 20px;
+  background: #fff;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  position: fixed;
+  z-index: 6;
   .topBar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     height: 72px;
     padding: 0 30px;
-
     .title {
       font-size: 24px;
       font-weight: 600;
       line-height: 24px;
     }
-
     .blank,
     .exitBtn {
       width: 22px;
     }
   }
-
   .contBox {
-    padding: 34px 30px 40px;
-
-    .itemBox {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      font-size: 18px;
-
-      img {
-        width: 104px;
-        height: 104px;
-        object-fit: cover;
-      }
+    display: flex;
+    flex-direction: column;
+    gap: 80px;
+    padding: 40px;
+    * {
+      font-family: "Roboto", sans-serif;
     }
-
-    .priceBox {
+    .infoBox {
       display: flex;
       flex-direction: column;
       gap: 24px;
-      margin: 60px 0 0 0;
-
-      .inputBox {
+      .coinBox {
         display: flex;
+        justify-content: space-between;
         align-items: center;
-        height: 70px;
-        padding: 10px 10px 10px 24px;
-        box-shadow: 0px 3px 20px rgba(0, 0, 0, 0.2);
+        height: 104px;
+        padding: 0 26px;
+        background: #f6f6f6;
         border-radius: 12px;
-
-        input {
-          flex: 1;
-          font-size: 30px;
-          font-weight: 700;
-          min-width: 0;
-
-          &::placeholder {
-            color: #d9d9d9;
-          }
-        }
-
-        .unit {
+        .coinImgBox {
           display: flex;
           justify-content: center;
           align-items: center;
-          width: 102px;
-          height: 50px;
-          font-size: 26px;
-          font-weight: 700;
-          color: #fff;
-          background: #000;
-          border-radius: 10px;
+          width: 68px;
+          height: 68px;
+          padding: 15px;
+          border-radius: 50%;
+          background: #fff;
+          box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+          img {
+            width: 100%;
+            object-fit: contain;
+          }
         }
-      }
-
-      .priceList {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-
-        li {
+        .priceList {
           display: flex;
-          justify-content: space-between;
-          font-size: 18px;
-          font-weight: 500;
-
-          .key {
+          flex-direction: column;
+          text-align: end;
+          gap: 6px;
+          font-size: 20px;
+          line-height: 20px;
+          .price {
+            font-weight: 600;
+          }
+          .exchange {
+            font-weight: 500;
             color: #7a7a7a;
           }
         }
       }
+      .dataList {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        font-size: 18px;
+        font-weight: 500;
+        color: #7a7a7a;
+        li {
+          display: flex;
+          justify-content: space-between;
+        }
+      }
     }
-
-    .confrimBox {
+    .confirmBox {
       display: flex;
       flex-direction: column;
       gap: 20px;
-      margin: 84px 0 0 0;
-
-      .explain {
-        font-size: 18px;
-        text-align: center;
+      .termBox {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        * {
+          font-size: 18px;
+          line-height: 18px;
+        }
+        .value {
+          display: flex;
+          gap: 18px;
+          align-items: center;
+          button {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            .chkBtn {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              width: 22px;
+              height: 22px;
+              border: 1.4px solid #000;
+              border-radius: 4px;
+            }
+          }
+        }
       }
-
       .confirmBtn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         height: 60px;
         font-size: 20px;
         font-weight: 500;
-        font-family: "Poppins", sans-serif;
         color: #fff;
         background: #000;
         border-radius: 12px;
-
-        #loading {
-          display: inline-block;
-          width: 38px;
-          height: 38px;
-          border: 3px solid rgba(255, 255, 255, 0.3);
-          border-radius: 50%;
-          border-top-color: #fff;
-          animation: spin 1s ease-in-out infinite;
-          -webkit-animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-          to {
-            -webkit-transform: rotate(360deg);
-          }
-        }
-        @-webkit-keyframes spin {
-          to {
-            -webkit-transform: rotate(360deg);
-          }
-        }
-
-        /* &:disabled {
-          color: #7a7a7a;
-          background: #e1e1e1;
-        } */
+        position: relative;
       }
     }
   }

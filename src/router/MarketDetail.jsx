@@ -6,7 +6,7 @@ import I_clip from "../img/icon/I_clip.svg";
 import E_detailItem from "../img/market/E_detailItem.png";
 import I_rtArw from "../img/icon/I_rtArw.svg";
 import { Fragment, useEffect, useRef, useState } from "react";
-import { putCommaAtPrice } from "../util/Util";
+import { putCommaAtPrice, strDot } from "../util/Util";
 import { D_category, D_transactionHistory } from "../data/DauctionDetail";
 import Offer from "../components/itemDetail/Offer";
 import { marketPlaceList } from "../data/Dmain";
@@ -27,8 +27,11 @@ import { ITEM_PRICE_DEF } from "../configs/configs";
 import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
 import { net } from "../configs/net";
+import I_tagWhite from "../img/icon/I_tagWhite.svg";
+
 export default function MarketDetail() {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const data = useLocation().state;
   const params = useParams();
   const moreRef = useRef();
@@ -42,8 +45,13 @@ export default function MarketDetail() {
   let [marketPlaceList, setmarketPlaceList] = useState([]);
   const [saleStatus, setSaleStatus] = useState(1);
   let [isstaked, setisstaked] = useState();
+  const [transaction, setTranSaction] = useState([]);
 
-  console.log("itemdataasdfasdfasdfasd", data);
+  console.log("asdoifajsodfij", params);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   const onclicklike = (_) => {
     let myaddress = getmyaddress();
@@ -108,7 +116,6 @@ export default function MarketDetail() {
       }
     }
   }, [moreIndex]);
-  console.log("params?.uuid", params?.itemid);
   const getitem = (_) => {
     let myaddress = getmyaddress();
     if (myaddress) {
@@ -129,6 +136,15 @@ export default function MarketDetail() {
         setmarketPlaceList(list);
       }
     });
+    if (data?.type === "ticket") {
+      axios.get(API.API_GET_TRANSACTIONS_TICKET + `/${data?.tokenid}?nettype=${net}`).then((resp) => {
+        LOGGER("transction", resp.data);
+        let { status, respdata } = resp.data;
+        if (status === "OK") {
+          setTranSaction(resp.data.payload.rowdata.slice(-3));
+        }
+      });
+    }
   };
   useEffect(
     (_) => {
@@ -218,7 +234,7 @@ export default function MarketDetail() {
                 </ul>
 
                 <div className="contBox">
-                  {category === 0 && <Offer />}
+                  {category === 0 && <Offer transaction={transaction} data={data} />}
                   {category === 1 && <Details />}
                   {category === 2 && <Properties />}
                 </div>
@@ -306,7 +322,7 @@ export default function MarketDetail() {
               <div className="itemInfoBox">
                 <div className="titleBox">
                   <strong className="title">
-                    {data?.type === "ticket" ? `##LUCKY TICKET ${data?.tokenid}` : `King Kong #${data?.item.titlename}`}{" "}
+                    {data?.type === "ticket" ? `##LUCKY TICKET ${data?.itemid}` : `King Kong #${data?.item.titlename}`}{" "}
                   </strong>
                   <div className="btnBox">
                     <div className="posBox">
@@ -385,7 +401,7 @@ export default function MarketDetail() {
                 </ul>
 
                 <div className="contBox">
-                  {category === 0 && <Offer />}
+                  {category === 0 && <Offer path="market" data={data} />}
                   {category === 1 && <Details />}
                   {category === 2 && <Properties />}
                 </div>
@@ -397,30 +413,33 @@ export default function MarketDetail() {
             <article className="titleBox">
               <strong className="title">Transaction History</strong>
             </article>
+            {data?.type === "ticket" && (
+              <ul className="historyList">
+                {transaction.map((cont, index) => (
+                  <Fragment key={index}>
+                    {index ? (
+                      <div className="sideBarBox">
+                        <span className="sideBar" />
+                      </div>
+                    ) : (
+                      <></>
+                    )}
+                    <li>
+                      <span className="iconBox">
+                        <img src={I_tagWhite} alt="" />
+                      </span>
 
-            {/* <ul className="historyList">
-              {D_transactionHistory.map((cont, index) => (
-                <Fragment key={index}>
-                  {index ? (
-                    <div className="sideBarBox">
-                      <span className="sideBar" />
-                    </div>
-                  ) : (
-                    <></>
-                  )}
-                  <li>
-                    <span className="iconBox">
-                      <img src={cont.img} alt="" />
-                    </span>
-
-                    <div className="contBox">
-                      <p className="cont">{cont.cont}</p>
-                      <p className="time">{cont.time}</p>
-                    </div>
-                  </li>
-                </Fragment>
-              ))}
-            </ul> */}
+                      <div className="contBox">
+                        <p className="cont">
+                          {strDot(cont.username, 15)} / {putCommaAtPrice(cont?.price)} USDT{" "}
+                        </p>
+                        <p className="time">{cont.createdat?.split("T")[0]}</p>
+                      </div>
+                    </li>
+                  </Fragment>
+                ))}
+              </ul>
+            )}
           </section>
 
           <section className="moreBox">

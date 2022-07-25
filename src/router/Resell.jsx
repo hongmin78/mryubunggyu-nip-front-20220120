@@ -76,7 +76,6 @@ export default function Resell() {
           console.log("$itemdetail_ITEMDETAIL", respdata);
           if (resp.data.status === "OK") {
             setItemDetail(respdata);
-            queryApprovalForAll(respdata);
           }
         }
       } catch (err) {
@@ -91,7 +90,6 @@ export default function Resell() {
           console.log("$itemdetail_ITEMDETAIL", respdata);
           if (resp.data.status === "OK") {
             setItemDetail(respdata);
-            queryApprovalForAll(respdata);
           }
         }
       } catch (err) {
@@ -167,7 +165,8 @@ export default function Resell() {
         value: "0x00",
       }).then((resp) => {
         if (resp) {
-          setSpinner(false);
+          console.log("resp", resp);
+          setApprovalForAll(resp);
         } else {
           SetErrorBar(messages.MSG_USER_DENIED_TX);
           return;
@@ -194,8 +193,9 @@ export default function Resell() {
         data: abistr,
         value: "0x00",
       }).then((resp) => {
+        console.log("resp", resp);
+        setApprovalForAll(resp);
         if (resp) {
-          setSpinner(false);
         } else {
           SetErrorBar(messages.MSG_USER_DENIED_TX);
           return;
@@ -216,7 +216,7 @@ export default function Resell() {
     const { ethereum } = window; //    const exampleMessage = "Test `personal_sign` message";
     const from = myaddress; // store.isLogin;
     let msg; // = `0x${Buffer.from(exampleMessage, "utf8").toString("hex")}`;
-    msg = `Token id:${itemDetail.id}, ${getweirep(bid)},Contract address :${
+    msg = `Token id:${ticketInfo?.itemid ? ticketInfo.itemid : ticketInfo?.id}, ${getweirep(bid)},Contract address :${
       addresses.contract_erc1155_ticket_sales
     }, wallet: ${myaddress}`;
 
@@ -265,9 +265,9 @@ export default function Resell() {
         ticket: {
           username: itemDetail?.username,
           contractaddress: addresses.contract_erc1155,
-          tokenid: tokenId,
+          tokenid: ticketInfo?.itemid ? ticketInfo.itemid : ticketInfo?.id,
           price: bid,
-
+          itemid: ticketInfo?.itemid ? ticketInfo?.itemid : ticketInfo?.id,
           expiry: 4119051884,
           paymeansaddress: addresses.contract_USDT,
           paymeansname: "USDT",
@@ -327,8 +327,8 @@ export default function Resell() {
   };
 
   useEffect(() => {
-    setSpinner(true);
     setTimeout(() => {
+      queryApprovalForAll();
       queryItemDetail();
       getUserInfo();
     }, 1200);
@@ -345,7 +345,9 @@ export default function Resell() {
             <div className="topBar">
               <p className="title">
                 {" "}
-                {type === "ticket" ? `Lucky Ticket #${tokenId}` : `King Kong #${itemDetail.titlename}`}
+                {type === "ticket"
+                  ? `Lucky Ticket #${itemDetail.itemid === null ? itemDetail.id : itemDetail.itemid}`
+                  : `King Kong #${itemDetail.titlename}`}
               </p>
             </div>
 
@@ -541,7 +543,9 @@ export default function Resell() {
               )}
               <p className="title">
                 {" "}
-                {type === "ticket" ? `Lucky Ticket #${tokenId}` : `King Kong #${itemDetail?.titlename}`}
+                {type === "ticket"
+                  ? `Lucky Ticket #${ticketInfo.itemid === null ? ticketInfo.id : ticketInfo.itemid}`
+                  : `King Kong #${itemDetail?.titlename}`}
               </p>
               {/* <p className="title">Series {itemDetail && itemDetail.itembalances?.group_.toUpperCase()} #112</p> */}
             </li>
@@ -554,7 +558,7 @@ export default function Resell() {
             </li>
 
             <li className="priceBox">
-              <p className="title">Fees : 2.88%</p>
+              <p className="title">Fees : 3%</p>
             </li>
           </ul>
         </PresellBox>

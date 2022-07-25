@@ -7,28 +7,41 @@ import { API } from "../../configs/api";
 import { useEffect, useState } from "react";
 import { net } from "../../configs/net";
 import person from "../../img/itemDetail/E_prof3.png";
+import { LOGGER, getmyaddress } from "../../util/common";
 
-export default function Offer(params, offers) {
+export default function Offer(params, offers, transaction, data) {
   const isMobile = useSelector((state) => state.common.isMobile);
-  console.log("offers", offers);
+  console.log("transaction", params);
   const [offersInfo, setOffersInfo] = useState([]);
-
-  console.log("params", params.params?.itemid);
+  const [TicketOffersInfo, setTicketOffersInfo] = useState([]);
 
   const fetchdata = () => {
-    axios
-      .get(API.API_GET_OFFERS + `/${params.params?.itemid}?nettype=${net}`)
-      .then((resp) => {
-        console.log("asdoijfosidajf", resp.data.list);
-        if (resp.data.status === "OK") {
-          setOffersInfo(resp.data.list);
+    if (params?.path === "auction") {
+      axios
+        .get(API.API_GET_OFFERS + `/${params.params?.itemid}?nettype=${net}`)
+        .then((resp) => {
+          console.log("asdoijfosidajf", resp.data.list);
+          if (resp.data.status === "OK") {
+            setOffersInfo(resp.data.list);
+          }
+        })
+        .catch((error) => console.log(error));
+    }
+    if (params?.path === "market" && params?.data?.type === "ticket") {
+      axios.get(API.API_GET_TRANSACTIONS_TICKET + `/${params?.data?.tokenid}?nettype=${net}`).then((resp) => {
+        LOGGER("transction_offer", resp.data);
+        let { status, respdata } = resp.data;
+        if (status === "OK") {
+          setTicketOffersInfo(resp.data.payload.rowdata.slice(-2));
         }
-      })
-      .catch((error) => console.log(error));
+      });
+    }
   };
+  console.log("asdfasdfasdfasdfasdfasdfasdf", TicketOffersInfo);
+
   useEffect(() => {
     fetchdata();
-  }, []);
+  }, [params]);
 
   if (isMobile)
     return (
@@ -51,12 +64,26 @@ export default function Offer(params, offers) {
   else
     return (
       <PofferBox>
-        {offersInfo &&
+        {params?.path === "auction" &&
+          offersInfo &&
           offersInfo?.map((cont, index) => (
             <li key={index}>
               <img src={cont.prfoImg ? cont.profoImg : person} alt="" />
               <div className="infoBox">
                 <p className="info">{`${strDot(cont.username, 11, 4)} ${parseInt(cont.buyprice).toFixed(2)} USDT `}</p>
+                <p className="time">
+                  {cont.updatedat === null ? strDot(cont.createdat, 10) : strDot(cont.updatedat, 10)}
+                </p>
+              </div>
+            </li>
+          ))}
+        {params?.path === "market" &&
+          params?.data?.type === "ticket" &&
+          TicketOffersInfo?.map((cont, index) => (
+            <li key={index}>
+              <img src={cont.prfoImg ? cont.profoImg : person} alt="" />
+              <div className="infoBox">
+                <p className="info">{`${strDot(cont.username, 11, 4)} ${parseInt(cont.price).toFixed(2)} USDT `}</p>
                 <p className="time">
                   {cont.updatedat === null ? strDot(cont.createdat, 10) : strDot(cont.updatedat, 10)}
                 </p>

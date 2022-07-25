@@ -106,8 +106,6 @@ export default function MyItems() {
 
       let myaddress = getmyaddress();
       axios.get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`).then((resp) => {
-        LOGGER("API_ticketInfo", resp.data);
-
         let { status, respdata } = resp.data;
         if (status == "OK" && respdata !== null) {
           setTickInfo(respdata);
@@ -575,7 +573,9 @@ export default function MyItems() {
             {ticketInfo && (
               <div className="infoBox">
                 <div className="titleBox">
-                  <strong className="title">Lucky Ticket #{tokenId}</strong>
+                  <strong className="title">
+                    Lucky Ticket #{ticketInfo.itemid === null ? ticketInfo.id : ticketInfo.itemid}
+                  </strong>
                 </div>
 
                 <div className="ownedBox">

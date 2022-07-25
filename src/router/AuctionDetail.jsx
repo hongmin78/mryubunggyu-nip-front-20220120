@@ -104,7 +104,7 @@ export default function AuctionDetail() {
       LOGGER("transction", resp.data);
       let { status, respdata } = resp.data;
       if (status === "OK") {
-        setTranSaction(resp.data.list);
+        setTranSaction(resp.data.list.splice(1, resp.data.list.length - 1));
       }
     });
   };
@@ -250,7 +250,7 @@ export default function AuctionDetail() {
                 </ul>
 
                 <div className="contBox">
-                  {category === 0 && <Offer params={params} />}
+                  {category === 0 && <Offer params={params} path="auction" />}
                   {category === 1 && <Details0303 attributes={attributes} />}
                   {category === 2 && <Properties itemdata={itemdata} />}
                 </div>
@@ -406,7 +406,7 @@ export default function AuctionDetail() {
                 </ul>
 
                 <div className="contBox">
-                  {category === 0 && <Offer params={params} />}
+                  {category === 0 && <Offer params={params} type="aution" />}
                   {category === 1 && <Details0303 attributes={attributes} />}
                   {category === 2 && <Properties itemdata={itemdata} />}
                 </div>

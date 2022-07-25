@@ -23,8 +23,6 @@ export default function Staking() {
   const fatchData = () => {
     let myaddress = getmyaddress();
     axios.get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`).then((resp) => {
-      LOGGER("API_ticketInfo", resp.data);
-
       let { status, respdata } = resp.data;
       if (status == "OK" && respdata !== null) {
         setItckInfo([respdata]);
