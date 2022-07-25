@@ -42,6 +42,7 @@ const API = {
   API_GET_TICK_INFO: `${URL}/queries/singlerow/logstakes/username`,
   API_GET_EMAILAUTH: `${URL}/queries/singlerow/emailverifycode/emailaddress`,
   API_GET_CIRCULATIONS: `${URL}/queries/rows/items/active/1/0/32/id/ASC`,
+  API_GET_KING_KONG_ITEM: `${URL}/queries/rows/items/username`,
   API_GET_CIRCULATIONS_ITEM: `${URL}/queries/circulations`,
   API_PUT_USERS: `${URL}/users`,
   API_GET_OFFERS: `${URL}/queries/itembalances/itemid`,

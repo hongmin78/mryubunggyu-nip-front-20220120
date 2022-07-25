@@ -385,7 +385,6 @@ export default function Main() {
                     <li key={index} className="item">
                       <div className="topBar">
                         <p className="key">LUCKY TICKET</p>
-                        <p className="value">#{`${index}`.padStart(5, "0")}</p>
                       </div>
 
                       <img src={E_staking} alt="" />
@@ -474,21 +473,6 @@ export default function Main() {
             <ul ref={headLineRef}>
               {banners?.map((value, index) => (
                 <li key={index}>
-                  {/* <article className="leftBox">
-                    <span className="interview">
-                      <img src={E_interview} alt="" />
-                    </span>
-
-                    <div className="titleBox">
-                      <p className="title">Pak on the frontier of NFTs.</p>
-                      <p className="explain">
-                        The acclaimed anonymous art entity has been pioneering
-                        in digital spaces for decades. Here’s what’s next.
-                      </p>
-                    </div>
-
-                    <p className="bottomText">ON THE FRONTIER OF NFTS.</p>
-                  </article> */}
                   <img className="mainImg" src={value.imageurlpc ? value.imageurlpc : E_staking} alt="" />
                 </li>
               ))}
@@ -613,7 +597,6 @@ export default function Main() {
                     <li key={index} className="item">
                       <div className="topBar">
                         <p className="key">LUCKY TICKET</p>
-                        <p className="value">#{`${index}`.padStart(5, "0")}</p>
                       </div>
 
                       <img src={E_staking} alt="" />

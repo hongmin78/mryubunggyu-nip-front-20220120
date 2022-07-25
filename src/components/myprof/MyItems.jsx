@@ -43,7 +43,7 @@ export default function MyItems() {
   const [tokenId, setTokenId] = useState();
   let [itemData, setItemData] = useState([]);
   let [itemBalData, setItemBalData] = useState([]);
-  let [myItems, setMyitems] = useState([]);
+  let [kingKongItem, setKingKongItem] = useState([]);
   let [userinfo, setuserinfo] = useState(null);
   const [getTickTimer, setGetTickTimer] = useState();
   const [tickTimer, setTickTimer] = useState();
@@ -63,16 +63,11 @@ export default function MyItems() {
         setuserinfo(respdata);
       }
     });
-    axios.get(API.API_QUERY_ORDERS + `/${myaddress}?nettype=${net}`).then((resp) => {
+    axios.get(API.API_GET_KING_KONG_ITEM + `/${myaddress}/0/100/id/ASC?nettype=${net}`).then((resp) => {
       LOGGER("Buy my item", resp.data);
       let { status, list, payload } = resp.data;
       if (status == "OK") {
-        if (payload?.rowdata) {
-          setMyitems(payload.rowdata);
-        }
-        if (list) {
-          setMyitems(list);
-        }
+        setKingKongItem(list);
       }
     });
 
@@ -92,7 +87,7 @@ export default function MyItems() {
         setItemBalData(list);
         LOGGER("ITEMBALANCES", list);
       }
-      axios //      .get("http://3.35.1 17.87:34705/auction/list", { params: { limit: 8 } })
+      axios //
         .get(API.API_GET_CIRCULATIONS_ITEM + `?nettype=${net}`)
         .then((resp) => {
           LOGGER("circulations", resp.data);
@@ -198,31 +193,6 @@ export default function MyItems() {
       setSpinner(false);
       let txhash;
       txhash = resp;
-
-      // axios
-      //   .post(API.API_TXS + `/${txhash}`, {
-      //     txhash: txhash,
-      //     username: myaddress,
-      //     typestr: "KING_KONG_STAKED",
-      //     auxdata: {
-      //       user_action: "KING_KONG_STAKED",
-      //       contract_type: addresses.contract_erc1155, // .ETH_TESTNET
-      //       contract_address: addresses.contract_erc1155, // .ETH_TESTNET
-      //       to_token_contract: addresses.contract_erc1155,
-      //       my_address: myaddress,
-      //       tokenIds: addresses.contract_erc1155,
-
-      //       nettype: net,
-      //     },
-      //   })
-      //   .then((res) => {
-      //     console.log("onclickstake reported!", res);
-      //   })
-      //   .catch((err) => console.log(err));
-      // awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
-      //   setIsApproved(true);
-      //   console.log("minedtxreceipt", minedtxreceipt);
-      // });
     });
   };
 
@@ -397,17 +367,7 @@ export default function MyItems() {
                       <p className="value">{item.roundnumber} Round</p>
                     </div>
 
-                    <div className="saleBox">
-                      {/* <div className="time">
-                        <p className="key">Ending in</p>
-                        <ul className="timeList">
-                          <li>{timeReceivables && timeReceivables.days()}일</li>
-                          <li>{timeReceivables && timeReceivables.hour()}시간</li>
-                          <li>{timeReceivables && timeReceivables.minutes()}분</li>
-                          <li>{timeReceivables && timeReceivables.second()}초</li>
-                        </ul>
-                      </div> */}
-                    </div>
+                    <div className="saleBox"></div>
 
                     <ul className="priceBox">
                       <li>
@@ -778,18 +738,13 @@ export default function MyItems() {
                 </div>
               </li>
             ))}
-          {myItems.length !== 0 &&
-            myItems.map((item, index) => {
-              if (item.isprivate === 1 && item.type === "kingkong") {
+          {kingKongItem.length !== 0 &&
+            kingKongItem.map((item, index) => {
+              if (item.isminted === 1 && item.group_ === "kingkong") {
                 return (
                   <li key={index} className="swapBox">
                     <div className="imgBoxBal">
-                      {item && item.itemdata?.url ? (
-                        <img className="itemImgBal" src={item.itemdata.url} alt="" />
-                      ) : (
-                        <img className="itemImgBal" src={E_staking} alt="" />
-                      )}
-
+                      <img className="itemImgBal" src={item.url} alt="" />
                       <div className="topBarBal">
                         <button className="likeBtnBal" onClick={() => {}}>
                           <img src={I_heartO} alt="" />
@@ -821,7 +776,7 @@ export default function MyItems() {
                             <p className="key">Current price</p>
                             <p className="value"> {parseInt(item && item.price).toFixed(2)} USDT</p>
                           </li>
-                          {item.type == "kingkong" && (
+                          {item.group_ == "kingkong" && (
                             <>
                               <button
                                 className="actionBtn"
@@ -1133,6 +1088,7 @@ const MmyItemsBox = styled.section`
     .imgBoxBal {
       display: flex;
       flex-direction: column;
+
       * {
         font-family: "Roboto", sans-serif;
       }
@@ -1226,7 +1182,7 @@ const PmyItemsBox = styled.section`
         height: 760px;
         position: relative;
         overflow: hidden;
-        border-radius: 12px;
+        border-radius: 10px;
         border: 20px solid transparent;
         background-image: linear-gradient(red, red), linear-gradient(to right, red 0%, orange 100%);
         background-origin: border-box;
@@ -1240,7 +1196,7 @@ const PmyItemsBox = styled.section`
           height: 100%;
           object-fit: contain;
           position: absolute;
-          border-radius: 12px;
+          border-radius: 10px;
           border: 20px solid transparent;
         }
         .topBar {
@@ -1374,13 +1330,10 @@ const PmyItemsBox = styled.section`
           justify-content: center;
           align-items: center;
           width: 100%;
-          height: 60px;
+          height: 70px;
           margin: 60px 0 0 0;
           font-size: 20px;
-          font-weight: 500;
           line-height: 20px;
-          color: #fff;
-          font-family: "Poppins", sans-serif;
           background: #000;
           border-radius: 12px;
         }
@@ -1389,13 +1342,10 @@ const PmyItemsBox = styled.section`
           justify-content: center;
           align-items: center;
           width: 100%;
-          height: 60px;
+          height: 70px;
           margin: 20px 0 0 0;
           font-size: 20px;
-          font-weight: 500;
           line-height: 20px;
-          color: #fff;
-          font-family: "Poppins", sans-serif;
           background: #000;
           border-radius: 12px;
         }
@@ -1484,12 +1434,16 @@ const PmyItemsBox = styled.section`
   }
   .imgBoxBal {
     display: flex;
+    border-radius: 50px;
     flex-direction: column;
+    border-radius: 12px;
+    border: 20px;
     * {
       font-family: "Roboto", sans-serif;
     }
     width: 760px;
     height: 760px;
+    object-fit: contain;
     position: relative;
     overflow: hidden;
     @media screen and (max-width: 1440px) {
@@ -1499,7 +1453,6 @@ const PmyItemsBox = styled.section`
     .itemImgBal {
       width: 100%;
       height: 100%;
-      object-fit: contain;
       position: absolute;
       border-radius: 12px;
     }
@@ -1676,10 +1629,8 @@ const PmyItemsBox = styled.section`
           height: 60px;
           margin: 60px 0 0 0;
           font-size: 20px;
-          font-weight: 500;
           line-height: 20px;
           color: #fff;
-          font-family: "Poppins", sans-serif;
           background: #000;
           border-radius: 12px;
         }
