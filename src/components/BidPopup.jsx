@@ -25,12 +25,10 @@ import { strDot } from "../util/Util";
 import { net } from "../configs/net";
 import E_staking from "../img/common/E_staking.png";
 
-const MODE_DEV_PROD = "PROD";
 export default function BidPopup({ off, userInfo, receivables, itemdata }) {
   console.log("marketPlaceList", itemdata);
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
-  const [termChk, setTermChk] = useState(false);
   let [myaddress, setmyaddress] = useState(getmyaddress());
   let [mybalance, setmybalance] = useState();
   let [isallowanceok, setisallowanceok] = useState(false);
@@ -77,9 +75,10 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
       axios.get(API.API_USERINFO + `/${myaddress}?nettype=${net}`).then((resp) => {
         if (resp.data && resp.data.respdata) {
           let { respdata } = resp.data;
-          LOGGER("myticket", resp.data);
+
           respdata.referer &&
             axios.get(API.API_SINGLE_REFFERER + `/${respdata.referer}?nettype=${net}`).then((resp) => {
+              LOGGER("myticket", resp.data.respdata);
               setuserinfo(resp.data.respdata);
             });
         }
@@ -90,7 +89,7 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
           contractaddress: addresses.contract_USDT,
           abikind: "ERC20",
           methodname: "allowance",
-          aargs: [myaddress, addresses.contract_erc1155_sales],
+          aargs: [myaddress, addresses.contract_kip17_salse],
         },
         ticket: {
           contractaddress: addresses.contract_USDT,
@@ -159,7 +158,7 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
           contractaddress: addresses.contract_USDT,
           abikind: "ERC20",
           methodname: "approve",
-          aargs: [addresses.contract_erc1155_sales, getweirep("" + 10000_0000)],
+          aargs: [addresses.contract_kip17_salse, getweirep("" + 10000_0000)],
         },
       },
       ticket: {
@@ -205,7 +204,7 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
           });
 
         awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then((minedtxreceipt) => {
-          LOGGER("minedtxreceipt", minedtxreceipt);
+          LOGGER("____minedtxreceipt", minedtxreceipt);
           SetErrorBar(messages.MSG_TX_FINALIZED);
           setApprove(true);
           query_with_arg({
@@ -228,6 +227,62 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
         console.log("txhash_ticket", txhash);
       });
     }
+    if (itemdata?.type === "kingkong") {
+      let abistr = getabistr_forfunction(options_arg["kingkong"].abistr);
+      requesttransaction({
+        from: myaddress,
+        to: addresses.contract_USDT,
+        data: abistr,
+        value: "0x00",
+      }).then((resp) => {
+        if (resp) {
+        } else {
+          SetErrorBar(messages.MSG_USER_DENIED_TX);
+          setisloader_00(false);
+          return;
+        }
+
+        let txhash = resp;
+        SetErrorBar(messages.MSG_TX_REQUEST_SENT);
+        axios
+          .post(API.API_TXS + `/${txhash}`, {
+            txhash,
+            username: myaddress,
+            typestr: "APPROVE",
+            amount: options_arg["kingkong"].amount,
+            auxdata: options_arg["kingkong"].auxdata,
+            contractaddress: options_arg["kingkong"].operator_contract,
+            nettype: net,
+          })
+          .then((resp) => {
+            LOGGER("APPROVE RESP", resp);
+            SetErrorBar(messages.MSG_TX_REQUEST_SENT);
+          });
+
+        awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then((minedtxreceipt) => {
+          LOGGER("minedtxreceipt", minedtxreceipt);
+          SetErrorBar(messages.MSG_TX_FINALIZED);
+          setApprove(true);
+          query_with_arg({
+            contractaddress: addresses.contract_USDT, // .ETH_TESTNET
+            abikind: "ERC20",
+            methodname: "allowance",
+            aargs: [myaddress, addresses.contract_kip17_salse], // ETH_TESTNET.
+          }).then((resp) => {
+            let allowanceineth = getethrep(resp);
+            LOGGER("gCwXF6Jjkh", resp, allowanceineth);
+            setallowanceamount(allowanceineth); //				setallowanceamount ( 100 )
+            setisloader_00(false);
+            if (allowanceineth > 0) {
+              setisallowanceok(false);
+              setisloader_00(false);
+            } else {
+            }
+          });
+        });
+        console.log("txhash_kingkong", txhash);
+      });
+    }
   };
 
   const onclick_buy = async (_) => {
@@ -246,9 +301,10 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
 
     const options_abistr = {
       kingkong: {
-        operator_contract: addresses.contract_erc1155_sales,
+        operator_contract: addresses.contract_kip17_salse,
         typestr: "BUY_NFT_ITEM",
         itemid: itemdata?.itemid,
+        tokenid: itemdata?.tokenid,
         amount: 1,
         uuid: itemdata?.uuid,
         username: myaddress,
@@ -257,38 +313,38 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
         saletype: 0,
         price: itemdata?.price,
         type: itemdata?.type,
+        nettype: net,
         auxdata: {
           user_action: "BUY_NFT_ITEM",
-          contract_type: "ERC1155Sale", // .ETH_TESTNET
-          contractaddress: addresses.contract_erc1155_sales, // .ETH_TESTNET
+          contract_type: "KIP17Sale", // .ETH_TESTNET
+          contractaddress: addresses.contract_kip17_salse, // .ETH_TESTNET
           my_address: myaddress,
           authorRoyalty: "0",
-          itemid: itemdata?.item?.itemid,
-          tokenid: itemdata.itembalances?.id,
+          itemid: itemdata?.itemid,
+          tokenid: itemdata?.id,
           author: "",
-          paymeansaddress: itemdata?.itembalances?.paymeansaddress,
+          paymeansaddress: itemdata?.paymeansaddress,
           amount: "1",
           uuid: itemdata?.uuid,
-          paymeansname: itemdata?.itembalances?.paymeans,
+          paymeansname: itemdata?.paymeansname,
           nettype: net,
         },
         abistr: {
-          contractaddress: addresses.contract_erc1155_sales,
-          abikind: "ERC1155Sale",
-          methodname: "mint_and_match_single_simple_legacy",
+          contractaddress: addresses.contract_kip17_salse,
+          abikind: "KIP17Sale",
+          methodname: "match_single_simple_legacy",
           // eslint-disable-next-line no-sparse-arrays
           aargs: [
-            // addresses.contract_erc1155_ticket_sales_minter, // target contractaddress
-            addresses.contract_erc1155, // target contractaddress
-            `${itemdata?.id}`,
-            "1", // amounttomint
-            "0", // decimals
-            "0", // authorroyalty
-            itemdata?.seller,
-            "1",
-            getweirep("" + itemdata?.price),
+            addresses.contract_kip17, // target contractaddress
+            "288",
+            "0xa6d9B48b3D869271fF84F9E62B9E48986EE3Aa7b",
+            `${itemdata?.itemid}`,
             addresses.contract_USDT, // sellersaddress
-            itemdata?.seller, // target contractaddress
+            getweirep("" + itemdata?.price),
+            itemdata?.seller,
+            userinfo?.username,
+            "12",
+            "0",
           ],
         },
       },
@@ -303,6 +359,7 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
         saletype: 0,
         price: itemdata?.price,
         type: itemdata?.type,
+        nettype: net,
         auxdata: {
           user_action: "BUY_NFT_ITEM_TICKET",
           contract_type: "ERC1155TicketSale", // .ETH_TESTNET
@@ -411,8 +468,80 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
         }
       };
       callreqtx();
-    } else {
-      SetErrorBar("Fail");
+    }
+    if (itemdata?.type === "kingkong") {
+      let abistr = await getabistr_forfunction(options_abistr["kingkong"].abistr);
+      console.log("kingkong_abistr", abistr);
+      const callreqtx = async () => {
+        let resp;
+        try {
+          resp = await requesttransaction({
+            from: myaddress,
+            to: addresses.contract_kip17_salse, // .ETH_TESTNET
+            data: abistr,
+          });
+          if (resp) {
+          } else {
+            SetErrorBar(messages.MSG_USER_DENIED_TX);
+            setDone(false);
+            setisloader_01(false);
+            return;
+          }
+          let txhash = resp;
+
+          axios
+            .post(API.API_TXS + `/${txhash}?nettype=${net}`, {
+              txhash,
+              username: myaddress,
+              itemid: itemdata?.itemid,
+              tokenid: itemdata?.tokenid,
+              uuid: itemdata?.uuid,
+              typestr: options_abistr["kingkong"].typestr,
+              amount: options_abistr["kingkong"].amount,
+              auxdata: options_abistr["kingkong"].auxdata,
+              contractaddress: options_abistr["kingkong"].operator_contract,
+            })
+            .then((resp) => {
+              LOGGER("", resp);
+              axios.put(API.API_UPDATE_ORDERS, {
+                matcher_contract: options_abistr["kingkong"].operator_contract,
+                typestr: options_abistr["kingkong"].typestr,
+                amount: options_abistr["kingkong"].amount,
+                uuid: itemdata?.uuid,
+                username: myaddress,
+                buyer: options_abistr["kingkong"].buyer,
+                paymeansaddress: addresses.contract_USDT,
+                paymeansname: "USDT",
+                seller: options_abistr["kingkong"].seller,
+                saletype: 0,
+                price: itemdata?.price,
+                nettype: net,
+                auxdata: options_abistr["kingkong"].auxdata,
+                type: itemdata?.type,
+                txhash: txhash,
+                tokenid: itemdata?.tokenid,
+                oldseller: itemdata?.seller,
+                itemid: itemdata?.itemid,
+              });
+              SetErrorBar(messages.MSG_TX_REQUEST_SENT);
+            });
+          /***** */
+          awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
+            LOGGER("minedtxreceipt", minedtxreceipt);
+            SetErrorBar(messages.MSG_TX_FINALIZED);
+            setDone(false);
+            setisloader_01(false);
+            off();
+            navigate("/market");
+          });
+        } catch (err) {
+          SetErrorBar(messages.MSG_USER_DENIED_TX);
+          setDone(false);
+          setisloader_01(false);
+          LOGGER();
+        }
+      };
+      callreqtx();
     }
   };
 

@@ -2,7 +2,7 @@ import { strDot } from "../util/Util";
 import I_heart from "../img/icon/I_heart.svg";
 import I_heartO from "../img/icon/I_heartO.svg";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import E_staking from "../img/common/E_staking.png";
 import moment from "moment";
@@ -12,8 +12,7 @@ import SetErrorBar from "../util/SetErrorBar";
 export default function MarketItem0227({ data, index, likeObj, setLikeObj, isstaked }) {
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
-
-  console.log("data123123123", isstaked);
+  const { pathname } = useLocation();
 
   function onClickItemLike(e, index) {
     e.stopPropagation();
@@ -22,15 +21,13 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj, issta
     setLikeObj({ ...dataObj });
   }
 
-  console.log("data", data);
-
   if (isMobile)
     return (
       <Mitem
         className="item"
         onClick={() => {
           data.type !== "ticket"
-            ? navigate(`/market/detail/${data.itemid}`)
+            ? navigate(`/market/detail/${data.itemid}`, { state: data })
             : isstaked
             ? SetErrorBar(messages.MSG_YOU_ALREADY_HAVE_STAKED)
             : navigate(`/market/detail/${data.uuid}`);

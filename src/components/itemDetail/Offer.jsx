@@ -11,7 +11,7 @@ import { LOGGER, getmyaddress } from "../../util/common";
 
 export default function Offer(params, offers, transaction, data) {
   const isMobile = useSelector((state) => state.common.isMobile);
-  console.log("transaction", params);
+
   const [offersInfo, setOffersInfo] = useState([]);
   const [TicketOffersInfo, setTicketOffersInfo] = useState([]);
 
@@ -36,8 +36,16 @@ export default function Offer(params, offers, transaction, data) {
         }
       });
     }
+    if (params?.path === "market" && params?.data?.type === "kingkong") {
+      axios.get(API.API_GET_TRANSACTIONS_KING_KONG + `/${params?.data?.itemid}?nettype=${net}`).then((resp) => {
+        LOGGER("transction_offer", resp.data);
+        let { status, respdata } = resp.data;
+        if (status === "OK") {
+          setTicketOffersInfo(resp.data.list.slice(-2));
+        }
+      });
+    }
   };
-  console.log("asdfasdfasdfasdfasdfasdfasdf", TicketOffersInfo);
 
   useEffect(() => {
     fetchdata();
@@ -77,19 +85,29 @@ export default function Offer(params, offers, transaction, data) {
               </div>
             </li>
           ))}
-        {params?.path === "market" &&
-          params?.data?.type === "ticket" &&
-          TicketOffersInfo?.map((cont, index) => (
-            <li key={index}>
-              <img src={cont.prfoImg ? cont.profoImg : person} alt="" />
-              <div className="infoBox">
-                <p className="info">{`${strDot(cont.username, 11, 4)} ${parseInt(cont.price).toFixed(2)} USDT `}</p>
-                <p className="time">
-                  {cont.updatedat === null ? strDot(cont.createdat, 10) : strDot(cont.updatedat, 10)}
-                </p>
-              </div>
-            </li>
-          ))}
+        {params?.path === "market" && params?.data?.type === "ticket"
+          ? TicketOffersInfo?.map((cont, index) => (
+              <li key={index}>
+                <img src={cont.prfoImg ? cont.profoImg : person} alt="" />
+                <div className="infoBox">
+                  <p className="info">{`${strDot(cont.username, 11, 4)} ${parseInt(cont.price).toFixed(2)} USDT `}</p>
+                  <p className="time">
+                    {cont.updatedat === null ? strDot(cont.createdat, 10) : strDot(cont.updatedat, 10)}
+                  </p>
+                </div>
+              </li>
+            ))
+          : TicketOffersInfo?.map((cont, index) => (
+              <li key={index}>
+                <img src={cont.prfoImg ? cont.profoImg : person} alt="" />
+                <div className="infoBox">
+                  <p className="info">{`${strDot(cont.username, 11, 4)} ${parseInt(cont.price).toFixed(2)} USDT `}</p>
+                  <p className="time">
+                    {cont.updatedat === null ? strDot(cont.createdat, 10) : strDot(cont.updatedat, 10)}
+                  </p>
+                </div>
+              </li>
+            ))}
       </PofferBox>
     );
 }

@@ -12,6 +12,14 @@ import moment from "moment";
 import { API } from "../../configs/api";
 import ticketImg from "../../img/staking/E_prof1.png";
 import { net } from "../../configs/net";
+import { getabistr_forfunction, query_with_arg, query_noarg, query_eth_balance } from "../../util/contract-calls";
+import { addresses } from "../../configs/addresses";
+import { getweirep, getethrep } from "../../util/eth";
+import SetErrorBar from "../../util/SetErrorBar";
+import { requesttransaction } from "../../services/metamask";
+import awaitTransactionMined from "await-transaction-mined";
+import { TIME_FETCH_MYADDRESS_DEF, TX_POLL_OPTIONS } from "../../configs/configs";
+import { web3 } from "../../configs/configweb3";
 
 export default function Staking() {
   const isMobile = useSelector((state) => state.common.isMobile);
@@ -19,6 +27,9 @@ export default function Staking() {
   const [toggleCode, setToggleCode] = useState(false);
   const [toggleLink, setToggleLink] = useState(false);
   const [ticketInfo, setItckInfo] = useState();
+  const [totalClaimedReward, setTotalClaimedReward] = useState(0);
+  const [totalMinted, setTotalMinted] = useState(0);
+  let [spinner, setSpinner] = useState(false);
 
   const fatchData = () => {
     let myaddress = getmyaddress();
@@ -36,6 +47,101 @@ export default function Staking() {
 
   console.log("logsataasdasd", ticketInfo);
 
+  //claim_nipcoin_reward
+  const query_claimed_reward = (_) => {
+    query_noarg({
+      contractaddress: addresses.STAKE,
+      abikind: "STAKING",
+      methodname: "query_claimed_reward",
+    }).then((resp) => {
+      LOGGER("@query_claimed_reward", getethrep(resp));
+      setTotalClaimedReward((+getethrep(resp)).toFixed(2));
+    });
+  };
+
+  //count mint ( kingkong )
+  const queryTotalMinted = () => {
+    let myaddress = getmyaddress();
+
+    if (myaddress) {
+    } else {
+      return;
+    }
+    console.log("asdasdasdsad", myaddress);
+
+    query_with_arg({
+      // contractaddress: contract,
+      abikind: "NFT",
+      methodname: "balanceOf",
+      aargs: [myaddress],
+    }).then((res) => {
+      setTotalMinted(res);
+      console.log("total minted", res);
+    });
+  };
+
+  //claim
+  const onclickclaim = async () => {
+    let myaddress = getmyaddress();
+    if (myaddress) {
+    } else {
+      return;
+    }
+    if (+totalClaimedReward > 0) {
+    } else {
+      SetErrorBar("You dont have any Reward");
+      return;
+    }
+
+    const abistring = getabistr_forfunction({
+      // contractaddress: contractEmployer,
+      abikind: "STAKING",
+      methodname: "claim",
+      aargs: [],
+    });
+
+    setSpinner(true);
+    requesttransaction({
+      from: myaddress,
+      // to: contractEmployer,
+      data: abistring,
+      value: "0x00",
+    }).then((res) => {
+      console.log(res);
+      if (res) {
+      } else {
+        SetErrorBar("User denied");
+        setSpinner(false);
+        return;
+      }
+
+      let txhash;
+      txhash = res;
+
+      awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
+        query_claimed_reward();
+        console.log("minedtxreceipt", minedtxreceipt);
+      });
+
+      axios
+        .post(API.API_TXS + `/${txhash}`, {
+          txhash: res,
+          username: myaddress,
+          typestr: "KINGKONG_CLAIM",
+          amount: totalClaimedReward,
+          auxdata: {
+            toAmount: totalClaimedReward,
+            rewardTokenContract: addresses.contract_nip_token,
+            rewardTokenSymbol: "NIP",
+            nettype: net,
+          },
+        })
+        .then((res) => {
+          console.log("on click claim reported!", res);
+        })
+        .catch((err) => console.log(err));
+    });
+  };
   if (isMobile)
     return (
       <MstakingBox>
@@ -139,6 +245,9 @@ export default function Staking() {
                     <p>0.00 Nips</p>
                   </span>
                   <span>5%</span>
+                  <button className="claimBtn" onClick={() => {}}>
+                    Claim
+                  </button>
                 </li>
               </ul>
             </div>
@@ -445,6 +554,15 @@ const PstakingBox = styled.section`
             }
           }
         }
+      }
+      .claimBtn {
+        width: 300px;
+        height: 50px;
+        font-size: 18px;
+        font-weight: 600;
+        border-radius: 12px;
+        color: #fff;
+        background: #000;
       }
 
       &.rewardBox {

@@ -14,6 +14,7 @@ const API = {
   API_MAX: URL + `/queries/max`, // /:tablename/:fieldname
   API_TXS: URL + "/transactions", // /:txhash
   API_UPDATE_ORDERS: URL + "/orders/update_orders", // /:txhash
+  API_UPDATE_KING_KONG_STAKE: URL + "/orders/update_kingkong_stake", // /:txhash
   API_TICKERS: URL + "/tickers",
   API_USERINFO: `${URL}/users/info`,
   API_TOGGLE_FAVORITE: URL + "/favorites/toggle",
@@ -49,6 +50,7 @@ const API = {
   API_GET_MARKET_OFFERS: `${URL}/queries/logorders/uuid`,
   API_GET_TRANSACTIONS: `${URL}/queries/transactionstotrack/itemid`,
   API_GET_TRANSACTIONS_TICKET: `${URL}/queries/logorders/tokenid`,
+  API_GET_TRANSACTIONS_KING_KONG: `${URL}/queries/logorders/itemid`,
   API_GET_ITEMS_DETAIL: `${URL}/items/item`,
   API_QUERY_STRING: (_value) => `${URL}/queries/singlerow/settings/key_/${_value}`,
   API_POST_SALE: `${URL}/orders`,

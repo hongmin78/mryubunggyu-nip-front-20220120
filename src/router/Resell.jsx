@@ -34,12 +34,7 @@ export default function Resell() {
   const isMobile = useSelector((state) => state.common.isMobile);
   const ticketInfo = useLocation().state;
   const [bid, setBid] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [startPopup, setStartPopup] = useState(false);
-  const [expDate, setExpDate] = useState("");
-  const [expDatePopup, setExpDatePopup] = useState(false);
   const [sign, setSign] = useState();
-
   let [userInfo, setUserInfo] = useState();
   let [itemDetail, setItemDetail] = useState();
   const { id } = useParams();
@@ -48,6 +43,7 @@ export default function Resell() {
   const [saleType, setSaleType] = useState("COMMON");
   const [isApprovedForAll, setApprovalForAll] = useState(false);
   let [spinner, setSpinner] = useState(false);
+  console.log("ticketInfo", itemDetail);
 
   const getUserInfo = async () => {
     try {
@@ -66,7 +62,6 @@ export default function Resell() {
       console.log(err);
     }
   };
-  console.log("type", type);
   const queryItemDetail = async () => {
     if (type === "kingkong") {
       try {
@@ -110,10 +105,10 @@ export default function Resell() {
 
       const options_arg = {
         kingkong: {
-          contractaddress: addresses.contract_erc1155,
-          abikind: "ERC1155",
+          contractaddress: addresses.contract_kip17,
+          abikind: "KIP17",
           methodname: "isApprovedForAll",
-          aargs: [myaddress, addresses.contract_erc1155_sales],
+          aargs: [myaddress, addresses.contract_kip17_salse],
         },
         ticket: {
           contractaddress: addresses.contract_erc1155,
@@ -153,14 +148,14 @@ export default function Resell() {
     }
     if (type === "kingkong") {
       let abistr = getabistr_forfunction({
-        contractaddress: addresses.contract_erc1155,
-        abikind: "ERC1155",
+        contractaddress: addresses.contract_kip17,
+        abikind: "KIP17",
         methodname: "setApprovalForAll",
-        aargs: [addresses.contract_erc1155_sales, true],
+        aargs: [addresses.contract_kip17_salse, true],
       });
       requesttransaction({
         from: myaddress,
-        to: addresses.contract_erc1155,
+        to: addresses.contract_kip17,
         data: abistr,
         value: "0x00",
       }).then((resp) => {
@@ -216,9 +211,16 @@ export default function Resell() {
     const { ethereum } = window; //    const exampleMessage = "Test `personal_sign` message";
     const from = myaddress; // store.isLogin;
     let msg; // = `0x${Buffer.from(exampleMessage, "utf8").toString("hex")}`;
-    msg = `Token id:${ticketInfo?.itemid ? ticketInfo.itemid : ticketInfo?.id}, ${getweirep(bid)},Contract address :${
-      addresses.contract_erc1155_ticket_sales
-    }, wallet: ${myaddress}`;
+    if (type === "kingkong") {
+      msg = `Token id:${itemDetail.itemid}, ${getweirep(bid)},Contract address :${
+        addresses.contract_erc1155_ticket_sales
+      }, wallet: ${myaddress}`;
+    }
+    if (type === "ticket") {
+      msg = `Token id:${ticketInfo?.itemid ? ticketInfo.itemid : ticketInfo?.id}, ${getweirep(bid)},Contract address :${
+        addresses.contract_erc1155_ticket_sales
+      }, wallet: ${myaddress}`;
+    }
 
     const sign = await ethereum.request({
       method: "personal_sign",
@@ -231,17 +233,26 @@ export default function Resell() {
 
   const postSell = async () => {
     let respsign = await onClickSignRequest();
-    console.log("res", respsign);
+    console.log("res", itemDetail);
+    let msg;
     setSpinner(true);
     if (respsign) {
       let myaddress = getmyaddress();
-      let msg = `Token id:${itemDetail.id}, ${getweirep(bid)},Contract address :${
-        addresses.contract_erc1155_ticket_sales
-      }, wallet: ${myaddress}`;
+      if (type === "kingkong") {
+        msg = `Token id:${itemDetail?.id}, ${getweirep(bid)},Contract address :${
+          addresses.contract_kip17_salse
+        }, wallet: ${myaddress}`;
+      }
+      if (type === "ticket") {
+        msg = `Token id:${itemDetail?.id}, ${getweirep(bid)},Contract address :${
+          addresses.contract_erc1155_ticket_sales
+        }, wallet: ${myaddress}`;
+      }
+
       let options_data = {
         kingkong: {
-          username: userInfo?.username,
-          contractaddress: addresses.contract_admin,
+          username: itemDetail?.username,
+          contractaddress: addresses.contract_kip17,
           tokenid: itemDetail?.id,
           price: bid,
           itemid: itemDetail?.itemid,
@@ -258,7 +269,7 @@ export default function Resell() {
           },
           expirystr: 4119051884,
           nettype: net,
-          seller: itemDetail.itembalances?.username,
+          seller: itemDetail?.username,
           typestr: saleType,
           type: "kingkong",
         },

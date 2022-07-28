@@ -9,7 +9,6 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { putCommaAtPrice, strDot } from "../util/Util";
 import { D_category, D_transactionHistory } from "../data/DauctionDetail";
 import Offer from "../components/itemDetail/Offer";
-import { marketPlaceList } from "../data/Dmain";
 import Details from "../components/itemDetail/Details";
 import Properties from "../components/itemDetail/Properties";
 import MarketItem from "../components/MarketItem";
@@ -47,7 +46,7 @@ export default function MarketDetail() {
   let [isstaked, setisstaked] = useState();
   const [transaction, setTranSaction] = useState([]);
 
-  console.log("asdoifajsodfij", params);
+  console.log("marketPlaceList", data);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -142,6 +141,15 @@ export default function MarketDetail() {
         let { status, respdata } = resp.data;
         if (status === "OK") {
           setTranSaction(resp.data.payload.rowdata.slice(-3));
+        }
+      });
+    }
+    if (data?.type === "kingkong") {
+      axios.get(API.API_GET_TRANSACTIONS_KING_KONG + `/${data?.itemid}?nettype=${net}`).then((resp) => {
+        LOGGER("transction", resp.data);
+        let { status, respdata } = resp.data;
+        if (status === "OK") {
+          setTranSaction(resp.data.list.slice(-3));
         }
       });
     }
@@ -415,7 +423,34 @@ export default function MarketDetail() {
             </article>
             {data?.type === "ticket" && (
               <ul className="historyList">
-                {transaction.map((cont, index) => (
+                {transaction?.map((cont, index) => (
+                  <Fragment key={index}>
+                    {index ? (
+                      <div className="sideBarBox">
+                        <span className="sideBar" />
+                      </div>
+                    ) : (
+                      <></>
+                    )}
+                    <li>
+                      <span className="iconBox">
+                        <img src={I_tagWhite} alt="" />
+                      </span>
+
+                      <div className="contBox">
+                        <p className="cont">
+                          {strDot(cont.username, 15)} / {putCommaAtPrice(cont?.price)} USDT{" "}
+                        </p>
+                        <p className="time">{cont.createdat?.split("T")[0]}</p>
+                      </div>
+                    </li>
+                  </Fragment>
+                ))}
+              </ul>
+            )}
+            {data?.type === "kingkong" && (
+              <ul className="historyList">
+                {transaction?.map((cont, index) => (
                   <Fragment key={index}>
                     {index ? (
                       <div className="sideBarBox">
@@ -448,13 +483,13 @@ export default function MarketDetail() {
             <div className="listBox">
               <div className="posBox">
                 <ul className="itemList" ref={moreRef}>
-                  {marketPlaceList.map((cont, index) => (
+                  {marketPlaceList?.map((cont, index) => (
                     <Fragment key={index}>
                       <MarketItem0227 data={cont} index={index} isstaked={isstaked} />
                     </Fragment>
                   ))}
                 </ul>
-                {marketPlaceList.length > 4 ? (
+                {marketPlaceList?.length > 4 ? (
                   <button className="nextBtn" onClick={onClickAuctionNextBtn}>
                     <img src={I_rtArw} alt="" />
                   </button>

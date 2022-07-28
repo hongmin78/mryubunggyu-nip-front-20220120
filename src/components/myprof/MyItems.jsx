@@ -2,10 +2,7 @@ import styled from "styled-components";
 import I_heartO from "../../img/icon/I_heartO.svg";
 import I_tIcon from "../../img/icon/I_tIcon.png";
 import I_dnArw from "../../img/icon/I_dnArw.svg";
-import E_item2 from "../../img/mypage/E_item2.png";
 import E_staking from "../../img/common/E_staking.png";
-import E_item3 from "../../img/mypage/E_item3.png";
-import { putCommaAtPrice, strDot } from "../../util/Util";
 import { useRef, useEffect, useState } from "react";
 import PopupBg from "../../components/PopupBg";
 import { D_sortList } from "../../data/DmyPage";
@@ -18,17 +15,14 @@ import { query_with_arg, getabistr_forfunction } from "../../util/contract-calls
 import { addresses } from "../../configs/addresses";
 import { TIME_FETCH_MYADDRESS_DEF, TX_POLL_OPTIONS } from "../../configs/configs";
 import { getmyaddress, LOGGER } from "../../util/common";
-import { web3 } from "../../configs/configweb3-bscmainnet";
-import { abi } from "../../contracts/abi-staker-20220414";
-// import BidPopup from "../BidPopup";
-import StakingPopup from "../StakingPopup";
+import { web3 } from "../../configs/configweb3";
 import moment from "moment";
 import PayPopup from "../PayPopup";
 import { net } from "../../configs/net";
-import { nettype } from "../../configs/configweb3-ropsten";
 import SetErrorBar from "../../util/SetErrorBar";
 import { requesttransaction } from "../../services/metamask";
 import awaitTransactionMined from "await-transaction-mined";
+import I_spinner from "../../img/icon/I_spinner.svg";
 
 export default function MyItems() {
   const navigate = useNavigate();
@@ -50,7 +44,7 @@ export default function MyItems() {
   const [ticketInfo, setTickInfo] = useState();
   const [circulations, setCirculations] = useState([]);
   let [spinner, setSpinner] = useState(false);
-  const [isApproved, setIsApproved] = useState(false);
+  const [isApprovedForAll, setIsApprovedForAll] = useState(false);
 
   const fetchdata = async (_) => {
     let myaddress = getmyaddress();
@@ -95,8 +89,6 @@ export default function MyItems() {
           if (status == "OK") {
             setCirculations(resp.data.list);
           }
-          //        console.log(res.data);
-          //      setMoreCollection(res.data);
         });
 
       let myaddress = getmyaddress();
@@ -136,49 +128,120 @@ export default function MyItems() {
       });
   };
 
-  useEffect(() => {
-    let myaddress = getmyaddress();
-    axios.get(API.API_LOGSTAKES + `/${myaddress}?nettype=${net}`).then((resp) => {
-      LOGGER("API_LOGSTAKES", resp.data);
-      let { status, respdata } = resp.data;
-      if (status == "OK") {
-        setGetTickTimer(respdata?.createdat);
-
-        setTickTimer("2022-08-04");
-      }
-    });
-  }, [getTickTimer]);
-
-  useEffect(
-    (_) => {
-      fetchdata();
-    },
-    [isOpen]
-  );
-
   const openModal = () => {
     setIsOpen((prevState) => !prevState);
   };
 
-  const onclick_staking = () => {
+  //Approve
+  const on_click_approve = (item) => {
+    setSpinner(true);
+    let myaddress = getmyaddress();
+    if (myaddress) {
+    } else {
+      SetErrorBar("Please connect wallet!");
+      return;
+    }
+
+    const abistring = getabistr_forfunction({
+      contractaddress: addresses.contract_kip17,
+      abikind: "KIP17",
+      methodname: "setApprovalForAll",
+      aargs: [addresses.contract_kip17_staking, true],
+    });
+    requesttransaction({
+      from: myaddress,
+      to: addresses.contract_kip17,
+      data: abistring,
+      value: "0x00",
+    }).then((resp) => {
+      console.log("stake", resp);
+      if (resp) {
+      } else {
+        SetErrorBar("User denied");
+        setSpinner(false);
+        return;
+      }
+
+      let txhash;
+      txhash = resp;
+      axios
+        .post(API.API_TXS + `/${txhash}`, {
+          txhash: txhash,
+          username: myaddress,
+          typestr: "STAKEAPPROVE",
+          auxdata: {
+            user_action: "approve",
+            contract_type: "KIP17", // .ETH_TESTNET
+            contract_address: addresses.contract_kip17, // .ETH_TESTNET
+            to_token_contract: addresses.contract_kip17_staking,
+            my_address: myaddress,
+            nettype: net,
+          },
+        })
+        .then((res) => {
+          console.log("onclickapprove reported!", res);
+        })
+        .catch((err) => console.log(err));
+
+      awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
+        SetErrorBar("Approved");
+        setSpinner(false);
+        setIsApprovedForAll(true);
+        console.log("minedtxreceipt", minedtxreceipt);
+      });
+    });
+  };
+
+  //queryApproval stake
+
+  const queryApproval = () => {
+    setSpinner(true);
+    let myaddress = getmyaddress();
+    if (myaddress) {
+    } else {
+      return;
+    }
+    query_with_arg({
+      contractaddress: addresses.contract_kip17,
+      abikind: "KIP17",
+      methodname: "isApprovedForAll",
+      aargs: [myaddress, addresses.contract_kip17_staking],
+    }).then((res) => {
+      console.log("approval", res);
+      setIsApprovedForAll(res);
+      setSpinner(false);
+    });
+  };
+
+  //stake
+  const stake_for_diposit = (item) => {
+    if (item == null) {
+      SetErrorBar("You have to select tokens first!");
+      return;
+    }
+
     let myaddress = getmyaddress();
     if (myaddress) {
     } else {
       return;
     }
     setSpinner(true);
+
+    console.log("tostringitems", item);
     let abistring;
-    abistring = getabistr_forfunction({
-      contractaddress: addresses.contract_erc1155,
-      abikind: "STAKING",
-      methodname: "deposit_batch",
-      aargs: [
-        //kip17토큰컨트렉터, itemData.id
-      ],
-    });
+    if (item !== null) {
+      abistring = getabistr_forfunction({
+        contractaddress: addresses.contract_kip17_staking,
+        abikind: "KIP17Stake",
+        methodname: "mint_deposit",
+        aargs: [addresses.contract_kip17, item?.itemid, 0],
+      });
+    }
+    console.log(abistring);
+
     requesttransaction({
       from: myaddress,
-      to: myaddress, //스테이킹컨트렉터,
+      to: addresses.contract_kip17_staking,
       data: abistring,
       value: "0x00",
     }).then((resp) => {
@@ -187,14 +250,140 @@ export default function MyItems() {
       } else {
         SetErrorBar("User denied");
         setSpinner(false);
-        return;
       }
-      SetErrorBar("Staked");
-      setSpinner(false);
+
       let txhash;
       txhash = resp;
+      axios
+        .post(API.API_TXS + `/${txhash}`, {
+          txhash: txhash,
+          username: myaddress,
+          typestr: "KING_KONG_STAKING",
+          auxdata: {
+            user_action: "KING_KONG_STAKING",
+            contract_type: "KING_KONG_STAKING", // .ETH_TESTNET
+            contract_address: addresses.contract_kip17_staking, // .ETH_TESTNET
+            to_token_contract: addresses.contract_kip17,
+            my_address: myaddress,
+            tokenIds: item?.id,
+            itemIds: "itemid",
+            nettype: net,
+          },
+        })
+        .then((res) => {
+          axios.put(API.API_UPDATE_KING_KONG_STAKE, {
+            itemid: item?.itemid,
+            nettype: net,
+            isstaked: 1,
+          });
+        })
+        .catch((err) => console.log(err));
+
+      awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
+        setSpinner(false);
+        axios.get(API.API_GET_KING_KONG_ITEM + `/${myaddress}/0/100/id/ASC?nettype=${net}`).then((resp) => {
+          LOGGER("Buy my item", resp.data);
+          let { status, list, payload } = resp.data;
+          if (status == "OK") {
+            setKingKongItem(list);
+          }
+        });
+        SetErrorBar("Success Staking");
+        console.log("minedtxreceipt", minedtxreceipt);
+      });
     });
   };
+
+  //withdraw
+  const stake_for_withdraw = (item) => {
+    console.log("withdraw", item);
+    if (item === null) {
+      SetErrorBar("You have to select tokens first!");
+      return;
+    }
+    let myaddress = getmyaddress();
+    if (myaddress) {
+    } else {
+      return;
+    }
+    setSpinner(true);
+    const abistring = getabistr_forfunction({
+      contractaddress: addresses.contract_kip17_staking,
+      abikind: "KIP17Stake",
+      methodname: "withdraw",
+      aargs: [addresses.contract_kip17, 0, myaddress],
+    });
+
+    requesttransaction({
+      from: myaddress,
+      to: addresses.contract_kip17,
+      data: abistring,
+      value: "0x00",
+    }).then((resp) => {
+      console.log("stake", resp);
+      let txhash;
+      txhash = resp;
+
+      axios
+        .post(API.API_TXS + `/${txhash}`, {
+          txhash: txhash,
+          username: myaddress,
+          typestr: "KING_KONG_UNSTAKE",
+          auxdata: {
+            user_action: "KING_KONG_UNSTAKE",
+            contract_type: "KING_KONG_UNSTAKE", // .ETH_TESTNET
+            contract_address: addresses.contract_kip17_staking, // .ETH_TESTNET
+            to_token_contract: addresses.contract_kip17,
+            my_address: myaddress,
+            tokenIds: itemData?.tokenid,
+            itemIds: item?.itemid,
+            nettype: net,
+          },
+        })
+        .then((res) => {
+          axios.put(API.API_UPDATE_KING_KONG_STAKE, {
+            itemid: item?.itemid,
+            nettype: net,
+            isstaked: 0,
+          });
+          console.log("onclickwithdraw reported!", res);
+        })
+        .catch((err) => console.log(err));
+      awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
+        setSpinner(false);
+        console.log("minedtxreceipt", minedtxreceipt);
+        axios.get(API.API_GET_KING_KONG_ITEM + `/${myaddress}/0/100/id/ASC?nettype=${net}`).then((resp) => {
+          LOGGER("Buy my item", resp.data);
+          let { status, list, payload } = resp.data;
+          if (status == "OK") {
+            setKingKongItem(list);
+          }
+        });
+      });
+    });
+  };
+
+  useEffect(() => {
+    let myaddress = getmyaddress();
+    axios.get(API.API_LOGSTAKES + `/${myaddress}?nettype=${net}`).then((resp) => {
+      LOGGER("API_LOGSTAKES", resp.data);
+      let { status, respdata } = resp.data;
+      if (status == "OK") {
+        setGetTickTimer(respdata?.createdat);
+        setTickTimer("2022-08-04");
+      }
+    });
+  }, [getTickTimer]);
+
+  useEffect(
+    (_) => {
+      setTimeout(() => {
+        fetchdata();
+        queryApproval();
+      }, 1500);
+    },
+    [isOpen, isApprovedForAll]
+  );
 
   if (isMobile)
     return (
@@ -786,9 +975,36 @@ export default function MyItems() {
                               >
                                 Sell
                               </button>
-                              <button className="actionBtn_two" onClick={() => navigate("/resell/" + item.itemid)}>
-                                Stake
-                              </button>
+                              {isApprovedForAll && item?.isstaked === 0 && (
+                                <button
+                                  className="actionBtn_two"
+                                  onClick={() => {
+                                    stake_for_diposit(item);
+                                  }}
+                                >
+                                  {spinner ? <div id="loading"></div> : "Stake"}
+                                </button>
+                              )}
+                              {isApprovedForAll && item?.isstaked === 1 && (
+                                <button
+                                  className="actionBtn_two"
+                                  onClick={() => {
+                                    stake_for_withdraw(item);
+                                  }}
+                                >
+                                  {spinner ? <div id="loading"></div> : "UnStake"}
+                                </button>
+                              )}
+                              {!isApprovedForAll && (
+                                <button
+                                  className="actionBtn_two"
+                                  onClick={() => {
+                                    on_click_approve(item);
+                                  }}
+                                >
+                                  {spinner ? <div id="loading"></div> : "Approve for Stake"}
+                                </button>
+                              )}
                             </>
                           )}
                         </ul>
@@ -1348,6 +1564,27 @@ const PmyItemsBox = styled.section`
           line-height: 20px;
           background: #000;
           border-radius: 12px;
+          #loading {
+            display: inline-block;
+            width: 38px;
+            height: 38px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            -webkit-animation: spin 1s ease-in-out infinite;
+          }
+
+          @keyframes spin {
+            to {
+              -webkit-transform: rotate(360deg);
+            }
+          }
+          @-webkit-keyframes spin {
+            to {
+              -webkit-transform: rotate(360deg);
+            }
+          }
         }
         .description {
           margin: 30px 0 0 0;

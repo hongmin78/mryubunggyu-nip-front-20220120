@@ -7,8 +7,9 @@ import { abi as abipay } from "../contracts/abipay";
 import { abi as abidelinquent } from "../contracts/abi-delinquents";
 import { abi as abierc1155 } from "../contracts/abi-erc1155";
 import { abi as abierc1155sales } from "../contracts/abi-erc1155Sale";
-import { abi as abierc1155ticketsale } from "../contracts/abi-erc1155_ticket_sale";
-import { abi as abierc1155ticket } from "../contracts/abi-erc1155_ticket";
+import { abi as abi17 } from "../contracts/abi-kip17";
+import { abi as abi17_sale } from "../contracts/abi-kip17_sales";
+import { abi as abi17_stake } from "../contracts/abi-kip17_stake";
 
 // import { abi_putons ale } from '../contracts/abi/abi_puton sale'
 import { LOGGER } from "./common";
@@ -25,6 +26,9 @@ const MAP_STR_ABI = {
   DELINQUENT: abidelinquent,
   ERC1155Sale: abierc1155sales,
   ERC1155: abierc1155,
+  KIP17: abi17,
+  KIP17Sale: abi17_sale,
+  KIP17Stake: abi17_stake,
 };
 const getabistr_forfunction = (jargs) => {
   console.log("jargs", jargs);
@@ -72,6 +76,7 @@ const query_noarg = (jargs) => {
 const query_with_arg = (jargs) => {
   // {contractaddress , methodname , aargs }=jargs
   let { contractaddress, abikind, methodname, aargs } = jargs;
+  console.log("jargs", jargs);
 
   let contract;
   contractaddress = contractaddress.toLowerCase();
