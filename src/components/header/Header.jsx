@@ -185,7 +185,7 @@ export default function Header() {
               >
                 Marketplace
               </button>
-              <button
+              {/* <button
                 style={{ color: isStaking && "#fff" }}
                 onClick={() => {
                   // onclick_staked_val_btn("/employment");
@@ -194,7 +194,7 @@ export default function Header() {
                 }}
               >
                 Employment
-              </button>
+              </button> */}
             </nav>
 
             {/**  <button className='menuBtn' >

@@ -178,7 +178,6 @@ function App() {
           <Route path="/auction/detail/:itemid" element={<AuctionDetail />} />
 
           <Route path="/market" element={<Market />} />
-          <Route path="/employment" element={<Employment />} />
           <Route path="/market/detail/:itemid" element={<MarketDetail />} />
           <Route path="/market/detail/:itemid/:popup" element={<MarketDetail />} />
 

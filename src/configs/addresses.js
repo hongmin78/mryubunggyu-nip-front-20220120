@@ -22,7 +22,7 @@ const jaddresses = {
     contract_kip17: "0x5263fBda9D02A427FD2Da6E7665671596d802D20", // 2022.07.25 mint
     contract_kip17_salse: "0x333406b681B9A6Dd4Fb8bF185C1261fb0DADAB98", // 2022.07.13 release
     //kingkong staking
-    contract_kip17_staking: "0xC57736370DaF48C92Fc031163724dD06Fa53ae26", // 2022.07.25 mint
+    contract_kip17_staking: "0x187c3a1DE5e8D0Ba74e626aC735e4Ce49Eb94443", // 2022.07.25 mint
     contract_nip_token: "0xa934775D7863833f51BFcA6ce5dFfa97aAB83cb8",
   },
   BSC_MAINNET: {
