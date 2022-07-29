@@ -18,11 +18,11 @@ const jaddresses = {
     contract_erc1155_sales: "0x32F5b0Bf75675e00EA6E630880d84F75dF3f22ac", // 2022.06.05 11:20pm latest release for ticket
     contract_erc1155: "0xf3f9ae90dadb021bb9bacf53bc0fbf9f3f963ef2", // 2022.06.05 latest release for ticket
     // //kingkong sales
-    contract_kip17: "0xc815252d41d0ee8EC1BD5eb76146041eFf1519Ab", // 2022.07.25 mint
-
+    // contract_kip17: "0xc815252d41d0ee8EC1BD5eb76146041eFf1519Ab", // 2022.07.25 mint
+    contract_kip17: "0x5263fBda9D02A427FD2Da6E7665671596d802D20", // 2022.07.25 mint
     contract_kip17_salse: "0x333406b681B9A6Dd4Fb8bF185C1261fb0DADAB98", // 2022.07.13 release
     //kingkong staking
-    contract_kip17_staking: "0xb2A9580Dc8513895203ca511C8e97f5E3F6e75bb", // 2022.07.25 mint
+    contract_kip17_staking: "0xC57736370DaF48C92Fc031163724dD06Fa53ae26", // 2022.07.25 mint
     contract_nip_token: "0xa934775D7863833f51BFcA6ce5dFfa97aAB83cb8",
   },
   BSC_MAINNET: {

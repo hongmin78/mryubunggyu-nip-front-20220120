@@ -329,6 +329,25 @@ export const abi = [
     type: "function",
   },
   {
+    constant: true,
+    inputs: [
+      {
+        name: "",
+        type: "string",
+      },
+    ],
+    name: "_itemhash_tokenid",
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+      },
+    ],
+    payable: false,
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     constant: false,
     inputs: [
       {
@@ -530,28 +549,6 @@ export const abi = [
         type: "bytes4",
       },
     ],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        name: "_erc721",
-        type: "address",
-      },
-      {
-        name: "_tokenid",
-        type: "uint256",
-      },
-      {
-        name: "_to",
-        type: "address",
-      },
-    ],
-    name: "withdraw",
-    outputs: [],
     payable: false,
     stateMutability: "nonpayable",
     type: "function",
@@ -804,6 +801,28 @@ export const abi = [
     ],
     payable: false,
     stateMutability: "view",
+    type: "function",
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        name: "_erc721",
+        type: "address",
+      },
+      {
+        name: "_itemid",
+        type: "string",
+      },
+      {
+        name: "_to",
+        type: "address",
+      },
+    ],
+    name: "withdraw",
+    outputs: [],
+    payable: false,
+    stateMutability: "nonpayable",
     type: "function",
   },
   {

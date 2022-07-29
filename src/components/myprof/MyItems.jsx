@@ -164,30 +164,33 @@ export default function MyItems() {
 
       let txhash;
       txhash = resp;
-      axios
-        .post(API.API_TXS + `/${txhash}`, {
-          txhash: txhash,
-          username: myaddress,
-          typestr: "STAKEAPPROVE",
-          auxdata: {
-            user_action: "approve",
-            contract_type: "KIP17", // .ETH_TESTNET
-            contract_address: addresses.contract_kip17, // .ETH_TESTNET
-            to_token_contract: addresses.contract_kip17_staking,
-            my_address: myaddress,
-            nettype: net,
-          },
-        })
-        .then((res) => {
-          console.log("onclickapprove reported!", res);
-        })
-        .catch((err) => console.log(err));
 
       awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
-        SetErrorBar("Approved");
-        setSpinner(false);
-        setIsApprovedForAll(true);
         console.log("minedtxreceipt", minedtxreceipt);
+        if (minedtxreceipt.status === true) {
+          axios
+            .post(API.API_TXS + `/${txhash}`, {
+              txhash: txhash,
+              username: myaddress,
+              typestr: "STAKEAPPROVE",
+              auxdata: {
+                user_action: "approve",
+                contract_type: "KIP17", // .ETH_TESTNET
+                contract_address: addresses.contract_kip17, // .ETH_TESTNET
+                to_token_contract: addresses.contract_kip17_staking,
+                my_address: myaddress,
+                nettype: net,
+              },
+            })
+            .then((res) => {
+              SetErrorBar("Approved");
+              setSpinner(false);
+              setIsApprovedForAll(true);
+            })
+            .catch((err) => console.log(err));
+        } else {
+          SetErrorBar("Fail Approve");
+        }
       });
     });
   };
@@ -254,42 +257,50 @@ export default function MyItems() {
 
       let txhash;
       txhash = resp;
-      axios
-        .post(API.API_TXS + `/${txhash}`, {
-          txhash: txhash,
-          username: myaddress,
-          typestr: "KING_KONG_STAKING",
-          auxdata: {
-            user_action: "KING_KONG_STAKING",
-            contract_type: "KING_KONG_STAKING", // .ETH_TESTNET
-            contract_address: addresses.contract_kip17_staking, // .ETH_TESTNET
-            to_token_contract: addresses.contract_kip17,
-            my_address: myaddress,
-            tokenIds: item?.id,
-            itemIds: "itemid",
-            nettype: net,
-          },
-        })
-        .then((res) => {
-          axios.put(API.API_UPDATE_KING_KONG_STAKE, {
-            itemid: item?.itemid,
-            nettype: net,
-            isstaked: 1,
-          });
-        })
-        .catch((err) => console.log(err));
 
       awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
-        setSpinner(false);
-        axios.get(API.API_GET_KING_KONG_ITEM + `/${myaddress}/0/100/id/ASC?nettype=${net}`).then((resp) => {
-          LOGGER("Buy my item", resp.data);
-          let { status, list, payload } = resp.data;
-          if (status == "OK") {
-            setKingKongItem(list);
-          }
-        });
-        SetErrorBar("Success Staking");
-        console.log("minedtxreceipt", minedtxreceipt);
+        if (minedtxreceipt.status === true) {
+          axios
+            .post(API.API_TXS + `/${txhash}`, {
+              txhash: txhash,
+              username: myaddress,
+              typestr: "KING_KONG_STAKING",
+              auxdata: {
+                user_action: "KING_KONG_STAKING",
+                contract_type: "KING_KONG_STAKING", // .ETH_TESTNET
+                contract_address: addresses.contract_kip17_staking, // .ETH_TESTNET
+                to_token_contract: addresses.contract_kip17,
+                my_address: myaddress,
+                tokenIds: item?.id,
+                itemIds: "itemid",
+                nettype: net,
+              },
+            })
+            .then((res) => {
+              axios
+                .put(API.API_UPDATE_KING_KONG_STAKE, {
+                  itemid: item?.itemid,
+                  nettype: net,
+                  isstaked: 1,
+                })
+                .then((res) => {
+                  setSpinner(false);
+                  axios.get(API.API_GET_KING_KONG_ITEM + `/${myaddress}/0/100/id/ASC?nettype=${net}`).then((resp) => {
+                    LOGGER("Buy my item", resp.data);
+                    let { status, list, payload } = resp.data;
+                    if (status == "OK") {
+                      setKingKongItem(list);
+                    }
+                  });
+                  SetErrorBar("Success Staking");
+                  console.log("minedtxreceipt", minedtxreceipt);
+                });
+            })
+            .catch((err) => console.log(err));
+        } else {
+          setSpinner(false);
+          SetErrorBar("Fail Stake");
+        }
       });
     });
   };
@@ -311,7 +322,7 @@ export default function MyItems() {
       contractaddress: addresses.contract_kip17_staking,
       abikind: "KIP17Stake",
       methodname: "withdraw",
-      aargs: [addresses.contract_kip17, 0, myaddress],
+      aargs: [addresses.contract_kip17, item?.itemid, myaddress],
     });
 
     requesttransaction({
@@ -324,41 +335,48 @@ export default function MyItems() {
       let txhash;
       txhash = resp;
 
-      axios
-        .post(API.API_TXS + `/${txhash}`, {
-          txhash: txhash,
-          username: myaddress,
-          typestr: "KING_KONG_UNSTAKE",
-          auxdata: {
-            user_action: "KING_KONG_UNSTAKE",
-            contract_type: "KING_KONG_UNSTAKE", // .ETH_TESTNET
-            contract_address: addresses.contract_kip17_staking, // .ETH_TESTNET
-            to_token_contract: addresses.contract_kip17,
-            my_address: myaddress,
-            tokenIds: itemData?.tokenid,
-            itemIds: item?.itemid,
-            nettype: net,
-          },
-        })
-        .then((res) => {
-          axios.put(API.API_UPDATE_KING_KONG_STAKE, {
-            itemid: item?.itemid,
-            nettype: net,
-            isstaked: 0,
-          });
-          console.log("onclickwithdraw reported!", res);
-        })
-        .catch((err) => console.log(err));
       awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
-        setSpinner(false);
         console.log("minedtxreceipt", minedtxreceipt);
-        axios.get(API.API_GET_KING_KONG_ITEM + `/${myaddress}/0/100/id/ASC?nettype=${net}`).then((resp) => {
-          LOGGER("Buy my item", resp.data);
-          let { status, list, payload } = resp.data;
-          if (status == "OK") {
-            setKingKongItem(list);
-          }
-        });
+        if (minedtxreceipt.status === true) {
+          axios
+            .post(API.API_TXS + `/${txhash}`, {
+              txhash: txhash,
+              username: myaddress,
+              typestr: "KING_KONG_UNSTAKE",
+              auxdata: {
+                user_action: "KING_KONG_UNSTAKE",
+                contract_type: "KING_KONG_UNSTAKE", // .ETH_TESTNET
+                contract_address: addresses.contract_kip17_staking, // .ETH_TESTNET
+                to_token_contract: addresses.contract_kip17,
+                my_address: myaddress,
+                tokenIds: itemData?.tokenid,
+                itemIds: item?.itemid,
+                nettype: net,
+              },
+            })
+            .then((res) => {
+              axios
+                .put(API.API_UPDATE_KING_KONG_STAKE, {
+                  itemid: item?.itemid,
+                  nettype: net,
+                  isstaked: 0,
+                })
+                .then((res) => {
+                  axios.get(API.API_GET_KING_KONG_ITEM + `/${myaddress}/0/100/id/ASC?nettype=${net}`).then((resp) => {
+                    LOGGER("Buy my item", resp.data);
+                    let { status, list, payload } = resp.data;
+                    if (status == "OK") {
+                      setKingKongItem(list);
+                    }
+                  });
+                });
+              console.log("onclickwithdraw reported!", res);
+            })
+            .catch((err) => console.log(err));
+        } else {
+          setSpinner(false);
+          SetErrorBar("Fail Unstake");
+        }
       });
     });
   };
@@ -968,6 +986,7 @@ export default function MyItems() {
                           {item.group_ == "kingkong" && (
                             <>
                               <button
+                                disabled={spinner}
                                 className="actionBtn"
                                 onClick={() =>
                                   navigate(`/resell/${item?.username}/kingkong/${item.itemid}`, { state: item[index] })
@@ -977,6 +996,7 @@ export default function MyItems() {
                               </button>
                               {isApprovedForAll && item?.isstaked === 0 && (
                                 <button
+                                  disabled={spinner}
                                   className="actionBtn_two"
                                   onClick={() => {
                                     stake_for_diposit(item);
@@ -987,6 +1007,7 @@ export default function MyItems() {
                               )}
                               {isApprovedForAll && item?.isstaked === 1 && (
                                 <button
+                                  disabled={spinner}
                                   className="actionBtn_two"
                                   onClick={() => {
                                     stake_for_withdraw(item);
@@ -997,6 +1018,7 @@ export default function MyItems() {
                               )}
                               {!isApprovedForAll && (
                                 <button
+                                  disabled={spinner}
                                   className="actionBtn_two"
                                   onClick={() => {
                                     on_click_approve(item);
