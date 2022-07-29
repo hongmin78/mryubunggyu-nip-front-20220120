@@ -16,15 +16,13 @@ export default function Offer(params, offers) {
   console.log("params", params.params?.itemid);
 
   const fetchdata = () => {
-    axios
-      .get(API.API_GET_OFFERS + `/${params.params?.itemid}?nettype=${net}`)
-      .then((resp) => {
-        console.log("asdoijfosidajf", resp.data.list);
-        if (resp.data.status === "OK") {
-          setOffersInfo(resp.data.list);
-        }
-      })
-      .catch((error) => console.log(error));
+    axios.get(API.API_GET_TRANSACTIONS + `/${params.params?.itemid}?nettype=${net}`).then((resp) => {
+      console.log("transction", resp.data);
+      let { status, respdata } = resp.data;
+      if (status === "OK") {
+        setOffersInfo(resp.data.list.slice(-2));
+      }
+    });
   };
   useEffect(() => {
     fetchdata();
@@ -56,7 +54,7 @@ export default function Offer(params, offers) {
             <li key={index}>
               <img src={cont.prfoImg ? cont.profoImg : person} alt="" />
               <div className="infoBox">
-                <p className="info">{`${strDot(cont.username, 11, 4)} ${parseInt(cont.buyprice).toFixed(2)} USDT `}</p>
+                <p className="info">{`${strDot(cont.username, 11, 4)} ${parseInt(cont.amount).toFixed(2)} USDT `}</p>
                 <p className="time">
                   {cont.updatedat === null ? strDot(cont.createdat, 10) : strDot(cont.updatedat, 10)}
                 </p>
