@@ -2,13 +2,15 @@ import { net } from "./net";
 
 const jaddresses = {
   ETH_TESTNET: {
+    admin: "0xa6d9B48b3D869271fF84F9E62B9E48986EE3Aa7b",
     contract_USDT: "0x34da0872bb4b215345f6e47ed6514d8c4cd5f8e0",
     //	 , contract_stake : '0xa30fec0c860659639247b66ebbe3b2ccc9145e4c' // ver0223 // 0x87ac1e8378cdb6ad11e85ea9565b385b03970279'
     contract_stake: "0xc964f791b8e92336abfb3fde5fd4738700110379",
     contract_admin: "0x005b38d678753f211abae8dbb38c45a9d159ecee", // 0xd24ff65996e94d79d3cd8a22e8f95c42fbec0e0f'
     // contract_pay_for_assigned_item: "0xaf9764ef97102951f9339d515e4c41099e8fc992",
     // contract_pay_for_assigned_item: "0x70D2764D702d90c1E068a5DB6006410dDa1A1D32", // 2022.05.08 3:57pm release latest
-    contract_pay_for_assigned_item: "0x7A01f4dC3A77d66B74A499c19535A8A8338C1D21", // 2022.05.020 12:19am release latest
+    contract_pay_for_assigned_item:
+      "0x7A01f4dC3A77d66B74A499c19535A8A8338C1D21", // 2022.05.020 12:19am release latest
     // payment_for_delinquency: "0x2cdb6d037cc0a9e5480f9071b4a00f20055057a7",
     payment_for_delinquency: "0x3a21780372d2bf9be278906295984a9799bea2a8",
     contract_ticketnft: "0x60123597c04bB08655e027B3398D0BD336ad68C6",
@@ -33,7 +35,8 @@ const jaddresses = {
     // contract_pay_for_assigned_item: "0xda90f3b82c531f32af791fa3a3e7a67b36aa0844",
     // contract_pay_for_assigned_item:
     //   "0x966C6627Ae93F01C4CE4bed607348690645F251D", //release 0520
-    contract_pay_for_assigned_item: "0x6fb460F0B9CEDad97Fa396228DEf6ade84201517", //release 0621
+    contract_pay_for_assigned_item:
+      "0x6fb460F0B9CEDad97Fa396228DEf6ade84201517", //release 0621
     payment_for_delinquency: "0xc7b12c6b2c0214ed60cfc1e2f3efdd6d83b58f29",
   },
 };

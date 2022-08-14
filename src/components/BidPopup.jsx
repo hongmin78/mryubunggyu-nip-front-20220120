@@ -8,7 +8,12 @@ import { useSelector } from "react-redux";
 import PopupBg from "./PopupBg";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { getabistr_forfunction, query_with_arg, query_noarg, query_eth_balance } from "../util/contract-calls";
+import {
+  getabistr_forfunction,
+  query_with_arg,
+  query_noarg,
+  query_eth_balance,
+} from "../util/contract-calls";
 import { addresses } from "../configs/addresses";
 import { DECIMALS_DISP_DEF } from "../configs/configs"; // DueAmount,
 import { LOGGER, getmyaddress, getobjtype } from "../util/common";
@@ -18,7 +23,12 @@ import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
 import { API } from "../configs/api";
 import awaitTransactionMined from "await-transaction-mined";
-import { web3, BASE_CURRENCY, PAY_CURRENCY, NETTYPE } from "../configs/configweb3";
+import {
+  web3,
+  BASE_CURRENCY,
+  PAY_CURRENCY,
+  NETTYPE,
+} from "../configs/configweb3";
 import { TX_POLL_OPTIONS, MAX_GAS_LIMIT } from "../configs/configs";
 import I_spinner from "../img/icon/I_spinner.svg";
 import { strDot } from "../util/Util";
@@ -49,15 +59,21 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
 
   useEffect((_) => {
     const spinner = spinnerHref.current; // document.querySelector("Spinner");
-    spinner.animate([{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], {
-      duration: 1000,
-      iterations: Infinity,
-    });
+    spinner.animate(
+      [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
+      {
+        duration: 1000,
+        iterations: Infinity,
+      }
+    );
     const spinner_approve = spinnerHref_approve.current; // document.querySelector("Spinner");
-    spinner_approve.animate([{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], {
-      duration: 1000,
-      iterations: Infinity,
-    });
+    spinner_approve.animate(
+      [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
+      {
+        duration: 1000,
+        iterations: Infinity,
+      }
+    );
     axios
       .get(API.API_QUERY_STRING("SALE_REFERER_FEE_RATE") + `?nettype=${net}`)
       .then((res) => {
@@ -72,17 +88,24 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
     const fetchdata = async (_) => {
       let myaddress = getmyaddress();
 
-      axios.get(API.API_USERINFO + `/${myaddress}?nettype=${net}`).then((resp) => {
-        if (resp.data && resp.data.respdata) {
-          let { respdata } = resp.data;
+      axios
+        .get(API.API_USERINFO + `/${myaddress}?nettype=${net}`)
+        .then((resp) => {
+          if (resp.data && resp.data.respdata) {
+            let { respdata } = resp.data;
 
-          respdata.referer &&
-            axios.get(API.API_SINGLE_REFFERER + `/${respdata.referer}?nettype=${net}`).then((resp) => {
-              LOGGER("myticket", resp.data.respdata);
-              setuserinfo(resp.data.respdata);
-            });
-        }
-      });
+            respdata.referer &&
+              axios
+                .get(
+                  API.API_SINGLE_REFFERER +
+                    `/${respdata.referer}?nettype=${net}`
+                )
+                .then((resp) => {
+                  LOGGER("myticket", resp.data.respdata);
+                  setuserinfo(resp.data.respdata);
+                });
+          }
+        });
 
       const options_arg = {
         kingkong: {
@@ -189,41 +212,43 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
         let txhash = resp;
         SetErrorBar(messages.MSG_TX_REQUEST_SENT);
 
-        awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then((minedtxreceipt) => {
-          LOGGER("____minedtxreceipt", minedtxreceipt);
-          SetErrorBar(messages.MSG_TX_FINALIZED);
-          setApprove(true);
-          axios
-            .post(API.API_TXS + `/${txhash}`, {
-              txhash,
-              username: myaddress,
-              typestr: "APPROVE",
-              amount: options_arg["ticket"].amount,
-              auxdata: options_arg["ticket"].auxdata,
-              contractaddress: options_arg["ticket"].operator_contract,
-              nettype: net,
-            })
-            .then((resp) => {
-              LOGGER("APPROVE RESP", resp);
-              SetErrorBar(messages.MSG_TX_REQUEST_SENT);
-              query_with_arg({
-                contractaddress: addresses.contract_USDT, // .ETH_TESTNET
-                abikind: "ERC20",
-                methodname: "allowance",
-                aargs: [myaddress, addresses.contract_erc1155_sales], // ETH_TESTNET.
-              }).then((resp) => {
-                let allowanceineth = getethrep(resp);
-                LOGGER("gCwXF6Jjkh", resp, allowanceineth);
-                setallowanceamount(allowanceineth); //				setallowanceamount ( 100 )
-                setisloader_00(false);
-                if (allowanceineth > 0) {
-                  setisallowanceok(false);
+        awaitTransactionMined
+          .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+          .then((minedtxreceipt) => {
+            LOGGER("____minedtxreceipt", minedtxreceipt);
+            SetErrorBar(messages.MSG_TX_FINALIZED);
+            setApprove(true);
+            axios
+              .post(API.API_TXS + `/${txhash}`, {
+                txhash,
+                username: myaddress,
+                typestr: "APPROVE",
+                amount: options_arg["ticket"].amount,
+                auxdata: options_arg["ticket"].auxdata,
+                contractaddress: options_arg["ticket"].operator_contract,
+                nettype: net,
+              })
+              .then((resp) => {
+                LOGGER("APPROVE RESP", resp);
+                SetErrorBar(messages.MSG_TX_REQUEST_SENT);
+                query_with_arg({
+                  contractaddress: addresses.contract_USDT, // .ETH_TESTNET
+                  abikind: "ERC20",
+                  methodname: "allowance",
+                  aargs: [myaddress, addresses.contract_erc1155_sales], // ETH_TESTNET.
+                }).then((resp) => {
+                  let allowanceineth = getethrep(resp);
+                  LOGGER("gCwXF6Jjkh", resp, allowanceineth);
+                  setallowanceamount(allowanceineth); //				setallowanceamount ( 100 )
                   setisloader_00(false);
-                } else {
-                }
+                  if (allowanceineth > 0) {
+                    setisallowanceok(false);
+                    setisloader_00(false);
+                  } else {
+                  }
+                });
               });
-            });
-        });
+          });
         console.log("txhash_ticket", txhash);
       });
     }
@@ -244,41 +269,43 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
 
         let txhash = resp;
         SetErrorBar(messages.MSG_TX_REQUEST_SENT);
-        awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then((minedtxreceipt) => {
-          LOGGER("minedtxreceipt", minedtxreceipt);
-          SetErrorBar(messages.MSG_TX_FINALIZED);
-          setApprove(true);
-          axios
-            .post(API.API_TXS + `/${txhash}`, {
-              txhash,
-              username: myaddress,
-              typestr: "APPROVE",
-              amount: options_arg["kingkong"].amount,
-              auxdata: options_arg["kingkong"].auxdata,
-              contractaddress: options_arg["kingkong"].operator_contract,
-              nettype: net,
-            })
-            .then((resp) => {
-              LOGGER("APPROVE RESP", resp);
-              SetErrorBar(messages.MSG_TX_REQUEST_SENT);
-              query_with_arg({
-                contractaddress: addresses.contract_USDT, // .ETH_TESTNET
-                abikind: "ERC20",
-                methodname: "allowance",
-                aargs: [myaddress, addresses.contract_kip17_salse], // ETH_TESTNET.
-              }).then((resp) => {
-                let allowanceineth = getethrep(resp);
-                LOGGER("gCwXF6Jjkh", resp, allowanceineth);
-                setallowanceamount(allowanceineth); //				setallowanceamount ( 100 )
-                setisloader_00(false);
-                if (allowanceineth > 0) {
-                  setisallowanceok(false);
+        awaitTransactionMined
+          .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+          .then((minedtxreceipt) => {
+            LOGGER("minedtxreceipt", minedtxreceipt);
+            SetErrorBar(messages.MSG_TX_FINALIZED);
+            setApprove(true);
+            axios
+              .post(API.API_TXS + `/${txhash}`, {
+                txhash,
+                username: myaddress,
+                typestr: "APPROVE",
+                amount: options_arg["kingkong"].amount,
+                auxdata: options_arg["kingkong"].auxdata,
+                contractaddress: options_arg["kingkong"].operator_contract,
+                nettype: net,
+              })
+              .then((resp) => {
+                LOGGER("APPROVE RESP", resp);
+                SetErrorBar(messages.MSG_TX_REQUEST_SENT);
+                query_with_arg({
+                  contractaddress: addresses.contract_USDT, // .ETH_TESTNET
+                  abikind: "ERC20",
+                  methodname: "allowance",
+                  aargs: [myaddress, addresses.contract_kip17_salse], // ETH_TESTNET.
+                }).then((resp) => {
+                  let allowanceineth = getethrep(resp);
+                  LOGGER("gCwXF6Jjkh", resp, allowanceineth);
+                  setallowanceamount(allowanceineth); //				setallowanceamount ( 100 )
                   setisloader_00(false);
-                } else {
-                }
+                  if (allowanceineth > 0) {
+                    setisallowanceok(false);
+                    setisloader_00(false);
+                  } else {
+                  }
+                });
               });
-            });
-        });
+          });
         console.log("txhash_kingkong", txhash);
       });
     }
@@ -335,13 +362,13 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
           // eslint-disable-next-line no-sparse-arrays
           aargs: [
             addresses.contract_kip17, // target contractaddress
-            "288",
-            "0xa6d9B48b3D869271fF84F9E62B9E48986EE3Aa7b",
-            `${itemdata?.itemid}`,
-            addresses.contract_USDT, // sellersaddress
-            getweirep("" + itemdata?.price),
-            itemdata?.seller,
-            userinfo?.username,
+            "288", // author_royalty
+            addresses.admin, // admin account address
+            `${itemdata?.itemid}`, // itemid
+            addresses.contract_USDT, // paymeansaddress
+            getweirep("" + itemdata?.price), // amounttopay
+            itemdata?.seller, // seller
+            userinfo?.username, //
             "12",
             "0",
           ],
@@ -417,49 +444,52 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
           let txhash = resp;
 
           /***** */
-          awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
-            LOGGER("minedtxreceipt", minedtxreceipt);
-            SetErrorBar(messages.MSG_TX_FINALIZED);
-            setDone(false);
-            setisloader_01(false);
-            off();
-            navigate("/market");
-            axios
-              .post(API.API_TXS + `/${txhash}?nettype=${net}`, {
-                txhash,
-                username: myaddress,
-                itemid: itemdata?.itemid,
-                tokenid: itemdata?.itemid,
-                uuid: itemdata?.uuid,
-                typestr: options_abistr["ticket"].typestr,
-                amount: options_abistr["ticket"].amount,
-                auxdata: options_abistr["ticket"].auxdata,
-                contractaddress: options_abistr["ticket"].operator_contract,
-              })
-              .then((resp) => {
-                LOGGER("", resp);
-                axios.put(API.API_UPDATE_ORDERS, {
-                  matcher_contract: options_abistr["ticket"].operator_contract,
+          awaitTransactionMined
+            .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+            .then(async (minedtxreceipt) => {
+              LOGGER("minedtxreceipt", minedtxreceipt);
+              SetErrorBar(messages.MSG_TX_FINALIZED);
+              setDone(false);
+              setisloader_01(false);
+              off();
+              navigate("/market");
+              axios
+                .post(API.API_TXS + `/${txhash}?nettype=${net}`, {
+                  txhash,
+                  username: myaddress,
+                  itemid: itemdata?.itemid,
+                  tokenid: itemdata?.itemid,
+                  uuid: itemdata?.uuid,
                   typestr: options_abistr["ticket"].typestr,
                   amount: options_abistr["ticket"].amount,
-                  uuid: itemdata?.uuid,
-                  username: myaddress,
-                  buyer: options_abistr["ticket"].buyer,
-                  paymeansaddress: addresses.contract_USDT,
-                  paymeansname: "USDT",
-                  seller: options_abistr["ticket"].seller,
-                  saletype: 0,
-                  price: itemdata?.price,
-                  nettype: net,
                   auxdata: options_abistr["ticket"].auxdata,
-                  type: itemdata?.type,
-                  txhash: txhash,
-                  tokenid: itemdata?.itemid,
-                  oldseller: itemdata?.seller,
+                  contractaddress: options_abistr["ticket"].operator_contract,
+                })
+                .then((resp) => {
+                  LOGGER("", resp);
+                  axios.put(API.API_UPDATE_ORDERS, {
+                    matcher_contract:
+                      options_abistr["ticket"].operator_contract,
+                    typestr: options_abistr["ticket"].typestr,
+                    amount: options_abistr["ticket"].amount,
+                    uuid: itemdata?.uuid,
+                    username: myaddress,
+                    buyer: options_abistr["ticket"].buyer,
+                    paymeansaddress: addresses.contract_USDT,
+                    paymeansname: "USDT",
+                    seller: options_abistr["ticket"].seller,
+                    saletype: 0,
+                    price: itemdata?.price,
+                    nettype: net,
+                    auxdata: options_abistr["ticket"].auxdata,
+                    type: itemdata?.type,
+                    txhash: txhash,
+                    tokenid: itemdata?.itemid,
+                    oldseller: itemdata?.seller,
+                  });
+                  SetErrorBar(messages.MSG_TX_REQUEST_SENT);
                 });
-                SetErrorBar(messages.MSG_TX_REQUEST_SENT);
-              });
-          });
+            });
         } catch (err) {
           SetErrorBar(messages.MSG_USER_DENIED_TX);
           setDone(false);
@@ -470,7 +500,9 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
       callreqtx();
     }
     if (itemdata?.type === "kingkong") {
-      let abistr = await getabistr_forfunction(options_abistr["kingkong"].abistr);
+      let abistr = await getabistr_forfunction(
+        options_abistr["kingkong"].abistr
+      );
       console.log("kingkong_abistr", abistr);
       const callreqtx = async () => {
         let resp;
@@ -490,51 +522,54 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
           let txhash = resp;
 
           /***** */
-          awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
-            LOGGER("minedtxreceipt", minedtxreceipt);
-            axios
-              .post(API.API_TXS + `/${txhash}?nettype=${net}`, {
-                txhash,
-                username: myaddress,
-                itemid: itemdata?.itemid,
-                tokenid: itemdata?.tokenid,
-                uuid: itemdata?.uuid,
-                typestr: options_abistr["kingkong"].typestr,
-                amount: options_abistr["kingkong"].amount,
-                auxdata: options_abistr["kingkong"].auxdata,
-                contractaddress: options_abistr["kingkong"].operator_contract,
-              })
-              .then((resp) => {
-                LOGGER("", resp);
-                axios.put(API.API_UPDATE_ORDERS, {
-                  matcher_contract: options_abistr["kingkong"].operator_contract,
+          awaitTransactionMined
+            .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+            .then(async (minedtxreceipt) => {
+              LOGGER("minedtxreceipt", minedtxreceipt);
+              axios
+                .post(API.API_TXS + `/${txhash}?nettype=${net}`, {
+                  txhash,
+                  username: myaddress,
+                  itemid: itemdata?.itemid,
+                  tokenid: itemdata?.tokenid,
+                  uuid: itemdata?.uuid,
                   typestr: options_abistr["kingkong"].typestr,
                   amount: options_abistr["kingkong"].amount,
-                  uuid: itemdata?.uuid,
-                  username: myaddress,
-                  buyer: options_abistr["kingkong"].buyer,
-                  paymeansaddress: addresses.contract_USDT,
-                  paymeansname: "USDT",
-                  seller: options_abistr["kingkong"].seller,
-                  saletype: 0,
-                  price: itemdata?.price,
-                  nettype: net,
                   auxdata: options_abistr["kingkong"].auxdata,
-                  type: itemdata?.type,
-                  txhash: txhash,
-                  tokenid: itemdata?.tokenid,
-                  oldseller: itemdata?.seller,
-                  itemid: itemdata?.itemid,
+                  contractaddress: options_abistr["kingkong"].operator_contract,
+                })
+                .then((resp) => {
+                  LOGGER("", resp);
+                  axios.put(API.API_UPDATE_ORDERS, {
+                    matcher_contract:
+                      options_abistr["kingkong"].operator_contract,
+                    typestr: options_abistr["kingkong"].typestr,
+                    amount: options_abistr["kingkong"].amount,
+                    uuid: itemdata?.uuid,
+                    username: myaddress,
+                    buyer: options_abistr["kingkong"].buyer,
+                    paymeansaddress: addresses.contract_USDT,
+                    paymeansname: "USDT",
+                    seller: options_abistr["kingkong"].seller,
+                    saletype: 0,
+                    price: itemdata?.price,
+                    nettype: net,
+                    auxdata: options_abistr["kingkong"].auxdata,
+                    type: itemdata?.type,
+                    txhash: txhash,
+                    tokenid: itemdata?.tokenid,
+                    oldseller: itemdata?.seller,
+                    itemid: itemdata?.itemid,
+                  });
+                  SetErrorBar(messages.MSG_TX_REQUEST_SENT);
                 });
-                SetErrorBar(messages.MSG_TX_REQUEST_SENT);
-              });
 
-            SetErrorBar(messages.MSG_TX_FINALIZED);
-            setDone(false);
-            setisloader_01(false);
-            off();
-            navigate("/market");
-          });
+              SetErrorBar(messages.MSG_TX_FINALIZED);
+              setDone(false);
+              setisloader_01(false);
+              off();
+              navigate("/market");
+            });
         } catch (err) {
           SetErrorBar(messages.MSG_USER_DENIED_TX);
           setDone(false);
@@ -568,7 +603,10 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
                 <ul className="priceList">
                   <li className="price">{DueAmount} USDT</li>
                   <li className="exchange">
-                    ${+DueAmount && tickerusdt ? putCommaAtPrice(+DueAmount * +tickerusdt) : null}
+                    $
+                    {+DueAmount && tickerusdt
+                      ? putCommaAtPrice(+DueAmount * +tickerusdt)
+                      : null}
                   </li>
                 </ul>
               </div>
@@ -582,7 +620,13 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
                   <p className="key">Your USDT balance</p>
                   <p className="value">{mybalance} USDT</p>
                 </li>
-                <li style={allowanceamount && +allowanceamount ? { display: "block" } : {}}>
+                <li
+                  style={
+                    allowanceamount && +allowanceamount
+                      ? { display: "block" }
+                      : {}
+                  }
+                >
                   <p className="key">Allowance</p>
                   <p className="value">{allowanceamount} USDT</p>
                 </li>
@@ -663,7 +707,10 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
               <ul className="priceList">
                 <li className="price">{DueAmount} USDT</li>
                 <li className="exchange">
-                  ${+DueAmount && tickerusdt ? putCommaAtPrice(+DueAmount * +tickerusdt) : null}
+                  $
+                  {+DueAmount && tickerusdt
+                    ? putCommaAtPrice(+DueAmount * +tickerusdt)
+                    : null}
                 </li>
               </ul>
             </div>

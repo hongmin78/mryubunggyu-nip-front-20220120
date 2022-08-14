@@ -53,7 +53,9 @@ export default function Resell() {
         SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
         return;
       }
-      const resp = await axios.get(API.API_USERINFO + `/${myaddress}?nettype=${net}`);
+      const resp = await axios.get(
+        API.API_USERINFO + `/${myaddress}?nettype=${net}`
+      );
       if (resp.data && resp.data.respdata) {
         let { respdata } = resp.data;
         setUserInfo(respdata);
@@ -65,7 +67,9 @@ export default function Resell() {
   const queryItemDetail = async () => {
     if (type === "kingkong") {
       try {
-        const resp = await axios.get(API.API_GET_ITEMS_DETAIL + `/${tokenId}?nettype=${net}`);
+        const resp = await axios.get(
+          API.API_GET_ITEMS_DETAIL + `/${tokenId}?nettype=${net}`
+        );
         if (resp.data && resp.data.respdata) {
           let { respdata } = resp.data;
           console.log("$itemdetail_ITEMDETAIL", respdata);
@@ -79,7 +83,9 @@ export default function Resell() {
     }
     if (type === "ticket") {
       try {
-        const resp = await axios.get(API.API_LOGSTAKES + `/${id}?nettype=${net}`);
+        const resp = await axios.get(
+          API.API_LOGSTAKES + `/${id}?nettype=${net}`
+        );
         if (resp.data && resp.data.respdata) {
           let { respdata } = resp.data;
           console.log("$itemdetail_ITEMDETAIL", respdata);
@@ -168,11 +174,13 @@ export default function Resell() {
         }
         let txhash = resp;
 
-        awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
-          console.log(minedtxreceipt);
-          SetErrorBar(messages.MSG_TX_FINALIZED);
-          setSpinner(false);
-        });
+        awaitTransactionMined
+          .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+          .then(async (minedtxreceipt) => {
+            console.log(minedtxreceipt);
+            SetErrorBar(messages.MSG_TX_FINALIZED);
+            setSpinner(false);
+          });
       });
     }
     if (type === "ticket") {
@@ -197,11 +205,13 @@ export default function Resell() {
         }
         let txhash = resp;
 
-        awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
-          console.log(minedtxreceipt);
-          SetErrorBar(messages.MSG_TX_FINALIZED);
-          setSpinner(false);
-        });
+        awaitTransactionMined
+          .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+          .then(async (minedtxreceipt) => {
+            console.log(minedtxreceipt);
+            SetErrorBar(messages.MSG_TX_FINALIZED);
+            setSpinner(false);
+          });
       });
     }
   };
@@ -212,12 +222,16 @@ export default function Resell() {
     const from = myaddress; // store.isLogin;
     let msg; // = `0x${Buffer.from(exampleMessage, "utf8").toString("hex")}`;
     if (type === "kingkong") {
-      msg = `Token id:${itemDetail.itemid}, ${getweirep(bid)},Contract address :${
+      msg = `Token id:${itemDetail.itemid}, ${getweirep(
+        bid
+      )},Contract address :${
         addresses.contract_erc1155_ticket_sales
       }, wallet: ${myaddress}`;
     }
     if (type === "ticket") {
-      msg = `Token id:${ticketInfo?.itemid ? ticketInfo.itemid : ticketInfo?.id}, ${getweirep(bid)},Contract address :${
+      msg = `Token id:${
+        ticketInfo?.itemid ? ticketInfo.itemid : ticketInfo?.id
+      }, ${getweirep(bid)},Contract address :${
         addresses.contract_erc1155_ticket_sales
       }, wallet: ${myaddress}`;
     }
@@ -239,12 +253,16 @@ export default function Resell() {
     if (respsign) {
       let myaddress = getmyaddress();
       if (type === "kingkong") {
-        msg = `Token id:${itemDetail?.id}, ${getweirep(bid)},Contract address :${
+        msg = `Token id:${itemDetail?.id}, ${getweirep(
+          bid
+        )},Contract address :${
           addresses.contract_kip17_salse
         }, wallet: ${myaddress}`;
       }
       if (type === "ticket") {
-        msg = `Token id:${itemDetail?.id}, ${getweirep(bid)},Contract address :${
+        msg = `Token id:${itemDetail?.id}, ${getweirep(
+          bid
+        )},Contract address :${
           addresses.contract_erc1155_ticket_sales
         }, wallet: ${myaddress}`;
       }
@@ -301,7 +319,7 @@ export default function Resell() {
       // }
 
       if (type === "kingkong") {
-        await axios
+        axios
           .post(API.API_POST_SALE, options_data["kingkong"])
           .then((res) => {
             console.log(res);
@@ -314,9 +332,6 @@ export default function Resell() {
             }
           })
           .catch((err) => console.log(err));
-        // } else {
-        //   SetErrorBar("Failed to provide all information.");
-        // }
       }
       if (type === "ticket") {
         axios
@@ -357,7 +372,11 @@ export default function Resell() {
               <p className="title">
                 {" "}
                 {type === "ticket"
-                  ? `Lucky Ticket #${itemDetail.itemid === null ? itemDetail.id : itemDetail.itemid}`
+                  ? `Lucky Ticket #${
+                      itemDetail.itemid === null
+                        ? itemDetail.id
+                        : itemDetail.itemid
+                    }`
                   : `King Kong #${itemDetail.titlename}`}
               </p>
             </div>
@@ -370,7 +389,8 @@ export default function Resell() {
                 </p>
 
                 <p className="explain">
-                  The auction begins. If the bid is more than 10 USDT, the bid will be awarded at 19:05 on July 17, 2022
+                  The auction begins. If the bid is more than 10 USDT, the bid
+                  will be awarded at 19:05 on July 17, 2022
                 </p>
 
                 <div className="priceBox">
@@ -393,8 +413,9 @@ export default function Resell() {
 
                     <div className="hovPopup">
                       <p>
-                        You can always accept a sale even if you are offered a price that is higher than your minimum
-                        bid and lower than your target bid.
+                        You can always accept a sale even if you are offered a
+                        price that is higher than your minimum bid and lower
+                        than your target bid.
                       </p>
                     </div>
                   </span>
@@ -404,12 +425,18 @@ export default function Resell() {
                   <input
                     value={bid}
                     onChange={(e) => setBid(e.target.value)}
-                    placeholder={type === "ticket" ? "Ticket Minimun bid 90$" : "Enter Minimum bid"}
+                    placeholder={
+                      type === "ticket"
+                        ? "Ticket Minimun bid 90$"
+                        : "Enter Minimum bid"
+                    }
                   />
                   <strong className="unit">USDT</strong>
                 </div>
 
-                <p className="explain">Suggested: 0%, 10%, 20%. Maximum is 25%</p>
+                <p className="explain">
+                  Suggested: 0%, 10%, 20%. Maximum is 25%
+                </p>
               </li>
 
               <li className="instructionBox contBox">
@@ -417,23 +444,27 @@ export default function Resell() {
 
                 <div className="textBox">
                   <p>
-                    When you sell items for the first time in your account, you need to go through the contract approval
-                    process
+                    When you sell items for the first time in your account, you
+                    need to go through the contract approval process
                   </p>
 
                   <ul className="processList">
                     <li>
                       <p>
-                        - If you are trading for the first time, you will need to reset your account. The process of
-                        sending 0 USDT to verify that the account is a valid account proceeds.
+                        - If you are trading for the first time, you will need
+                        to reset your account. The process of sending 0 USDT to
+                        verify that the account is a valid account proceeds.
                       </p>
                     </li>
                     <li>
-                      <p>- Please complete the signature to create a sales list.</p>
+                      <p>
+                        - Please complete the signature to create a sales list.
+                      </p>
                     </li>
                     <li>
                       <p>
-                        - Gas fee is paid only for the first time, and subsequent listings are supported free of charge.
+                        - Gas fee is paid only for the first time, and
+                        subsequent listings are supported free of charge.
                       </p>
                     </li>
                   </ul>
@@ -471,8 +502,9 @@ export default function Resell() {
 
                     <div className="hovPopup">
                       <p>
-                        You can always accept a sale even if you are offered a price that is higher than your minimum
-                        bid and lower than your target bid.
+                        You can always accept a sale even if you are offered a
+                        price that is higher than your minimum bid and lower
+                        than your target bid.
                       </p>
                     </div>
                   </span>
@@ -489,35 +521,45 @@ export default function Resell() {
                         SetErrorBar("Ticket minumum bid 90 USDT");
                       }
                     }}
-                    placeholder={type === "ticket" ? "Minimun bid 90 USDT" : "Enter Minimum bid"}
+                    placeholder={
+                      type === "ticket"
+                        ? "Minimun bid 90 USDT"
+                        : "Enter Minimum bid"
+                    }
                   />
                   <strong className="unit">USDT</strong>
                 </div>
 
-                <p className="explain">Suggested: 0%, 10%, 20%. Maximum is 25%</p>
+                <p className="explain">
+                  Suggested: 0%, 10%, 20%. Maximum is 25%
+                </p>
               </li>
               <li className="instructionBox contBox">
                 <p className="title">Instruction</p>
 
                 <div className="textBox">
                   <p>
-                    When you sell items for the first time in your account, you need to go through the contract approval
-                    process
+                    When you sell items for the first time in your account, you
+                    need to go through the contract approval process
                   </p>
 
                   <ul className="processList">
                     <li>
                       <p>
-                        - If you are trading for the first time, you will need to reset your account. The process of
-                        sending 0 USDT to verify that the account is a valid account proceeds.
+                        - If you are trading for the first time, you will need
+                        to reset your account. The process of sending 0 USDT to
+                        verify that the account is a valid account proceeds.
                       </p>
                     </li>
                     <li>
-                      <p>- Please complete the signature to create a sales list.</p>
+                      <p>
+                        - Please complete the signature to create a sales list.
+                      </p>
                     </li>
                     <li>
                       <p>
-                        - Gas fee is paid only for the first time, and subsequent listings are supported free of charge.
+                        - Gas fee is paid only for the first time, and
+                        subsequent listings are supported free of charge.
                       </p>
                     </li>
                   </ul>
@@ -532,7 +574,11 @@ export default function Resell() {
                 </button> */}
               </div>
               {isApprovedForAll ? (
-                <button className="actionBtn" disabled={bid !== "" ? false : true} onClick={() => postSell()}>
+                <button
+                  className="actionBtn"
+                  disabled={bid !== "" ? false : true}
+                  onClick={() => postSell()}
+                >
                   {spinner ? <div id="loading"></div> : "Sell"}
                 </button>
               ) : (
@@ -555,7 +601,11 @@ export default function Resell() {
               <p className="title">
                 {" "}
                 {type === "ticket"
-                  ? `Lucky Ticket #${ticketInfo.itemid === null ? ticketInfo.id : ticketInfo.itemid}`
+                  ? `Lucky Ticket #${
+                      ticketInfo.itemid === null
+                        ? ticketInfo.id
+                        : ticketInfo.itemid
+                    }`
                   : `King Kong #${itemDetail?.titlename}`}
               </p>
               {/* <p className="title">Series {itemDetail && itemDetail.itembalances?.group_.toUpperCase()} #112</p> */}
