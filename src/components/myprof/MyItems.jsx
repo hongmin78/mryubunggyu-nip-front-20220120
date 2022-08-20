@@ -47,9 +47,9 @@ export default function MyItems() {
   const [isApprovedForAll, setIsApprovedForAll] = useState(false);
 
   const fetchdata = async (_) => {
+    setTimeout(_=>{
     let myaddress = getmyaddress();
-
-    LOGGER("myaddress", myaddress);
+    LOGGER("@myaddress", myaddress);
     axios.get(API.API_USERINFO + `/${myaddress}?nettype=${net}`).then((resp) => {
       if (resp.data && resp.data.respdata) {
         let { respdata } = resp.data;
@@ -76,10 +76,9 @@ export default function MyItems() {
 
     axios.get(API.API_ITEMBALANCES + `/${myaddress}?nettype=${net}`).then((res) => {
       let { list, status } = res.data;
-
+      LOGGER("@ITEMBALANCES", res.data );
       if (status === "OK" && list?.length > 0) {
         setItemBalData(list);
-        LOGGER("ITEMBALANCES", list);
       }
       axios //
         .get(API.API_GET_CIRCULATIONS_ITEM + `?nettype=${net}`)
@@ -91,13 +90,15 @@ export default function MyItems() {
           }
         });
 
-      let myaddress = getmyaddress();
-      axios.get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`).then((resp) => {
-        let { status, respdata } = resp.data;
-        if (status == "OK" && respdata !== null) {
-          setTickInfo(respdata);
-        }
-      });
+//        let myaddress = getmyaddress();
+        axios.get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`).then((resp) => {
+          let { status, respdata } = resp.data;
+          LOGGER ( `@API_GET_TICK_INFO` , respdata )
+          if (status == "OK" && respdata !== null) {
+            setTickInfo(respdata);
+          }
+        });  
+//      } , 1500 )
     });
 
     //true
@@ -126,6 +127,7 @@ export default function MyItems() {
           return;
         }
       });
+    } , 1500 )
   };
 
   const openModal = () => {
@@ -922,12 +924,14 @@ export default function MyItems() {
                           <button
                             className="actionBtn"
                             onClick={() =>
-                              navigate(`/resell/${item?.username}/kingkong/${item.itemid}`, { state: item[index] })
+                              navigate(`/resell/${item?.username}/kingkong/${item.itemid}`, { state: item[index] } )
                             }
                           >
                             Sell
                           </button>
-                          <button className="actionBtn_two" onClick={() => navigate("/resell/" + item.itemid)}>
+                          <button className="actionBtn_two" onClick={() =>
+                              navigate(`/employ/${item?.username}/kingkong/${item.itemid}`, { state: item[index] } )
+                            } >
                             Stake
                           </button>
                         </>

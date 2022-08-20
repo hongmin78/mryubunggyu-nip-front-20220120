@@ -18,7 +18,7 @@ import { net } from "../configs/net";
 import EmploymentItem from "../components/EmploymentItem";
 import StatusBar from "../components/StatusBar";
 
-export default function Employment() {
+export default function Employed () {
   const searchBoxRef = useRef();
   const sortBtnRef = useRef();
   const statBarRef = useRef();

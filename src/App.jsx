@@ -30,8 +30,8 @@ import { API } from "./configs/api";
 import { browserName, browserVersion, isChrome, isFirefox, isSafari, isEdge } from "react-device-detect";
 import { CURRENT_TIME } from "./configs/configs";
 import { net } from "./configs/net";
-import Employment from "./router/Employment";
-
+import Employed from "./router/Employed";
+import Employ from './router/Employ'
 function App() {
   const dispatch = useDispatch();
   //	let [ address , setaddress ] = useState()
@@ -185,7 +185,12 @@ function App() {
           <Route path="/editprof" element={<EditProf />} />
 
           <Route path="/resell/:id/:type/:tokenId" element={<Resell />} />
+
           <Route path="/test" element={<Test />} />
+          <Route path="/employed" element={<Employed />} />
+          <Route path="/employ" element={<Employ />} />
+          <Route path="/employ/:id/:type/:tokenId" element={<Employ />} />
+
         </Routes>
       </HashRouter>
     </AppBox>
