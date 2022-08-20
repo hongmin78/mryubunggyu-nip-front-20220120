@@ -20,18 +20,21 @@ const jaddresses = {
     contract_erc1155_sales: "0x32F5b0Bf75675e00EA6E630880d84F75dF3f22ac", // 2022.06.05 11:20pm latest release for ticket
     contract_erc1155: "0xf3f9ae90dadb021bb9bacf53bc0fbf9f3f963ef2", // 2022.06.05 latest release for ticket
     // //kingkong sales
-//    contract_kip17:         "0xc815252d41d0ee8EC1BD5eb76146041eFf1519Ab", // XXX not owrking for some reason 
-    contract_kip17 : '0x33529fd45b1093b412cd33a60fed7dcbac4da176' ,
-    contract_kip17_sales : '0xae5698f140df507f88883380ef351f65453b85e8' ,
-    contract_kip17_staking : '0x4694c05a9bd6325fd06f049074631e5813a5ddce' ,
+    //    contract_kip17:         "0xc815252d41d0ee8EC1BD5eb76146041eFf1519Ab", // XXX not owrking for some reason
+    // contract_kip17 : '0x33529fd45b1093b412cd33a60fed7dcbac4da176' ,
+    // contract_kip17_sales : '0xae5698f140df507f88883380ef351f65453b85e8' ,
+    // contract_kip17: "0x5263fBda9D02A427FD2Da6E7665671596d802D20", // 2022.07.25 mint
+    contract_kip17: "0xDf348CbE9950A10AfB1330EBA2dE10348820455E", // 2022.08.20 __latest release
+    // contract_kip17_salse: "0x333406b681B9A6Dd4Fb8bF185C1261fb0DADAB98", // 2022.07.13 release
+    contract_kip17_salse: "0x5851074f6e6B855DC486B4B3Fd6919E6CE094F7C", // 2022.08.20 __latest release
+    contract_kip17_staking: "0x4694c05a9bd6325fd06f049074631e5813a5ddce",
 
     //kingkong staking
     contract_nip_token: "0xa934775D7863833f51BFcA6ce5dFfa97aAB83cb8",
-    contract_reward_token : '0x164866BD5b7668E9be67e41ee4878b9DBdAe2Aa2' ,
-//    contract_kip17: "0x5263fBda9D02A427FD2Da6E7665671596d802D20", // XXX not working 2022.07.25 mint // chang deployed
-//    contract_kip17_salse: "0x333406b681B9A6Dd4Fb8bF185C1261fb0DADAB98", // XXX not working 2022.07.13 release
-//    contract_kip17_staking: "0x187c3a1DE5e8D0Ba74e626aC735e4Ce49Eb94443", // XXXX a not working one 2022.07.25 mint
-
+    contract_reward_token: "0x164866BD5b7668E9be67e41ee4878b9DBdAe2Aa2",
+    //    contract_kip17: "0x5263fBda9D02A427FD2Da6E7665671596d802D20", // XXX not working 2022.07.25 mint // chang deployed
+    //    contract_kip17_salse: "0x333406b681B9A6Dd4Fb8bF185C1261fb0DADAB98", // XXX not working 2022.07.13 release
+    //    contract_kip17_staking: "0x187c3a1DE5e8D0Ba74e626aC735e4Ce49Eb94443", // XXXX a not working one 2022.07.25 mint
   },
   BSC_MAINNET: {
     contract_USDT: "0x55d398326f99059fF775485246999027B3197955", // owner : 0x83f714ad20e34748516e8367faf143abde6c3783

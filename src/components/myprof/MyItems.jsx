@@ -11,9 +11,15 @@ import SelectPopup from "../SelectPopup";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { API } from "../../configs/api";
-import { query_with_arg, getabistr_forfunction } from "../../util/contract-calls";
+import {
+  query_with_arg,
+  getabistr_forfunction,
+} from "../../util/contract-calls";
 import { addresses } from "../../configs/addresses";
-import { TIME_FETCH_MYADDRESS_DEF, TX_POLL_OPTIONS } from "../../configs/configs";
+import {
+  TIME_FETCH_MYADDRESS_DEF,
+  TX_POLL_OPTIONS,
+} from "../../configs/configs";
 import { getmyaddress, LOGGER } from "../../util/common";
 import { web3 } from "../../configs/configweb3";
 import moment from "moment";
@@ -47,87 +53,98 @@ export default function MyItems() {
   const [isApprovedForAll, setIsApprovedForAll] = useState(false);
 
   const fetchdata = async (_) => {
-    setTimeout(_=>{
-    let myaddress = getmyaddress();
-    LOGGER("@myaddress", myaddress);
-    axios.get(API.API_USERINFO + `/${myaddress}?nettype=${net}`).then((resp) => {
-      if (resp.data && resp.data.respdata) {
-        let { respdata } = resp.data;
-        LOGGER("myticket", resp.data);
-        setuserinfo(respdata);
-      }
-    });
-    axios.get(API.API_GET_KING_KONG_ITEM + `/${myaddress}/0/100/id/ASC?nettype=${net}`).then((resp) => {
-      LOGGER("Buy my item", resp.data);
-      let { status, list, payload } = resp.data;
-      if (status == "OK") {
-        setKingKongItem(list);
-      }
-    });
-
-    axios
-      .get(API.API_RECEIVABLES + `/${myaddress}?nettype=${net}`)
-      .then((res) => {
-        let { list } = res.data;
-        setItemData(list);
-        LOGGER("receivables", list);
-      })
-      .catch((err) => console.log(err));
-
-    axios.get(API.API_ITEMBALANCES + `/${myaddress}?nettype=${net}`).then((res) => {
-      let { list, status } = res.data;
-      LOGGER("@ITEMBALANCES", res.data );
-      if (status === "OK" && list?.length > 0) {
-        setItemBalData(list);
-      }
-      axios //
-        .get(API.API_GET_CIRCULATIONS_ITEM + `?nettype=${net}`)
+    setTimeout((_) => {
+      let myaddress = getmyaddress();
+      LOGGER("@myaddress", myaddress);
+      axios
+        .get(API.API_USERINFO + `/${myaddress}?nettype=${net}`)
         .then((resp) => {
-          LOGGER("circulations", resp.data);
-          let { status, list } = resp.data;
+          if (resp.data && resp.data.respdata) {
+            let { respdata } = resp.data;
+            LOGGER("myticket", resp.data);
+            setuserinfo(respdata);
+          }
+        });
+      axios
+        .get(
+          API.API_GET_KING_KONG_ITEM +
+            `/${myaddress}/0/100/id/ASC?nettype=${net}`
+        )
+        .then((resp) => {
+          LOGGER("Buy my item", resp.data);
+          let { status, list, payload } = resp.data;
           if (status == "OK") {
-            setCirculations(resp.data.list);
+            // setKingKongItem(list);
           }
         });
 
-//        let myaddress = getmyaddress();
-        axios.get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`).then((resp) => {
-          let { status, respdata } = resp.data;
-          LOGGER ( `@API_GET_TICK_INFO` , respdata )
-          if (status == "OK" && respdata !== null) {
-            setTickInfo(respdata);
-          }
-        });  
-//      } , 1500 )
-    });
+      axios
+        .get(API.API_RECEIVABLES + `/${myaddress}?nettype=${net}`)
+        .then((res) => {
+          let { list } = res.data;
+          setItemData(list);
+          LOGGER("receivables", list);
+        })
+        .catch((err) => console.log(err));
 
-    //true
-    true &&
-      query_with_arg({
-        contractaddress: addresses.contract_ticketnft, // ETH_TESTNET.
-        abikind: "TICKETNFT",
-        methodname: "_balance_user_itemhash",
-        aargs: [myaddress], // ETH_TESTNET.
-      }).then(async (resp) => {
-        LOGGER("tickeinfo", resp);
-        let myitemhash = resp;
-        let mytokenid;
-        try {
-          mytokenid = await query_with_arg({
-            contractaddress: addresses.contract_ticketnft,
-            abikind: "TICKETNFT",
-            methodname: "_itemhash_tokenid",
-            aargs: [myitemhash],
-          });
-          LOGGER("GEVKU97nIv", mytokenid);
-          setTokenId(mytokenid);
-        } catch (err) {
-          LOGGER(err);
-          mytokenid = null;
-          return;
-        }
-      });
-    } , 1500 )
+      axios
+        .get(API.API_ITEMBALANCES + `/${myaddress}?nettype=${net}`)
+        .then((res) => {
+          let { list, status } = res.data;
+          LOGGER("@ITEMBALANCES", res.data);
+          if (status === "OK" && list?.length > 0) {
+            setItemBalData(list);
+          }
+          axios //
+            .get(API.API_GET_CIRCULATIONS_ITEM + `?nettype=${net}`)
+            .then((resp) => {
+              LOGGER("circulations", resp.data);
+              let { status, list } = resp.data;
+              if (status == "OK") {
+                setCirculations(resp.data.list);
+              }
+            });
+
+          //        let myaddress = getmyaddress();
+          axios
+            .get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`)
+            .then((resp) => {
+              let { status, respdata } = resp.data;
+              LOGGER(`@API_GET_TICK_INFO`, respdata);
+              if (status == "OK" && respdata !== null) {
+                setTickInfo(respdata);
+              }
+            });
+          //      } , 1500 )
+        });
+
+      //true
+      true &&
+        query_with_arg({
+          contractaddress: addresses.contract_ticketnft, // ETH_TESTNET.
+          abikind: "TICKETNFT",
+          methodname: "_balance_user_itemhash",
+          aargs: [myaddress], // ETH_TESTNET.
+        }).then(async (resp) => {
+          LOGGER("tickeinfo", resp);
+          let myitemhash = resp;
+          let mytokenid;
+          try {
+            mytokenid = await query_with_arg({
+              contractaddress: addresses.contract_ticketnft,
+              abikind: "TICKETNFT",
+              methodname: "_itemhash_tokenid",
+              aargs: [myitemhash],
+            });
+            LOGGER("GEVKU97nIv", mytokenid);
+            setTokenId(mytokenid);
+          } catch (err) {
+            LOGGER(err);
+            mytokenid = null;
+            return;
+          }
+        });
+    }, 1500);
   };
 
   const openModal = () => {
@@ -167,33 +184,35 @@ export default function MyItems() {
       let txhash;
       txhash = resp;
 
-      awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
-        console.log("minedtxreceipt", minedtxreceipt);
-        if (minedtxreceipt.status === true) {
-          axios
-            .post(API.API_TXS + `/${txhash}`, {
-              txhash: txhash,
-              username: myaddress,
-              typestr: "STAKEAPPROVE",
-              auxdata: {
-                user_action: "approve",
-                contract_type: "KIP17", // .ETH_TESTNET
-                contract_address: addresses.contract_kip17, // .ETH_TESTNET
-                to_token_contract: addresses.contract_kip17_staking,
-                my_address: myaddress,
-                nettype: net,
-              },
-            })
-            .then((res) => {
-              SetErrorBar("Approved");
-              setSpinner(false);
-              setIsApprovedForAll(true);
-            })
-            .catch((err) => console.log(err));
-        } else {
-          SetErrorBar("Fail Approve");
-        }
-      });
+      awaitTransactionMined
+        .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+        .then(async (minedtxreceipt) => {
+          console.log("minedtxreceipt", minedtxreceipt);
+          if (minedtxreceipt.status === true) {
+            axios
+              .post(API.API_TXS + `/${txhash}`, {
+                txhash: txhash,
+                username: myaddress,
+                typestr: "STAKEAPPROVE",
+                auxdata: {
+                  user_action: "approve",
+                  contract_type: "KIP17", // .ETH_TESTNET
+                  contract_address: addresses.contract_kip17, // .ETH_TESTNET
+                  to_token_contract: addresses.contract_kip17_staking,
+                  my_address: myaddress,
+                  nettype: net,
+                },
+              })
+              .then((res) => {
+                SetErrorBar("Approved");
+                setSpinner(false);
+                setIsApprovedForAll(true);
+              })
+              .catch((err) => console.log(err));
+          } else {
+            SetErrorBar("Fail Approve");
+          }
+        });
     });
   };
 
@@ -260,50 +279,57 @@ export default function MyItems() {
       let txhash;
       txhash = resp;
 
-      awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
-        if (minedtxreceipt.status === true) {
-          axios
-            .post(API.API_TXS + `/${txhash}`, {
-              txhash: txhash,
-              username: myaddress,
-              typestr: "KING_KONG_STAKING",
-              auxdata: {
-                user_action: "KING_KONG_STAKING",
-                contract_type: "KING_KONG_STAKING", // .ETH_TESTNET
-                contract_address: addresses.contract_kip17_staking, // .ETH_TESTNET
-                to_token_contract: addresses.contract_kip17,
-                my_address: myaddress,
-                tokenIds: item?.id,
-                itemIds: "itemid",
-                nettype: net,
-              },
-            })
-            .then((res) => {
-              axios
-                .put(API.API_UPDATE_KING_KONG_STAKE, {
-                  itemid: item?.itemid,
+      awaitTransactionMined
+        .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+        .then(async (minedtxreceipt) => {
+          if (minedtxreceipt.status === true) {
+            axios
+              .post(API.API_TXS + `/${txhash}`, {
+                txhash: txhash,
+                username: myaddress,
+                typestr: "KING_KONG_STAKING",
+                auxdata: {
+                  user_action: "KING_KONG_STAKING",
+                  contract_type: "KING_KONG_STAKING", // .ETH_TESTNET
+                  contract_address: addresses.contract_kip17_staking, // .ETH_TESTNET
+                  to_token_contract: addresses.contract_kip17,
+                  my_address: myaddress,
+                  tokenIds: item?.id,
+                  itemIds: "itemid",
                   nettype: net,
-                  isstaked: 1,
-                })
-                .then((res) => {
-                  setSpinner(false);
-                  axios.get(API.API_GET_KING_KONG_ITEM + `/${myaddress}/0/100/id/ASC?nettype=${net}`).then((resp) => {
-                    LOGGER("Buy my item", resp.data);
-                    let { status, list, payload } = resp.data;
-                    if (status == "OK") {
-                      setKingKongItem(list);
-                    }
+                },
+              })
+              .then((res) => {
+                axios
+                  .put(API.API_UPDATE_KING_KONG_STAKE, {
+                    itemid: item?.itemid,
+                    nettype: net,
+                    isstaked: 1,
+                  })
+                  .then((res) => {
+                    setSpinner(false);
+                    axios
+                      .get(
+                        API.API_GET_KING_KONG_ITEM +
+                          `/${myaddress}/0/100/id/ASC?nettype=${net}`
+                      )
+                      .then((resp) => {
+                        LOGGER("Buy my item", resp.data);
+                        let { status, list, payload } = resp.data;
+                        if (status == "OK") {
+                          // setKingKongItem(list);
+                        }
+                      });
+                    SetErrorBar("Success Staking");
+                    console.log("minedtxreceipt", minedtxreceipt);
                   });
-                  SetErrorBar("Success Staking");
-                  console.log("minedtxreceipt", minedtxreceipt);
-                });
-            })
-            .catch((err) => console.log(err));
-        } else {
-          setSpinner(false);
-          SetErrorBar("Fail Stake");
-        }
-      });
+              })
+              .catch((err) => console.log(err));
+          } else {
+            setSpinner(false);
+            SetErrorBar("Fail Stake");
+          }
+        });
     });
   };
 
@@ -337,62 +363,71 @@ export default function MyItems() {
       let txhash;
       txhash = resp;
 
-      awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
-        console.log("minedtxreceipt", minedtxreceipt);
-        if (minedtxreceipt.status === true) {
-          axios
-            .post(API.API_TXS + `/${txhash}`, {
-              txhash: txhash,
-              username: myaddress,
-              typestr: "KING_KONG_UNSTAKE",
-              auxdata: {
-                user_action: "KING_KONG_UNSTAKE",
-                contract_type: "KING_KONG_UNSTAKE", // .ETH_TESTNET
-                contract_address: addresses.contract_kip17_staking, // .ETH_TESTNET
-                to_token_contract: addresses.contract_kip17,
-                my_address: myaddress,
-                tokenIds: itemData?.tokenid,
-                itemIds: item?.itemid,
-                nettype: net,
-              },
-            })
-            .then((res) => {
-              axios
-                .put(API.API_UPDATE_KING_KONG_STAKE, {
-                  itemid: item?.itemid,
+      awaitTransactionMined
+        .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+        .then(async (minedtxreceipt) => {
+          console.log("minedtxreceipt", minedtxreceipt);
+          if (minedtxreceipt.status === true) {
+            axios
+              .post(API.API_TXS + `/${txhash}`, {
+                txhash: txhash,
+                username: myaddress,
+                typestr: "KING_KONG_UNSTAKE",
+                auxdata: {
+                  user_action: "KING_KONG_UNSTAKE",
+                  contract_type: "KING_KONG_UNSTAKE", // .ETH_TESTNET
+                  contract_address: addresses.contract_kip17_staking, // .ETH_TESTNET
+                  to_token_contract: addresses.contract_kip17,
+                  my_address: myaddress,
+                  tokenIds: itemData?.tokenid,
+                  itemIds: item?.itemid,
                   nettype: net,
-                  isstaked: 0,
-                })
-                .then((res) => {
-                  axios.get(API.API_GET_KING_KONG_ITEM + `/${myaddress}/0/100/id/ASC?nettype=${net}`).then((resp) => {
-                    LOGGER("Buy my item", resp.data);
-                    let { status, list, payload } = resp.data;
-                    if (status == "OK") {
-                      setKingKongItem(list);
-                    }
+                },
+              })
+              .then((res) => {
+                axios
+                  .put(API.API_UPDATE_KING_KONG_STAKE, {
+                    itemid: item?.itemid,
+                    nettype: net,
+                    isstaked: 0,
+                  })
+                  .then((res) => {
+                    axios
+                      .get(
+                        API.API_GET_KING_KONG_ITEM +
+                          `/${myaddress}/0/100/id/ASC?nettype=${net}`
+                      )
+                      .then((resp) => {
+                        LOGGER("Buy my item", resp.data);
+                        let { status, list, payload } = resp.data;
+                        if (status == "OK") {
+                          // setKingKongItem(list);
+                        }
+                      });
                   });
-                });
-              console.log("onclickwithdraw reported!", res);
-            })
-            .catch((err) => console.log(err));
-        } else {
-          setSpinner(false);
-          SetErrorBar("Fail Unstake");
-        }
-      });
+                console.log("onclickwithdraw reported!", res);
+              })
+              .catch((err) => console.log(err));
+          } else {
+            setSpinner(false);
+            SetErrorBar("Fail Unstake");
+          }
+        });
     });
   };
 
   useEffect(() => {
     let myaddress = getmyaddress();
-    axios.get(API.API_LOGSTAKES + `/${myaddress}?nettype=${net}`).then((resp) => {
-      LOGGER("API_LOGSTAKES", resp.data);
-      let { status, respdata } = resp.data;
-      if (status == "OK") {
-        setGetTickTimer(respdata?.createdat);
-        setTickTimer("2022-08-04");
-      }
-    });
+    axios
+      .get(API.API_LOGSTAKES + `/${myaddress}?nettype=${net}`)
+      .then((resp) => {
+        LOGGER("API_LOGSTAKES", resp.data);
+        let { status, respdata } = resp.data;
+        if (status == "OK") {
+          setGetTickTimer(respdata?.createdat);
+          setTickTimer("2022-08-04");
+        }
+      });
   }, [getTickTimer]);
 
   useEffect(
@@ -413,8 +448,12 @@ export default function MyItems() {
             <button
               className="sortBtn"
               ref={sortBtnRef}
-              onFocus={() => (sortBtnRef.current.style.border = "3px solid #000")}
-              onBlur={() => (sortBtnRef.current.style.border = "1px solid #d9d9d9")}
+              onFocus={() =>
+                (sortBtnRef.current.style.border = "3px solid #000")
+              }
+              onBlur={() =>
+                (sortBtnRef.current.style.border = "1px solid #d9d9d9")
+              }
               onClick={() => setSortPopup(true)}
             >
               <p>{sortOpt}</p>
@@ -423,7 +462,12 @@ export default function MyItems() {
 
             {sortPopup && (
               <>
-                <SelectPopup off={setSortPopup} dataList={D_sortList} select={sortOpt} setFunc={setSortOpt} />
+                <SelectPopup
+                  off={setSortPopup}
+                  dataList={D_sortList}
+                  select={sortOpt}
+                  setFunc={setSortOpt}
+                />
 
                 <PopupBg off={setSortPopup} />
               </>
@@ -432,7 +476,11 @@ export default function MyItems() {
 
           <ul className="filterList">
             {filterList.map((cont, index) => (
-              <li key={index} className={filter === index ? "on" : ""} onClick={() => setFilter(index)}>
+              <li
+                key={index}
+                className={filter === index ? "on" : ""}
+                onClick={() => setFilter(index)}
+              >
                 {cont}
               </li>
             ))}
@@ -440,7 +488,10 @@ export default function MyItems() {
         </div>
 
         <ul className="itemList">
-          <li className="stakingBox" style={isstaked ? {} : { display: "none" }}>
+          <li
+            className="stakingBox"
+            style={isstaked ? {} : { display: "none" }}
+          >
             <div className="imgBox">
               <div className="topBar">
                 <img className="itemImg" src={E_staking} alt="" />
@@ -468,18 +519,22 @@ export default function MyItems() {
                 </button>
 
                 <p className="description">
-                  The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days
-                  and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
-                  completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all transactions
-                  in your account will be suspended. It operates normally after applying a penalty of 10% of the winning
-                  bid amount.
+                  The NFT purchased by participating in the subscription auction
+                  generates 12% of profits after 3 days and is sold random. In
+                  addition, the results are announced at 9:00 AM, and the
+                  transaction is completed from 9:00 AM to 21:00 PM. If the
+                  transaction is not completed within time, all transactions in
+                  your account will be suspended. It operates normally after
+                  applying a penalty of 10% of the winning bid amount.
                 </p>
               </div>
             )}
             {ticketInfo && (
               <div className="infoBox">
                 <div className="titleBox">
-                  <strong className="title">Lucky Ticket #{ticketInfo.id}</strong>
+                  <strong className="title">
+                    Lucky Ticket #{ticketInfo.id}
+                  </strong>
                 </div>
 
                 <div className="ownedBox">
@@ -514,11 +569,13 @@ export default function MyItems() {
                 </button>
 
                 <p className="description">
-                  The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days
-                  and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
-                  completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all transactions
-                  in your account will be suspended. It operates normally after applying a penalty of 10% of the winning
-                  bid amount.
+                  The NFT purchased by participating in the subscription auction
+                  generates 12% of profits after 3 days and is sold random. In
+                  addition, the results are announced at 9:00 AM, and the
+                  transaction is completed from 9:00 AM to 21:00 PM. If the
+                  transaction is not completed within time, all transactions in
+                  your account will be suspended. It operates normally after
+                  applying a penalty of 10% of the winning bid amount.
                 </p>
               </div>
             )}
@@ -537,11 +594,13 @@ export default function MyItems() {
                 </button>
 
                 <p className="description">
-                  The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days
-                  and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
-                  completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all transactions
-                  in your account will be suspended. It operates normally after applying a penalty of 10% of the winning
-                  bid amount.
+                  The NFT purchased by participating in the subscription auction
+                  generates 12% of profits after 3 days and is sold random. In
+                  addition, the results are announced at 9:00 AM, and the
+                  transaction is completed from 9:00 AM to 21:00 PM. If the
+                  transaction is not completed within time, all transactions in
+                  your account will be suspended. It operates normally after
+                  applying a penalty of 10% of the winning bid amount.
                 </p>
               </div>
             )}
@@ -564,7 +623,9 @@ export default function MyItems() {
 
                   <div className="infoBox">
                     <div className="titleBox">
-                      <strong className="title">{item.itemdata?.titlename}</strong>
+                      <strong className="title">
+                        {item.itemdata?.titlename}
+                      </strong>
                     </div>
 
                     <div className="ownedBox">
@@ -581,7 +642,9 @@ export default function MyItems() {
                     <ul className="priceBox">
                       <li>
                         <p className="key">Current price</p>
-                        <p className="value">{Math.ceil(item.amount * 100) / 100} USDT</p>
+                        <p className="value">
+                          {Math.ceil(item.amount * 100) / 100} USDT
+                        </p>
                       </li>
                     </ul>
 
@@ -596,11 +659,14 @@ export default function MyItems() {
                     </button>
 
                     <p className="description">
-                      The NFT purchased by participating in the subscription auction generates 12% of profits after 3
-                      days and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
-                      completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all
-                      transactions in your account will be suspended. It operates normally after applying a penalty of
-                      10% of the winning bid amount.
+                      The NFT purchased by participating in the subscription
+                      auction generates 12% of profits after 3 days and is sold
+                      random. In addition, the results are announced at 9:00 AM,
+                      and the transaction is completed from 9:00 AM to 21:00 PM.
+                      If the transaction is not completed within time, all
+                      transactions in your account will be suspended. It
+                      operates normally after applying a penalty of 10% of the
+                      winning bid amount.
                     </p>
                   </div>
                 </li>
@@ -652,13 +718,19 @@ export default function MyItems() {
                       <p className="key">Current price</p>
                       {circulations.map((itm, i) => {
                         if (item.itemid === itm.itemid)
-                          return <p className="value"> {parseInt(item && item.buyprice).toFixed(2)} USDT</p>;
+                          return (
+                            <p className="value">
+                              {" "}
+                              {parseInt(item && item.buyprice).toFixed(2)} USDT
+                            </p>
+                          );
                       })}
                     </li>
                   </ul>
                   <p className="description">
-                    King Kong NFT can be staking or sold to Marketplace at a price of up to 25%. If you steaking, you
-                    will get 30% annual NIP COIN reward.
+                    King Kong NFT can be staking or sold to Marketplace at a
+                    price of up to 25%. If you steaking, you will get 30% annual
+                    NIP COIN reward.
                   </p>
                 </div>
               </li>
@@ -673,7 +745,11 @@ export default function MyItems() {
         <div className="topBar">
           <ul className="filterList">
             {filterList.map((cont, index) => (
-              <li key={index} className={filter === index ? "on" : ""} onClick={() => setFilter(index)}>
+              <li
+                key={index}
+                className={filter === index ? "on" : ""}
+                onClick={() => setFilter(index)}
+              >
                 {cont}
               </li>
             ))}
@@ -683,8 +759,12 @@ export default function MyItems() {
             <button
               className="sortBtn"
               ref={sortBtnRef}
-              onFocus={() => (sortBtnRef.current.style.border = "3px solid #000")}
-              onBlur={() => (sortBtnRef.current.style.border = "1px solid #d9d9d9")}
+              onFocus={() =>
+                (sortBtnRef.current.style.border = "3px solid #000")
+              }
+              onBlur={() =>
+                (sortBtnRef.current.style.border = "1px solid #d9d9d9")
+              }
               onClick={() => setSortPopup(true)}
             >
               <p>{sortOpt}</p>
@@ -693,7 +773,12 @@ export default function MyItems() {
 
             {sortPopup && (
               <>
-                <SelectPopup off={setSortPopup} dataList={D_sortList} select={sortOpt} setFunc={setSortOpt} />
+                <SelectPopup
+                  off={setSortPopup}
+                  dataList={D_sortList}
+                  select={sortOpt}
+                  setFunc={setSortOpt}
+                />
 
                 <PopupBg off={setSortPopup} />
               </>
@@ -702,7 +787,10 @@ export default function MyItems() {
         </div>
 
         <ul className="itemList">
-          <li className="stakingBox" style={isstaked ? {} : { display: "none" }}>
+          <li
+            className="stakingBox"
+            style={isstaked ? {} : { display: "none" }}
+          >
             <div className="imgBox">
               <div className="topBar">
                 <img className="itemImg" src={E_staking} alt="" />
@@ -730,11 +818,13 @@ export default function MyItems() {
                 </button>
 
                 <p className="description">
-                  The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days
-                  and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
-                  completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all transactions
-                  in your account will be suspended. It operates normally after applying a penalty of 10% of the winning
-                  bid amount.
+                  The NFT purchased by participating in the subscription auction
+                  generates 12% of profits after 3 days and is sold random. In
+                  addition, the results are announced at 9:00 AM, and the
+                  transaction is completed from 9:00 AM to 21:00 PM. If the
+                  transaction is not completed within time, all transactions in
+                  your account will be suspended. It operates normally after
+                  applying a penalty of 10% of the winning bid amount.
                 </p>
               </div>
             )}
@@ -743,7 +833,10 @@ export default function MyItems() {
               <div className="infoBox">
                 <div className="titleBox">
                   <strong className="title">
-                    Lucky Ticket #{ticketInfo.itemid === null ? ticketInfo.id : ticketInfo.itemid}
+                    Lucky Ticket #
+                    {ticketInfo.itemid === null
+                      ? ticketInfo.id
+                      : ticketInfo.itemid}
                   </strong>
                 </div>
 
@@ -755,7 +848,9 @@ export default function MyItems() {
                 <div className="saleBox">
                   <div className="ownedBox">
                     <p className="key">Bought Date</p>
-                    <p className="value">{ticketInfo && ticketInfo.createdat.split("T", 1)}</p>
+                    <p className="value">
+                      {ticketInfo && ticketInfo.createdat.split("T", 1)}
+                    </p>
                     <p className="key">Expire Date</p>
                     <p className="value">
                       {ticketInfo &&
@@ -780,17 +875,24 @@ export default function MyItems() {
 
                 <button
                   className="actionBtn"
-                  onClick={() => navigate(`/resell/${ticketInfo.username}/ticket/${tokenId}`, { state: ticketInfo })}
+                  onClick={() =>
+                    navigate(
+                      `/resell/${ticketInfo.username}/ticket/${tokenId}`,
+                      { state: ticketInfo }
+                    )
+                  }
                 >
                   SELL
                 </button>
 
                 <p className="description">
-                  The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days
-                  and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
-                  completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all transactions
-                  in your account will be suspended. It operates normally after applying a penalty of 10% of the winning
-                  bid amount.
+                  The NFT purchased by participating in the subscription auction
+                  generates 12% of profits after 3 days and is sold random. In
+                  addition, the results are announced at 9:00 AM, and the
+                  transaction is completed from 9:00 AM to 21:00 PM. If the
+                  transaction is not completed within time, all transactions in
+                  your account will be suspended. It operates normally after
+                  applying a penalty of 10% of the winning bid amount.
                 </p>
               </div>
             )}
@@ -818,7 +920,9 @@ export default function MyItems() {
 
                   <div className="infoBox">
                     <div className="titleBox">
-                      <strong className="title">#{item.itemdata.titlename}</strong>
+                      <strong className="title">
+                        #{item.itemdata.titlename}
+                      </strong>
                     </div>
 
                     <div className="ownedBox">
@@ -833,13 +937,17 @@ export default function MyItems() {
                     <div className="saleBox">
                       <div className="key"></div>
                       <div className="value">
-                        <strong className="price">{parseInt(item.amount).toFixed(2)} USDT</strong>
+                        <strong className="price">
+                          {parseInt(item.amount).toFixed(2)} USDT
+                        </strong>
                       </div>
 
                       <ul className="priceBox">
                         <li>
                           <p className="key">Current price</p>
-                          <p className="value">{parseInt(item.amount).toFixed(2)} USDT</p>
+                          <p className="value">
+                            {parseInt(item.amount).toFixed(2)} USDT
+                          </p>
                         </li>
                       </ul>
                     </div>
@@ -855,23 +963,30 @@ export default function MyItems() {
                     </button>
 
                     <p className="description">
-                      The NFT purchased by participating in the subscription auction generates 12% of profits after 3
-                      days and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
-                      completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all
-                      transactions in your account will be suspended. It operates normally after applying a penalty of
-                      10% of the winning bid amount.
+                      The NFT purchased by participating in the subscription
+                      auction generates 12% of profits after 3 days and is sold
+                      random. In addition, the results are announced at 9:00 AM,
+                      and the transaction is completed from 9:00 AM to 21:00 PM.
+                      If the transaction is not completed within time, all
+                      transactions in your account will be suspended. It
+                      operates normally after applying a penalty of 10% of the
+                      winning bid amount.
                     </p>
                   </div>
                 </li>
               );
             })}
 
-          {itemBalData?.length !== 0 &&
+          {/* {itemBalData?.length !== 0 &&
             itemBalData?.map((item, index) => (
               <li key={index} className="swapBox">
                 <div className="imgBoxBal">
                   {item && item.itemdata?.url ? (
-                    <img className="itemImgBal" src={item.itemdata.url} alt="" />
+                    <img
+                      className="itemImgBal"
+                      src={item.itemdata.url}
+                      alt=""
+                    />
                   ) : (
                     <img className="itemImgBal" src={E_staking} alt="" />
                   )}
@@ -885,7 +1000,9 @@ export default function MyItems() {
                 </div>
                 <div className="infoBox">
                   <div className="titleBox">
-                    <strong className="title">{item && item.itemdata?.titlename}</strong>
+                    <strong className="title">
+                      {item && item.itemdata?.titlename}
+                    </strong>
                   </div>
 
                   <div className="ownedBox">
@@ -897,7 +1014,9 @@ export default function MyItems() {
                     <div className="ownedBox">
                       <p className="key">Bought Date</p>
                       <p className="value">
-                        {item && item.updatedat ? item.updatedat.split("T", 1) : item.createdat.split("T", 1)}
+                        {item && item.updatedat
+                          ? item.updatedat.split("T", 1)
+                          : item.createdat.split("T", 1)}
                       </p>{" "}
                       <p className="key">Sold Date</p>
                       <p className="value">
@@ -917,21 +1036,33 @@ export default function MyItems() {
                     <ul className="priceBox">
                       <li key={index}>
                         <p className="key">Current price</p>
-                        <p className="value"> {parseInt(item && item.buyprice).toFixed(2)} USDT</p>
+                        <p className="value">
+                          {" "}
+                          {parseInt(item && item.buyprice).toFixed(2)} USDT
+                        </p>
                       </li>
                       {item.group_ == "kingkong" && (
                         <>
                           <button
                             className="actionBtn"
                             onClick={() =>
-                              navigate(`/resell/${item?.username}/kingkong/${item.itemid}`, { state: item[index] } )
+                              navigate(
+                                `/resell/${item?.username}/kingkong/${item.itemid}`,
+                                { state: item[index] }
+                              )
                             }
                           >
                             Sell
                           </button>
-                          <button className="actionBtn_two" onClick={() =>
-                              navigate(`/employ/${item?.username}/kingkong/${item.itemid}`, { state: item[index] } )
-                            } >
+                          <button
+                            className="actionBtn_two"
+                            onClick={() =>
+                              navigate(
+                                `/employ/${item?.username}/kingkong/${item.itemid}`,
+                                { state: item[index] }
+                              )
+                            }
+                          >
                             Stake
                           </button>
                         </>
@@ -940,22 +1071,29 @@ export default function MyItems() {
                   </div>
 
                   <p className="description">
-                    The NFT purchased by participating in the subscription auction generates 12% of profits after 3 days
-                    and is sold random. In addition, the results are announced at 9:00 AM, and the transaction is
-                    completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all
-                    transactions in youasdfasdfasdfasdfsadfasdfr account will be suspended. It operates normally after
-                    applying a penalty of 10% of the winning bid amount.
+                    The NFT purchased by participating in the subscription
+                    auction generates 12% of profits after 3 days and is sold
+                    random. In addition, the results are announced at 9:00 AM,
+                    and the transaction is completed from 9:00 AM to 21:00 PM.
+                    If the transaction is not completed within time, all
+                    transactions in youasdfasdfasdfasdfsadfasdfr account will be
+                    suspended. It operates normally after applying a penalty of
+                    10% of the winning bid amount.
                   </p>
                 </div>
               </li>
-            ))}
-          {kingKongItem.length !== 0 &&
-            kingKongItem.map((item, index) => {
-              if (item.isminted === 1 && item.group_ === "kingkong") {
+            ))} */}
+          {itemBalData.length !== 0 &&
+            itemBalData.map((item, index) => {
+              if (item.itemdata?.isminted === 1 && item.group_ === "kingkong") {
                 return (
                   <li key={index} className="swapBox">
                     <div className="imgBoxBal">
-                      <img className="itemImgBal" src={item.url} alt="" />
+                      <img
+                        className="itemImgBal"
+                        src={item.itemdata?.url}
+                        alt=""
+                      />
                       <div className="topBarBal">
                         <button className="likeBtnBal" onClick={() => {}}>
                           <img src={I_heartO} alt="" />
@@ -965,7 +1103,9 @@ export default function MyItems() {
                     </div>
                     <div className="infoBox">
                       <div className="titleBox">
-                        <strong className="title">{item && item.itemdata?.titlename}</strong>
+                        <strong className="title">
+                          {item && item.itemdata?.titlename}
+                        </strong>
                       </div>
 
                       <div className="ownedBox">
@@ -976,7 +1116,9 @@ export default function MyItems() {
                       <div className="ownedBox">
                         <p className="key">Bought Date</p>
                         <p className="value">
-                          {item && item.updatedat ? item.updatedat.split("T", 1) : item.createdat.split("T", 1)}
+                          {item && item.updatedat
+                            ? item.updatedat.split("T", 1)
+                            : item.createdat.split("T", 1)}
                         </p>{" "}
                       </div>
 
@@ -985,7 +1127,13 @@ export default function MyItems() {
                         <ul className="priceBox">
                           <li key={index}>
                             <p className="key">Current price</p>
-                            <p className="value"> {parseInt(item && item.price).toFixed(2)} USDT</p>
+                            <p className="value">
+                              {" "}
+                              {parseInt(item && item.itemdata?.price).toFixed(
+                                2
+                              )}{" "}
+                              USDT
+                            </p>
                           </li>
                           {item.group_ == "kingkong" && (
                             <>
@@ -993,33 +1141,46 @@ export default function MyItems() {
                                 disabled={spinner}
                                 className="actionBtn"
                                 onClick={() =>
-                                  navigate(`/resell/${item?.username}/kingkong/${item.itemid}`, { state: item[index] })
+                                  navigate(
+                                    `/resell/${item?.username}/kingkong/${item.itemid}`,
+                                    { state: item[index] }
+                                  )
                                 }
                               >
                                 Sell
                               </button>
-                              {isApprovedForAll && item?.isstaked === 0 && (
-                                <button
-                                  disabled={spinner}
-                                  className="actionBtn_two"
-                                  onClick={() => {
-                                    stake_for_diposit(item);
-                                  }}
-                                >
-                                  {spinner ? <div id="loading"></div> : "Stake"}
-                                </button>
-                              )}
-                              {isApprovedForAll && item?.isstaked === 1 && (
-                                <button
-                                  disabled={spinner}
-                                  className="actionBtn_two"
-                                  onClick={() => {
-                                    stake_for_withdraw(item);
-                                  }}
-                                >
-                                  {spinner ? <div id="loading"></div> : "UnStake"}
-                                </button>
-                              )}
+                              {/* {isApprovedForAll &&
+                                item.itemdata?.isstaked === 0 && (
+                                  <button
+                                    disabled={spinner}
+                                    className="actionBtn_two"
+                                    onClick={() => {
+                                      stake_for_diposit(item);
+                                    }}
+                                  >
+                                    {spinner ? (
+                                      <div id="loading"></div>
+                                    ) : (
+                                      "Stake"
+                                    )}
+                                  </button>
+                                )}
+                              {isApprovedForAll &&
+                                item.itemdata?.isstaked === 1 && (
+                                  <button
+                                    disabled={spinner}
+                                    className="actionBtn_two"
+                                    onClick={() => {
+                                      stake_for_withdraw(item);
+                                    }}
+                                  >
+                                    {spinner ? (
+                                      <div id="loading"></div>
+                                    ) : (
+                                      "UnStake"
+                                    )}
+                                  </button>
+                                )}
                               {!isApprovedForAll && (
                                 <button
                                   disabled={spinner}
@@ -1028,20 +1189,38 @@ export default function MyItems() {
                                     on_click_approve(item);
                                   }}
                                 >
-                                  {spinner ? <div id="loading"></div> : "Approve for Stake"}
+                                  {spinner ? (
+                                    <div id="loading"></div>
+                                  ) : (
+                                    "Approve for Stake"
+                                  )}
                                 </button>
-                              )}
+                              )} */}
+                              <button
+                                className="actionBtn_two"
+                                onClick={() =>
+                                  navigate(
+                                    `/employ/${item?.username}/kingkong/${item.itemid}`,
+                                    { state: item[index] }
+                                  )
+                                }
+                              >
+                                Stake
+                              </button>
                             </>
                           )}
                         </ul>
                       </div>
 
                       <p className="description">
-                        The NFT purchased by participating in the subscription auction generates 12% of profits after 3
-                        days and is sold random. In addition, the results are announced at 9:00 AM, and the transaction
-                        is completed from 9:00 AM to 21:00 PM. If the transaction is not completed within time, all
-                        transactions in youasdfasdfasdfasdfsadfasdfr account will be suspended. It operates normally
-                        after applying a penalty of 10% of the winning bid amount.
+                        The NFT purchased by participating in the subscription
+                        auction generates 12% of profits after 3 days and is
+                        sold random. In addition, the results are announced at
+                        9:00 AM, and the transaction is completed from 9:00 AM
+                        to 21:00 PM. If the transaction is not completed within
+                        time, all transactions in youasdfasdfasdfasdfsadfasdfr
+                        account will be suspended. It operates normally after
+                        applying a penalty of 10% of the winning bid amount.
                       </p>
                     </div>
                   </li>
@@ -1049,7 +1228,13 @@ export default function MyItems() {
               }
             })}
 
-          {isOpen && <PayPopup off={openModal} userInfo={userinfo} receivables={receivables} />}
+          {isOpen && (
+            <PayPopup
+              off={openModal}
+              userInfo={userinfo}
+              receivables={receivables}
+            />
+          )}
         </ul>
       </PmyItemsBox>
     );
@@ -1118,7 +1303,8 @@ const MmyItemsBox = styled.section`
         overflow: hidden;
         border-radius: 12px;
         border: 20px solid transparent;
-        background-image: linear-gradient(to right, red 0%, orange 100%), linear-gradient(to right, red 0%, orange 100%);
+        background-image: linear-gradient(to right, red 0%, orange 100%),
+          linear-gradient(to right, red 0%, orange 100%);
         background-origin: border-box;
         background-clip: content-box, border-box;
 
@@ -1426,7 +1612,8 @@ const PmyItemsBox = styled.section`
         overflow: hidden;
         border-radius: 10px;
         border: 20px solid transparent;
-        background-image: linear-gradient(red, red), linear-gradient(to right, red 0%, orange 100%);
+        background-image: linear-gradient(red, red),
+          linear-gradient(to right, red 0%, orange 100%);
         background-origin: border-box;
         background-clip: content-box, border-box;
         @media screen and (max-width: 1440px) {
@@ -1758,7 +1945,8 @@ const PmyItemsBox = styled.section`
         overflow: hidden;
         border-radius: 12px;
         border: 20px solid transparent;
-        background-image: linear-gradient(to right, red 0%, orange 100%), linear-gradient(to right, red 0%, orange 100%);
+        background-image: linear-gradient(to right, red 0%, orange 100%),
+          linear-gradient(to right, red 0%, orange 100%);
         background-origin: border-box;
         background-clip: content-box, border-box;
         @media screen and (max-width: 1440px) {
