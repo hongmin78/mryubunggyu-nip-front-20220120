@@ -742,32 +742,34 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
               <span className="value"></span>
             </div>
 
-            <button
-              className="confirmBtn"
-              onClick={() => {
-                onclick_approve();
-              }}
-              style={approve ? { display: "none" } : { display: "inline" }}
-            >
-              Approve
-              <img
-                ref={spinnerHref_approve}
-                src={I_spinner}
-                alt=""
-                style={{
-                  display: isloader_00 ? "block" : "none",
-                  width: "18px",
-                  top: "20px",
-                  right: "150px",
-                  top: "20px",
-                  position: "absolute",
+            {!allowanceamount && (
+              <button
+                className="confirmBtn"
+                onClick={() => {
+                  onclick_approve();
                 }}
-              />
-            </button>
+                style={approve ? { display: "none" } : { display: "inline" }}
+              >
+                Approve
+                <img
+                  ref={spinnerHref_approve}
+                  src={I_spinner}
+                  alt=""
+                  style={{
+                    display: isloader_00 ? "block" : "none",
+                    width: "18px",
+                    top: "20px",
+                    right: "150px",
+                    top: "20px",
+                    position: "absolute",
+                  }}
+                />
+              </button>
+            )}
 
             <button
               className="confirmBtn"
-              disabled={approve === false ? true : false || done === true}
+              disabled={allowanceamount && done === true}
               onClick={() => {
                 onclick_buy();
               }}
