@@ -29,9 +29,6 @@ export default function Staking() {
   const [totalClaimedReward, setTotalClaimedReward] = useState(0);
   const [totalMinted, setTotalMinted] = useState(0);
   let [spinner, setSpinner] = useState(false);
-  let [ myaddress , setmyaddress ] = useState()
-  let [ claimbaleamount , setclaimbaleamount ] = useState()
-  let [ claimedamount , setclaimedamount ] = useState()
   const fatchData = () => {
     let myaddress = getmyaddress();
     axios.get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`).then((resp) => {
@@ -43,32 +40,12 @@ export default function Staking() {
   };
   useEffect(() => {
     fatchData();
-  }, [])
-  useEffect( _=>{
-    setTimeout (_=>{
-      let myaddress = getmyaddress ()
-      false && query_claimbale_amount ( myaddress )
-      queryTotalMinted ( myaddress )
-    } , 1500 )
-  } , [] )
+  }, []);
   console.log("logsataasdasd", ticketInfo);  //claim_nipcoin_reward
-
-const query_claimbale_amount = myaddress =>{
-  query_with_arg ( {
-    contractaddress : addresses.contract_kip17_staking
-//    , abikind : 'STA KING' // KIP17Stake
-  , abikind : 'KIP17Stake' // 
-  , methodname : 'query_claimbale_amount'
-    , aargs : [ myaddress ]
-  }).then ( resp => {
-    LOGGER( `@query_claimbale_amount` , resp )
-  }).catch(LOGGER)
-}
   const query_claimed_reward = (_) => {
     query_noarg({
       contractaddress: addresses.STAKE,
-      abikind: 'claimed' , // "STA KING",
-       abikind : 'KIP17Stake' , // 
+      abikind: "STAKING",
       methodname: "query_claimed_reward",
     }).then((resp) => {
       LOGGER("@query_claimed_reward", getethrep(resp));
@@ -76,21 +53,23 @@ const query_claimbale_amount = myaddress =>{
     });
   };
   //count mint ( kingkong )
-  const queryTotalMinted = ( myaddress ) => { //    let myaddress = getmyaddress();
+  const queryTotalMinted = () => {
+    let myaddress = getmyaddress();
+
     if (myaddress) {
     } else {
       return;
     }
     console.log("asdasdasdsad", myaddress);
+
     query_with_arg({
-      contractaddress: addresses.contract_kip17_staking ,
-//      abikind: "STAK ING", // NFT
- abikind : 'KIP17Stake' , // 
+      // contractaddress: contract,
+      abikind: "NFT",
       methodname: "balanceOf",
       aargs: [myaddress],
     }).then((res) => {
       setTotalMinted(res);
-      console.log("@total minted", res);
+      console.log("total minted", res);
     });
   };
 
@@ -106,12 +85,14 @@ const query_claimbale_amount = myaddress =>{
       SetErrorBar("You dont have any Reward");
       return;
     }
+
     const abistring = getabistr_forfunction({
       // contractaddress: contractEmployer,
-      abikind: 'KIP17Stake' , // STAKING",
+      abikind: "STAKING",
       methodname: "claim",
       aargs: [],
     });
+
     setSpinner(true);
     requesttransaction({
       from: myaddress,
@@ -126,12 +107,15 @@ const query_claimbale_amount = myaddress =>{
         setSpinner(false);
         return;
       }
+
       let txhash;
       txhash = res;
+
       awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
         query_claimed_reward();
         console.log("minedtxreceipt", minedtxreceipt);
       });
+
       axios
         .post(API.API_TXS + `/${txhash}`, {
           txhash: res,
@@ -140,7 +124,7 @@ const query_claimbale_amount = myaddress =>{
           amount: totalClaimedReward,
           auxdata: {
             toAmount: totalClaimedReward,
-            rewardTokenContract: addresses.contract_reward_token , // contract_nip_token,
+            rewardTokenContract: addresses.contract_nip_token,
             rewardTokenSymbol: "NIP",
             nettype: net,
           },

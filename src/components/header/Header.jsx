@@ -57,14 +57,14 @@ export default function Header() {
 
   const awaitWallet = () => {
     // let myaddress = "0xb440393a03078b967000f09577e32c3252f15832";
-    let myaddress = getmyaddress();
     setTimeout(() => {
+      let myaddress = getmyaddress();
       if (myaddress) {
         return;
       } else {
         setWalletStatus("Connect Wallet");
       }
-    }, 1600);
+    }, 1500);
     setWalletStatus("Connecting...");
   };
 

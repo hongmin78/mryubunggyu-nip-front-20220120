@@ -24,11 +24,12 @@ import { addresses } from "../configs/addresses";
 import { getabistr_forfunction, query_with_arg } from "../util/contract-calls";
 import { requesttransaction } from "../services/metamask";
 import awaitTransactionMined from "await-transaction-mined";
-import { web3 } from "../configs/configweb3-ropsten";
+import { nettype, web3 } from "../configs/configweb3-ropsten";
 import { TX_POLL_OPTIONS } from "../configs/configs";
 import { getethrep, getweirep } from "../util/eth";
+const LOGGER=console.log
 
-export default function Resell() {
+export default function Employ () {
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
   const ticketInfo = useLocation().state;
@@ -40,10 +41,10 @@ export default function Resell() {
   const { type } = useParams();
   const { tokenId } = useParams();
   const [saleType, setSaleType] = useState("COMMON");
-  const [isApprovedForAll, setApprovalForAll] = useState(false);
-  let [spinner, setSpinner] = useState(false);
-  console.log("ticketInfo", itemDetail);
-
+  const [isApprovedForAll, set_isApprovedForAll] = useState(false);
+  let [spinner, setSpinner ] = useState(false);
+  let [ myaddress , setmyaddress ] =useState( null )
+  console.log("ticketInfo", itemDetail );
   const getUserInfo = async () => {
     try {
       let myaddress = getmyaddress();
@@ -52,9 +53,7 @@ export default function Resell() {
         SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
         return;
       }
-      const resp = await axios.get(
-        API.API_USERINFO + `/${myaddress}?nettype=${net}`
-      );
+      const resp = await axios.get(API.API_USERINFO + `/${myaddress}?nettype=${net}`);
       if (resp.data && resp.data.respdata) {
         let { respdata } = resp.data;
         setUserInfo(respdata);
@@ -66,9 +65,7 @@ export default function Resell() {
   const queryItemDetail = async () => {
     if (type === "kingkong") {
       try {
-        const resp = await axios.get(
-          API.API_GET_ITEMS_DETAIL + `/${tokenId}?nettype=${net}`
-        );
+        const resp = await axios.get(API.API_GET_ITEMS_DETAIL + `/${tokenId}?nettype=${net}`);
         if (resp.data && resp.data.respdata) {
           let { respdata } = resp.data;
           console.log("$itemdetail_ITEMDETAIL", respdata);
@@ -82,9 +79,7 @@ export default function Resell() {
     }
     if (type === "ticket") {
       try {
-        const resp = await axios.get(
-          API.API_LOGSTAKES + `/${id}?nettype=${net}`
-        );
+        const resp = await axios.get(API.API_LOGSTAKES + `/${id}?nettype=${net}`);
         if (resp.data && resp.data.respdata) {
           let { respdata } = resp.data;
           console.log("$itemdetail_ITEMDETAIL", respdata);
@@ -97,7 +92,6 @@ export default function Resell() {
       }
     }
   };
-
   const queryApprovalForAll = async (item) => {
     setSpinner(true);
     try {
@@ -107,36 +101,22 @@ export default function Resell() {
         SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
         return;
       }
-
       const options_arg = {
         kingkong: {
           contractaddress: addresses.contract_kip17,
           abikind: "KIP17",
           methodname: "isApprovedForAll",
-          aargs: [myaddress, addresses.contract_kip17_salse],
-        },
-        ticket: {
-          contractaddress: addresses.contract_erc1155,
-          abikind: "ERC1155",
-          methodname: "isApprovedForAll",
-          aargs: [myaddress, addresses.contract_erc1155_sales],
+          aargs: [myaddress
+            , addresses.contract_kip17_staking 
+          ], // contract_ki p17_salse
         },
       };
-
-      if (type === "kingkong") {
-        query_with_arg(options_arg["kingkong"]).then((resp) => {
+        query_with_arg ( options_arg["kingkong"] ).then((resp) => {
           console.log("$sell-isApprovedForAll?", resp);
-          setApprovalForAll(resp);
+          set_isApprovedForAll(resp);
           setSpinner(false);
         });
-      }
-      if (type === "ticket") {
-        query_with_arg(options_arg["ticket"]).then((resp) => {
-          console.log("$sell-ticket-isApprovedForAll?", resp);
-          setApprovalForAll(resp);
-          setSpinner(false);
-        });
-      }
+      
     } catch (err) {
       console.log(err);
     }
@@ -154,9 +134,11 @@ export default function Resell() {
     if (type === "kingkong") {
       let abistr = getabistr_forfunction({
         contractaddress: addresses.contract_kip17,
-        abikind: "KIP17",
+        abikind: "KIP17", // KIP17
         methodname: "setApprovalForAll",
-        aargs: [addresses.contract_kip17_salse, true],
+        aargs: [addresses.contract_kip17_staking 
+          , true  // 
+        ], // contr act_kip17_salse
       });
       requesttransaction({
         from: myaddress,
@@ -166,51 +148,18 @@ export default function Resell() {
       }).then((resp) => {
         if (resp) {
           console.log("resp", resp);
-          setApprovalForAll(resp);
+          set_isApprovedForAll(resp);
         } else {
           SetErrorBar(messages.MSG_USER_DENIED_TX);
           return;
         }
         let txhash = resp;
 
-        awaitTransactionMined
-          .awaitTx(web3, txhash, TX_POLL_OPTIONS)
-          .then(async (minedtxreceipt) => {
-            console.log(minedtxreceipt);
-            SetErrorBar(messages.MSG_TX_FINALIZED);
-            setSpinner(false);
-          });
-      });
-    }
-    if (type === "ticket") {
-      let abistr = getabistr_forfunction({
-        contractaddress: addresses.contract_erc1155,
-        abikind: "ERC1155",
-        methodname: "setApprovalForAll",
-        aargs: [addresses.contract_erc1155_sales, true],
-      });
-      requesttransaction({
-        from: myaddress,
-        to: addresses.contract_erc1155,
-        data: abistr,
-        value: "0x00",
-      }).then((resp) => {
-        console.log("resp", resp);
-        setApprovalForAll(resp);
-        if (resp) {
-        } else {
-          SetErrorBar(messages.MSG_USER_DENIED_TX);
-          return;
-        }
-        let txhash = resp;
-
-        awaitTransactionMined
-          .awaitTx(web3, txhash, TX_POLL_OPTIONS)
-          .then(async (minedtxreceipt) => {
-            console.log(minedtxreceipt);
-            SetErrorBar(messages.MSG_TX_FINALIZED);
-            setSpinner(false);
-          });
+        awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
+          console.log(minedtxreceipt);
+          SetErrorBar(messages.MSG_TX_FINALIZED);
+          setSpinner(false);
+        });
       });
     }
   };
@@ -221,148 +170,63 @@ export default function Resell() {
     const from = myaddress; // store.isLogin;
     let msg; // = `0x${Buffer.from(exampleMessage, "utf8").toString("hex")}`;
     if (type === "kingkong") {
-      msg = `Token id:${itemDetail.itemid}, ${getweirep(
-        bid
-      )},Contract address :${
+      msg = `Token id:${itemDetail.itemid}, ${getweirep(bid)},Contract address :${
         addresses.contract_erc1155_ticket_sales
       }, wallet: ${myaddress}`;
     }
     if (type === "ticket") {
-      msg = `Token id:${
-        ticketInfo?.itemid ? ticketInfo.itemid : ticketInfo?.id
-      }, ${getweirep(bid)},Contract address :${
+      msg = `Token id:${ticketInfo?.itemid ? ticketInfo.itemid : ticketInfo?.id}, ${getweirep(bid)},Contract address :${
         addresses.contract_erc1155_ticket_sales
       }, wallet: ${myaddress}`;
     }
-
     const sign = await ethereum.request({
       method: "personal_sign",
       params: [msg, from],
     });
-
     setSign(sign);
     return sign;
   };
-
-  const postSell = async () => {
-    let respsign = await onClickSignRequest();
-    console.log("res", itemDetail);
-    let msg;
+  const make_employ_tx = async () => { //    let respsign = await onClickSignRequest();
+    console.log("res", itemDetail); //    let msg;
     setSpinner(true);
-    if (respsign) {
-      let myaddress = getmyaddress();
-      if (type === "kingkong") {
-        msg = `Token id:${itemDetail?.id}, ${getweirep(
-          bid
-        )},Contract address :${
-          addresses.contract_kip17_salse
-        }, wallet: ${myaddress}`;
-      }
-      if (type === "ticket") {
-        msg = `Token id:${itemDetail?.id}, ${getweirep(
-          bid
-        )},Contract address :${
-          addresses.contract_erc1155_ticket_sales
-        }, wallet: ${myaddress}`;
-      }
-
-      let options_data = {
-        kingkong: {
-          username: itemDetail?.username,
-          contractaddress: addresses.contract_kip17,
-          tokenid: itemDetail?.id,
-          price: bid,
-          itemid: itemDetail?.itemid,
-          expiry: 4119051884,
-          paymeansaddress: addresses.contract_USDT,
-          paymeansname: "USDT",
-          saletype: saleType === "COMMON" ? 1 : saleType === "AUCTION" ? 2 : 0,
-          saletypestr: saleType,
-          salestatusstr: saleType,
-          salestatus: 1, // "on sale",
-          jsignature: {
-            signature: sign,
-            msg,
-          },
-          expirystr: 4119051884,
-          nettype: net,
-          seller: itemDetail?.username,
-          typestr: saleType,
-          type: "kingkong",
-        },
-        ticket: {
-          username: itemDetail?.username,
-          contractaddress: addresses.contract_erc1155,
-          tokenid: ticketInfo?.itemid ? ticketInfo.itemid : ticketInfo?.id,
-          price: bid,
-          itemid: ticketInfo?.itemid ? ticketInfo?.itemid : ticketInfo?.id,
-          expiry: 4119051884,
-          paymeansaddress: addresses.contract_USDT,
-          paymeansname: "USDT",
-          saletype: saleType === "COMMON" ? 1 : saleType === "AUCTION" ? 2 : 0,
-          saletypestr: saleType,
-          salestatusstr: saleType,
-          salestatus: 1, // "on sale",
-          jsignature: {
-            signature: sign,
-            msg,
-          },
-          expirystr: 4119051884,
-          nettype: net,
-          seller: itemDetail?.username,
-          typestr: saleType,
-          type: "ticket",
-        },
-      };
-
-      // }
-
-      if (type === "kingkong") {
-        axios
-          .post(API.API_POST_SALE, options_data["kingkong"])
-          .then((res) => {
-            console.log(res);
-            SetErrorBar("Item has been posted!");
-            // reload();
-            if (res.data.status === "OK") {
-              SetErrorBar("Item has been posted!");
-              setSpinner(false);
-              navigate("/market");
-            }
-          })
-          .catch((err) => console.log(err));
-      }
-      if (type === "ticket") {
-        axios
-          .post(API.API_POST_SALE, options_data["ticket"])
-          .then((res) => {
-            console.log(res);
-
-            if (res.data.status === "OK") {
-              SetErrorBar("Item has been posted!");
-              setSpinner(false);
-              navigate("/market");
-            }
-          })
-          .catch((err) => console.log(err));
-      }
-    } else {
-      SetErrorBar("Failed to provide all information.");
-    }
+    let { itemid } = itemDetail
+    let abistr = getabistr_forfunction( {
+      contractaddress: addresses.contract_kip17_staking , // ETH_TESTNET.
+      abikind: "KIP17Stake",
+      methodname: "mint_deposit",
+      aargs: [ addresses.contract_kip17
+        , itemid
+        , 250 
+      ], // .ETH_TESTNET
+    })
+    requesttransaction({
+      from: myaddress,
+      to: addresses.contract_kip17_staking , // ETH_TESTNET.
+      data: abistr,
+    }).then((resp) => {
+      LOGGER( '@txresp' , resp )
+      axios.post ( API.API_TXS + `/${resp}?nettype=${nettype}` , {
+        typestr : 'EMPLOY_KINGKONG'
+        , username : myaddress
+        , itemid
+        , contractaddress : addresses.contract_kip17_staking
+      }) //
+    })
   };
 
-  useEffect(() => {
+  useEffect( () => {
     setTimeout(() => {
+      setmyaddress ( getmyaddress() )
       queryApprovalForAll();
       queryItemDetail();
       getUserInfo();
-    }, 1200);
-  }, []);
+    }, 1500 );
+  }, [] );
 
   if (isMobile)
     return (
       <>
-        <DetailHeader title="Put on marketplace" />
+        <DetailHeader title="Employ your kingkong for reward" />
         <MresellBox>
           <img className="itemImg" src={E_item3} alt="" />
 
@@ -371,11 +235,7 @@ export default function Resell() {
               <p className="title">
                 {" "}
                 {type === "ticket"
-                  ? `Lucky Ticket #${
-                      itemDetail.itemid === null
-                        ? itemDetail.id
-                        : itemDetail.itemid
-                    }`
+                  ? `Lucky Ticket #${itemDetail.itemid === null ? itemDetail.id : itemDetail.itemid}`
                   : `King Kong #${itemDetail.titlename}`}
               </p>
             </div>
@@ -388,8 +248,7 @@ export default function Resell() {
                 </p>
 
                 <p className="explain">
-                  The auction begins. If the bid is more than 10 USDT, the bid
-                  will be awarded at 19:05 on July 17, 2022
+                  The auction begins. If the bid is more than 10 USDT, the bid will be awarded at 19:05 on July 17, 2022
                 </p>
 
                 <div className="priceBox">
@@ -403,18 +262,15 @@ export default function Resell() {
                 </div>
               </li>
 
-              <li className="bidBox contBox">
+{/**              <li className="bidBox contBox" style={{display : 'none'}}>
                 <div className="titleBox">
                   <p className="title">Minimum bid</p>
-
                   <span className="hovInfo">
                     <img src={I_info} alt="" />
-
                     <div className="hovPopup">
                       <p>
-                        You can always accept a sale even if you are offered a
-                        price that is higher than your minimum bid and lower
-                        than your target bid.
+                        You can always accept a sale even if you are offered a price that is higher than your minimum
+                        bid and lower than your target bid.
                       </p>
                     </div>
                   </span>
@@ -424,53 +280,43 @@ export default function Resell() {
                   <input
                     value={bid}
                     onChange={(e) => setBid(e.target.value)}
-                    placeholder={
-                      type === "ticket"
-                        ? "Ticket Minimun bid 90$"
-                        : "Enter Minimum bid"
-                    }
+                    placeholder={type === "ticket" ? "Ticket Minimun bid 90$" : "Enter Minimum bid"}
                   />
                   <strong className="unit">USDT</strong>
                 </div>
-
-                <p className="explain">
-                  Suggested: 0%, 10%, 20%. Maximum is 25%
-                </p>
+                <p className="explain">Suggested: 0%, 10%, 20%. Maximum is 25%</p>
               </li>
+*/}
 
               <li className="instructionBox contBox">
                 <p className="title">Instruction</p>
 
                 <div className="textBox">
                   <p>
-                    When you sell items for the first time in your account, you
-                    need to go through the contract approval process
+                    When you sell items for the first time in your account, you need to go through the contract approval
+                    process
                   </p>
 
                   <ul className="processList">
                     <li>
                       <p>
-                        - If you are trading for the first time, you will need
-                        to reset your account. The process of sending 0 USDT to
-                        verify that the account is a valid account proceeds.
+                        - If you are trading for the first time, you will need to reset your account. The process of
+                        sending 0 USDT to verify that the account is a valid account proceeds.
                       </p>
                     </li>
                     <li>
-                      <p>
-                        - Please complete the signature to create a sales list.
-                      </p>
+                      <p>- Please complete the signature to create a sales list.</p>
                     </li>
                     <li>
                       <p>
-                        - Gas fee is paid only for the first time, and
-                        subsequent listings are supported free of charge.
+                        - Gas fee is paid only for the first time, and subsequent listings are supported free of charge.
                       </p>
                     </li>
                   </ul>
                 </div>
               </li>
 
-              <button className="actionBtn" onClick={() => postSell()}>
+              <button className="actionBtn" onClick={() => make_employ_tx()}>
                 Sales start
               </button>
             </ul>
@@ -488,11 +334,11 @@ export default function Resell() {
               <button className="exitBtn" onClick={() => navigate(-1)}>
                 <img src={I_ltArw} alt="" />
               </button>
-              <p className="title">Put on marketplace</p>
+              <p className="title">Employ your kingkong for reward</p>
             </div>
 
             <ul className="sellBox">
-              <li className="bidBox contBox">
+{/**               <li className="bidBox contBox">
                 <div className="titleBox">
                   <p className="title">Minimum bid</p>
 
@@ -501,9 +347,8 @@ export default function Resell() {
 
                     <div className="hovPopup">
                       <p>
-                        You can always accept a sale even if you are offered a
-                        price that is higher than your minimum bid and lower
-                        than your target bid.
+                        You can always accept a sale even if you are offered a price that is higher than your minimum
+                        bid and lower than your target bid.
                       </p>
                     </div>
                   </span>
@@ -520,45 +365,34 @@ export default function Resell() {
                         SetErrorBar("Ticket minumum bid 90 USDT");
                       }
                     }}
-                    placeholder={
-                      type === "ticket"
-                        ? "Minimun bid 90 USDT"
-                        : "Enter Minimum bid"
-                    }
+                    placeholder={type === "ticket" ? "Minimun bid 90 USDT" : "Enter Minimum bid"}
                   />
                   <strong className="unit">USDT</strong>
                 </div>
-
-                <p className="explain">
-                  Suggested: 0%, 10%, 20%. Maximum is 25%
-                </p>
-              </li>
+                <p className="explain">Suggested: 0%, 10%, 20%. Maximum is 25%</p>
+              </li> */}
               <li className="instructionBox contBox">
                 <p className="title">Instruction</p>
 
                 <div className="textBox">
                   <p>
-                    When you sell items for the first time in your account, you
-                    need to go through the contract approval process
+                    When you sell items for the first time in your account, you need to go through the contract approval
+                    process
                   </p>
 
                   <ul className="processList">
                     <li>
                       <p>
-                        - If you are trading for the first time, you will need
-                        to reset your account. The process of sending 0 USDT to
-                        verify that the account is a valid account proceeds.
+                        - If you are trading for the first time, you will need to reset your account. The process of
+                        sending 0 USDT to verify that the account is a valid account proceeds.
                       </p>
                     </li>
                     <li>
-                      <p>
-                        - Please complete the signature to create a sales list.
-                      </p>
+                      <p>- Please complete the signature to create a sales list.</p>
                     </li>
                     <li>
                       <p>
-                        - Gas fee is paid only for the first time, and
-                        subsequent listings are supported free of charge.
+                        - Gas fee is paid only for the first time, and subsequent listings are supported free of charge.
                       </p>
                     </li>
                   </ul>
@@ -573,12 +407,8 @@ export default function Resell() {
                 </button> */}
               </div>
               {isApprovedForAll ? (
-                <button
-                  className="actionBtn"
-                  disabled={bid !== "" ? false : true}
-                  onClick={() => postSell()}
-                >
-                  {spinner ? <div id="loading"></div> : "Sell"}
+                <button className="actionBtn" disabled={ false } onClick={() => make_employ_tx()}>
+                  {spinner ? <div id="loading"></div> : "Employ"}
                 </button>
               ) : (
                 <button className="actionBtn" onClick={() => approveForAll()}>
@@ -600,11 +430,7 @@ export default function Resell() {
               <p className="title">
                 {" "}
                 {type === "ticket"
-                  ? `Lucky Ticket #${
-                      ticketInfo.itemid === null
-                        ? ticketInfo.id
-                        : ticketInfo.itemid
-                    }`
+                  ? `Lucky Ticket #${ticketInfo.itemid === null ? ticketInfo.id : ticketInfo.itemid}`
                   : `King Kong #${itemDetail?.titlename}`}
               </p>
               {/* <p className="title">Series {itemDetail && itemDetail.itembalances?.group_.toUpperCase()} #112</p> */}
