@@ -7,6 +7,7 @@ const messages = {
   MSG_YOU_ALREADY_HAVE_STAKED: "Already purchased", // 이미 구매완료 되었습니다'
   MSG_USER_DENIED_TX: "Transaction has been denied", // 트랜잭션 요청을 거부하였습니다'
   MSG_TX_FINALIZED: "Transaction finalized",
+  MSG_TX_FAILED: "Transaction failed!",
   MSG_DONE_LOGIN: "Logged in", // 로그인되었습니다'
   MSG_SERVER_ERR: "Server Error",
   MSG_EMAIL_SENT: "Email sent",

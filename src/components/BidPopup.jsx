@@ -35,7 +35,7 @@ import { strDot } from "../util/Util";
 import { net } from "../configs/net";
 import E_staking from "../img/common/E_staking.png";
 
-export default function BidPopup({ off, userInfo, receivables, itemdata }) {
+export default function BidPopup({ off, itemdata }) {
   console.log("marketPlaceList", itemdata);
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
@@ -55,7 +55,7 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
   let [isloader_01, setisloader_01] = useState(false);
   let [DueAmount, setDueAmount] = useState(parseInt(itemdata?.price));
   let [refererFeeRate, setRefererFeeRate] = useState("");
-  let [userinfo, setuserinfo] = useState(null);
+  let [userinfo, setuserinfo] = useState("");
 
   useEffect((_) => {
     const spinner = spinnerHref.current; // document.querySelector("Spinner");
@@ -93,17 +93,18 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
         .then((resp) => {
           if (resp.data && resp.data.respdata) {
             let { respdata } = resp.data;
-
-            respdata.referer &&
-              axios
-                .get(
-                  API.API_SINGLE_REFFERER +
-                    `/${respdata.referer}?nettype=${net}`
-                )
-                .then((resp) => {
-                  LOGGER("myticket", resp.data.respdata);
-                  setuserinfo(resp.data.respdata);
-                });
+            setuserinfo(respdata);
+            // if (respdata?.referer) {
+            //   axios
+            //     .get(
+            //       API.API_SINGLE_REFFERER +
+            //         `/${respdata.referer}?nettype=${net}`
+            //     )
+            //     .then((resp) => {
+            //       LOGGER("myticket", resp.data.respdata);
+            //       setuserinfo(resp.data.respdata);
+            //     });
+            // }
           }
         });
 
@@ -216,6 +217,12 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
           .awaitTx(web3, txhash, TX_POLL_OPTIONS)
           .then((minedtxreceipt) => {
             LOGGER("____minedtxreceipt", minedtxreceipt);
+            let { status } = minedtxreceipt;
+            if (status) {
+            } else {
+              SetErrorBar(messages.MSG_TX_FAILED);
+              return;
+            }
             SetErrorBar(messages.MSG_TX_FINALIZED);
             setApprove(true);
             axios
@@ -273,6 +280,12 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
           .awaitTx(web3, txhash, TX_POLL_OPTIONS)
           .then((minedtxreceipt) => {
             LOGGER("minedtxreceipt", minedtxreceipt);
+            let { status } = minedtxreceipt;
+            if (status) {
+            } else {
+              SetErrorBar(messages.MSG_TX_FAILED);
+              return;
+            }
             SetErrorBar(messages.MSG_TX_FINALIZED);
             setApprove(true);
             axios
@@ -368,7 +381,7 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
             addresses.contract_USDT, // paymeansaddress
             getweirep("" + itemdata?.price), // amounttopay
             itemdata?.seller, // seller
-            userinfo?.username, //
+            userinfo?.refereraddress || userinfo.username, //
             "12",
             "0",
           ],
@@ -413,7 +426,8 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
             "1", // amounttomint
             "0", // _decimals
             "0",
-            userinfo?.username,
+            // userinfo?.username,
+            userinfo?.refereraddress || userinfo.username, //
             "1",
             getweirep("" + itemdata?.price),
             addresses.contract_USDT, // sellersaddress
@@ -448,6 +462,12 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
             .awaitTx(web3, txhash, TX_POLL_OPTIONS)
             .then(async (minedtxreceipt) => {
               LOGGER("minedtxreceipt", minedtxreceipt);
+              let { status } = minedtxreceipt;
+              if (status) {
+              } else {
+                SetErrorBar(messages.MSG_TX_FAILED);
+                return;
+              }
               SetErrorBar(messages.MSG_TX_FINALIZED);
               setDone(false);
               setisloader_01(false);
@@ -526,6 +546,13 @@ export default function BidPopup({ off, userInfo, receivables, itemdata }) {
             .awaitTx(web3, txhash, TX_POLL_OPTIONS)
             .then(async (minedtxreceipt) => {
               LOGGER("minedtxreceipt", minedtxreceipt);
+              let { status } = minedtxreceipt;
+              if (status) {
+              } else {
+                SetErrorBar(messages.MSG_TX_FAILED);
+                return;
+              }
+
               axios
                 .post(API.API_TXS + `/${txhash}?nettype=${net}`, {
                   txhash,
