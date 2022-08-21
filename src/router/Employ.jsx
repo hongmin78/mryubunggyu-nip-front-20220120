@@ -27,9 +27,9 @@ import awaitTransactionMined from "await-transaction-mined";
 import { nettype, web3 } from "../configs/configweb3-ropsten";
 import { TX_POLL_OPTIONS } from "../configs/configs";
 import { getethrep, getweirep } from "../util/eth";
-const LOGGER=console.log
+const LOGGER = console.log;
 
-export default function Employ () {
+export default function Employ() {
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
   const ticketInfo = useLocation().state;
@@ -42,9 +42,9 @@ export default function Employ () {
   const { tokenId } = useParams();
   const [saleType, setSaleType] = useState("COMMON");
   const [isApprovedForAll, set_isApprovedForAll] = useState(false);
-  let [spinner, setSpinner ] = useState(false);
-  let [ myaddress , setmyaddress ] =useState( null )
-  console.log("ticketInfo", itemDetail );
+  let [spinner, setSpinner] = useState(false);
+  let [myaddress, setmyaddress] = useState(null);
+  console.log("ticketInfo", itemDetail);
   const getUserInfo = async () => {
     try {
       let myaddress = getmyaddress();
@@ -53,7 +53,9 @@ export default function Employ () {
         SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
         return;
       }
-      const resp = await axios.get(API.API_USERINFO + `/${myaddress}?nettype=${net}`);
+      const resp = await axios.get(
+        API.API_USERINFO + `/${myaddress}?nettype=${net}`
+      );
       if (resp.data && resp.data.respdata) {
         let { respdata } = resp.data;
         setUserInfo(respdata);
@@ -65,7 +67,9 @@ export default function Employ () {
   const queryItemDetail = async () => {
     if (type === "kingkong") {
       try {
-        const resp = await axios.get(API.API_GET_ITEMS_DETAIL + `/${tokenId}?nettype=${net}`);
+        const resp = await axios.get(
+          API.API_GET_ITEMS_DETAIL + `/${tokenId}?nettype=${net}`
+        );
         if (resp.data && resp.data.respdata) {
           let { respdata } = resp.data;
           console.log("$itemdetail_ITEMDETAIL", respdata);
@@ -79,7 +83,9 @@ export default function Employ () {
     }
     if (type === "ticket") {
       try {
-        const resp = await axios.get(API.API_LOGSTAKES + `/${id}?nettype=${net}`);
+        const resp = await axios.get(
+          API.API_LOGSTAKES + `/${id}?nettype=${net}`
+        );
         if (resp.data && resp.data.respdata) {
           let { respdata } = resp.data;
           console.log("$itemdetail_ITEMDETAIL", respdata);
@@ -106,17 +112,14 @@ export default function Employ () {
           contractaddress: addresses.contract_kip17,
           abikind: "KIP17",
           methodname: "isApprovedForAll",
-          aargs: [myaddress
-            , addresses.contract_kip17_staking 
-          ], // contract_ki p17_salse
+          aargs: [myaddress, addresses.contract_kip17_staking], // contract_ki p17_salse
         },
       };
-        query_with_arg ( options_arg["kingkong"] ).then((resp) => {
-          console.log("$sell-isApprovedForAll?", resp);
-          set_isApprovedForAll(resp);
-          setSpinner(false);
-        });
-      
+      query_with_arg(options_arg["kingkong"]).then((resp) => {
+        console.log("$sell-isApprovedForAll?", resp);
+        set_isApprovedForAll(resp);
+        setSpinner(false);
+      });
     } catch (err) {
       console.log(err);
     }
@@ -136,8 +139,9 @@ export default function Employ () {
         contractaddress: addresses.contract_kip17,
         abikind: "KIP17", // KIP17
         methodname: "setApprovalForAll",
-        aargs: [addresses.contract_kip17_staking 
-          , true  // 
+        aargs: [
+          addresses.contract_kip17_staking,
+          true, //
         ], // contr act_kip17_salse
       });
       requesttransaction({
@@ -155,11 +159,13 @@ export default function Employ () {
         }
         let txhash = resp;
 
-        awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
-          console.log(minedtxreceipt);
-          SetErrorBar(messages.MSG_TX_FINALIZED);
-          setSpinner(false);
-        });
+        awaitTransactionMined
+          .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+          .then(async (minedtxreceipt) => {
+            console.log(minedtxreceipt);
+            SetErrorBar(messages.MSG_TX_FINALIZED);
+            setSpinner(false);
+          });
       });
     }
   };
@@ -170,12 +176,16 @@ export default function Employ () {
     const from = myaddress; // store.isLogin;
     let msg; // = `0x${Buffer.from(exampleMessage, "utf8").toString("hex")}`;
     if (type === "kingkong") {
-      msg = `Token id:${itemDetail.itemid}, ${getweirep(bid)},Contract address :${
+      msg = `Token id:${itemDetail.itemid}, ${getweirep(
+        bid
+      )},Contract address :${
         addresses.contract_erc1155_ticket_sales
       }, wallet: ${myaddress}`;
     }
     if (type === "ticket") {
-      msg = `Token id:${ticketInfo?.itemid ? ticketInfo.itemid : ticketInfo?.id}, ${getweirep(bid)},Contract address :${
+      msg = `Token id:${
+        ticketInfo?.itemid ? ticketInfo.itemid : ticketInfo?.id
+      }, ${getweirep(bid)},Contract address :${
         addresses.contract_erc1155_ticket_sales
       }, wallet: ${myaddress}`;
     }
@@ -186,42 +196,40 @@ export default function Employ () {
     setSign(sign);
     return sign;
   };
-  const make_employ_tx = async () => { //    let respsign = await onClickSignRequest();
+  const make_employ_tx = async () => {
+    //    let respsign = await onClickSignRequest();
     console.log("res", itemDetail); //    let msg;
     setSpinner(true);
-    let { itemid } = itemDetail
-    let abistr = getabistr_forfunction( {
-      contractaddress: addresses.contract_kip17_staking , // ETH_TESTNET.
+    let { itemid } = itemDetail;
+    let abistr = getabistr_forfunction({
+      contractaddress: addresses.contract_kip17_staking, // ETH_TESTNET.
       abikind: "KIP17Stake",
       methodname: "mint_deposit",
-      aargs: [ addresses.contract_kip17
-        , itemid
-        , 250 
-      ], // .ETH_TESTNET
-    })
+      aargs: [addresses.contract_kip17, itemid, 250], // .ETH_TESTNET
+    });
     requesttransaction({
       from: myaddress,
-      to: addresses.contract_kip17_staking , // ETH_TESTNET.
+      to: addresses.contract_kip17_staking, // ETH_TESTNET.
       data: abistr,
     }).then((resp) => {
-      LOGGER( '@txresp' , resp )
-      axios.post ( API.API_TXS + `/${resp}?nettype=${nettype}` , {
-        typestr : 'EMPLOY_KINGKONG'
-        , username : myaddress
-        , itemid
-        , contractaddress : addresses.contract_kip17_staking
-      }) //
-    })
+      LOGGER("@txresp", resp);
+      axios.post(API.API_TXS + `/${resp}?nettype=${nettype}`, {
+        typestr: "EMPLOY_KINGKONG",
+        username: myaddress,
+        itemid,
+        contractaddress: addresses.contract_kip17_staking,
+      }); //
+    });
   };
 
-  useEffect( () => {
-    setTimeout(() => {
-      setmyaddress ( getmyaddress() )
-      queryApprovalForAll();
-      queryItemDetail();
-      getUserInfo();
-    }, 1500 );
-  }, [] );
+  useEffect(() => {
+    // setTimeout(() => {
+    setmyaddress(getmyaddress());
+    queryApprovalForAll();
+    queryItemDetail();
+    getUserInfo();
+    // }, 1500 );
+  }, []);
 
   if (isMobile)
     return (
@@ -235,7 +243,11 @@ export default function Employ () {
               <p className="title">
                 {" "}
                 {type === "ticket"
-                  ? `Lucky Ticket #${itemDetail.itemid === null ? itemDetail.id : itemDetail.itemid}`
+                  ? `Lucky Ticket #${
+                      itemDetail.itemid === null
+                        ? itemDetail.id
+                        : itemDetail.itemid
+                    }`
                   : `King Kong #${itemDetail.titlename}`}
               </p>
             </div>
@@ -248,7 +260,8 @@ export default function Employ () {
                 </p>
 
                 <p className="explain">
-                  The auction begins. If the bid is more than 10 USDT, the bid will be awarded at 19:05 on July 17, 2022
+                  The auction begins. If the bid is more than 10 USDT, the bid
+                  will be awarded at 19:05 on July 17, 2022
                 </p>
 
                 <div className="priceBox">
@@ -262,7 +275,7 @@ export default function Employ () {
                 </div>
               </li>
 
-{/**              <li className="bidBox contBox" style={{display : 'none'}}>
+              {/**              <li className="bidBox contBox" style={{display : 'none'}}>
                 <div className="titleBox">
                   <p className="title">Minimum bid</p>
                   <span className="hovInfo">
@@ -293,23 +306,27 @@ export default function Employ () {
 
                 <div className="textBox">
                   <p>
-                    When you sell items for the first time in your account, you need to go through the contract approval
-                    process
+                    When you sell items for the first time in your account, you
+                    need to go through the contract approval process
                   </p>
 
                   <ul className="processList">
                     <li>
                       <p>
-                        - If you are trading for the first time, you will need to reset your account. The process of
-                        sending 0 USDT to verify that the account is a valid account proceeds.
+                        - If you are trading for the first time, you will need
+                        to reset your account. The process of sending 0 USDT to
+                        verify that the account is a valid account proceeds.
                       </p>
                     </li>
                     <li>
-                      <p>- Please complete the signature to create a sales list.</p>
+                      <p>
+                        - Please complete the signature to create a sales list.
+                      </p>
                     </li>
                     <li>
                       <p>
-                        - Gas fee is paid only for the first time, and subsequent listings are supported free of charge.
+                        - Gas fee is paid only for the first time, and
+                        subsequent listings are supported free of charge.
                       </p>
                     </li>
                   </ul>
@@ -338,7 +355,7 @@ export default function Employ () {
             </div>
 
             <ul className="sellBox">
-{/**               <li className="bidBox contBox">
+              {/**               <li className="bidBox contBox">
                 <div className="titleBox">
                   <p className="title">Minimum bid</p>
 
@@ -376,23 +393,27 @@ export default function Employ () {
 
                 <div className="textBox">
                   <p>
-                    When you sell items for the first time in your account, you need to go through the contract approval
-                    process
+                    When you sell items for the first time in your account, you
+                    need to go through the contract approval process
                   </p>
 
                   <ul className="processList">
                     <li>
                       <p>
-                        - If you are trading for the first time, you will need to reset your account. The process of
-                        sending 0 USDT to verify that the account is a valid account proceeds.
+                        - If you are trading for the first time, you will need
+                        to reset your account. The process of sending 0 USDT to
+                        verify that the account is a valid account proceeds.
                       </p>
                     </li>
                     <li>
-                      <p>- Please complete the signature to create a sales list.</p>
+                      <p>
+                        - Please complete the signature to create a sales list.
+                      </p>
                     </li>
                     <li>
                       <p>
-                        - Gas fee is paid only for the first time, and subsequent listings are supported free of charge.
+                        - Gas fee is paid only for the first time, and
+                        subsequent listings are supported free of charge.
                       </p>
                     </li>
                   </ul>
@@ -407,7 +428,11 @@ export default function Employ () {
                 </button> */}
               </div>
               {isApprovedForAll ? (
-                <button className="actionBtn" disabled={ false } onClick={() => make_employ_tx()}>
+                <button
+                  className="actionBtn"
+                  disabled={false}
+                  onClick={() => make_employ_tx()}
+                >
                   {spinner ? <div id="loading"></div> : "Employ"}
                 </button>
               ) : (
@@ -430,7 +455,11 @@ export default function Employ () {
               <p className="title">
                 {" "}
                 {type === "ticket"
-                  ? `Lucky Ticket #${ticketInfo.itemid === null ? ticketInfo.id : ticketInfo.itemid}`
+                  ? `Lucky Ticket #${
+                      ticketInfo.itemid === null
+                        ? ticketInfo.id
+                        : ticketInfo.itemid
+                    }`
                   : `King Kong #${itemDetail?.titlename}`}
               </p>
               {/* <p className="title">Series {itemDetail && itemDetail.itembalances?.group_.toUpperCase()} #112</p> */}

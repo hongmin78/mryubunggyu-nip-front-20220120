@@ -5,20 +5,34 @@ import { D_recommendList } from "../../data/DmyPage";
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { strDot } from "../../util/Util";
-import { D_rewardHeader, D_rewardList, D_vaultHeader, D_vaultList, D_stakeHeader } from "../../data/Dstaking";
+import {
+  D_rewardHeader,
+  D_rewardList,
+  D_vaultHeader,
+  D_vaultList,
+  D_stakeHeader,
+} from "../../data/Dstaking";
 import { getmyaddress, LOGGER } from "../../util/common";
 import axios from "axios";
 import moment from "moment";
 import { API } from "../../configs/api";
 import ticketImg from "../../img/staking/E_prof1.png";
 import { net } from "../../configs/net";
-import { getabistr_forfunction, query_with_arg, query_noarg, query_eth_balance } from "../../util/contract-calls";
+import {
+  getabistr_forfunction,
+  query_with_arg,
+  query_noarg,
+  query_eth_balance,
+} from "../../util/contract-calls";
 import { addresses } from "../../configs/addresses";
 import { getweirep, getethrep } from "../../util/eth";
 import SetErrorBar from "../../util/SetErrorBar";
 import { requesttransaction } from "../../services/metamask";
 import awaitTransactionMined from "await-transaction-mined";
-import { TIME_FETCH_MYADDRESS_DEF, TX_POLL_OPTIONS } from "../../configs/configs";
+import {
+  TIME_FETCH_MYADDRESS_DEF,
+  TX_POLL_OPTIONS,
+} from "../../configs/configs";
 import { web3 } from "../../configs/configweb3";
 
 export default function Staking() {
@@ -29,46 +43,50 @@ export default function Staking() {
   const [totalClaimedReward, setTotalClaimedReward] = useState(0);
   const [totalMinted, setTotalMinted] = useState(0);
   let [spinner, setSpinner] = useState(false);
-  let [ myaddress , setmyaddress ] = useState()
-  let [ claimbaleamount , setclaimbaleamount ] = useState()
-  let [ claimedamount , setclaimedamount ] = useState()
+  let [myaddress, setmyaddress] = useState();
+  let [claimbaleamount, setclaimbaleamount] = useState();
+  let [claimedamount, setclaimedamount] = useState();
   const fatchData = () => {
     let myaddress = getmyaddress();
-    axios.get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`).then((resp) => {
-      let { status, respdata } = resp.data;
-      if (status == "OK" && respdata !== null) {
-        setItckInfo([respdata]);
-      }
-    });
+    axios
+      .get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`)
+      .then((resp) => {
+        let { status, respdata } = resp.data;
+        if (status == "OK" && respdata !== null) {
+          setItckInfo([respdata]);
+        }
+      });
   };
   useEffect(() => {
     fatchData();
-  }, [])
-  useEffect( _=>{
-    setTimeout (_=>{
-      let myaddress = getmyaddress ()
-      false && query_claimbale_amount ( myaddress )
-      queryTotalMinted ( myaddress )
-    } , 1500 )
-  } , [] )
-  console.log("logsataasdasd", ticketInfo);  //claim_nipcoin_reward
+  }, []);
+  useEffect((_) => {
+    // setTimeout (_=>{
+    let myaddress = getmyaddress();
+    false && query_claimbale_amount(myaddress);
+    queryTotalMinted(myaddress);
+    // } , 1500 )
+  }, []);
+  console.log("logsataasdasd", ticketInfo); //claim_nipcoin_reward
 
-const query_claimbale_amount = myaddress =>{
-  query_with_arg ( {
-    contractaddress : addresses.contract_kip17_staking
-//    , abikind : 'STA KING' // KIP17Stake
-  , abikind : 'KIP17Stake' // 
-  , methodname : 'query_claimbale_amount'
-    , aargs : [ myaddress ]
-  }).then ( resp => {
-    LOGGER( `@query_claimbale_amount` , resp )
-  }).catch(LOGGER)
-}
+  const query_claimbale_amount = (myaddress) => {
+    query_with_arg({
+      contractaddress: addresses.contract_kip17_staking,
+      //    , abikind : 'STA KING' // KIP17Stake
+      abikind: "KIP17Stake", //
+      methodname: "query_claimbale_amount",
+      aargs: [myaddress],
+    })
+      .then((resp) => {
+        LOGGER(`@query_claimbale_amount`, resp);
+      })
+      .catch(LOGGER);
+  };
   const query_claimed_reward = (_) => {
     query_noarg({
       contractaddress: addresses.STAKE,
-      abikind: 'claimed' , // "STA KING",
-       abikind : 'KIP17Stake' , // 
+      abikind: "claimed", // "STA KING",
+      abikind: "KIP17Stake", //
       methodname: "query_claimed_reward",
     }).then((resp) => {
       LOGGER("@query_claimed_reward", getethrep(resp));
@@ -76,16 +94,17 @@ const query_claimbale_amount = myaddress =>{
     });
   };
   //count mint ( kingkong )
-  const queryTotalMinted = ( myaddress ) => { //    let myaddress = getmyaddress();
+  const queryTotalMinted = (myaddress) => {
+    //    let myaddress = getmyaddress();
     if (myaddress) {
     } else {
       return;
     }
     console.log("asdasdasdsad", myaddress);
     query_with_arg({
-      contractaddress: addresses.contract_kip17_staking ,
-//      abikind: "STAK ING", // NFT
- abikind : 'KIP17Stake' , // 
+      contractaddress: addresses.contract_kip17_staking,
+      //      abikind: "STAK ING", // NFT
+      abikind: "KIP17Stake", //
       methodname: "balanceOf",
       aargs: [myaddress],
     }).then((res) => {
@@ -108,7 +127,7 @@ const query_claimbale_amount = myaddress =>{
     }
     const abistring = getabistr_forfunction({
       // contractaddress: contractEmployer,
-      abikind: 'KIP17Stake' , // STAKING",
+      abikind: "KIP17Stake", // STAKING",
       methodname: "claim",
       aargs: [],
     });
@@ -128,10 +147,12 @@ const query_claimbale_amount = myaddress =>{
       }
       let txhash;
       txhash = res;
-      awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
-        query_claimed_reward();
-        console.log("minedtxreceipt", minedtxreceipt);
-      });
+      awaitTransactionMined
+        .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+        .then(async (minedtxreceipt) => {
+          query_claimed_reward();
+          console.log("minedtxreceipt", minedtxreceipt);
+        });
       axios
         .post(API.API_TXS + `/${txhash}`, {
           txhash: res,
@@ -140,7 +161,7 @@ const query_claimbale_amount = myaddress =>{
           amount: totalClaimedReward,
           auxdata: {
             toAmount: totalClaimedReward,
-            rewardTokenContract: addresses.contract_reward_token , // contract_nip_token,
+            rewardTokenContract: addresses.contract_reward_token, // contract_nip_token,
             rewardTokenSymbol: "NIP",
             nettype: net,
           },
@@ -165,7 +186,11 @@ const query_claimbale_amount = myaddress =>{
                     <li key={index}>
                       <div className="topBar">
                         <img src={ticketImg} alt="" />
-                        <p>{cont.active && cont.active === 1 ? "ACTIVE" : "UNACTIVE"}</p>
+                        <p>
+                          {cont.active && cont.active === 1
+                            ? "ACTIVE"
+                            : "UNACTIVE"}
+                        </p>
                       </div>
 
                       <ul className="dataList">
@@ -175,11 +200,19 @@ const query_claimbale_amount = myaddress =>{
                         </li>
                         <li>
                           <p className="key">Start</p>
-                          <p className="value">{moment(cont.createdat).format("YYYY-MM-DD hh:mm:ss")}</p>
+                          <p className="value">
+                            {moment(cont.createdat).format(
+                              "YYYY-MM-DD hh:mm:ss"
+                            )}
+                          </p>
                         </li>
                         <li>
                           <p className="key">Ended</p>
-                          <p className="value">{moment(cont.createdat).add(90, "day").format("YYYY-MM-DD hh:mm:ss")}</p>
+                          <p className="value">
+                            {moment(cont.createdat)
+                              .add(90, "day")
+                              .format("YYYY-MM-DD hh:mm:ss")}
+                          </p>
                         </li>
                       </ul>
 
@@ -317,7 +350,11 @@ const query_claimbale_amount = myaddress =>{
                     <li key={index}>
                       <span>
                         <img src={ticketImg} alt="" />
-                        <p>{cont.active && cont.active === 1 ? "ACTIVE" : "UNACTIVE"}</p>
+                        <p>
+                          {cont.active && cont.active === 1
+                            ? "ACTIVE"
+                            : "UNACTIVE"}
+                        </p>
                       </span>
 
                       <span>
@@ -326,7 +363,11 @@ const query_claimbale_amount = myaddress =>{
 
                       <span>{cont.createdat.split(".", 1)}</span>
 
-                      <span>{moment(cont.createdat).add(90, "day").format("YYYY-MM-DDThh:mm:ss")}</span>
+                      <span>
+                        {moment(cont.createdat)
+                          .add(90, "day")
+                          .format("YYYY-MM-DDThh:mm:ss")}
+                      </span>
 
                       {/* <span>
                         <button className="unstakeBtn" onClick={() => {}}>

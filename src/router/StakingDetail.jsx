@@ -96,9 +96,9 @@ export default function StakingDetail() {
   };
 
   useEffect((_) => {
-    setTimeout((_) => {
-      query_stake_currency_balance();
-    }, []);
+    // setTimeout((_) => {
+    query_stake_currency_balance();
+    // }, []);
     // return //   alert(myaddress)
     // LOGGER('', myaddress)
     // if (myaddress) {

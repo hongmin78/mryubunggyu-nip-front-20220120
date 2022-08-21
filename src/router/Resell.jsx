@@ -350,11 +350,11 @@ export default function Resell() {
   };
 
   useEffect(() => {
-    setTimeout(() => {
-      queryApprovalForAll();
-      queryItemDetail();
-      getUserInfo();
-    }, 1200);
+    // setTimeout(() => {
+    queryApprovalForAll();
+    queryItemDetail();
+    getUserInfo();
+    // }, 1200);
   }, []);
 
   if (isMobile)

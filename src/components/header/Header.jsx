@@ -37,34 +37,36 @@ export default function Header() {
   const [walletStatus, setWalletStatus] = useState("");
 
   useEffect(() => {
-    setTimeout(() => {
-      // let myaddress = "0xb440393a03078b967000f09577e32c3252f15832";
-      let myaddress = getmyaddress();
-      if (myaddress) {
-      } else {
-        SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
-        return;
-      }
-      axios.get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`).then((resp) => {
+    // setTimeout(() => {
+    // let myaddress = "0xb440393a03078b967000f09577e32c3252f15832";
+    let myaddress = getmyaddress();
+    if (myaddress) {
+    } else {
+      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+      return;
+    }
+    axios
+      .get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`)
+      .then((resp) => {
         let { status, respdata } = resp.data;
         if (status == "OK" && respdata !== null) {
           setTickInfo(respdata);
           awaitWallet();
         }
       });
-    }, 1000);
+    // }, 1000);
   }, []);
 
   const awaitWallet = () => {
     // let myaddress = "0xb440393a03078b967000f09577e32c3252f15832";
-    setTimeout(() => {
-      let myaddress = getmyaddress();
-      if (myaddress) {
-        return;
-      } else {
-        setWalletStatus("Connect Wallet");
-      }
-    }, 1500);
+    // setTimeout(() => {
+    let myaddress = getmyaddress();
+    if (myaddress) {
+      return;
+    } else {
+      setWalletStatus("Connect Wallet");
+    }
+    // }, 1500);
     setWalletStatus("Connecting...");
   };
 
@@ -77,7 +79,9 @@ export default function Header() {
       return;
     }
     LOGGER("", myaddress);
-    let resp = await axios.get(API.API_USERINFO + `/${myaddress}?nettype=${net}`);
+    let resp = await axios.get(
+      API.API_USERINFO + `/${myaddress}?nettype=${net}`
+    );
     LOGGER("rBojncz0CD", resp.data);
     let { status, respdata } = resp.data;
     if (status == "OK") {
@@ -140,7 +144,11 @@ export default function Header() {
       <>
         <MheaderBox style={{ background: isStaking && "unset" }}>
           <button className="logoBox" onClick={() => navigate("/")}>
-            <img className="logoImg" src={isStaking ? I_headerLogoWhite : I_headerLogo} alt="" />
+            <img
+              className="logoImg"
+              src={isStaking ? I_headerLogoWhite : I_headerLogo}
+              alt=""
+            />
           </button>
 
           <button className="menuBtn" onClick={() => setMenuPopup(true)}>
@@ -148,7 +156,13 @@ export default function Header() {
           </button>
         </MheaderBox>
 
-        {menuPopup && <MmenuPopup off={setMenuPopup} mybalance={mybalance} ticketInfo={ticketInfo} />}
+        {menuPopup && (
+          <MmenuPopup
+            off={setMenuPopup}
+            mybalance={mybalance}
+            ticketInfo={ticketInfo}
+          />
+        )}
       </>
     );
   } else {
@@ -156,7 +170,11 @@ export default function Header() {
       <PheaderBox style={{ background: isStaking && "unset" }}>
         <section className="innerBox">
           <button className="logoBox" onClick={() => navigate("/")}>
-            <img className="logoImg" src={isStaking ? I_headerLogoWhite : I_headerLogo} alt="" />
+            <img
+              className="logoImg"
+              src={isStaking ? I_headerLogoWhite : I_headerLogo}
+              alt=""
+            />
           </button>
 
           <article className="rightBox">

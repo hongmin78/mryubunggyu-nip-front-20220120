@@ -88,15 +88,15 @@ function App() {
   };
 
   useEffect(() => {
-    setTimeout(() => {
-      let myaddress = getmyaddress();
-      if (myaddress) {
-      } else {
-        SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
-        return;
-      }
-      queryuseraddress(myaddress);
-    }, 1500);
+    // setTimeout(() => {
+    let myaddress = getmyaddress();
+    if (myaddress) {
+    } else {
+      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+      return;
+    }
+    queryuseraddress(myaddress);
+    // }, 1500);
   }, []);
 
   useEffect(() => {
@@ -139,14 +139,14 @@ function App() {
         LOGGER("@chainChanged", chainId);
       });
 
-      setTimeout(() => {
-        if (address) {
-        } else {
-          SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
-          return;
-        }
-        queryuseraddress(address);
-      }, 1500);
+      // setTimeout(() => {
+      if (address) {
+      } else {
+        SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+        return;
+      }
+      queryuseraddress(address);
+      // }, 1500);
     } else {
       SetErrorBar("Please Install MetaMask");
       if (isChrome) {

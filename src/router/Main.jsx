@@ -87,7 +87,7 @@ export default function Main() {
   }, []);
 
   useEffect(() => {
-    setTimeout(() => {
+    // setTimeout(() => {
       let address = getmyaddress();
       let myaddress = address;
       console.log("address", address);
@@ -128,7 +128,7 @@ export default function Main() {
           }
         })
         .catch((err) => console.log(err));
-    }, 1500);
+    // }, 1500);
   }, []);
 
   function shuffleArray(array) {

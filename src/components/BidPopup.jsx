@@ -166,9 +166,9 @@ export default function BidPopup({ off, itemdata }) {
         setmyethbalance((+getethrep(resp)).toFixed(DECIMALS_DISP_DEF));
       });
     };
-    setTimeout(() => {
+    // setTimeout(() => {
       fetchdata();
-    }, 1500);
+    // }, 1500);
   }, []);
 
   const onclick_approve = async (_) => {

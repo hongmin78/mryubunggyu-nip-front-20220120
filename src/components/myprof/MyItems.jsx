@@ -53,7 +53,7 @@ export default function MyItems() {
   const [isApprovedForAll, setIsApprovedForAll] = useState(false);
 
   const fetchdata = async (_) => {
-    setTimeout((_) => {
+    // setTimeout((_) => {
       let myaddress = getmyaddress();
       LOGGER("@myaddress", myaddress);
       axios
@@ -142,7 +142,7 @@ export default function MyItems() {
           return;
         }
       });
-    }, 1500);
+    // }, 1500);
   };
 
   const openModal = () => {
@@ -430,10 +430,10 @@ export default function MyItems() {
 
   useEffect(
     (_) => {
-      setTimeout(() => {
+      // setTimeout(() => {
         fetchdata();
         queryApproval();
-      }, 1500);
+      // }, 1500);
     },
     [isOpen, isApprovedForAll]
   );

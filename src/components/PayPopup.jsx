@@ -8,7 +8,12 @@ import { useSelector } from "react-redux";
 import PopupBg from "./PopupBg";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { getabistr_forfunction, query_with_arg, query_noarg, query_eth_balance } from "../util/contract-calls";
+import {
+  getabistr_forfunction,
+  query_with_arg,
+  query_noarg,
+  query_eth_balance,
+} from "../util/contract-calls";
 import { addresses } from "../configs/addresses";
 import { DECIMALS_DISP_DEF } from "../configs/configs"; // DueAmount,
 import { LOGGER, getmyaddress, getobjtype } from "../util/common";
@@ -18,7 +23,12 @@ import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
 import { API } from "../configs/api";
 import awaitTransactionMined from "await-transaction-mined";
-import { web3, BASE_CURRENCY, PAY_CURRENCY, NETTYPE } from "../configs/configweb3";
+import {
+  web3,
+  BASE_CURRENCY,
+  PAY_CURRENCY,
+  NETTYPE,
+} from "../configs/configweb3";
 import { TX_POLL_OPTIONS, MAX_GAS_LIMIT } from "../configs/configs";
 import I_spinner from "../img/icon/I_spinner.svg";
 import { strDot } from "../util/Util";
@@ -47,15 +57,21 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
   let [refererFeeRate, setRefererFeeRate] = useState("");
   useEffect((_) => {
     const spinner = spinnerHref.current; // document.querySelector("Spinner");
-    spinner.animate([{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], {
-      duration: 1000,
-      iterations: Infinity,
-    });
+    spinner.animate(
+      [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
+      {
+        duration: 1000,
+        iterations: Infinity,
+      }
+    );
     const spinner_approve = spinnerHref_approve.current; // document.querySelector("Spinner");
-    spinner_approve.animate([{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }], {
-      duration: 1000,
-      iterations: Infinity,
-    });
+    spinner_approve.animate(
+      [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
+      {
+        duration: 1000,
+        iterations: Infinity,
+      }
+    );
     axios
       .get(API.API_QUERY_STRING("SALE_REFERER_FEE_RATE") + `?nettype=${net}`)
       .then((res) => {
@@ -116,9 +132,9 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
         setmyethbalance((+getethrep(resp)).toFixed(DECIMALS_DISP_DEF));
       });
     };
-    setTimeout(() => {
-      fetchdata();
-    }, 1500);
+    // setTimeout(() => {
+    fetchdata();
+    // }, 1500);
   }, []);
   const onclick_approve = async (_) => {
     LOGGER("");
@@ -128,7 +144,10 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
       contractaddress: addresses.contract_USDT, // ETH_TESTNET.
       abikind: "ERC20",
       methodname: "approve",
-      aargs: [addresses.contract_pay_for_assigned_item, getweirep("" + 10 ** 18)], // .ETH_TESTNET
+      aargs: [
+        addresses.contract_pay_for_assigned_item,
+        getweirep("" + 10 ** 18),
+      ], // .ETH_TESTNET
     });
     LOGGER("", abistr);
     requesttransaction({
@@ -160,27 +179,29 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
           LOGGER("APPROVE RESP", resp);
           SetErrorBar(messages.MSG_TX_REQUEST_SENT);
         });
-      awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then((minedtxreceipt) => {
-        LOGGER("minedtxreceipt", minedtxreceipt);
-        SetErrorBar(messages.MSG_TX_FINALIZED);
-        setApprove(true);
-        query_with_arg({
-          contractaddress: addresses.contract_USDT, // .ETH_TESTNET
-          abikind: "ERC20",
-          methodname: "allowance",
-          aargs: [myaddress, addresses.contract_pay_for_assigned_item], // ETH_TESTNET.
-        }).then((resp) => {
-          let allowanceineth = getethrep(resp);
-          LOGGER("gCwXF6Jjkh", resp, allowanceineth);
-          setallowanceamount(allowanceineth); //				setallowanceamount ( 100 )
-          setisloader_00(false);
-          if (allowanceineth > 0) {
-            setisallowanceok(false);
+      awaitTransactionMined
+        .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+        .then((minedtxreceipt) => {
+          LOGGER("minedtxreceipt", minedtxreceipt);
+          SetErrorBar(messages.MSG_TX_FINALIZED);
+          setApprove(true);
+          query_with_arg({
+            contractaddress: addresses.contract_USDT, // .ETH_TESTNET
+            abikind: "ERC20",
+            methodname: "allowance",
+            aargs: [myaddress, addresses.contract_pay_for_assigned_item], // ETH_TESTNET.
+          }).then((resp) => {
+            let allowanceineth = getethrep(resp);
+            LOGGER("gCwXF6Jjkh", resp, allowanceineth);
+            setallowanceamount(allowanceineth); //				setallowanceamount ( 100 )
             setisloader_00(false);
-          } else {
-          }
+            if (allowanceineth > 0) {
+              setisallowanceok(false);
+              setisloader_00(false);
+            } else {
+            }
+          });
         });
-      });
     });
   };
 
@@ -264,13 +285,15 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
               SetErrorBar(messages.MSG_TX_REQUEST_SENT);
             });
           /***** */
-          awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
-            LOGGER("minedtxreceipt", minedtxreceipt);
-            SetErrorBar(messages.MSG_TX_FINALIZED);
-            setDone(false);
-            setisloader_01(false);
-            off();
-          });
+          awaitTransactionMined
+            .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+            .then(async (minedtxreceipt) => {
+              LOGGER("minedtxreceipt", minedtxreceipt);
+              SetErrorBar(messages.MSG_TX_FINALIZED);
+              setDone(false);
+              setisloader_01(false);
+              off();
+            });
         } catch (err) {
           SetErrorBar(messages.MSG_USER_DENIED_TX);
           setDone(false);
@@ -308,7 +331,10 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
                 <ul className="priceList">
                   <li className="price">{DueAmount} USDT</li>
                   <li className="exchange">
-                    ${+DueAmount && tickerusdt ? putCommaAtPrice(+DueAmount * +tickerusdt) : null}
+                    $
+                    {+DueAmount && tickerusdt
+                      ? putCommaAtPrice(+DueAmount * +tickerusdt)
+                      : null}
                   </li>
                 </ul>
               </div>
@@ -331,7 +357,13 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
                   <p className="key">Your USDT balance</p>
                   <p className="value">{mybalance} USDT</p>
                 </li>
-                <li style={allowanceamount && +allowanceamount ? { display: "block" } : {}}>
+                <li
+                  style={
+                    allowanceamount && +allowanceamount
+                      ? { display: "block" }
+                      : {}
+                  }
+                >
                   <p className="key">Allowance</p>
                   <p className="value">{allowanceamount} USDT</p>
                 </li>
@@ -409,7 +441,10 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
               <ul className="priceList">
                 <li className="price">{DueAmount} USDT</li>
                 <li className="exchange">
-                  ${+DueAmount && tickerusdt ? putCommaAtPrice(+DueAmount * +tickerusdt) : null}
+                  $
+                  {+DueAmount && tickerusdt
+                    ? putCommaAtPrice(+DueAmount * +tickerusdt)
+                    : null}
                 </li>
               </ul>
             </div>
