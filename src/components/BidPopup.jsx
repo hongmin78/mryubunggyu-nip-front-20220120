@@ -126,8 +126,8 @@ export default function BidPopup({ off, itemdata }) {
       if (itemdata?.type === "kingkong") {
         query_with_arg(options_arg["kingkong"]).then((resp) => {
           let allowanceineth = getethrep(resp);
+          console.log("_________allowance", allowanceineth);
 
-          LOGGER("8LYRxjNp8k_kingkong", resp, allowanceineth);
           setallowanceamount(allowanceineth);
           //				setallowanceamount ( 100 )
           if (allowanceineth > 0) {
@@ -221,6 +221,7 @@ export default function BidPopup({ off, itemdata }) {
             if (status) {
             } else {
               SetErrorBar(messages.MSG_TX_FAILED);
+              off();
               return;
             }
             SetErrorBar(messages.MSG_TX_FINALIZED);
@@ -284,6 +285,7 @@ export default function BidPopup({ off, itemdata }) {
             if (status) {
             } else {
               SetErrorBar(messages.MSG_TX_FAILED);
+              off();
               return;
             }
             SetErrorBar(messages.MSG_TX_FINALIZED);
@@ -381,7 +383,7 @@ export default function BidPopup({ off, itemdata }) {
             addresses.contract_USDT, // paymeansaddress
             getweirep("" + itemdata?.price), // amounttopay
             itemdata?.seller, // seller
-            userinfo?.refereraddress || userinfo.username, //
+            userinfo?.refereraddress,
             "12",
             "0",
           ],
@@ -427,7 +429,7 @@ export default function BidPopup({ off, itemdata }) {
             "0", // _decimals
             "0",
             // userinfo?.username,
-            userinfo?.refereraddress || userinfo.username, //
+            userinfo?.refereraddress,
             "1",
             getweirep("" + itemdata?.price),
             addresses.contract_USDT, // sellersaddress
@@ -466,6 +468,7 @@ export default function BidPopup({ off, itemdata }) {
               if (status) {
               } else {
                 SetErrorBar(messages.MSG_TX_FAILED);
+                off();
                 return;
               }
               SetErrorBar(messages.MSG_TX_FINALIZED);
@@ -550,6 +553,7 @@ export default function BidPopup({ off, itemdata }) {
               if (status) {
               } else {
                 SetErrorBar(messages.MSG_TX_FAILED);
+                off();
                 return;
               }
 
@@ -751,7 +755,7 @@ export default function BidPopup({ off, itemdata }) {
                 <p className="key">Your USDT balance</p>
                 <p className="value">{mybalance} USDT</p>
               </li>
-              <li style={allowanceamount ? { display: "block" } : {}}>
+              <li>
                 <p className="key">Allowance:</p>
                 <p className="value">{allowanceamount} USDT</p>
               </li>
@@ -769,7 +773,7 @@ export default function BidPopup({ off, itemdata }) {
               <span className="value"></span>
             </div>
 
-            {!allowanceamount && (
+            {!+allowanceamount && (
               <button
                 className="confirmBtn"
                 onClick={() => {
@@ -796,7 +800,7 @@ export default function BidPopup({ off, itemdata }) {
 
             <button
               className="confirmBtn"
-              disabled={allowanceamount && done === true}
+              disabled={+allowanceamount && done === true}
               onClick={() => {
                 onclick_buy();
               }}
@@ -1044,6 +1048,7 @@ const PstakingPopupBox = styled.section`
         li {
           display: flex;
           justify-content: space-between;
+          flex-wrap: nowrap;
         }
       }
     }

@@ -315,8 +315,6 @@ export default function Resell() {
         },
       };
 
-      // }
-
       if (type === "kingkong") {
         axios
           .post(API.API_POST_SALE, options_data["kingkong"])

@@ -92,7 +92,7 @@ export default function MyItems() {
         .then((res) => {
           let { list, status } = res.data;
           LOGGER("@ITEMBALANCES", res.data);
-          if (status === "OK" && list?.length > 0) {
+          if (status === "OK" && list && list.length > 0) {
             setItemBalData(list);
           }
           axios //
@@ -118,32 +118,30 @@ export default function MyItems() {
           //      } , 1500 )
         });
 
-      //true
-      true &&
-        query_with_arg({
-          contractaddress: addresses.contract_ticketnft, // ETH_TESTNET.
-          abikind: "TICKETNFT",
-          methodname: "_balance_user_itemhash",
-          aargs: [myaddress], // ETH_TESTNET.
-        }).then(async (resp) => {
-          LOGGER("tickeinfo", resp);
-          let myitemhash = resp;
-          let mytokenid;
-          try {
-            mytokenid = await query_with_arg({
-              contractaddress: addresses.contract_ticketnft,
-              abikind: "TICKETNFT",
-              methodname: "_itemhash_tokenid",
-              aargs: [myitemhash],
-            });
-            LOGGER("GEVKU97nIv", mytokenid);
-            setTokenId(mytokenid);
-          } catch (err) {
-            LOGGER(err);
-            mytokenid = null;
-            return;
-          }
-        });
+      query_with_arg({
+        contractaddress: addresses.contract_ticketnft, // ETH_TESTNET.
+        abikind: "TICKETNFT",
+        methodname: "_balance_user_itemhash",
+        aargs: [myaddress], // ETH_TESTNET.
+      }).then(async (resp) => {
+        LOGGER("tickeinfo", resp);
+        let myitemhash = resp;
+        let mytokenid;
+        try {
+          mytokenid = await query_with_arg({
+            contractaddress: addresses.contract_ticketnft,
+            abikind: "TICKETNFT",
+            methodname: "_itemhash_tokenid",
+            aargs: [myitemhash],
+          });
+          LOGGER("GEVKU97nIv", mytokenid);
+          setTokenId(mytokenid);
+        } catch (err) {
+          LOGGER(err);
+          mytokenid = null;
+          return;
+        }
+      });
     }, 1500);
   };
 
@@ -807,7 +805,7 @@ export default function MyItems() {
               <div className="infoBox">
                 <div className="titleBox">
                   <strong className="title">
-                    Need a buy <hr />
+                    Need to buy <hr />
                     "Lucky Ticket"
                   </strong>
                 </div>
@@ -1085,7 +1083,7 @@ export default function MyItems() {
             ))} */}
           {itemBalData.length !== 0 &&
             itemBalData.map((item, index) => {
-              if (item.itemdata?.isminted === 1 && item.group_ === "kingkong") {
+              if (item.group_ === "kingkong") {
                 return (
                   <li key={index} className="swapBox">
                     <div className="imgBoxBal">
