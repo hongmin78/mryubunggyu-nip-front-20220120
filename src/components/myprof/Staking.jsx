@@ -397,7 +397,7 @@ export default function Staking() {
                       <span>
                         <img src={cont.itemdata?.url} alt="" />
                         <p>
-                          {cont.status && cont.status === 1
+                          {cont.isstaked && cont.isstaked === 1
                             ? "ACTIVE"
                             : "UNACTIVE"}
                         </p>
@@ -416,7 +416,7 @@ export default function Staking() {
                       </span>
 
                       <span>
-                        {cont.status == 1 ? (
+                        {cont.isstaked == 1 ? (
                           <button className="unstakeBtn" onClick={() => {}}>
                             Unemploy
                           </button>

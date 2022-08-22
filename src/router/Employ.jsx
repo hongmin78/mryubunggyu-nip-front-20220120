@@ -444,7 +444,13 @@ export default function Employ() {
                   disabled={false}
                   onClick={() => make_employ_tx()}
                 >
-                  {spinner ? <div id="loading"></div> : "Employ"}
+                  {spinner ? (
+                    <div id="loading"></div>
+                  ) : itemDetail && itemDetail.itembalances?.isstaked == 1 ? (
+                    "Unemploy"
+                  ) : (
+                    "Employ"
+                  )}
                 </button>
               ) : (
                 <button className="actionBtn" onClick={() => approveForAll()}>
