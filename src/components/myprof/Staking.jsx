@@ -46,7 +46,8 @@ export default function Staking() {
   let [myaddress, setmyaddress] = useState();
   let [claimbaleamount, setclaimbaleamount] = useState();
   let [claimedamount, setclaimedamount] = useState();
-  const fatchData = () => {
+  let [kingkong_list, set_kingkong_list] = useState([]);
+  const fatchData = async () => {
     let myaddress = getmyaddress();
     axios
       .get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`)
@@ -56,6 +57,18 @@ export default function Staking() {
           setItckInfo([respdata]);
         }
       });
+    try {
+      let resp = await axios.get(
+        API.API_ITEMBALANCES + `/${myaddress}?nettype=${net}`
+      );
+      let { list, status } = resp.data;
+      console.log("__list", list);
+      if (status == "OK") {
+        set_kingkong_list(list);
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
   useEffect(() => {
     fatchData();
@@ -374,6 +387,45 @@ export default function Staking() {
                           Unstake
                         </button>
                       </span> */}
+                    </li>
+                  ))}
+              </ul>
+              <ul className="list">
+                {kingkong_list &&
+                  kingkong_list?.map((cont, index) => (
+                    <li key={index}>
+                      <span>
+                        <img src={cont.itemdata?.url} alt="" />
+                        <p>
+                          {cont.status && cont.status === 1
+                            ? "ACTIVE"
+                            : "UNACTIVE"}
+                        </p>
+                      </span>
+
+                      <span>
+                        <p>{cont.itemdata?.price}&nbsp;USDT</p>
+                      </span>
+
+                      <span>{cont.createdat.split(".", 1)}</span>
+
+                      <span>
+                        {moment(cont.createdat)
+                          .add(90, "day")
+                          .format("YYYY-MM-DDThh:mm:ss")}
+                      </span>
+
+                      <span>
+                        {cont.status == 1 ? (
+                          <button className="unstakeBtn" onClick={() => {}}>
+                            Unemploy
+                          </button>
+                        ) : (
+                          <button className="unstakeBtn" onClick={() => {}}>
+                            Employ
+                          </button>
+                        )}
+                      </span>
                     </li>
                   ))}
               </ul>

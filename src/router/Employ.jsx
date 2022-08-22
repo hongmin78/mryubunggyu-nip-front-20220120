@@ -158,7 +158,6 @@ export default function Employ() {
           return;
         }
         let txhash = resp;
-
         awaitTransactionMined
           .awaitTx(web3, txhash, TX_POLL_OPTIONS)
           .then(async (minedtxreceipt) => {
@@ -213,12 +212,24 @@ export default function Employ() {
       data: abistr,
     }).then((resp) => {
       LOGGER("@txresp", resp);
-      axios.post(API.API_TXS + `/${resp}?nettype=${nettype}`, {
-        typestr: "EMPLOY_KINGKONG",
-        username: myaddress,
-        itemid,
-        contractaddress: addresses.contract_kip17_staking,
-      }); //
+      let txhash = resp;
+      awaitTransactionMined
+        .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+        .then(async (minedtxreceipt) => {
+          LOGGER("minedtxreceipt", minedtxreceipt);
+          let { status } = minedtxreceipt;
+          if (status) {
+          } else {
+            SetErrorBar(messages.MSG_TX_FAILED);
+            return;
+          }
+          axios.post(API.API_TXS + `/${resp}?nettype=${nettype}`, {
+            typestr: "EMPLOY_KINGKONG",
+            username: myaddress,
+            itemid,
+            contractaddress: addresses.contract_kip17_staking,
+          }); //
+        });
     });
   };
 
