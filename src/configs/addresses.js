@@ -28,7 +28,7 @@ const jaddresses = {
     // contract_kip17_salse: "0x333406b681B9A6Dd4Fb8bF185C1261fb0DADAB98", // 2022.07.13 release
     contract_kip17_salse: "0x5851074f6e6B855DC486B4B3Fd6919E6CE094F7C", // 2022.08.20 __latest release
     // contract_kip17_staking: "0x4694c05a9bd6325fd06f049074631e5813a5ddce",
-    contract_kip17_staking: "0xD907dE7855F7D21c0342CC93172a094c0BF2B163", // 2022.08.22 __latest release
+    contract_kip17_staking: "0xbeC33551d30e488E23Ad858eBC4a5EB50e144C27", // 2022.08.22 __latest release
 
     //kingkong staking
     contract_nip_token: "0xa934775D7863833f51BFcA6ce5dFfa97aAB83cb8",
