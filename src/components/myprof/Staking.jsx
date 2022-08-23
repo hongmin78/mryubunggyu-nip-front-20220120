@@ -110,26 +110,27 @@ export default function Staking() {
   };
 
   const make_employ_tx = async (itemDetail, status) => {
-    //    let respsign = await onClickSignRequest();
+    let myaddress = getmyaddress();
     console.log("res", itemDetail); //    let msg;
     setSpinner(true);
     let { itemid, itemdata } = itemDetail;
     let options_arg = {
-      0: {
+      withdraw: {
         contractaddress: addresses.contract_kip17_staking, // ETH_TESTNET.
         abikind: "KIP17Stake",
-        methodname: "withdraw",
-        aargs: [addresses.contract_kip17, itemdata?.tokenid, 250], // .ETH_TESTNET
+        methodname: status,
+        aargs: [addresses.contract_kip17, itemdata?.tokenid, myaddress], // .ETH_TESTNET
       },
-      1: {
+      mint_deposit: {
         contractaddress: addresses.contract_kip17_staking, // ETH_TESTNET.
         abikind: "KIP17Stake",
-        methodname: "mint_deposit",
+        methodname: status,
         aargs: [addresses.contract_kip17, itemid, 250], // .ETH_TESTNET
       },
     };
+    console.log("__________asdfasdfaqwef", options_arg[status]);
 
-    let abistr = getabistr_forfunction(options_arg[status]);
+    let abistr = await getabistr_forfunction(options_arg[status]);
     requesttransaction({
       from: myaddress,
       to: addresses.contract_kip17_staking, // ETH_TESTNET.
@@ -470,14 +471,14 @@ export default function Staking() {
                         {cont.isstaked == 1 ? (
                           <button
                             className="unstakeBtn"
-                            onClick={() => make_employ_tx(cont, 0)}
+                            onClick={() => make_employ_tx(cont, "withdraw")}
                           >
                             Unemploy
                           </button>
                         ) : (
                           <button
                             className="unstakeBtn"
-                            onClick={() => make_employ_tx(cont, 1)}
+                            onClick={() => make_employ_tx(cont, "mint_deposit")}
                           >
                             Employ
                           </button>
