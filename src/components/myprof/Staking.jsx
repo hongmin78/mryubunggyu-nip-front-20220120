@@ -34,6 +34,8 @@ import {
   TX_POLL_OPTIONS,
 } from "../../configs/configs";
 import { web3 } from "../../configs/configweb3";
+import { messages } from "../../configs/messages";
+import { nettype } from "../../configs/configweb3-ropsten";
 
 export default function Staking() {
   const isMobile = useSelector((state) => state.common.isMobile);
@@ -104,6 +106,55 @@ export default function Staking() {
     }).then((resp) => {
       LOGGER("@query_claimed_reward", getethrep(resp));
       setTotalClaimedReward((+getethrep(resp)).toFixed(2));
+    });
+  };
+
+  const make_employ_tx = async (itemDetail, status) => {
+    //    let respsign = await onClickSignRequest();
+    console.log("res", itemDetail); //    let msg;
+    setSpinner(true);
+    let { itemid, itemdata } = itemDetail;
+    let options_arg = {
+      0: {
+        contractaddress: addresses.contract_kip17_staking, // ETH_TESTNET.
+        abikind: "KIP17Stake",
+        methodname: "withdraw",
+        aargs: [addresses.contract_kip17, itemdata?.tokenid, 250], // .ETH_TESTNET
+      },
+      1: {
+        contractaddress: addresses.contract_kip17_staking, // ETH_TESTNET.
+        abikind: "KIP17Stake",
+        methodname: "mint_deposit",
+        aargs: [addresses.contract_kip17, itemid, 250], // .ETH_TESTNET
+      },
+    };
+
+    let abistr = getabistr_forfunction(options_arg[status]);
+    requesttransaction({
+      from: myaddress,
+      to: addresses.contract_kip17_staking, // ETH_TESTNET.
+      data: abistr,
+    }).then((resp) => {
+      LOGGER("@txresp", resp);
+      let txhash = resp;
+      awaitTransactionMined
+        .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+        .then(async (minedtxreceipt) => {
+          LOGGER("minedtxreceipt", minedtxreceipt);
+          let { status } = minedtxreceipt;
+          if (status) {
+          } else {
+            SetErrorBar(messages.MSG_TX_FAILED);
+            return;
+          }
+          setSpinner(false);
+          axios.post(API.API_TXS + `/${resp}?nettype=${nettype}`, {
+            typestr: `${!status && "UN"}EMPLOY_KINGKONG`,
+            username: myaddress,
+            itemid,
+            contractaddress: addresses.contract_kip17_staking,
+          }); //
+        });
     });
   };
   //count mint ( kingkong )
@@ -417,11 +468,17 @@ export default function Staking() {
 
                       <span>
                         {cont.isstaked == 1 ? (
-                          <button className="unstakeBtn" onClick={() => {}}>
+                          <button
+                            className="unstakeBtn"
+                            onClick={() => make_employ_tx(cont, 0)}
+                          >
                             Unemploy
                           </button>
                         ) : (
-                          <button className="unstakeBtn" onClick={() => {}}>
+                          <button
+                            className="unstakeBtn"
+                            onClick={() => make_employ_tx(cont, 1)}
+                          >
                             Employ
                           </button>
                         )}

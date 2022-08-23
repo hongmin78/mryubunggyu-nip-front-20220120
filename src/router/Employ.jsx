@@ -223,6 +223,7 @@ export default function Employ() {
             SetErrorBar(messages.MSG_TX_FAILED);
             return;
           }
+          setSpinner(false);
           axios.post(API.API_TXS + `/${resp}?nettype=${nettype}`, {
             typestr: "EMPLOY_KINGKONG",
             username: myaddress,
