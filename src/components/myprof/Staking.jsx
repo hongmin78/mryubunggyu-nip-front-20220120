@@ -76,31 +76,29 @@ export default function Staking() {
     fatchData();
   }, []);
   useEffect((_) => {
-    // setTimeout (_=>{
     let myaddress = getmyaddress();
-    false && query_claimbale_amount(myaddress);
+    // query_claimable_amount(myaddress);
+    query_claimed_reward();
     queryTotalMinted(myaddress);
-    // } , 1500 )
   }, []);
   console.log("logsataasdasd", ticketInfo); //claim_nipcoin_reward
 
-  const query_claimbale_amount = (myaddress) => {
-    query_with_arg({
-      contractaddress: addresses.contract_kip17_staking,
-      //    , abikind : 'STA KING' // KIP17Stake
-      abikind: "KIP17Stake", //
-      methodname: "query_claimbale_amount",
-      aargs: [myaddress],
-    })
-      .then((resp) => {
-        LOGGER(`@query_claimbale_amount`, resp);
-      })
-      .catch(LOGGER);
-  };
+  // const query_claimable_amount = (myaddress) => {
+  //   query_with_arg({
+  //     contractaddress: addresses.contract_kip17_staking,
+  //     abikind: "KIP17Stake", //
+  //     methodname: "query_claimable_amount",
+  //     aargs: [myaddress],
+  //   })
+  //     .then((resp) => {
+  //       LOGGER(`@query_claimable_amount`, resp);
+  //       setclaimbaleamount((+getethrep(resp)).toFixed(4));
+  //     })
+  //     .catch(LOGGER);
+  // };
   const query_claimed_reward = (_) => {
     query_noarg({
-      contractaddress: addresses.STAKE,
-      abikind: "claimed", // "STA KING",
+      contractaddress: addresses.contract_kip17_staking,
       abikind: "KIP17Stake", //
       methodname: "query_claimed_reward",
     }).then((resp) => {
@@ -191,7 +189,7 @@ export default function Staking() {
       return;
     }
     const abistring = getabistr_forfunction({
-      // contractaddress: contractEmployer,
+      contractaddress: addresses.contract_kip17_staking,
       abikind: "KIP17Stake", // STAKING",
       methodname: "claim",
       aargs: [],
@@ -199,7 +197,7 @@ export default function Staking() {
     setSpinner(true);
     requesttransaction({
       from: myaddress,
-      // to: contractEmployer,
+      to: addresses.contract_kip17_staking,
       data: abistring,
       value: "0x00",
     }).then((res) => {
@@ -222,7 +220,7 @@ export default function Staking() {
         .post(API.API_TXS + `/${txhash}`, {
           txhash: res,
           username: myaddress,
-          typestr: "KINGKONG_CLAIM",
+          typestr: "CLAIM_KINGKONG_WAGE",
           amount: totalClaimedReward,
           auxdata: {
             toAmount: totalClaimedReward,
@@ -349,10 +347,10 @@ export default function Staking() {
                     <p>10 NFT</p>
                   </span>
                   <span>
-                    <p>0.00 Nips</p>
+                    <p>{totalClaimedReward} Nips</p>
                   </span>
                   <span>5%</span>
-                  <button className="claimBtn" onClick={() => {}}>
+                  <button className="claimBtn" onClick={() => onclickclaim()}>
                     Claim
                   </button>
                 </li>
