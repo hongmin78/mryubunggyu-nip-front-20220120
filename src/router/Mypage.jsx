@@ -29,7 +29,8 @@ export default function Mypage() {
   const navigate = useNavigate();
   const isLogin = useSelector((state) => state.common.isLogin);
   const isMobile = useSelector((state) => state.common.isMobile);
-  const [category, setCategory] = useState(0);
+  let _category = localStorage.getItem("category");
+  const [category, setCategory] = useState(_category ? +_category : 0);
   const [showEditBtn, setShowEditBtn] = useState(false);
   const [showCopyBtn, setShowCopyBtn] = useState(false);
   const [userinfo, setuserinfo] = useState();
@@ -113,7 +114,13 @@ export default function Mypage() {
           <article className="categoryCont">
             <ul className="categoryBar">
               {categoryList.map((cont, index) => (
-                <li key={index} onClick={() => setCategory(index)}>
+                <li
+                  key={index}
+                  onClick={() => {
+                    setCategory(index);
+                    localStorage.setItem("category", index);
+                  }}
+                >
                   <p>{cont}</p>
 
                   <div
@@ -194,7 +201,13 @@ export default function Mypage() {
           <article className="categoryCont">
             <ul className="categoryBar">
               {categoryList.map((cont, index) => (
-                <li key={index} onClick={() => setCategory(index)}>
+                <li
+                  key={index}
+                  onClick={() => {
+                    setCategory(index);
+                    localStorage.setItem("category", index);
+                  }}
+                >
                   <p>{cont}</p>
 
                   <div

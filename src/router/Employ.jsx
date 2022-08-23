@@ -195,17 +195,28 @@ export default function Employ() {
     setSign(sign);
     return sign;
   };
-  const make_employ_tx = async () => {
-    //    let respsign = await onClickSignRequest();
+  const make_employ_tx = async (_status) => {
+    let myaddress = getmyaddress();
     console.log("res", itemDetail); //    let msg;
     setSpinner(true);
-    let { itemid } = itemDetail;
-    let abistr = getabistr_forfunction({
-      contractaddress: addresses.contract_kip17_staking, // ETH_TESTNET.
-      abikind: "KIP17Stake",
-      methodname: "mint_deposit",
-      aargs: [addresses.contract_kip17, itemid, 250], // .ETH_TESTNET
-    });
+    let { itemid, tokenid } = itemDetail;
+    let options_arg = {
+      withdraw: {
+        contractaddress: addresses.contract_kip17_staking, // ETH_TESTNET.
+        abikind: "KIP17Stake",
+        methodname: _status,
+        aargs: [addresses.contract_kip17, tokenid, myaddress], // .ETH_TESTNET
+      },
+      mint_deposit: {
+        contractaddress: addresses.contract_kip17_staking, // ETH_TESTNET.
+        abikind: "KIP17Stake",
+        methodname: _status,
+        aargs: [addresses.contract_kip17, itemid, 250], // .ETH_TESTNET
+      },
+    };
+    console.log("__________asdfasdfaqwef", options_arg[_status]);
+
+    let abistr = await getabistr_forfunction(options_arg[_status]);
     requesttransaction({
       from: myaddress,
       to: addresses.contract_kip17_staking, // ETH_TESTNET.
@@ -223,13 +234,21 @@ export default function Employ() {
             SetErrorBar(messages.MSG_TX_FAILED);
             return;
           }
+          SetErrorBar(messages.MSG_TX_FINALIZED);
           setSpinner(false);
-          axios.post(API.API_TXS + `/${resp}?nettype=${nettype}`, {
-            typestr: "EMPLOY_KINGKONG",
-            username: myaddress,
-            itemid,
-            contractaddress: addresses.contract_kip17_staking,
-          }); //
+          axios
+            .post(API.API_TXS + `/${resp}?nettype=${nettype}`, {
+              typestr: `${_status == "withdraw" ? "UN" : ""}EMPLOY_KINGKONG`,
+              username: myaddress,
+              itemid,
+              contractaddress: addresses.contract_kip17_staking,
+            })
+            .then(async (_) => {
+              window.location.reload();
+            })
+            .catch((err) => {
+              console.log(err);
+            }); //
         });
     });
   };
@@ -440,19 +459,23 @@ export default function Employ() {
                 </button> */}
               </div>
               {isApprovedForAll ? (
-                <button
-                  className="actionBtn"
-                  disabled={false}
-                  onClick={() => make_employ_tx()}
-                >
-                  {spinner ? (
-                    <div id="loading"></div>
-                  ) : itemDetail && itemDetail.itembalances?.isstaked == 1 ? (
-                    "Unemploy"
-                  ) : (
-                    "Employ"
-                  )}
-                </button>
+                itemDetail && itemDetail.itembalances?.isstaked == 1 ? (
+                  <button
+                    className="actionBtn"
+                    disabled={false}
+                    onClick={() => make_employ_tx("withdraw")}
+                  >
+                    {spinner ? <div id="loading"></div> : "Unemploy"}
+                  </button>
+                ) : (
+                  <button
+                    className="actionBtn"
+                    disabled={false}
+                    onClick={() => make_employ_tx("mint_deposit")}
+                  >
+                    {spinner ? <div id="loading"></div> : "Employ"}
+                  </button>
+                )
               ) : (
                 <button className="actionBtn" onClick={() => approveForAll()}>
                   {spinner ? <div id="loading"></div> : "Approve for all"}

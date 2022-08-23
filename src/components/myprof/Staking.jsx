@@ -49,8 +49,10 @@ export default function Staking() {
   let [claimbaleamount, setclaimbaleamount] = useState();
   let [claimedamount, setclaimedamount] = useState();
   let [kingkong_list, set_kingkong_list] = useState([]);
+  let [staked_count, set_staked_count] = useState(0);
   const fatchData = async () => {
     let myaddress = getmyaddress();
+    query_claimable_amount(myaddress);
     axios
       .get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`)
       .then((resp) => {
@@ -66,6 +68,8 @@ export default function Staking() {
       let { list, status } = resp.data;
       console.log("__list", list);
       if (status == "OK") {
+        let stakedcount = list.filter((el) => el.isstaked == 1);
+        set_staked_count(stakedcount.length);
         set_kingkong_list(list);
       }
     } catch (err) {
@@ -83,19 +87,19 @@ export default function Staking() {
   }, []);
   console.log("logsataasdasd", ticketInfo); //claim_nipcoin_reward
 
-  // const query_claimable_amount = (myaddress) => {
-  //   query_with_arg({
-  //     contractaddress: addresses.contract_kip17_staking,
-  //     abikind: "KIP17Stake", //
-  //     methodname: "query_claimable_amount",
-  //     aargs: [myaddress],
-  //   })
-  //     .then((resp) => {
-  //       LOGGER(`@query_claimable_amount`, resp);
-  //       setclaimbaleamount((+getethrep(resp)).toFixed(4));
-  //     })
-  //     .catch(LOGGER);
-  // };
+  const query_claimable_amount = (myaddress) => {
+    query_with_arg({
+      contractaddress: addresses.contract_kip17_staking,
+      abikind: "KIP17Stake", //
+      methodname: "query_claimable_amount",
+      aargs: [myaddress],
+    })
+      .then((resp) => {
+        LOGGER(`@query_claimable_amount`, resp);
+        setclaimbaleamount((+getethrep(resp)).toFixed(4));
+      })
+      .catch(LOGGER);
+  };
   const query_claimed_reward = (_) => {
     query_noarg({
       contractaddress: addresses.contract_kip17_staking,
@@ -103,7 +107,7 @@ export default function Staking() {
       methodname: "query_claimed_reward",
     }).then((resp) => {
       LOGGER("@query_claimed_reward", getethrep(resp));
-      setTotalClaimedReward((+getethrep(resp)).toFixed(2));
+      setTotalClaimedReward((+getethrep(resp)).toFixed(4));
     });
   };
 
@@ -154,8 +158,8 @@ export default function Staking() {
               itemid,
               contractaddress: addresses.contract_kip17_staking,
             })
-            .then((_) => {
-              fatchData();
+            .then(async (_) => {
+              window.location.reload();
             })
             .catch((err) => {
               console.log(err);
@@ -190,11 +194,11 @@ export default function Staking() {
     } else {
       return;
     }
-    if (+totalClaimedReward > 0) {
-    } else {
-      SetErrorBar("You dont have any Reward");
-      return;
-    }
+    // if (+totalClaimedReward > 0) {
+    // } else {
+    //   SetErrorBar("You dont have any Reward");
+    //   return;
+    // }
     const abistring = getabistr_forfunction({
       contractaddress: addresses.contract_kip17_staking,
       abikind: "KIP17Stake", // STAKING",
@@ -351,12 +355,12 @@ export default function Staking() {
               <ul className="list">
                 <li>
                   <span style={{ marginLeft: 40 }}>
-                    <p>10 NFT</p>
+                    <p>{staked_count} NFT</p>
                   </span>
                   <span>
                     <p>{totalClaimedReward} Nips</p>
                   </span>
-                  <span>5%</span>
+                  <span>{claimbaleamount}</span>
                   <button className="claimBtn" onClick={() => onclickclaim()}>
                     Claim
                   </button>
