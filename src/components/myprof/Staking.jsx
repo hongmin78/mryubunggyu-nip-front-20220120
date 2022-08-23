@@ -107,7 +107,7 @@ export default function Staking() {
     });
   };
 
-  const make_employ_tx = async (itemDetail, status) => {
+  const make_employ_tx = async (itemDetail, _status) => {
     let myaddress = getmyaddress();
     console.log("res", itemDetail); //    let msg;
     setSpinner(true);
@@ -116,19 +116,19 @@ export default function Staking() {
       withdraw: {
         contractaddress: addresses.contract_kip17_staking, // ETH_TESTNET.
         abikind: "KIP17Stake",
-        methodname: status,
+        methodname: _status,
         aargs: [addresses.contract_kip17, itemdata?.tokenid, myaddress], // .ETH_TESTNET
       },
       mint_deposit: {
         contractaddress: addresses.contract_kip17_staking, // ETH_TESTNET.
         abikind: "KIP17Stake",
-        methodname: status,
+        methodname: _status,
         aargs: [addresses.contract_kip17, itemid, 250], // .ETH_TESTNET
       },
     };
-    console.log("__________asdfasdfaqwef", options_arg[status]);
+    console.log("__________asdfasdfaqwef", options_arg[_status]);
 
-    let abistr = await getabistr_forfunction(options_arg[status]);
+    let abistr = await getabistr_forfunction(options_arg[_status]);
     requesttransaction({
       from: myaddress,
       to: addresses.contract_kip17_staking, // ETH_TESTNET.
@@ -146,13 +146,20 @@ export default function Staking() {
             SetErrorBar(messages.MSG_TX_FAILED);
             return;
           }
-          setSpinner(false);
-          axios.post(API.API_TXS + `/${resp}?nettype=${nettype}`, {
-            typestr: `${!status && "UN"}EMPLOY_KINGKONG`,
-            username: myaddress,
-            itemid,
-            contractaddress: addresses.contract_kip17_staking,
-          }); //
+          SetErrorBar(messages.MSG_TX_FINALIZED);
+          axios
+            .post(API.API_TXS + `/${resp}?nettype=${nettype}`, {
+              typestr: `${_status == "withdraw" ? "UN" : ""}EMPLOY_KINGKONG`,
+              username: myaddress,
+              itemid,
+              contractaddress: addresses.contract_kip17_staking,
+            })
+            .then((_) => {
+              fatchData();
+            })
+            .catch((err) => {
+              console.log(err);
+            }); //
         });
     });
   };

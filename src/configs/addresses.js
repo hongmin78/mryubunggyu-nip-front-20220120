@@ -24,10 +24,12 @@ const jaddresses = {
     // contract_kip17 : '0x33529fd45b1093b412cd33a60fed7dcbac4da176' ,
     // contract_kip17_sales : '0xae5698f140df507f88883380ef351f65453b85e8' ,
     // contract_kip17: "0x5263fBda9D02A427FD2Da6E7665671596d802D20", // 2022.07.25 mint
-    contract_kip17: "0xDf348CbE9950A10AfB1330EBA2dE10348820455E", // 2022.08.20 __latest release
+    // contract_kip17: "0xDf348CbE9950A10AfB1330EBA2dE10348820455E", // 2022.08.20
+    contract_kip17: "0xd6B336673C3Fb8cA2a1f07DC80AAe41D6c280A2F", // 2022.08.23 __latest release
     // contract_kip17_salse: "0x333406b681B9A6Dd4Fb8bF185C1261fb0DADAB98", // 2022.07.13 release
     contract_kip17_salse: "0x5851074f6e6B855DC486B4B3Fd6919E6CE094F7C", // 2022.08.20 __latest release
-    contract_kip17_staking: "0x4694c05a9bd6325fd06f049074631e5813a5ddce",
+    // contract_kip17_staking: "0x4694c05a9bd6325fd06f049074631e5813a5ddce",
+    contract_kip17_staking: "0x359C2EE823d93A10F16F3D821f0C7DD8c33FdE9f", // 2022.08.23 __latest release
     // contract_kip17_staking: "0xbeC33551d30e488E23Ad858eBC4a5EB50e144C27", // 2022.08.22 __latest release
 
     //kingkong staking
