@@ -88,46 +88,46 @@ export default function Main() {
 
   useEffect(() => {
     // setTimeout(() => {
-      let address = getmyaddress();
-      let myaddress = address;
-      console.log("address", address);
-      axios
-        .get(
-          `${API.API_DELINQUENCY}/${address}/0/10/id/DESC?nettype=${net}&itemdetail=1`
-        )
-        .then((res) => {
-          console.log("RES", res);
-          let { status } = res.data;
+    let address = getmyaddress();
+    let myaddress = address;
+    console.log("address", address);
+    axios
+      .get(
+        `${API.API_DELINQUENCY}/${address}/0/10/id/DESC?nettype=${net}&itemdetail=1`
+      )
+      .then((res) => {
+        console.log("RES", res);
+        let { status } = res.data;
 
-          if (status === "OK") {
-            let { list } = res.data;
-            if (list && list?.length > 0) {
-              // const amount = list.reduce((a, b) => a.amount + b.amount, 0);
-              let sum = 0;
-              list.forEach((item) => {
-                sum += +item.amount;
-              });
-              dispatch(setDelinquencyAmount(sum.toFixed(2)));
-              localStorage.setItem("seller", list[0].seller);
-              SetErrorBar("Please pay delinquency fee");
-              navigate("/penalty");
-            }
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          alert(err.message);
-        });
-      axios
-        .get(API.API_RECEIVABLES + `/${address}` + `?nettype=${net}`)
-        .then((res) => {
+        if (status === "OK") {
           let { list } = res.data;
-          LOGGER("receivables", list);
-          if (list?.length > 0) {
-            SetErrorBar("exists receivables");
+          if (list && list?.length > 0) {
+            // const amount = list.reduce((a, b) => a.amount + b.amount, 0);
+            let sum = 0;
+            list.forEach((item) => {
+              sum += +item.amount;
+            });
+            dispatch(setDelinquencyAmount(sum.toFixed(2)));
+            localStorage.setItem("seller", list[0].seller);
+            SetErrorBar("Please pay delinquency fee");
+            navigate("/penalty");
           }
-        })
-        .catch((err) => console.log(err));
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        alert(err.message);
+      });
+    axios
+      .get(API.API_RECEIVABLES + `/${address}` + `?nettype=${net}`)
+      .then((res) => {
+        let { list } = res.data;
+        LOGGER("receivables", list);
+        if (list?.length > 0) {
+          SetErrorBar("exists receivables");
+        }
+      })
+      .catch((err) => console.log(err));
     // }, 1500);
   }, []);
 
@@ -188,8 +188,12 @@ export default function Main() {
         LOGGER("itemBalance", resp.data);
         let { status, payload } = resp.data;
         if (status == "OK") {
-          setD_marketItemList(resp.data.list);
-          setpremiumitemlist(resp.data.list);
+          let { list } = resp.data;
+          let notstaked = list.filter((el) =>
+            el.item ? el.item.isstaked == 0 : el
+          );
+          setD_marketItemList(notstaked);
+          setpremiumitemlist(notstaked);
         }
       });
   }

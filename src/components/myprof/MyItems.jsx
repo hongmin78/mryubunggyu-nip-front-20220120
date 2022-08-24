@@ -54,94 +54,93 @@ export default function MyItems() {
 
   const fetchdata = async (_) => {
     // setTimeout((_) => {
-      let myaddress = getmyaddress();
-      LOGGER("@myaddress", myaddress);
-      axios
-        .get(API.API_USERINFO + `/${myaddress}?nettype=${net}`)
-        .then((resp) => {
-          if (resp.data && resp.data.respdata) {
-            let { respdata } = resp.data;
-            LOGGER("myticket", resp.data);
-            setuserinfo(respdata);
-          }
-        });
-      axios
-        .get(
-          API.API_GET_KING_KONG_ITEM +
-            `/${myaddress}/0/100/id/ASC?nettype=${net}`
-        )
-        .then((resp) => {
-          LOGGER("Buy my item", resp.data);
-          let { status, list, payload } = resp.data;
-          if (status == "OK") {
-            // setKingKongItem(list);
-          }
-        });
-
-      axios
-        .get(API.API_RECEIVABLES + `/${myaddress}?nettype=${net}`)
-        .then((res) => {
-          let { list } = res.data;
-          setItemData(list);
-          LOGGER("receivables", list);
-        })
-        .catch((err) => console.log(err));
-
-      axios
-        .get(API.API_ITEMBALANCES + `/${myaddress}?nettype=${net}`)
-        .then((res) => {
-          let { list, status } = res.data;
-          LOGGER("@ITEMBALANCES", res.data);
-          if (status === "OK" && list && list.length > 0) {
-            setItemBalData(list);
-          }
-          axios //
-            .get(API.API_GET_CIRCULATIONS_ITEM + `?nettype=${net}`)
-            .then((resp) => {
-              LOGGER("circulations", resp.data);
-              let { status, list } = resp.data;
-              if (status == "OK") {
-                setCirculations(resp.data.list);
-              }
-            });
-
-          //        let myaddress = getmyaddress();
-          axios
-            .get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`)
-            .then((resp) => {
-              let { status, respdata } = resp.data;
-              LOGGER(`@API_GET_TICK_INFO`, respdata);
-              if (status == "OK" && respdata !== null) {
-                setTickInfo(respdata);
-              }
-            });
-          //      } , 1500 )
-        });
-
-      query_with_arg({
-        contractaddress: addresses.contract_ticketnft, // ETH_TESTNET.
-        abikind: "TICKETNFT",
-        methodname: "_balance_user_itemhash",
-        aargs: [myaddress], // ETH_TESTNET.
-      }).then(async (resp) => {
-        LOGGER("tickeinfo", resp);
-        let myitemhash = resp;
-        let mytokenid;
-        try {
-          mytokenid = await query_with_arg({
-            contractaddress: addresses.contract_ticketnft,
-            abikind: "TICKETNFT",
-            methodname: "_itemhash_tokenid",
-            aargs: [myitemhash],
-          });
-          LOGGER("GEVKU97nIv", mytokenid);
-          setTokenId(mytokenid);
-        } catch (err) {
-          LOGGER(err);
-          mytokenid = null;
-          return;
+    let myaddress = getmyaddress();
+    LOGGER("@myaddress", myaddress);
+    axios
+      .get(API.API_USERINFO + `/${myaddress}?nettype=${net}`)
+      .then((resp) => {
+        if (resp.data && resp.data.respdata) {
+          let { respdata } = resp.data;
+          LOGGER("myticket", resp.data);
+          setuserinfo(respdata);
         }
       });
+    axios
+      .get(
+        API.API_GET_KING_KONG_ITEM + `/${myaddress}/0/100/id/ASC?nettype=${net}`
+      )
+      .then((resp) => {
+        LOGGER("Buy my item", resp.data);
+        let { status, list, payload } = resp.data;
+        if (status == "OK") {
+          // setKingKongItem(list);
+        }
+      });
+
+    axios
+      .get(API.API_RECEIVABLES + `/${myaddress}?nettype=${net}`)
+      .then((res) => {
+        let { list } = res.data;
+        setItemData(list);
+        LOGGER("receivables", list);
+      })
+      .catch((err) => console.log(err));
+
+    axios
+      .get(API.API_ITEMBALANCES + `/${myaddress}?nettype=${net}`)
+      .then((res) => {
+        let { list, status } = res.data;
+        LOGGER("@ITEMBALANCES", res.data);
+        if (status === "OK" && list && list.length > 0) {
+          setItemBalData(list.filter((el) => el.isstaked == 0));
+        }
+        axios //
+          .get(API.API_GET_CIRCULATIONS_ITEM + `?nettype=${net}`)
+          .then((resp) => {
+            LOGGER("circulations", resp.data);
+            let { status, list } = resp.data;
+            if (status == "OK") {
+              setCirculations(resp.data.list);
+            }
+          });
+
+        //        let myaddress = getmyaddress();
+        axios
+          .get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`)
+          .then((resp) => {
+            let { status, respdata } = resp.data;
+            LOGGER(`@API_GET_TICK_INFO`, respdata);
+            if (status == "OK" && respdata !== null) {
+              setTickInfo(respdata);
+            }
+          });
+        //      } , 1500 )
+      });
+
+    query_with_arg({
+      contractaddress: addresses.contract_ticketnft, // ETH_TESTNET.
+      abikind: "TICKETNFT",
+      methodname: "_balance_user_itemhash",
+      aargs: [myaddress], // ETH_TESTNET.
+    }).then(async (resp) => {
+      LOGGER("tickeinfo", resp);
+      let myitemhash = resp;
+      let mytokenid;
+      try {
+        mytokenid = await query_with_arg({
+          contractaddress: addresses.contract_ticketnft,
+          abikind: "TICKETNFT",
+          methodname: "_itemhash_tokenid",
+          aargs: [myitemhash],
+        });
+        LOGGER("GEVKU97nIv", mytokenid);
+        setTokenId(mytokenid);
+      } catch (err) {
+        LOGGER(err);
+        mytokenid = null;
+        return;
+      }
+    });
     // }, 1500);
   };
 
@@ -431,8 +430,8 @@ export default function MyItems() {
   useEffect(
     (_) => {
       // setTimeout(() => {
-        fetchdata();
-        queryApproval();
+      fetchdata();
+      queryApproval();
       // }, 1500);
     },
     [isOpen, isApprovedForAll]
