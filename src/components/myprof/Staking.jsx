@@ -140,6 +140,11 @@ export default function Staking() {
     }).then((resp) => {
       LOGGER("@txresp", resp);
       let txhash = resp;
+      if (resp) {
+      } else {
+        setSpinner(false);
+        return;
+      }
       awaitTransactionMined
         .awaitTx(web3, txhash, TX_POLL_OPTIONS)
         .then(async (minedtxreceipt) => {
@@ -263,7 +268,7 @@ export default function Staking() {
                         <p>
                           {cont.active && cont.active === 1
                             ? "ACTIVE"
-                            : "UNACTIVE"}
+                            : "INACTIVE"}
                         </p>
                       </div>
 
@@ -298,43 +303,6 @@ export default function Staking() {
               </ul>
             </div>
           </li>
-
-          {/* <li className="rewardBox">
-            <strong className="contTitle">Earned Rewards</strong>
-
-            <div className="listBox">
-              <ul className="list">
-                {ticketInfo &&
-                  ticketInfo.map((cont, index) => (
-                    <li key={index}>
-                      <div className="topBar">
-                        <img src={ticketImg} alt="" />
-                        <p>{cont.active && cont.active === 1 ? "ACTIVE" : "UNACTIVE"}</p>
-                      </div>
-
-                      <ul className="dataList">
-                        <li>
-                          <p className="key">Staking Amount</p>
-                          <p>{cont.amount}&nbsp;USDT</p>
-                        </li>
-                        <li>
-                          <p className="key">Start</p>
-                          <p className="value">{cont.cycle}</p>
-                        </li>
-                        <li>
-                          <p className="key">Ended</p>
-                          <span>{moment(cont.createdat).add(90, "day").format("YYYY-MM-DD hh:mm:ss")}</span>
-                        </li>
-                      </ul>
-
-                      <button className="unstakeBtn" onClick={() => {}}>
-                        Claim
-                      </button>
-                    </li>
-                  ))}
-              </ul>
-            </div>
-          </li> */}
         </ul>
       </MstakingBox>
     );
@@ -368,44 +336,6 @@ export default function Staking() {
               </ul>
             </div>
           </li>
-
-          {/* <li className="rewardBox">
-            <strong className="contTitle">Earned Rewards</strong>
-
-            <div className="listBox">
-              <ul className="listHeader">
-                {D_rewardHeader.map((cont, index) => (
-                  <li key={index}>{cont}</li>
-                ))}
-              </ul>
-
-              <ul className="list">
-                {D_rewardList.map((cont, index) => (
-                  <li key={index}>
-                    <span>
-                      <img src={cont.img} alt="" />
-                      <p>{cont.name}</p>
-                    </span>
-
-                    <span>
-                      <p>{cont.amount}&nbsp;USDT</p>
-                    </span>
-
-                    <span>{cont.apy}%</span>
-
-                    <span>{cont.cycle}</span>
-
-                    <span>
-                      <p>{cont.earned} NIP</p>
-                      <button className="claimBtn" onClick={() => {}}>
-                        Claim
-                      </button>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </li> */}
         </ul>
         <ul className="contList">
           <li className="vaultsBox">
@@ -427,7 +357,7 @@ export default function Staking() {
                         <p>
                           {cont.active && cont.active === 1
                             ? "ACTIVE"
-                            : "UNACTIVE"}
+                            : "INACTIVE"}
                         </p>
                       </span>
 
@@ -435,19 +365,15 @@ export default function Staking() {
                         <p>{cont.price}&nbsp;USDT</p>
                       </span>
 
-                      <span>{cont.createdat.split(".", 1)}</span>
+                      <span>
+                        {moment(cont.createdat).format("YYYY-MM-DD hh:mm:ss")}
+                      </span>
 
                       <span>
                         {moment(cont.createdat)
                           .add(90, "day")
-                          .format("YYYY-MM-DDThh:mm:ss")}
+                          .format("YYYY-MM-DD hh:mm:ss")}
                       </span>
-
-                      {/* <span>
-                        <button className="unstakeBtn" onClick={() => {}}>
-                          Unstake
-                        </button>
-                      </span> */}
                     </li>
                   ))}
               </ul>
@@ -460,7 +386,7 @@ export default function Staking() {
                         <p>
                           {cont.isstaked && cont.isstaked === 1
                             ? "ACTIVE"
-                            : "UNACTIVE"}
+                            : "INACTIVE"}
                         </p>
                       </span>
 
@@ -468,28 +394,33 @@ export default function Staking() {
                         <p>{cont.buyprice}&nbsp;USDT</p>
                       </span>
 
-                      <span>{cont.createdat.split(".", 1)}</span>
+                      <span>
+                        {moment(cont.createdat).format("YYYY-MM-DD hh:mm:ss")}
+                      </span>
 
                       <span>
-                        {moment(cont.createdat)
+                        {/* {moment(cont.createdat)
                           .add(90, "day")
-                          .format("YYYY-MM-DDThh:mm:ss")}
+                          .format("YYYY-MM-DD hh:mm:ss")} */}
+                        -
                       </span>
 
                       <span>
                         {cont.isstaked == 1 ? (
                           <button
                             className="unstakeBtn"
+                            disabled={spinner}
                             onClick={() => make_employ_tx(cont, "withdraw")}
                           >
-                            Unemploy
+                            {spinner ? <div id="loading"></div> : "Unemploy"}
                           </button>
                         ) : (
                           <button
                             className="unstakeBtn"
+                            disabled={spinner}
                             onClick={() => make_employ_tx(cont, "mint_deposit")}
                           >
-                            Employ
+                            {spinner ? <div id="loading"></div> : "Employ"}
                           </button>
                         )}
                       </span>
@@ -498,44 +429,6 @@ export default function Staking() {
               </ul>
             </div>
           </li>
-
-          {/* <li className="rewardBox">
-            <strong className="contTitle">Earned Rewards</strong>
-
-            <div className="listBox">
-              <ul className="listHeader">
-                {D_rewardHeader.map((cont, index) => (
-                  <li key={index}>{cont}</li>
-                ))}
-              </ul>
-
-              <ul className="list">
-                {D_rewardList.map((cont, index) => (
-                  <li key={index}>
-                    <span>
-                      <img src={cont.img} alt="" />
-                      <p>{cont.name}</p>
-                    </span>
-
-                    <span>
-                      <p>{cont.amount}&nbsp;USDT</p>
-                    </span>
-
-                    <span>{cont.apy}%</span>
-
-                    <span>{cont.cycle}</span>
-
-                    <span>
-                      <p>{cont.earned} NIP</p>
-                      <button className="claimBtn" onClick={() => {}}>
-                        Claim
-                      </button>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </li> */}
         </ul>
       </PstakingBox>
     );
@@ -618,6 +511,29 @@ const MstakingBox = styled.section`
               color: #fff;
               border-radius: 3.33vw;
               background: #000;
+
+              #loading {
+                display: inline-block;
+                width: 38px;
+                height: 38px;
+                border: 3px solid rgba(255, 255, 255, 0.3);
+                border-radius: 50%;
+                border-top-color: #fff;
+                animation: spin 1s ease-in-out infinite;
+                -webkit-animation: spin 1s ease-in-out infinite;
+                z-index: 999;
+              }
+
+              @keyframes spin {
+                to {
+                  -webkit-transform: rotate(360deg);
+                }
+              }
+              @-webkit-keyframes spin {
+                to {
+                  -webkit-transform: rotate(360deg);
+                }
+              }
             }
           }
         }
@@ -719,6 +635,27 @@ const PstakingBox = styled.section`
                 border-radius: 12px;
                 color: #fff;
                 background: #000;
+                #loading {
+                  display: inline-block;
+                  width: 28px;
+                  height: 28px;
+                  border: 3px solid rgba(255, 255, 255, 0.3);
+                  border-radius: 50%;
+                  border-top-color: #fff;
+                  animation: spin 1s ease-in-out infinite;
+                  -webkit-animation: spin 1s ease-in-out infinite;
+                }
+
+                @keyframes spin {
+                  to {
+                    -webkit-transform: rotate(360deg);
+                  }
+                }
+                @-webkit-keyframes spin {
+                  to {
+                    -webkit-transform: rotate(360deg);
+                  }
+                }
               }
             }
           }
