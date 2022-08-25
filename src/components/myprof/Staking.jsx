@@ -465,7 +465,7 @@ export default function Staking() {
                       </span>
 
                       <span>
-                        <p>{cont.itemdata?.price}&nbsp;USDT</p>
+                        <p>{cont.buyprice}&nbsp;USDT</p>
                       </span>
 
                       <span>{cont.createdat.split(".", 1)}</span>

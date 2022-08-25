@@ -1126,10 +1126,7 @@ export default function MyItems() {
                             <p className="key">Current price</p>
                             <p className="value">
                               {" "}
-                              {parseInt(item && item.itemdata?.price).toFixed(
-                                2
-                              )}{" "}
-                              USDT
+                              {parseInt(item && item.buyprice).toFixed(2)} USDT
                             </p>
                           </li>
                           {item.group_ == "kingkong" && (
