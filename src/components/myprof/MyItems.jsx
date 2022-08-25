@@ -92,7 +92,7 @@ export default function MyItems() {
         let { list, status } = res.data;
         LOGGER("@ITEMBALANCES", res.data);
         if (status === "OK" && list && list.length > 0) {
-          setItemBalData(list.filter((el) => el.isstaked == 0));
+          setItemBalData(list);
         }
         axios //
           .get(API.API_GET_CIRCULATIONS_ITEM + `?nettype=${net}`)
@@ -974,112 +974,6 @@ export default function MyItems() {
               );
             })}
 
-          {/* {itemBalData?.length !== 0 &&
-            itemBalData?.map((item, index) => (
-              <li key={index} className="swapBox">
-                <div className="imgBoxBal">
-                  {item && item.itemdata?.url ? (
-                    <img
-                      className="itemImgBal"
-                      src={item.itemdata.url}
-                      alt=""
-                    />
-                  ) : (
-                    <img className="itemImgBal" src={E_staking} alt="" />
-                  )}
-
-                  <div className="topBarBal">
-                    <button className="likeBtnBal" onClick={() => {}}>
-                      <img src={I_heartO} alt="" />
-                      <p>22</p>
-                    </button>
-                  </div>
-                </div>
-                <div className="infoBox">
-                  <div className="titleBox">
-                    <strong className="title">
-                      {item && item.itemdata?.titlename}
-                    </strong>
-                  </div>
-
-                  <div className="ownedBox">
-                    <p className="key">Owned by</p>
-                    <p className="value">@{item && item.username}</p>
-                  </div>
-
-                  {item.group_ !== "kingkong" ? (
-                    <div className="ownedBox">
-                      <p className="key">Bought Date</p>
-                      <p className="value">
-                        {item && item.updatedat
-                          ? item.updatedat.split("T", 1)
-                          : item.createdat.split("T", 1)}
-                      </p>{" "}
-                      <p className="key">Sold Date</p>
-                      <p className="value">
-                        {item.updatedat
-                          ? moment(item && item.updatedat)
-                              .add(3, "days")
-                              .format("YYYY-MM-DD")
-                          : moment(item && item.createdat)
-                              .add(3, "days")
-                              .format("YYYY-MM-DD")}
-                      </p>
-                    </div>
-                  ) : null}
-
-                  <div className="saleBox">
-                    <div className="key"></div>
-                    <ul className="priceBox">
-                      <li key={index}>
-                        <p className="key">Current price</p>
-                        <p className="value">
-                          {" "}
-                          {parseInt(item && item.buyprice).toFixed(2)} USDT
-                        </p>
-                      </li>
-                      {item.group_ == "kingkong" && (
-                        <>
-                          <button
-                            className="actionBtn"
-                            onClick={() =>
-                              navigate(
-                                `/resell/${item?.username}/kingkong/${item.itemid}`,
-                                { state: item[index] }
-                              )
-                            }
-                          >
-                            Sell
-                          </button>
-                          <button
-                            className="actionBtn_two"
-                            onClick={() =>
-                              navigate(
-                                `/employ/${item?.username}/kingkong/${item.itemid}`,
-                                { state: item[index] }
-                              )
-                            }
-                          >
-                            Stake
-                          </button>
-                        </>
-                      )}
-                    </ul>
-                  </div>
-
-                  <p className="description">
-                    The NFT purchased by participating in the subscription
-                    auction generates 12% of profits after 3 days and is sold
-                    random. In addition, the results are announced at 9:00 AM,
-                    and the transaction is completed from 9:00 AM to 21:00 PM.
-                    If the transaction is not completed within time, all
-                    transactions in youasdfasdfasdfasdfsadfasdfr account will be
-                    suspended. It operates normally after applying a penalty of
-                    10% of the winning bid amount.
-                  </p>
-                </div>
-              </li>
-            ))} */}
           {itemBalData.length !== 0 &&
             itemBalData.map((item, index) => {
               if (item.group_ === "kingkong") {
@@ -1129,7 +1023,7 @@ export default function MyItems() {
                               {parseInt(item && item.buyprice).toFixed(2)} USDT
                             </p>
                           </li>
-                          {item.group_ == "kingkong" && (
+                          {item.group_ == "kingkong" && item.isstaked == 0 && (
                             <>
                               <button
                                 disabled={spinner}
@@ -1143,53 +1037,7 @@ export default function MyItems() {
                               >
                                 Sell
                               </button>
-                              {/* {isApprovedForAll &&
-                                item.itemdata?.isstaked === 0 && (
-                                  <button
-                                    disabled={spinner}
-                                    className="actionBtn_two"
-                                    onClick={() => {
-                                      stake_for_diposit(item);
-                                    }}
-                                  >
-                                    {spinner ? (
-                                      <div id="loading"></div>
-                                    ) : (
-                                      "Stake"
-                                    )}
-                                  </button>
-                                )}
-                              {isApprovedForAll &&
-                                item.itemdata?.isstaked === 1 && (
-                                  <button
-                                    disabled={spinner}
-                                    className="actionBtn_two"
-                                    onClick={() => {
-                                      stake_for_withdraw(item);
-                                    }}
-                                  >
-                                    {spinner ? (
-                                      <div id="loading"></div>
-                                    ) : (
-                                      "UnStake"
-                                    )}
-                                  </button>
-                                )}
-                              {!isApprovedForAll && (
-                                <button
-                                  disabled={spinner}
-                                  className="actionBtn_two"
-                                  onClick={() => {
-                                    on_click_approve(item);
-                                  }}
-                                >
-                                  {spinner ? (
-                                    <div id="loading"></div>
-                                  ) : (
-                                    "Approve for Stake"
-                                  )}
-                                </button>
-                              )} */}
+
                               <button
                                 className="actionBtn_two"
                                 onClick={() =>

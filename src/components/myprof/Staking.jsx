@@ -395,7 +395,9 @@ export default function Staking() {
                       </span>
 
                       <span>
-                        {moment(cont.createdat).format("YYYY-MM-DD hh:mm:ss")}
+                        {moment(
+                          cont.updatedat ? cont.updatedat : cont.createdat
+                        ).format("YYYY-MM-DD hh:mm:ss")}
                       </span>
 
                       <span>
