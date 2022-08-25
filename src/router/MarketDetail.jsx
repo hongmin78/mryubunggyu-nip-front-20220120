@@ -108,7 +108,9 @@ export default function MarketDetail() {
       } else {
         moreRef.current.scrollTo({
           left: isMobile
-            ? moreRef.current.scrollLeft + moreRef.current.children[moreIndex].getBoundingClientRect().left - 20
+            ? moreRef.current.scrollLeft +
+              moreRef.current.children[moreIndex].getBoundingClientRect().left -
+              20
             : contWidth * itemNumByPage * moreIndex + itemNumByPage * 40,
           behavior: "smooth",
         });
@@ -118,40 +120,52 @@ export default function MarketDetail() {
   const getitem = (_) => {
     let myaddress = getmyaddress();
     if (myaddress) {
-      axios.get(API.API_USERINFO + `/${myaddress}?nettype=${net}`).then((resp) => {
-        LOGGER("rBojncz0CD", resp.data);
-        let { status, respdata } = resp.data;
-        if (status == "OK") {
-          setisstaked(respdata.isstaked);
-        }
-      });
+      axios
+        .get(API.API_USERINFO + `/${myaddress}?nettype=${net}`)
+        .then((resp) => {
+          LOGGER("rBojncz0CD", resp.data);
+          let { status, respdata } = resp.data;
+          if (status == "OK") {
+            setisstaked(respdata.isstaked);
+          }
+        });
     }
   };
   const getotheritems = (_) => {
-    axios.get(API.API_ALL_ITEMS_MARKET + `/status/1/0/100/id/DESC?nettype=${net}`).then((resp) => {
-      LOGGER("", resp.data);
-      let { status, list } = resp.data;
-      if (status == "OK") {
-        setmarketPlaceList(list);
-      }
-    });
-    if (data?.type === "ticket") {
-      axios.get(API.API_GET_TRANSACTIONS_TICKET + `/${data?.tokenid}?nettype=${net}`).then((resp) => {
-        LOGGER("transction", resp.data);
-        let { status, respdata } = resp.data;
-        if (status === "OK") {
-          setTranSaction(resp.data.payload.rowdata.slice(-3));
+    axios
+      .get(API.API_ALL_ITEMS_MARKET + `/status/1/0/100/id/DESC?nettype=${net}`)
+      .then((resp) => {
+        LOGGER("", resp.data);
+        let { status, list } = resp.data;
+        if (status == "OK") {
+          setmarketPlaceList(list);
         }
       });
+    if (data?.type === "ticket") {
+      axios
+        .get(
+          API.API_GET_TRANSACTIONS_TICKET + `/${data?.tokenid}?nettype=${net}`
+        )
+        .then((resp) => {
+          LOGGER("transction", resp.data);
+          let { status, respdata } = resp.data;
+          if (status === "OK") {
+            setTranSaction(resp.data.payload.rowdata.slice(-3));
+          }
+        });
     }
     if (data?.type === "kingkong") {
-      axios.get(API.API_GET_TRANSACTIONS_KING_KONG + `/${data?.itemid}?nettype=${net}`).then((resp) => {
-        LOGGER("transction", resp.data);
-        let { status, respdata } = resp.data;
-        if (status === "OK") {
-          setTranSaction(resp.data.list.slice(-3));
-        }
-      });
+      axios
+        .get(
+          API.API_GET_TRANSACTIONS_KING_KONG + `/${data?.itemid}?nettype=${net}`
+        )
+        .then((resp) => {
+          // LOGGER("transction", resp.data);
+          // let { status, respdata } = resp.data;
+          // if (status === "OK") {
+          //   setTranSaction(resp.data.list.slice(-3));
+          // }
+        });
     }
   };
   useEffect(
@@ -187,14 +201,20 @@ export default function MarketDetail() {
                         <img src={toggleLike ? I_heartO : I_heart} alt="" />
                       </button>
 
-                      <button className="moreBtn hoverBtn" onClick={() => setShowCopyBtn(true)}>
+                      <button
+                        className="moreBtn hoverBtn"
+                        onClick={() => setShowCopyBtn(true)}
+                      >
                         <img src={I_3dot} alt="" />
                       </button>
                     </div>
 
                     {showCopyBtn && (
                       <>
-                        <button className="copyBtn displayBtn" onClick={() => setShowCopyBtn(false)}>
+                        <button
+                          className="copyBtn displayBtn"
+                          onClick={() => setShowCopyBtn(false)}
+                        >
                           <img src={I_clip} alt="" />
                           Copy Link
                         </button>
@@ -211,7 +231,12 @@ export default function MarketDetail() {
 
                 <div className="ownedBox">
                   <p className="key">Owned by</p>
-                  <p className="value">@{itemdata?.type === "ticket" ? `${itemdata?.seller}` : `${data?.seller}`}</p>
+                  <p className="value">
+                    @
+                    {itemdata?.type === "ticket"
+                      ? `${itemdata?.seller}`
+                      : `${data?.seller}`}
+                  </p>
                 </div>
 
                 <div className="saleBox">
@@ -219,7 +244,10 @@ export default function MarketDetail() {
                     <p className="key">Current price</p>
                     <strong className="value">
                       {/* {itemdata?.group_ == "kong" ? "100" : ITEM_PRICE_DEF} USDT */}
-                      {itemdata?.type === "ticket" ? `${itemdata?.price}` : `${data?.price}`} USDT
+                      {itemdata?.type === "ticket"
+                        ? `${itemdata?.price}`
+                        : `${data?.price}`}{" "}
+                      USDT
                     </strong>
                   </div>
                 </div>
@@ -242,7 +270,9 @@ export default function MarketDetail() {
                 </ul>
 
                 <div className="contBox">
-                  {category === 0 && <Offer transaction={transaction} data={data} />}
+                  {category === 0 && (
+                    <Offer transaction={transaction} data={data} />
+                  )}
                   {category === 1 && <Details />}
                   {category === 2 && <Properties />}
                 </div>
@@ -288,7 +318,11 @@ export default function MarketDetail() {
                 <ul className="itemList" ref={moreRef}>
                   {marketPlaceList.map((cont, index) => (
                     <Fragment key={index}>
-                      <MarketItem0227 data={cont} index={index} isstaked={isstaked} />
+                      <MarketItem0227
+                        data={cont}
+                        index={index}
+                        isstaked={isstaked}
+                      />
                     </Fragment>
                   ))}
                 </ul>
@@ -330,7 +364,9 @@ export default function MarketDetail() {
               <div className="itemInfoBox">
                 <div className="titleBox">
                   <strong className="title">
-                    {data?.type === "ticket" ? `##LUCKY TICKET ${data?.itemid}` : `King Kong #${data?.item.titlename}`}{" "}
+                    {data?.type === "ticket"
+                      ? `##LUCKY TICKET ${data?.itemid}`
+                      : `King Kong #${data?.item.titlename}`}{" "}
                   </strong>
                   <div className="btnBox">
                     <div className="posBox">
@@ -345,19 +381,28 @@ export default function MarketDetail() {
                     </div>
 
                     <div className="posBox">
-                      <button className="moreBtn hoverBtn" onClick={() => setShowCopyBtn(true)}>
+                      <button
+                        className="moreBtn hoverBtn"
+                        onClick={() => setShowCopyBtn(true)}
+                      >
                         <img src={I_3dot} alt="" />
                       </button>
 
                       <div className="hoverBox">
-                        <button className="copyBtn displayBtn" onClick={() => setShowCopyBtn(false)}>
+                        <button
+                          className="copyBtn displayBtn"
+                          onClick={() => setShowCopyBtn(false)}
+                        >
                           <img src={I_clip} alt="" />
                           Copy Link
                         </button>
                       </div>
                       {showCopyBtn && (
                         <>
-                          <button className="copyBtn displayBtn" onClick={() => setShowCopyBtn(false)}>
+                          <button
+                            className="copyBtn displayBtn"
+                            onClick={() => setShowCopyBtn(false)}
+                          >
                             <img src={I_clip} alt="" />
                             Copy Link
                           </button>
@@ -370,7 +415,12 @@ export default function MarketDetail() {
 
                 <div className="ownedBox">
                   <p className="key">Owned by</p>
-                  <p className="value">@{data?.type === "ticket" ? `${data?.seller}` : `${data?.seller}`}</p>
+                  <p className="value">
+                    @
+                    {data?.type === "ticket"
+                      ? `${data?.seller}`
+                      : `${data?.seller}`}
+                  </p>
                 </div>
 
                 <div className="saleBox">
@@ -382,7 +432,10 @@ export default function MarketDetail() {
                   <div className="value">
                     <strong className="price">
                       {/* {itemdata?.group_ == "kong" ? "100" : ITEM_PRICE_DEF} USDT */}
-                      {itemdata?.type === "ticket" ? `${data?.price}` : `${data?.price}`} USDT
+                      {itemdata?.type === "ticket"
+                        ? `${data?.price}`
+                        : `${data?.price}`}{" "}
+                      USDT
                     </strong>
                   </div>
                 </div>
@@ -439,7 +492,8 @@ export default function MarketDetail() {
 
                       <div className="contBox">
                         <p className="cont">
-                          {strDot(cont.username, 15)} / {putCommaAtPrice(cont?.price)} USDT{" "}
+                          {strDot(cont.username, 15)} /{" "}
+                          {putCommaAtPrice(cont?.price)} USDT{" "}
                         </p>
                         <p className="time">{cont.createdat?.split("T")[0]}</p>
                       </div>
@@ -466,7 +520,8 @@ export default function MarketDetail() {
 
                       <div className="contBox">
                         <p className="cont">
-                          {strDot(cont.username, 15)} / {putCommaAtPrice(cont?.price)} USDT{" "}
+                          {strDot(cont.username, 15)} /{" "}
+                          {putCommaAtPrice(cont?.price)} USDT{" "}
                         </p>
                         <p className="time">{cont.createdat?.split("T")[0]}</p>
                       </div>
@@ -485,7 +540,11 @@ export default function MarketDetail() {
                 <ul className="itemList" ref={moreRef}>
                   {marketPlaceList?.map((cont, index) => (
                     <Fragment key={index}>
-                      <MarketItem0227 data={cont} index={index} isstaked={isstaked} />
+                      <MarketItem0227
+                        data={cont}
+                        index={index}
+                        isstaked={isstaked}
+                      />
                     </Fragment>
                   ))}
                 </ul>

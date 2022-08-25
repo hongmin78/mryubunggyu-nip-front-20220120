@@ -28,22 +28,32 @@ export default function Offer(params, offers, transaction, data) {
         .catch((error) => console.log(error));
     }
     if (params?.path === "market" && params?.data?.type === "ticket") {
-      axios.get(API.API_GET_TRANSACTIONS_TICKET + `/${params?.data?.tokenid}?nettype=${net}`).then((resp) => {
-        LOGGER("transction_offer", resp.data);
-        let { status, respdata } = resp.data;
-        if (status === "OK") {
-          setTicketOffersInfo(resp.data.payload.rowdata.slice(-2));
-        }
-      });
+      axios
+        .get(
+          API.API_GET_TRANSACTIONS_TICKET +
+            `/${params?.data?.tokenid}?nettype=${net}`
+        )
+        .then((resp) => {
+          // LOGGER("transction_offer", resp.data);
+          // let { status, respdata } = resp.data;
+          // if (status === "OK") {
+          //   setTicketOffersInfo(resp.data.payload.rowdata.slice(-2));
+          // }
+        });
     }
     if (params?.path === "market" && params?.data?.type === "kingkong") {
-      axios.get(API.API_GET_TRANSACTIONS_KING_KONG + `/${params?.data?.itemid}?nettype=${net}`).then((resp) => {
-        LOGGER("transction_offer", resp.data);
-        let { status, respdata } = resp.data;
-        if (status === "OK") {
-          setTicketOffersInfo(resp.data.list.slice(-2));
-        }
-      });
+      axios
+        .get(
+          API.API_GET_TRANSACTIONS_KING_KONG +
+            `/${params?.data?.itemid}?nettype=${net}`
+        )
+        .then((resp) => {
+          // LOGGER("transaction_offer", resp.data);
+          // let { status, respdata } = resp.data;
+          // if (status === "OK") {
+          //   setTicketOffersInfo(respdata.data.list.slice(-2));
+          // }
+        });
     }
   };
 
@@ -61,7 +71,9 @@ export default function Offer(params, offers, transaction, data) {
               <div className="infoBox">
                 <p className="info">
                   {" "}
-                  {cont.updatedat === null ? strDot(cont.createdat, 10) : strDot(cont.updatedat, 10)}
+                  {cont.updatedat === null
+                    ? strDot(cont.createdat, 10)
+                    : strDot(cont.updatedat, 10)}
                 </p>
                 <p className="time">{cont.updatedat}</p>
               </div>
@@ -78,9 +90,15 @@ export default function Offer(params, offers, transaction, data) {
             <li key={index}>
               <img src={cont.prfoImg ? cont.profoImg : person} alt="" />
               <div className="infoBox">
-                <p className="info">{`${strDot(cont.username, 11, 4)} ${parseInt(cont.buyprice).toFixed(2)} USDT `}</p>
+                <p className="info">{`${strDot(
+                  cont.username,
+                  11,
+                  4
+                )} ${parseInt(cont.buyprice).toFixed(2)} USDT `}</p>
                 <p className="time">
-                  {cont.updatedat === null ? strDot(cont.createdat, 10) : strDot(cont.updatedat, 10)}
+                  {cont.updatedat === null
+                    ? strDot(cont.createdat, 10)
+                    : strDot(cont.updatedat, 10)}
                 </p>
               </div>
             </li>
@@ -90,9 +108,15 @@ export default function Offer(params, offers, transaction, data) {
               <li key={index}>
                 <img src={cont.prfoImg ? cont.profoImg : person} alt="" />
                 <div className="infoBox">
-                  <p className="info">{`${strDot(cont.username, 11, 4)} ${parseInt(cont.price).toFixed(2)} USDT `}</p>
+                  <p className="info">{`${strDot(
+                    cont.username,
+                    11,
+                    4
+                  )} ${parseInt(cont.price).toFixed(2)} USDT `}</p>
                   <p className="time">
-                    {cont.updatedat === null ? strDot(cont.createdat, 10) : strDot(cont.updatedat, 10)}
+                    {cont.updatedat === null
+                      ? strDot(cont.createdat, 10)
+                      : strDot(cont.updatedat, 10)}
                   </p>
                 </div>
               </li>
@@ -101,9 +125,15 @@ export default function Offer(params, offers, transaction, data) {
               <li key={index}>
                 <img src={cont.prfoImg ? cont.profoImg : person} alt="" />
                 <div className="infoBox">
-                  <p className="info">{`${strDot(cont.username, 11, 4)} ${parseInt(cont.price).toFixed(2)} USDT `}</p>
+                  <p className="info">{`${strDot(
+                    cont.username,
+                    11,
+                    4
+                  )} ${parseInt(cont.price).toFixed(2)} USDT `}</p>
                   <p className="time">
-                    {cont.updatedat === null ? strDot(cont.createdat, 10) : strDot(cont.updatedat, 10)}
+                    {cont.updatedat === null
+                      ? strDot(cont.createdat, 10)
+                      : strDot(cont.updatedat, 10)}
                   </p>
                 </div>
               </li>
