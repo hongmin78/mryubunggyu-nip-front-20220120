@@ -248,8 +248,7 @@ function App() {
         ) : (
           <Routes>
             <Route exact path="/" element={<UnderConst />} />
-            {/* <Route path="*" element={<NoMatch />} /> */}
-            <Navigate path="*" element={<NoMatch />} />
+            <Route path="*" element={<NoMatch />} />
           </Routes>
         )}
       </HashRouter>
