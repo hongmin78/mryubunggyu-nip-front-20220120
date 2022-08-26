@@ -45,8 +45,10 @@ import { CURRENT_TIME } from "./configs/configs";
 import { net } from "./configs/net";
 import Employed from "./router/Employed";
 import Employ from "./router/Employ";
+import UnderConst from "./components/UnderConstruction/UnderConst";
 function App() {
   const dispatch = useDispatch();
+  const [isavailable, setisavailable] = useState(0);
   //	let [ address , setaddress ] = useState()
   function handleResize() {
     if (window.innerWidth > 1024) dispatch(setMobile(false));
@@ -202,46 +204,52 @@ function App() {
 
       <GlobalStyle />
       <HashRouter>
-        <Routes>
-          {/* <Route path="*" element={<Navigate to="/" />} /> */}
-          <Route path="/" element={<Main />} />
-          <Route path="/winning" element={<Winning />} />
-          <Route path="/penalty" element={<Penalty />} />
+        {isavailable ? (
+          <Routes>
+            <Route path="/" element={<Main />} />
+            <Route path="/winning" element={<Winning />} />
+            <Route path="/penalty" element={<Penalty />} />
 
-          <Route path="/term" element={<Term />} />
+            <Route path="/term" element={<Term />} />
 
-          <Route path="/connectwallet" element={<ConnectWallet />} />
-          <Route path="/connectwallet/:refere" element={<ConnectWallet />} />
-          <Route
-            path="/emailauth/:email/:authNum/:walletaddress"
-            element={<EmailAuth />}
-          />
-          <Route path="/emailauth/:email/:authNum" element={<EmailAuth />} />
+            <Route path="/connectwallet" element={<ConnectWallet />} />
+            <Route path="/connectwallet/:refere" element={<ConnectWallet />} />
+            <Route
+              path="/emailauth/:email/:authNum/:walletaddress"
+              element={<EmailAuth />}
+            />
+            <Route path="/emailauth/:email/:authNum" element={<EmailAuth />} />
 
-          <Route path="/staking" element={<Staking />} />
-          <Route path="/staking/:popup" element={<Staking />} />
-          <Route path="/staking/detail/:id" element={<StakingDetail />} />
+            <Route path="/staking" element={<Staking />} />
+            <Route path="/staking/:popup" element={<Staking />} />
+            <Route path="/staking/detail/:id" element={<StakingDetail />} />
 
-          <Route path="/auction" element={<Auction />} />
-          <Route path="/auction/detail/:itemid" element={<AuctionDetail />} />
+            <Route path="/auction" element={<Auction />} />
+            <Route path="/auction/detail/:itemid" element={<AuctionDetail />} />
 
-          <Route path="/market" element={<Market />} />
-          <Route path="/market/detail/:itemid" element={<MarketDetail />} />
-          <Route
-            path="/market/detail/:itemid/:popup"
-            element={<MarketDetail />}
-          />
+            <Route path="/market" element={<Market />} />
+            <Route path="/market/detail/:itemid" element={<MarketDetail />} />
+            <Route
+              path="/market/detail/:itemid/:popup"
+              element={<MarketDetail />}
+            />
 
-          <Route path="/mypage" element={<Mypage />} />
-          <Route path="/editprof" element={<EditProf />} />
+            <Route path="/mypage" element={<Mypage />} />
+            <Route path="/editprof" element={<EditProf />} />
 
-          <Route path="/resell/:id/:type/:tokenId" element={<Resell />} />
+            <Route path="/resell/:id/:type/:tokenId" element={<Resell />} />
 
-          <Route path="/test" element={<Test />} />
-          <Route path="/employed" element={<Employed />} />
-          <Route path="/employ" element={<Employ />} />
-          <Route path="/employ/:id/:type/:tokenId" element={<Employ />} />
-        </Routes>
+            <Route path="/test" element={<Test />} />
+            <Route path="/employed" element={<Employed />} />
+            <Route path="/employ" element={<Employ />} />
+            <Route path="/employ/:id/:type/:tokenId" element={<Employ />} />
+          </Routes>
+        ) : (
+          <Routes>
+            <Route path="/" element={<UnderConst />} />
+            <Route path="*" element={<UnderConst />} />
+          </Routes>
+        )}
       </HashRouter>
     </AppBox>
   );

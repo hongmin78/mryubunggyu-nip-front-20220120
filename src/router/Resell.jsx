@@ -317,7 +317,10 @@ export default function Resell() {
 
       if (type === "kingkong") {
         axios
-          .post(API.API_POST_SALE, options_data["kingkong"])
+          .post(
+            API.API_POST_SALE + `/?nettype=${net}`,
+            options_data["kingkong"]
+          )
           .then((res) => {
             console.log(res);
             SetErrorBar("Item has been posted!");
