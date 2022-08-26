@@ -247,7 +247,7 @@ function App() {
         ) : (
           <Routes>
             <Route path="/" element={<UnderConst />} />
-            <Route path="*" element={<UnderConst />} />
+            <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         )}
       </HashRouter>
