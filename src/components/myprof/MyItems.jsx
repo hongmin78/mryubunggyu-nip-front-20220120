@@ -154,7 +154,7 @@ export default function MyItems() {
     let myaddress = getmyaddress();
     if (myaddress) {
     } else {
-      SetErrorBar("Please connect wallet!");
+      // SetErrorBar("Please connect wallet!");
       return;
     }
 
