@@ -42,7 +42,6 @@ export default function Header() {
     let myaddress = getmyaddress();
     if (myaddress) {
     } else {
-      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
       return;
     }
     axios
@@ -75,7 +74,6 @@ export default function Header() {
     let myaddress = getmyaddress();
     if (myaddress) {
     } else {
-      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
       return;
     }
     LOGGER("", myaddress);
@@ -93,7 +91,7 @@ export default function Header() {
     let myaddress = getmyaddress();
     if (myaddress) {
     } else {
-      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+
       return;
     }
     LOGGER("MXZfykw8Mw", myaddress);

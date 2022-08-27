@@ -70,7 +70,7 @@ export default function Staking() {
       if (status == "OK") {
         let stakedcount = list.filter((el) => el.isstaked == 1);
         set_staked_count(stakedcount.length);
-        set_kingkong_list(list);
+        set_kingkong_list(list.filter((el) => el.group_ == "kingkong"));
       }
     } catch (err) {
       console.log(err);

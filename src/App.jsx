@@ -91,15 +91,12 @@ function App() {
   };
 
   useEffect(() => {
-    // setTimeout(() => {
     let myaddress = getmyaddress();
     if (myaddress) {
     } else {
-      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
       return;
     }
     queryuseraddress(myaddress);
-    // }, 1500);
   }, []);
 
   useEffect(() => {
@@ -145,7 +142,6 @@ function App() {
       // setTimeout(() => {
       if (address) {
       } else {
-        SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
         return;
       }
       queryuseraddress(address);

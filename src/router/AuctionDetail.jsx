@@ -51,7 +51,7 @@ export default function AuctionDetail() {
     let myaddress = getmyaddress();
     if (myaddress) {
     } else {
-      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+
       return;
     }
     axios
