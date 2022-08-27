@@ -976,7 +976,7 @@ export default function MyItems() {
 
           {itemBalData.length !== 0 &&
             itemBalData.map((item, index) => {
-              if (item.group_ === "kingkong") {
+              if (item.group_ != "ticket") {
                 return (
                   <li key={index} className="swapBox">
                     <div className="imgBoxBal">

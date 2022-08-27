@@ -49,7 +49,7 @@ import UnderConst from "./components/UnderConstruction/UnderConst";
 import NoMatch from "./components/NoMatch";
 function App() {
   const dispatch = useDispatch();
-  const [isavailable, setisavailable] = useState(0);
+  const [isavailable, setisavailable] = useState(1);
   //	let [ address , setaddress ] = useState()
   function handleResize() {
     if (window.innerWidth > 1024) dispatch(setMobile(false));
