@@ -50,6 +50,21 @@ const jaddresses = {
     contract_pay_for_assigned_item:
       "0x6fb460F0B9CEDad97Fa396228DEf6ade84201517", //release 0621
     payment_for_delinquency: "0xc7b12c6b2c0214ed60cfc1e2f3efdd6d83b58f29",
+
+    // latter contracts
+    contract_nip_token: "0xa934775D7863833f51BFcA6ce5dFfa97aAB83cb8",
+    contract_reward_token: "0xa934775D7863833f51BFcA6ce5dFfa97aAB83cb8",
+
+    // minter contracts
+    contract_erc1155: "0x9910F229037accaA687d3e4467aB59510813f4a9", //
+    contract_kip17: "0x419c123980a27b06C1c9E8be278B0DFCAC9b6338", //
+    // minter contracts
+
+    // acting contracts
+    contract_erc1155_sales: "",
+    contract_kip17_salse: "0xf9BE3049F554E5fD6D4c5e76001f93f8C16C7620", //
+    contract_kip17_staking: "0x8B297c44DFF5A73E4F678BCAd522807336692B19", //
+    // acting contracts
   },
 };
 let addresses = jaddresses[net];

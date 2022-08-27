@@ -243,6 +243,7 @@ function App() {
             <Route path="/employed" element={<Employed />} />
             <Route path="/employ" element={<Employ />} />
             <Route path="/employ/:id/:type/:tokenId" element={<Employ />} />
+            <Route path="*" element={<UnderConst />} />
           </Routes>
         ) : (
           <Routes>
