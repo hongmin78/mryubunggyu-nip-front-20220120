@@ -46,6 +46,7 @@ import { net } from "./configs/net";
 import Employed from "./router/Employed";
 import Employ from "./router/Employ";
 import UnderConst from "./components/UnderConstruction/UnderConst";
+import NoMatch from "./components/NoMatch";
 function App() {
   const dispatch = useDispatch();
   const [isavailable, setisavailable] = useState(0);
@@ -247,8 +248,8 @@ function App() {
           </Routes>
         ) : (
           <Routes>
-            <Route path="/" element={<UnderConst />} />
-            <Route path="*" element={<Navigate to="/" />} />
+            <Route exact path="/" element={<UnderConst />} />
+            <Route path="*" element={<NoMatch />} />
           </Routes>
         )}
       </HashRouter>

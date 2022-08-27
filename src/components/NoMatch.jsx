@@ -1,11 +1,11 @@
 import styled from "styled-components";
-export default function UnderConst() {
+export default function NoMatch() {
   return (
     <Container>
-      <h1>We'll be back soon!</h1>
+      <h1>Oops not found :(</h1>
       <p style={{ width: "650px", textAlign: "center" }}>
-        We're very sorry for the inconvenience but we're performing maintenance.
-        Please check back soon...
+        Probably you are trying to access not existing page... Try again later
+        ;)
       </p>
       <p>- NIP team 🖤</p>
     </Container>
