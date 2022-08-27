@@ -162,7 +162,6 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
       methodname: "approve",
       aargs: [addresses.payment_for_delinquency, getweirep("" + 10 ** 10)], // .ETH_TESTNET
     });
-    LOGGER("ㅁㄴㅇㅁㄴㅇㅁㄴㅇㅁㄴㅇㅁㄴㅇㄴㅇ", abistr);
     setisloader_00(true);
     requesttransaction({
       from: myaddress,
@@ -274,28 +273,35 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
             txhash = resp.txHash;
             break;
         }
-        axios
-          .post(API.API_TXS + `/${txhash}?nettype=${net}`, {
-            txhash,
-            username: myaddress,
-            typestr: "CLEAR_DELINQUENT",
-            auxdata: {
-              amount: delinquencyAmount,
-              currency: PAY_CURRENCY,
-              currencyaddress: addresses.contract_USDT, // ETH_TESTNET.
-              nettype: NETTYPE,
-            },
-            nettype: net,
-          })
-          .then((resp) => {
-            LOGGER("", resp);
-            SetErrorBar(messages.MSG_TX_REQUEST_SENT);
-          });
+
         /***** */
         awaitTransactionMined
           .awaitTx(web3, txhash, TX_POLL_OPTIONS)
           .then(async (minedtxreceipt) => {
             LOGGER("minedtxreceipt", minedtxreceipt);
+            let { status } = minedtxreceipt;
+            if (status) {
+            } else {
+              SetErrorBar(messages.MSG_TX_FAILED);
+              return;
+            }
+            axios
+              .post(API.API_TXS + `/${txhash}?nettype=${net}`, {
+                txhash,
+                username: myaddress,
+                typestr: "CLEAR_DELINQUENT",
+                auxdata: {
+                  amount: delinquencyAmount,
+                  currency: PAY_CURRENCY,
+                  currencyaddress: addresses.contract_USDT, // ETH_TESTNET.
+                  nettype: net,
+                },
+                nettype: net,
+              })
+              .then((resp) => {
+                LOGGER("", resp);
+                SetErrorBar(messages.MSG_TX_REQUEST_SENT);
+              });
             SetErrorBar(messages.MSG_TX_FINALIZED);
             setDone(false);
             window.location.replace("/");

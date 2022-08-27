@@ -61,7 +61,7 @@ const jaddresses = {
     // minter contracts
 
     // acting contracts
-    contract_erc1155_sales: "",
+    contract_erc1155_sales: "0x6B65da7049310170DF19A61494E89c7D516e3FB2",
     contract_kip17_salse: "0xf9BE3049F554E5fD6D4c5e76001f93f8C16C7620", //
     contract_kip17_staking: "0x8B297c44DFF5A73E4F678BCAd522807336692B19", //
     // acting contracts

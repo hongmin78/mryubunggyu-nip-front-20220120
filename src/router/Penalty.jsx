@@ -19,7 +19,9 @@ export default function Penalty() {
   const navigate = useNavigate();
   let address = getmyaddress();
   const isMobile = useSelector((state) => state.common.isMobile);
-  const delinquencyAmount = useSelector((state) => state.common.delinquencyAmount);
+  const delinquencyAmount = useSelector(
+    (state) => state.common.delinquencyAmount
+  );
 
   const [like, setLike] = useState(false);
   const [openModal, setOpenModal] = useState(false);
@@ -31,7 +33,10 @@ export default function Penalty() {
 
   const fatchData = () => {
     axios
-      .get(`${API.API_DELINQUENCY}/${address}/0/10/id/DESC` + `?nettype=${net}&itemdetail=1`)
+      .get(
+        `${API.API_DELINQUENCY}/${address}/0/10/id/DESC` +
+          `?nettype=${net}&itemdetail=1`
+      )
       .then((res) => {
         console.log("Pay", res);
         let { status, list } = res.data;
@@ -65,7 +70,10 @@ export default function Penalty() {
                 </div>
 
                 <div className="explain">
-                  <p className="cong">Your profile is blocked temporarily. Please pay for your delinquency.</p>
+                  <p className="cong">
+                    Your profile is blocked temporarily. Please pay for your
+                    delinquency.
+                  </p>
                 </div>
               </div>
             </article>
@@ -74,7 +82,9 @@ export default function Penalty() {
               <div className="topBar">
                 <div className="profBox">
                   <img src={E_marketProf1} alt="" />
-                  <p className="address">{payList[0] ? strDot(payList[0].username, 4, 10) : null}</p>
+                  <p className="address">
+                    {payList[0] ? strDot(payList[0].username, 4, 10) : null}
+                  </p>
                 </div>
 
                 <button className="likeBtn" onClick={() => setLike(!like)}>
@@ -107,7 +117,9 @@ export default function Penalty() {
                   ))}
               </div>
             </article>
-            <p style={{ fontSize: "6vw", fontWeight: "bold" }}>Please pay Total {delinquencyAmount} USDT</p>
+            <p style={{ fontSize: "6vw", fontWeight: "bold" }}>
+              Please pay Total {delinquencyAmount} USDT
+            </p>
             <article className="btnBox">
               <button className="confirmBtn" onClick={modalToggle}>
                 Pay now
@@ -134,7 +146,9 @@ export default function Penalty() {
                 <div className="topBar">
                   <div className="profBox">
                     <img src={E_marketProf1} alt="" />
-                    <p className="address">{payList[0] ? strDot(payList[0].username, 4, 10) : null}</p>
+                    <p className="address">
+                      {payList[0] ? strDot(payList[0].username, 4, 10) : null}
+                    </p>
                   </div>
 
                   <button className="likeBtn" onClick={() => setLike(!like)}>
@@ -158,10 +172,15 @@ export default function Penalty() {
                           <p>Series Kong {item.item.titlename}</p>
                         </li>
                         <li className="price">
-                          <p>Price : {parseInt(item.circulations.price).toFixed(2)} USDT</p>
+                          <p>
+                            Price :{" "}
+                            {parseInt(item.circulations?.price).toFixed(2)} USDT
+                          </p>
                         </li>
                         <li className="price">
-                          <p>Penalty : {parseInt(item.amount).toFixed(2)} USDT</p>
+                          <p>
+                            Penalty : {parseInt(item.amount).toFixed(2)} USDT
+                          </p>
                         </li>
                       </ul>
                     ))}
@@ -176,8 +195,13 @@ export default function Penalty() {
                   </strong>
 
                   <div className="explain">
-                    <p className="pay">Your profile is blocked temporarily. Please pay for your delinquency.</p>
-                    <p className="cong">Please pay Total {delinquencyAmount} USDT</p>
+                    <p className="pay">
+                      Your profile is blocked temporarily. Please pay for your
+                      delinquency.
+                    </p>
+                    <p className="cong">
+                      Please pay Total {delinquencyAmount} USDT
+                    </p>
                   </div>
                 </div>
 
@@ -189,7 +213,12 @@ export default function Penalty() {
               </div>
             </article>
           </section>
-          {openModal && <PayDelinquency off={modalToggle} delinquencyAmount={delinquencyAmount} />}
+          {openModal && (
+            <PayDelinquency
+              off={modalToggle}
+              delinquencyAmount={delinquencyAmount}
+            />
+          )}
         </PpenaltyBox>
       </>
     );
