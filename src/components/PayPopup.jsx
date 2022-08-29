@@ -42,7 +42,7 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
   let [myaddress, setmyaddress] = useState(getmyaddress());
   let [mybalance, setmybalance] = useState();
   let [isallowanceok, setisallowanceok] = useState(false);
-  let [allowanceamount, setallowanceamount] = useState();
+  let [allowanceamount, setallowanceamount] = useState(0);
   let [approve, setApprove] = useState(false);
   // let [st akedbalance, setsta kedbalance] = useState();
   let [tvl, settvl] = useState();
@@ -110,7 +110,7 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
         let allowanceineth = getethrep(resp);
         console.log("__allowance", resp);
         LOGGER("8LYRxjNp8k", resp, allowanceineth);
-        setallowanceamount(allowanceineth);
+        setallowanceamount(+allowanceineth);
         //				setallowanceamount ( 100 )
         if (+allowanceineth > 0) {
           setisallowanceok(false);
@@ -148,7 +148,7 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
       methodname: "approve",
       aargs: [
         addresses.contract_pay_for_assigned_item,
-        getweirep("" + 10 ** 18),
+        getweirep("" + 10 ** 6),
       ], // .ETH_TESTNET
     });
     LOGGER("", abistr);
@@ -195,7 +195,7 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
           }).then((resp) => {
             let allowanceineth = getethrep(resp);
             LOGGER("gCwXF6Jjkh", resp, allowanceineth);
-            setallowanceamount(allowanceineth); //				setallowanceamount ( 100 )
+            setallowanceamount(+allowanceineth); //				setallowanceamount ( 100 )
             setisloader_00(false);
             if (allowanceineth > 0) {
               setisallowanceok(false);
@@ -265,36 +265,44 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
             return;
           }
           let txhash = resp;
-          axios
-            .post(API.API_TXS + `/${txhash}?nettype=${net}`, {
-              txhash,
-              username: myaddress,
-              typestr: "PAY",
-              itemid: receivables.itemid,
-              nettype: net,
 
-              auxdata: {
-                referfeeamount: receivables.amount,
-                feerate: refererFeeRate,
-                currency: PAY_CURRENCY || "USDT",
-                currencyaddress: addresses.contract_USDT, // ETH_TESTNET.
-                nettype: net,
-                amount: receivables.amount,
-              },
-            })
-            .then((resp) => {
-              LOGGER("", resp);
-              SetErrorBar(messages.MSG_TX_REQUEST_SENT);
-            });
           /***** */
           awaitTransactionMined
             .awaitTx(web3, txhash, TX_POLL_OPTIONS)
             .then(async (minedtxreceipt) => {
               LOGGER("minedtxreceipt", minedtxreceipt);
+              let { status } = minedtxreceipt;
+              if (status) {
+              } else {
+                SetErrorBar(messages.MSG_TX_FAILED);
+                return;
+              }
               SetErrorBar(messages.MSG_TX_FINALIZED);
               setDone(false);
               setisloader_01(false);
               off();
+              window.location.reload();
+              axios
+                .post(API.API_TXS + `/${txhash}?nettype=${net}`, {
+                  txhash,
+                  username: myaddress,
+                  typestr: "PAY",
+                  itemid: receivables.itemid,
+                  nettype: net,
+
+                  auxdata: {
+                    referfeeamount: receivables.amount,
+                    feerate: refererFeeRate,
+                    currency: PAY_CURRENCY || "USDT",
+                    currencyaddress: addresses.contract_USDT, // ETH_TESTNET.
+                    nettype: net,
+                    amount: receivables.amount,
+                  },
+                })
+                .then((resp) => {
+                  LOGGER("", resp);
+                  SetErrorBar(messages.MSG_TX_REQUEST_SENT);
+                });
             });
         } catch (err) {
           SetErrorBar(messages.MSG_USER_DENIED_TX);
@@ -466,7 +474,7 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
               </li>
               <li style={allowanceamount ? { display: "block" } : {}}>
                 <p className="key">Allowance:</p>
-                <p className="value">{allowanceamount} USDT</p>
+                <p className="value">{allowanceamount.toFixed(2)} USDT</p>
               </li>
               <li>
                 <p className="key">Your {BASE_CURRENCY} balance</p>
