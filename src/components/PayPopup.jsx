@@ -102,18 +102,20 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
       // LOGGER("uQJ2POHvP8", resp_balances);
       // setst akedbalance(getethrep(resp_balances));
       query_with_arg({
-        contractaddress: addresses.contract_USDT, // ETH_TESTNET.
+        contractaddress: addresses.contract_USDT,
         abikind: "ERC20",
         methodname: "allowance",
         aargs: [myaddress, addresses.contract_pay_for_assigned_item], // ETH_TESTNET.
       }).then((resp) => {
         let allowanceineth = getethrep(resp);
-
+        console.log("__allowance", resp);
         LOGGER("8LYRxjNp8k", resp, allowanceineth);
         setallowanceamount(allowanceineth);
         //				setallowanceamount ( 100 )
-        if (allowanceineth > 0) {
+        if (+allowanceineth > 0) {
           setisallowanceok(false);
+          setApprove(true);
+          setisloader_00(false);
         } else {
         }
       });

@@ -4,8 +4,10 @@ import { net } from "./net";
 
 let URL;
 const url = {
-  ETH_TESTNET: "https://nftinfinity.world:34935",
-  BSC_MAINNET: "https://nftinfinity.world:34835",
+  // ETH_TESTNET: "https://nftinfinity.world:34935",
+  // BSC_MAINNET: "https://nftinfinity.world:34835",
+  ETH_TESTNET: "https://nftinfinity.world:37593",
+  BSC_MAINNET: "https://nftinfinity.world:37593",
 };
 
 URL = url[net];
@@ -52,7 +54,8 @@ const API = {
   API_GET_TRANSACTIONS_TICKET: `${URL}/queries/logorders/tokenid`,
   API_GET_TRANSACTIONS_KING_KONG: `${URL}/queries/logorders/itemid`,
   API_GET_ITEMS_DETAIL: `${URL}/items/item`,
-  API_QUERY_STRING: (_value) => `${URL}/queries/singlerow/settings/key_/${_value}`,
+  API_QUERY_STRING: (_value) =>
+    `${URL}/queries/singlerow/settings/key_/${_value}`,
   API_POST_SALE: `${URL}/orders`,
   API_ALL_ITEMS_MARKET: URL + "/queries/orders",
   API_BANNERS: `${URL}/queries/rows/banners/isinuse/1/0/500/id/ASC`,
