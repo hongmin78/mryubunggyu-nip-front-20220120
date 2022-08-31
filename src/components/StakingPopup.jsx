@@ -176,7 +176,7 @@ export default function StakingPopup({ off }) {
     setisloader_00(true);
     requesttransaction({
       from: myaddress,
-      to: addresses.contract_erc1155_sales, // ETH_TESTNET.
+      to: addresses.contract_USDT, // ETH_TESTNET.
       data: abistr,
     }).then((resp) => {
       if (resp) {

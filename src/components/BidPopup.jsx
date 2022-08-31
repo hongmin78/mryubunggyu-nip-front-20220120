@@ -417,7 +417,6 @@ export default function BidPopup({ off, itemdata }) {
             "1", // amounttomint
             "0", // _decimals
             "0",
-            // userinfo?.username,
             userinfo?.refereraddress,
             "1",
             getweirep("" + itemdata?.price),
