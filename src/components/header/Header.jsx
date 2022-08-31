@@ -105,35 +105,33 @@ export default function Header() {
   };
   const fetchdata = (_) => {
     query_contractaddresses().then(async (resp) => {
-       
- 
-    // let myaddress = "0xb440393a03078b967000f09577e32c3252f15832";
-    let myaddress = getmyaddress();
-    if (myaddress) {
-    } else {
-      return;
-    }
-    LOGGER("MXZfykw8Mw", myaddress);
-    setmyaddress(myaddress);
-    if (myaddress) {
-      query_with_arg({
-        contractaddress: await get_contractaddress('contract_USDT', resp);, // ETH_TESTNET.
-        abikind: "ERC20",
-        methodname: "balanceOf",
-        aargs: [myaddress],
-      }).then((resp) => {
-        LOGGER("Ce4mDMhjbS", resp);
-        setmybalance(getethrep(resp));
-      });
+      // let myaddress = "0xb440393a03078b967000f09577e32c3252f15832";
+      let myaddress = getmyaddress();
+      if (myaddress) {
+      } else {
+        return;
+      }
+      LOGGER("MXZfykw8Mw", myaddress);
+      setmyaddress(myaddress);
+      if (myaddress) {
+        query_with_arg({
+          contractaddress: await get_contractaddress("contract_USDT", resp), // ETH_TESTNET.
+          abikind: "ERC20",
+          methodname: "balanceOf",
+          aargs: [myaddress],
+        }).then((resp) => {
+          LOGGER("Ce4mDMhjbS", resp);
+          setmybalance(getethrep(resp));
+        });
 
-      window.ethereum.on("networkChanged", function (networkId) {
-        LOGGER("", networkId);
-        // Time to reload your interface with the new networkId
-      });
-    } else {
-      return;
-    }
-  });
+        window.ethereum.on("networkChanged", function (networkId) {
+          LOGGER("", networkId);
+          // Time to reload your interface with the new networkId
+        });
+      } else {
+        return;
+      }
+    });
   };
 
   useEffect(

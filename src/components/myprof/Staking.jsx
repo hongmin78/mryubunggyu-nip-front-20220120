@@ -264,6 +264,19 @@ export default function Staking() {
       awaitTransactionMined
         .awaitTx(web3, txhash, TX_POLL_OPTIONS)
         .then(async (minedtxreceipt) => {
+          const query_claimed_reward = async (_) => {
+            query_noarg({
+              contractaddress: await get_contractaddress(
+                "KIP17[staking]",
+                contractaddresses
+              ),
+              abikind: "KIP17Stake", //
+              methodname: "query_claimed_reward",
+            }).then((resp) => {
+              LOGGER("@query_claimed_reward", getethrep(resp));
+              setTotalClaimedReward((+getethrep(resp)).toFixed(4));
+            });
+          };
           query_claimed_reward();
           console.log("minedtxreceipt", minedtxreceipt);
         });
