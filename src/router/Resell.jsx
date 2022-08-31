@@ -20,13 +20,13 @@ import { messages } from "../configs/messages";
 import SetErrorBar from "../util/SetErrorBar";
 import ticketImg from "../img/staking/E_prof1.png";
 import moment from "moment";
-import { addresses } from "../configs/addresses";
 import { getabistr_forfunction, query_with_arg } from "../util/contract-calls";
 import { requesttransaction } from "../services/metamask";
 import awaitTransactionMined from "await-transaction-mined";
 import { web3 } from "../configs/configweb3-ropsten";
 import { TX_POLL_OPTIONS } from "../configs/configs";
 import { getethrep, getweirep } from "../util/eth";
+import { get_contractaddress } from "../util/Util";
 
 export default function Resell() {
   const navigate = useNavigate();
@@ -42,6 +42,24 @@ export default function Resell() {
   const [saleType, setSaleType] = useState("COMMON");
   const [isApprovedForAll, setApprovalForAll] = useState(false);
   let [spinner, setSpinner] = useState(false);
+  const [contractaddresses, setContractaddresses] = useState([]);
+
+  const query_contractaddresses = async () => {
+    return new Promise(async (res, rej) => {
+      try {
+        let { data } = await axios.get(API.API_CADDR);
+        let { status, list } = data;
+        if (status == "OK") {
+          setContractaddresses(list);
+          res(list);
+        } else {
+          rej("Failed to fetch contractaddresses");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  };
   console.log("ticketInfo", itemDetail);
 
   const getUserInfo = async () => {
@@ -98,51 +116,7 @@ export default function Resell() {
     }
   };
 
-  const queryApprovalForAll = async (item) => {
-    setSpinner(true);
-    try {
-      let myaddress = getmyaddress();
-      if (myaddress) {
-      } else {
-        SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
-        return;
-      }
-
-      const options_arg = {
-        kingkong: {
-          contractaddress: addresses.contract_kip17,
-          abikind: "KIP17",
-          methodname: "isApprovedForAll",
-          aargs: [myaddress, addresses.contract_kip17_salse],
-        },
-        ticket: {
-          contractaddress: addresses.contract_erc1155,
-          abikind: "ERC1155",
-          methodname: "isApprovedForAll",
-          aargs: [myaddress, addresses.contract_erc1155_sales],
-        },
-      };
-
-      if (type === "kingkong") {
-        query_with_arg(options_arg["kingkong"]).then((resp) => {
-          console.log("$sell-isApprovedForAll?", resp);
-          setApprovalForAll(resp);
-          setSpinner(false);
-        });
-      }
-      if (type === "ticket") {
-        query_with_arg(options_arg["ticket"]).then((resp) => {
-          console.log("$sell-ticket-isApprovedForAll?", resp);
-          setApprovalForAll(resp);
-          setSpinner(false);
-        });
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const approveForAll = () => {
+  const approveForAll = async () => {
     let myaddress = getmyaddress();
     setSpinner(true);
     if (myaddress) {
@@ -153,14 +127,17 @@ export default function Resell() {
     }
     if (type === "kingkong") {
       let abistr = getabistr_forfunction({
-        contractaddress: addresses.contract_kip17,
+        contractaddress: await get_contractaddress("KIP17", contractaddresses),
         abikind: "KIP17",
         methodname: "setApprovalForAll",
-        aargs: [addresses.contract_kip17_salse, true],
+        aargs: [
+          await get_contractaddress("KIP17[sales]", contractaddresses),
+          true,
+        ],
       });
       requesttransaction({
         from: myaddress,
-        to: addresses.contract_kip17,
+        to: await get_contractaddress("KIP17", contractaddresses),
         data: abistr,
         value: "0x00",
       }).then((resp) => {
@@ -184,14 +161,20 @@ export default function Resell() {
     }
     if (type === "ticket") {
       let abistr = getabistr_forfunction({
-        contractaddress: addresses.contract_erc1155,
+        contractaddress: await get_contractaddress(
+          "ERC1155",
+          contractaddresses
+        ),
         abikind: "ERC1155",
         methodname: "setApprovalForAll",
-        aargs: [addresses.contract_erc1155_sales, true],
+        aargs: [
+          await get_contractaddress("ERC1155[sales]", contractaddresses),
+          true,
+        ],
       });
       requesttransaction({
         from: myaddress,
-        to: addresses.contract_erc1155,
+        to: await get_contractaddress("ERC1155", contractaddresses),
         data: abistr,
         value: "0x00",
       }).then((resp) => {
@@ -223,16 +206,18 @@ export default function Resell() {
     if (type === "kingkong") {
       msg = `Token id:${itemDetail.itemid}, ${getweirep(
         bid
-      )},Contract address :${
-        addresses.contract_erc1155_ticket_sales
-      }, wallet: ${myaddress}`;
+      )},Contract address :${await get_contractaddress(
+        "ERC1155[sales]",
+        contractaddresses
+      )}, wallet: ${myaddress}`;
     }
     if (type === "ticket") {
       msg = `Token id:${
         ticketInfo?.itemid ? ticketInfo.itemid : ticketInfo?.id
-      }, ${getweirep(bid)},Contract address :${
-        addresses.contract_erc1155_ticket_sales
-      }, wallet: ${myaddress}`;
+      }, ${getweirep(bid)},Contract address :${await get_contractaddress(
+        "ERC1155[sales]",
+        contractaddresses
+      )}, wallet: ${myaddress}`;
     }
 
     const sign = await ethereum.request({
@@ -254,27 +239,35 @@ export default function Resell() {
       if (type === "kingkong") {
         msg = `Token id:${itemDetail?.id}, ${getweirep(
           bid
-        )},Contract address :${
-          addresses.contract_kip17_salse
-        }, wallet: ${myaddress}`;
+        )},Contract address :${await get_contractaddress(
+          "KIP17[sales]",
+          contractaddresses
+        )}, wallet: ${myaddress}`;
       }
       if (type === "ticket") {
         msg = `Token id:${itemDetail?.id}, ${getweirep(
           bid
-        )},Contract address :${
-          addresses.contract_erc1155_ticket_sales
-        }, wallet: ${myaddress}`;
+        )},Contract address :${await get_contractaddress(
+          "ERC1155[sales]",
+          contractaddresses
+        )}, wallet: ${myaddress}`;
       }
 
       let options_data = {
         kingkong: {
           username: itemDetail?.username,
-          contractaddress: addresses.contract_kip17,
+          contractaddress: await get_contractaddress(
+            "KIP17",
+            contractaddresses
+          ),
           tokenid: itemDetail?.id,
           price: bid,
           itemid: itemDetail?.itemid,
           expiry: 4119051884,
-          paymeansaddress: addresses.contract_USDT,
+          paymeansaddress: await get_contractaddress(
+            "contract_USDT",
+            contractaddresses
+          ),
           paymeansname: "USDT",
           saletype: saleType === "COMMON" ? 1 : saleType === "AUCTION" ? 2 : 0,
           saletypestr: saleType,
@@ -292,12 +285,18 @@ export default function Resell() {
         },
         ticket: {
           username: itemDetail?.username,
-          contractaddress: addresses.contract_erc1155,
+          contractaddress: await get_contractaddress(
+            "ERC1155",
+            contractaddresses
+          ),
           tokenid: ticketInfo?.itemid ? ticketInfo.itemid : ticketInfo?.id,
           price: bid,
           itemid: ticketInfo?.itemid ? ticketInfo?.itemid : ticketInfo?.id,
           expiry: 4119051884,
-          paymeansaddress: addresses.contract_USDT,
+          paymeansaddress: await get_contractaddress(
+            "contract_USDT",
+            contractaddresses
+          ),
           paymeansname: "USDT",
           saletype: saleType === "COMMON" ? 1 : saleType === "AUCTION" ? 2 : 0,
           saletypestr: saleType,
@@ -353,11 +352,61 @@ export default function Resell() {
   };
 
   useEffect(() => {
-    // setTimeout(() => {
-    queryApprovalForAll();
-    queryItemDetail();
-    getUserInfo();
-    // }, 1200);
+    query_contractaddresses().then(async (resp) => {
+      const queryApprovalForAll = async (item) => {
+        setSpinner(true);
+        try {
+          let myaddress = getmyaddress();
+          if (myaddress) {
+          } else {
+            SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+            return;
+          }
+
+          const options_arg = {
+            kingkong: {
+              contractaddress: await get_contractaddress("KIP17", resp),
+              abikind: "KIP17",
+              methodname: "isApprovedForAll",
+              aargs: [
+                myaddress,
+                await get_contractaddress("KIP17[sales]", resp),
+              ],
+            },
+            ticket: {
+              contractaddress: await get_contractaddress("ERC1155", resp),
+              abikind: "ERC1155",
+              methodname: "isApprovedForAll",
+              aargs: [
+                myaddress,
+                await get_contractaddress("ERC1155[sales]", resp),
+              ],
+            },
+          };
+
+          if (type === "kingkong") {
+            query_with_arg(options_arg["kingkong"]).then((resp) => {
+              console.log("$sell-isApprovedForAll?", resp);
+              setApprovalForAll(resp);
+              setSpinner(false);
+            });
+          }
+          if (type === "ticket") {
+            query_with_arg(options_arg["ticket"]).then((resp) => {
+              console.log("$sell-ticket-isApprovedForAll?", resp);
+              setApprovalForAll(resp);
+              setSpinner(false);
+            });
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      };
+
+      queryApprovalForAll();
+      queryItemDetail();
+      getUserInfo();
+    });
   }, []);
 
   if (isMobile)

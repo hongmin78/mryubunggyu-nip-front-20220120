@@ -20,13 +20,13 @@ import { messages } from "../configs/messages";
 import SetErrorBar from "../util/SetErrorBar";
 import ticketImg from "../img/staking/E_prof1.png";
 import moment from "moment";
-import { addresses } from "../configs/addresses";
 import { getabistr_forfunction, query_with_arg } from "../util/contract-calls";
 import { requesttransaction } from "../services/metamask";
 import awaitTransactionMined from "await-transaction-mined";
 import { nettype, web3 } from "../configs/configweb3-ropsten";
 import { TX_POLL_OPTIONS } from "../configs/configs";
 import { getethrep, getweirep } from "../util/eth";
+import { get_contractaddress } from "../util/Util";
 const LOGGER = console.log;
 
 export default function Employ() {
@@ -44,6 +44,24 @@ export default function Employ() {
   const [isApprovedForAll, set_isApprovedForAll] = useState(false);
   let [spinner, setSpinner] = useState(false);
   let [myaddress, setmyaddress] = useState(null);
+  const [contractaddresses, setContractaddresses] = useState([]);
+
+  const query_contractaddresses = async () => {
+    return new Promise(async (res, rej) => {
+      try {
+        let { data } = await axios.get(API.API_CADDR);
+        let { status, list } = data;
+        if (status == "OK") {
+          setContractaddresses(list);
+          res(list);
+        } else {
+          rej("Failed to fetch contractaddresses");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  };
   console.log("ticketInfo", itemDetail);
   const getUserInfo = async () => {
     try {
@@ -98,34 +116,8 @@ export default function Employ() {
       }
     }
   };
-  const queryApprovalForAll = async (item) => {
-    setSpinner(true);
-    try {
-      let myaddress = getmyaddress();
-      if (myaddress) {
-      } else {
-        SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
-        return;
-      }
-      const options_arg = {
-        kingkong: {
-          contractaddress: addresses.contract_kip17,
-          abikind: "KIP17",
-          methodname: "isApprovedForAll",
-          aargs: [myaddress, addresses.contract_kip17_staking], // contract_ki p17_salse
-        },
-      };
-      query_with_arg(options_arg["kingkong"]).then((resp) => {
-        console.log("$sell-isApprovedForAll?", resp);
-        set_isApprovedForAll(resp);
-        setSpinner(false);
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  };
 
-  const approveForAll = () => {
+  const approveForAll = async () => {
     let myaddress = getmyaddress();
     setSpinner(true);
     if (myaddress) {
@@ -136,17 +128,17 @@ export default function Employ() {
     }
     if (type === "kingkong") {
       let abistr = getabistr_forfunction({
-        contractaddress: addresses.contract_kip17,
+        contractaddress: await get_contractaddress("KIP17", contractaddresses),
         abikind: "KIP17", // KIP17
         methodname: "setApprovalForAll",
         aargs: [
-          addresses.contract_kip17_staking,
+          await get_contractaddress("KIP17[staking]", contractaddresses),
           true, //
         ], // contr act_kip17_salse
       });
       requesttransaction({
         from: myaddress,
-        to: addresses.contract_kip17,
+        to: await get_contractaddress("KIP17", contractaddresses),
         data: abistr,
         value: "0x00",
       }).then((resp) => {
@@ -177,16 +169,18 @@ export default function Employ() {
     if (type === "kingkong") {
       msg = `Token id:${itemDetail.itemid}, ${getweirep(
         bid
-      )},Contract address :${
-        addresses.contract_erc1155_ticket_sales
-      }, wallet: ${myaddress}`;
+      )},Contract address :${await get_contractaddress(
+        "ERC1155[sales]",
+        contractaddresses
+      )}, wallet: ${myaddress}`;
     }
     if (type === "ticket") {
       msg = `Token id:${
         ticketInfo?.itemid ? ticketInfo.itemid : ticketInfo?.id
-      }, ${getweirep(bid)},Contract address :${
-        addresses.contract_erc1155_ticket_sales
-      }, wallet: ${myaddress}`;
+      }, ${getweirep(bid)},Contract address :${await get_contractaddress(
+        "ERC1155[sales]",
+        contractaddresses
+      )}, wallet: ${myaddress}`;
     }
     const sign = await ethereum.request({
       method: "personal_sign",
@@ -202,16 +196,30 @@ export default function Employ() {
     let { itemid, tokenid } = itemDetail;
     let options_arg = {
       withdraw: {
-        contractaddress: addresses.contract_kip17_staking, // ETH_TESTNET.
+        contractaddress: await get_contractaddress(
+          "KIP17[staking]",
+          contractaddresses
+        ), // ETH_TESTNET.
         abikind: "KIP17Stake",
         methodname: _status,
-        aargs: [addresses.contract_kip17, tokenid, myaddress], // .ETH_TESTNET
+        aargs: [
+          await get_contractaddress("KIP17", contractaddresses),
+          tokenid,
+          myaddress,
+        ], // .ETH_TESTNET
       },
       mint_deposit: {
-        contractaddress: addresses.contract_kip17_staking, // ETH_TESTNET.
+        contractaddress: await get_contractaddress(
+          "KIP17[staking]",
+          contractaddresses
+        ), // ETH_TESTNET.
         abikind: "KIP17Stake",
         methodname: _status,
-        aargs: [addresses.contract_kip17, itemid, 250], // .ETH_TESTNET
+        aargs: [
+          await get_contractaddress("KIP17", contractaddresses),
+          itemid,
+          250,
+        ], // .ETH_TESTNET
       },
     };
     console.log("__________asdfasdfaqwef", options_arg[_status]);
@@ -219,7 +227,7 @@ export default function Employ() {
     let abistr = await getabistr_forfunction(options_arg[_status]);
     requesttransaction({
       from: myaddress,
-      to: addresses.contract_kip17_staking, // ETH_TESTNET.
+      to: await get_contractaddress("KIP17[staking]", contractaddresses), // ETH_TESTNET.
       data: abistr,
     }).then((resp) => {
       LOGGER("@txresp", resp);
@@ -241,7 +249,10 @@ export default function Employ() {
               typestr: `${_status == "withdraw" ? "UN" : ""}EMPLOY_KINGKONG`,
               username: myaddress,
               itemid,
-              contractaddress: addresses.contract_kip17_staking,
+              contractaddress: await get_contractaddress(
+                "KIP17[staking]",
+                contractaddresses
+              ),
             })
             .then(async (_) => {
               window.location.reload();
@@ -254,12 +265,41 @@ export default function Employ() {
   };
 
   useEffect(() => {
-    // setTimeout(() => {
-    setmyaddress(getmyaddress());
-    queryApprovalForAll();
-    queryItemDetail();
-    getUserInfo();
-    // }, 1500 );
+    query_contractaddresses().then(async (resp) => {
+      const queryApprovalForAll = async (item) => {
+        setSpinner(true);
+        try {
+          let myaddress = getmyaddress();
+          if (myaddress) {
+          } else {
+            SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+            return;
+          }
+          const options_arg = {
+            kingkong: {
+              contractaddress: await get_contractaddress("KIP17", resp),
+              abikind: "KIP17",
+              methodname: "isApprovedForAll",
+              aargs: [
+                myaddress,
+                await get_contractaddress("KIP17[staking]", resp),
+              ], // contract_ki p17_salse
+            },
+          };
+          query_with_arg(options_arg["kingkong"]).then((resp) => {
+            console.log("$sell-isApprovedForAll?", resp);
+            set_isApprovedForAll(resp);
+            setSpinner(false);
+          });
+        } catch (err) {
+          console.log(err);
+        }
+      };
+      setmyaddress(getmyaddress());
+      queryApprovalForAll();
+      queryItemDetail();
+      getUserInfo();
+    });
   }, []);
 
   if (isMobile)

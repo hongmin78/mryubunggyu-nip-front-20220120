@@ -9,7 +9,6 @@ import StakingPopup from "../components/StakingPopup";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import Header from "../components/header/Header";
-import { addresses } from "../configs/addresses";
 import axios from "axios";
 import { API } from "../configs/api";
 import { LOGGER } from "../util/common";
@@ -22,6 +21,7 @@ import {
   TIME_FETCH_MYADDRESS_DEF,
 } from "../configs/configs";
 import { getethrep } from "../util/eth";
+import { get_contractaddress } from "../util/Util";
 // import { useSelector } from "react-redux";
 // const MODE_DEV_PROD='DEV'
 const MODE_DEV_PROD = "PROD";
@@ -34,13 +34,33 @@ export default function StakingDetail() {
   let [stakecurrencybalance, setstakecurrencybalance] = useState();
   let myaddress = getmyaddress();
   let isLogin = useSelector((state) => state.common.isLogin);
+  const [contractaddresses, setContractaddresses] = useState([]);
+
+  const query_contractaddresses = async () => {
+    return new Promise(async (res, rej) => {
+      try {
+        let { data } = await axios.get(API.API_CADDR);
+        let { status, list } = data;
+        if (status == "OK") {
+          setContractaddresses(list);
+          res(list);
+        } else {
+          rej("Failed to fetch contractaddresses");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  };
 
   const onclickstakingbutton = async (_) => {
     let myaddress = getmyaddress();
-    const querybalance = (_) => {
-      console.log("", addresses.contract_USDT, [myaddress]); // ETH_TESTNET.
+    const querybalance = async (_) => {
       return query_with_arg({
-        contractaddress: addresses.contract_USDT, // ETH_TESTNET.
+        contractaddress: await get_contractaddress(
+          "contract_USDT",
+          contractaddresses
+        ), // ETH_TESTNET.
         abikind: "ERC20",
         methodname: "balanceOf",
         aargs: [myaddress],
@@ -72,25 +92,26 @@ export default function StakingDetail() {
     },
     [isLogin]
   );
-  const query_stake_currency_balance = (_) => {
-    let myaddress = getmyaddress();
-    if (myaddress) {
-      query_with_arg({
-        contractaddress: addresses.contract_USDT, // ETH_TESTNET.
-        abikind: "ERC20",
-        methodname: "balanceOf",
-        aargs: [myaddress],
-      }).then((resp) => {
-        setstakecurrencybalance(getethrep(resp, 4));
-      });
-    } else {
-      return;
-    }
-    console.log("", addresses.contract_USDT, [myaddress]); // ETH_TESTNET.
-  };
 
   useEffect((_) => {
-    query_stake_currency_balance();
+    query_contractaddresses().then(async (resp) => {
+      const query_stake_currency_balance = async (_) => {
+        let myaddress = getmyaddress();
+        if (myaddress) {
+          query_with_arg({
+            contractaddress: await get_contractaddress("contract_USDT", resp), // ETH_TESTNET.
+            abikind: "ERC20",
+            methodname: "balanceOf",
+            aargs: [myaddress],
+          }).then((resp) => {
+            setstakecurrencybalance(getethrep(resp, 4));
+          });
+        } else {
+          return;
+        }
+      };
+      query_stake_currency_balance();
+    });
   }, []);
   if (isMobile)
     return (

@@ -29,6 +29,7 @@ import SetErrorBar from "../../util/SetErrorBar";
 import { requesttransaction } from "../../services/metamask";
 import awaitTransactionMined from "await-transaction-mined";
 import I_spinner from "../../img/icon/I_spinner.svg";
+import { get_contractaddress } from "../../util/Util";
 
 export default function MyItems() {
   const navigate = useNavigate();
@@ -51,6 +52,24 @@ export default function MyItems() {
   const [circulations, setCirculations] = useState([]);
   let [spinner, setSpinner] = useState(false);
   const [isApprovedForAll, setIsApprovedForAll] = useState(false);
+  const [contractaddresses, setContractaddresses] = useState([]);
+
+  const query_contractaddresses = async () => {
+    return new Promise(async (res, rej) => {
+      try {
+        let { data } = await axios.get(API.API_CADDR);
+        let { status, list } = data;
+        if (status == "OK") {
+          setContractaddresses(list);
+          res(list);
+        } else {
+          rej("Failed to fetch contractaddresses");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  };
 
   const fetchdata = async (_) => {
     // setTimeout((_) => {
@@ -115,31 +134,6 @@ export default function MyItems() {
             }
           });
       });
-
-    query_with_arg({
-      contractaddress: addresses.contract_ticketnft, // ETH_TESTNET.
-      abikind: "TICKETNFT",
-      methodname: "_balance_user_itemhash",
-      aargs: [myaddress], // ETH_TESTNET.
-    }).then(async (resp) => {
-      LOGGER("tickeinfo", resp);
-      let myitemhash = resp;
-      let mytokenid;
-      try {
-        mytokenid = await query_with_arg({
-          contractaddress: addresses.contract_ticketnft,
-          abikind: "TICKETNFT",
-          methodname: "_itemhash_tokenid",
-          aargs: [myitemhash],
-        });
-        LOGGER("GEVKU97nIv", mytokenid);
-        setTokenId(mytokenid);
-      } catch (err) {
-        LOGGER(err);
-        mytokenid = null;
-        return;
-      }
-    });
   };
 
   const openModal = () => {
@@ -147,7 +141,7 @@ export default function MyItems() {
   };
 
   //Approve
-  const on_click_approve = (item) => {
+  const on_click_approve = async (item) => {
     setSpinner(true);
     let myaddress = getmyaddress();
     if (myaddress) {
@@ -157,14 +151,17 @@ export default function MyItems() {
     }
 
     const abistring = getabistr_forfunction({
-      contractaddress: addresses.contract_kip17,
+      contractaddress: await get_contractaddress("KIP17", contractaddresses),
       abikind: "KIP17",
       methodname: "setApprovalForAll",
-      aargs: [addresses.contract_kip17_staking, true],
+      aargs: [
+        await get_contractaddress("KIP17[staking]", contractaddresses),
+        true,
+      ],
     });
     requesttransaction({
       from: myaddress,
-      to: addresses.contract_kip17,
+      to: await get_contractaddress("KIP17", contractaddresses),
       data: abistring,
       value: "0x00",
     }).then((resp) => {
@@ -192,8 +189,14 @@ export default function MyItems() {
                 auxdata: {
                   user_action: "approve",
                   contract_type: "KIP17", // .ETH_TESTNET
-                  contract_address: addresses.contract_kip17, // .ETH_TESTNET
-                  to_token_contract: addresses.contract_kip17_staking,
+                  contract_address: await get_contractaddress(
+                    "KIP17",
+                    contractaddresses
+                  ), // .ETH_TESTNET
+                  to_token_contract: await get_contractaddress(
+                    "KIP17[staking]",
+                    contractaddresses
+                  ),
                   my_address: myaddress,
                   nettype: net,
                 },
@@ -211,29 +214,8 @@ export default function MyItems() {
     });
   };
 
-  //queryApproval stake
-
-  const queryApproval = () => {
-    setSpinner(true);
-    let myaddress = getmyaddress();
-    if (myaddress) {
-    } else {
-      return;
-    }
-    query_with_arg({
-      contractaddress: addresses.contract_kip17,
-      abikind: "KIP17",
-      methodname: "isApprovedForAll",
-      aargs: [myaddress, addresses.contract_kip17_staking],
-    }).then((res) => {
-      console.log("approval", res);
-      setIsApprovedForAll(res);
-      setSpinner(false);
-    });
-  };
-
   //stake
-  const stake_for_diposit = (item) => {
+  const stake_for_diposit = async (item) => {
     if (item == null) {
       SetErrorBar("You have to select tokens first!");
       return;
@@ -250,17 +232,24 @@ export default function MyItems() {
     let abistring;
     if (item !== null) {
       abistring = getabistr_forfunction({
-        contractaddress: addresses.contract_kip17_staking,
+        contractaddress: await get_contractaddress(
+          "KIP17[staking]",
+          contractaddresses
+        ),
         abikind: "KIP17Stake",
         methodname: "mint_deposit",
-        aargs: [addresses.contract_kip17, item?.itemid, 0],
+        aargs: [
+          await get_contractaddress("KIP17", contractaddresses),
+          item?.itemid,
+          0,
+        ],
       });
     }
     console.log(abistring);
 
     requesttransaction({
       from: myaddress,
-      to: addresses.contract_kip17_staking,
+      to: await get_contractaddress("KIP17[staking]", contractaddresses),
       data: abistring,
       value: "0x00",
     }).then((resp) => {
@@ -286,8 +275,14 @@ export default function MyItems() {
                 auxdata: {
                   user_action: "KING_KONG_STAKING",
                   contract_type: "KING_KONG_STAKING", // .ETH_TESTNET
-                  contract_address: addresses.contract_kip17_staking, // .ETH_TESTNET
-                  to_token_contract: addresses.contract_kip17,
+                  contract_address: await get_contractaddress(
+                    "KIP17[staking]",
+                    contractaddresses
+                  ), // .ETH_TESTNET
+                  to_token_contract: await get_contractaddress(
+                    "KIP17",
+                    contractaddresses
+                  ),
                   my_address: myaddress,
                   tokenIds: item?.id,
                   itemIds: "itemid",
@@ -329,7 +324,7 @@ export default function MyItems() {
   };
 
   //withdraw
-  const stake_for_withdraw = (item) => {
+  const stake_for_withdraw = async (item) => {
     console.log("withdraw", item);
     if (item === null) {
       SetErrorBar("You have to select tokens first!");
@@ -342,15 +337,22 @@ export default function MyItems() {
     }
     setSpinner(true);
     const abistring = getabistr_forfunction({
-      contractaddress: addresses.contract_kip17_staking,
+      contractaddress: await get_contractaddress(
+        "KIP17[staking]",
+        contractaddresses
+      ),
       abikind: "KIP17Stake",
       methodname: "withdraw",
-      aargs: [addresses.contract_kip17, item?.itemid, myaddress],
+      aargs: [
+        await get_contractaddress("KIP17", contractaddresses),
+        item?.itemid,
+        myaddress,
+      ],
     });
 
     requesttransaction({
       from: myaddress,
-      to: addresses.contract_kip17,
+      to: await get_contractaddress("KIP17", contractaddresses),
       data: abistring,
       value: "0x00",
     }).then((resp) => {
@@ -371,8 +373,14 @@ export default function MyItems() {
                 auxdata: {
                   user_action: "KING_KONG_UNSTAKE",
                   contract_type: "KING_KONG_UNSTAKE", // .ETH_TESTNET
-                  contract_address: addresses.contract_kip17_staking, // .ETH_TESTNET
-                  to_token_contract: addresses.contract_kip17,
+                  contract_address: await get_contractaddress(
+                    "KIP17[staking]",
+                    contractaddresses
+                  ), // .ETH_TESTNET
+                  to_token_contract: await get_contractaddress(
+                    "KIP17",
+                    contractaddresses
+                  ),
                   my_address: myaddress,
                   tokenIds: itemData?.tokenid,
                   itemIds: item?.itemid,
@@ -425,15 +433,56 @@ export default function MyItems() {
       });
   }, [getTickTimer]);
 
-  useEffect(
-    (_) => {
-      // setTimeout(() => {
+  useEffect(() => {
+    query_contractaddresses().then(async (resp) => {
+      let myaddress = getmyaddress();
+      query_with_arg({
+        contractaddress: addresses.contract_ticketnft, // ETH_TESTNET.
+        abikind: "TICKETNFT",
+        methodname: "_balance_user_itemhash",
+        aargs: [myaddress], // ETH_TESTNET.
+      }).then(async (resp) => {
+        LOGGER("tickeinfo", resp);
+        let myitemhash = resp;
+        let mytokenid;
+        try {
+          mytokenid = await query_with_arg({
+            contractaddress: addresses.contract_ticketnft,
+            abikind: "TICKETNFT",
+            methodname: "_itemhash_tokenid",
+            aargs: [myitemhash],
+          });
+          LOGGER("GEVKU97nIv", mytokenid);
+          setTokenId(mytokenid);
+        } catch (err) {
+          LOGGER(err);
+          mytokenid = null;
+          return;
+        }
+      });
+
+      const queryApproval = async () => {
+        setSpinner(true);
+        let myaddress = getmyaddress();
+        if (myaddress) {
+        } else {
+          return;
+        }
+        query_with_arg({
+          contractaddress: await get_contractaddress("KIP17", resp),
+          abikind: "KIP17",
+          methodname: "isApprovedForAll",
+          aargs: [myaddress, await get_contractaddress("KIP17[staking]", resp)],
+        }).then((res) => {
+          console.log("approval", res);
+          setIsApprovedForAll(res);
+          setSpinner(false);
+        });
+      };
       fetchdata();
       queryApproval();
-      // }, 1500);
-    },
-    [isOpen, isApprovedForAll]
-  );
+    });
+  }, [isOpen, isApprovedForAll]);
 
   if (isMobile)
     return (

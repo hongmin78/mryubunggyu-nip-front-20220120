@@ -19,7 +19,7 @@ import { getmyaddress, LOGGER } from "../util/common";
 import moment from "moment";
 import axios from "axios";
 import { API } from "../configs/api";
-import { addresses } from "../configs/addresses";
+
 import { TIME_FETCH_MYADDRESS_DEF } from "../configs/configs";
 import SetErrorBar from "../util/SetErrorBar.js";
 import { messages } from "../configs/messages";

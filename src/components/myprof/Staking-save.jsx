@@ -5,20 +5,34 @@ import { D_recommendList } from "../../data/DmyPage";
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { strDot } from "../../util/Util";
-import { D_rewardHeader, D_rewardList, D_vaultHeader, D_vaultList, D_stakeHeader } from "../../data/Dstaking";
+import {
+  D_rewardHeader,
+  D_rewardList,
+  D_vaultHeader,
+  D_vaultList,
+  D_stakeHeader,
+} from "../../data/Dstaking";
 import { getmyaddress, LOGGER } from "../../util/common";
 import axios from "axios";
 import moment from "moment";
 import { API } from "../../configs/api";
 import ticketImg from "../../img/staking/E_prof1.png";
 import { net } from "../../configs/net";
-import { getabistr_forfunction, query_with_arg, query_noarg, query_eth_balance } from "../../util/contract-calls";
+import {
+  getabistr_forfunction,
+  query_with_arg,
+  query_noarg,
+  query_eth_balance,
+} from "../../util/contract-calls";
 import { addresses } from "../../configs/addresses";
 import { getweirep, getethrep } from "../../util/eth";
 import SetErrorBar from "../../util/SetErrorBar";
 import { requesttransaction } from "../../services/metamask";
 import awaitTransactionMined from "await-transaction-mined";
-import { TIME_FETCH_MYADDRESS_DEF, TX_POLL_OPTIONS } from "../../configs/configs";
+import {
+  TIME_FETCH_MYADDRESS_DEF,
+  TX_POLL_OPTIONS,
+} from "../../configs/configs";
 import { web3 } from "../../configs/configweb3";
 
 export default function Staking() {
@@ -31,17 +45,19 @@ export default function Staking() {
   let [spinner, setSpinner] = useState(false);
   const fatchData = () => {
     let myaddress = getmyaddress();
-    axios.get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`).then((resp) => {
-      let { status, respdata } = resp.data;
-      if (status == "OK" && respdata !== null) {
-        setItckInfo([respdata]);
-      }
-    });
+    axios
+      .get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`)
+      .then((resp) => {
+        let { status, respdata } = resp.data;
+        if (status == "OK" && respdata !== null) {
+          setItckInfo([respdata]);
+        }
+      });
   };
   useEffect(() => {
     fatchData();
   }, []);
-  console.log("logsataasdasd", ticketInfo);  //claim_nipcoin_reward
+  console.log("logsataasdasd", ticketInfo); //claim_nipcoin_reward
   const query_claimed_reward = (_) => {
     query_noarg({
       contractaddress: addresses.STAKE,
@@ -111,10 +127,12 @@ export default function Staking() {
       let txhash;
       txhash = res;
 
-      awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then(async (minedtxreceipt) => {
-        query_claimed_reward();
-        console.log("minedtxreceipt", minedtxreceipt);
-      });
+      awaitTransactionMined
+        .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+        .then(async (minedtxreceipt) => {
+          query_claimed_reward();
+          console.log("minedtxreceipt", minedtxreceipt);
+        });
 
       axios
         .post(API.API_TXS + `/${txhash}`, {
@@ -149,7 +167,11 @@ export default function Staking() {
                     <li key={index}>
                       <div className="topBar">
                         <img src={ticketImg} alt="" />
-                        <p>{cont.active && cont.active === 1 ? "ACTIVE" : "UNACTIVE"}</p>
+                        <p>
+                          {cont.active && cont.active === 1
+                            ? "ACTIVE"
+                            : "UNACTIVE"}
+                        </p>
                       </div>
 
                       <ul className="dataList">
@@ -159,11 +181,19 @@ export default function Staking() {
                         </li>
                         <li>
                           <p className="key">Start</p>
-                          <p className="value">{moment(cont.createdat).format("YYYY-MM-DD hh:mm:ss")}</p>
+                          <p className="value">
+                            {moment(cont.createdat).format(
+                              "YYYY-MM-DD hh:mm:ss"
+                            )}
+                          </p>
                         </li>
                         <li>
                           <p className="key">Ended</p>
-                          <p className="value">{moment(cont.createdat).add(90, "day").format("YYYY-MM-DD hh:mm:ss")}</p>
+                          <p className="value">
+                            {moment(cont.createdat)
+                              .add(90, "day")
+                              .format("YYYY-MM-DD hh:mm:ss")}
+                          </p>
                         </li>
                       </ul>
 
@@ -301,7 +331,11 @@ export default function Staking() {
                     <li key={index}>
                       <span>
                         <img src={ticketImg} alt="" />
-                        <p>{cont.active && cont.active === 1 ? "ACTIVE" : "UNACTIVE"}</p>
+                        <p>
+                          {cont.active && cont.active === 1
+                            ? "ACTIVE"
+                            : "UNACTIVE"}
+                        </p>
                       </span>
 
                       <span>
@@ -310,7 +344,11 @@ export default function Staking() {
 
                       <span>{cont.createdat.split(".", 1)}</span>
 
-                      <span>{moment(cont.createdat).add(90, "day").format("YYYY-MM-DDThh:mm:ss")}</span>
+                      <span>
+                        {moment(cont.createdat)
+                          .add(90, "day")
+                          .format("YYYY-MM-DDThh:mm:ss")}
+                      </span>
 
                       {/* <span>
                         <button className="unstakeBtn" onClick={() => {}}>

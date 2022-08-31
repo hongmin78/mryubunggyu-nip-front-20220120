@@ -24,7 +24,7 @@ import {
   query_noarg,
   query_eth_balance,
 } from "../../util/contract-calls";
-import { addresses } from "../../configs/addresses";
+
 import { getweirep, getethrep } from "../../util/eth";
 import SetErrorBar from "../../util/SetErrorBar";
 import { requesttransaction } from "../../services/metamask";
