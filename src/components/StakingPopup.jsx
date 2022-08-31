@@ -2,7 +2,11 @@ import styled from "styled-components";
 import I_x from "../img/icon/I_x.svg";
 import I_tIcon from "../img/icon/I_tIcon.png";
 import I_chkWhite from "../img/icon/I_chkWhite.svg";
-import { get_ipfsformatcid, putCommaAtPrice } from "../util/Util";
+import {
+  get_contractaddress,
+  get_ipfsformatcid,
+  putCommaAtPrice,
+} from "../util/Util";
 import { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import PopupBg from "./PopupBg";
@@ -53,95 +57,111 @@ export default function StakingPopup({ off }) {
   let [isloader_01, setisloader_01] = useState(false);
   const [userinfo, setuserinfo] = useState({});
   let [MIN_STAKE_AMOUNT, setMIN_STAKE_AMOUNT] = useState("100");
+  const [contractaddresses, setContractaddresses] = useState([]);
   useEffect((_) => {
-    const spinner = spinnerHref.current; // document.querySelector("Spinner");
-    spinner.animate(
-      [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
-      {
-        duration: 1000,
-        iterations: Infinity,
-      }
-    );
-    const spinner_approve = spinnerHref_approve.current; // document.querySelector("Spinner");
-    spinner_approve.animate(
-      [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
-      {
-        duration: 1000,
-        iterations: Infinity,
-      }
-    );
-
-    const fetchdata = async (_) => {
-      axios.get(API.API_TICKERS + `?nettype=${net}`).then((resp) => {
-        LOGGER("MDmEMQ5xde", resp.data);
-        let { status, payload, list } = resp;
-        //				let { USDT } = payload.list
-        //			LOGGER( 'mlB7HasjBh' , USDT )
-        //		settickerusdt ( USDT )
-      });
-      let myaddress = getmyaddress();
-      // LOGGER("", addresses.con tract_stake, myaddress); // .ETH_TESTNET
-      // let resp_balances = await query_with_arg({
-      //   contractaddress: addresses.contra ct_stake, // ETH_TESTNET.
-      //   abikind: "STAKE",
-      //   methodname: "_balances",
-      //   aargs: [myaddress],
-      // });
-      // LOGGER("uQJ2POHvP8", resp_balances);
-      // setstakedbalance(getethrep(resp_balances));
-      query_with_arg({
-        contractaddress: addresses.contract_USDT, // ETH_TESTNET.
-        abikind: "ERC20",
-        methodname: "allowance",
-        aargs: [myaddress, addresses.contract_erc1155_sales], // ETH_TESTNET.
-      }).then((resp) => {
-        let allowanceineth = getethrep(resp);
-        LOGGER("8LYRxjNp8k", resp, allowanceineth);
-        setallowanceamount(allowanceineth);
-        //				setallowanceamount ( 100 )
-        if (allowanceineth > 0) {
-          setisallowanceok(false);
-        } else {
+    query_contractaddresses().then((res) => {
+      console.log("CONTRACTADDRESSES", contractaddresses);
+      const spinner = spinnerHref.current; // document.querySelector("Spinner");
+      spinner.animate(
+        [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
+        {
+          duration: 1000,
+          iterations: Infinity,
         }
-      });
-      query_with_arg({
-        contractaddress: addresses.contract_USDT, // ETH_TESTNET.
-        abikind: "ERC20",
-        methodname: "balanceOf",
-        aargs: [myaddress],
-      }).then((resp) => {
-        LOGGER("", resp);
-        setmybalance(getethrep(resp, 4));
-      });
-      // query_noarg({
-      //   contractaddress: addresses.contr act_stake, // ETH_TESTNET.
-      //   abikind: "STAKE",
-      //   methodname: "_tvl",
-      // }).then((resp) => {
-      //   LOGGER("", resp);
-      //   settvl(getethrep(resp));
-      // });
-
-      query_with_arg({
-        contractaddress: addresses.contract_admin,
-        abikind: "ADMIN",
-        methodname: "_stakeplans",
-        aargs: [addresses.contract_USDT],
-      }).then((resp) => {
-        LOGGER("HSudcIgxuB", resp);
-        if (resp) {
-        } else {
-          return;
+      );
+      const spinner_approve = spinnerHref_approve.current; // document.querySelector("Spinner");
+      spinner_approve.animate(
+        [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
+        {
+          duration: 1000,
+          iterations: Infinity,
         }
-        setMIN_STAKE_AMOUNT(getethrep(resp[4]));
-      });
+      );
 
-      query_eth_balance(myaddress).then((resp) => {
-        LOGGER("rmgUxgo5ye", resp);
-        setmyethbalance((+getethrep(resp)).toFixed(DECIMALS_DISP_DEF));
-      });
-    };
-    fetchdata();
+      const fetchdata = async (_) => {
+        axios.get(API.API_TICKERS + `?nettype=${net}`).then((resp) => {
+          LOGGER("MDmEMQ5xde", resp.data);
+          let { status, payload, list } = resp;
+          //				let { USDT } = payload.list
+          //			LOGGER( 'mlB7HasjBh' , USDT )
+          //		settickerusdt ( USDT )
+        });
+        let myaddress = getmyaddress();
+        // LOGGER("", addresses.con tract_stake, myaddress); // .ETH_TESTNET
+        // let resp_balances = await query_with_arg({
+        //   contractaddress: addresses.contra ct_stake, // ETH_TESTNET.
+        //   abikind: "STAKE",
+        //   methodname: "_balances",
+        //   aargs: [myaddress],
+        // });
+        // LOGGER("uQJ2POHvP8", resp_balances);
+        // setstakedbalance(getethrep(resp_balances));
+        query_with_arg({
+          contractaddress: get_contractaddress(
+            "contract_USDT",
+            contractaddresses
+          ), // ETH_TESTNET.
+          abikind: "ERC20",
+          methodname: "allowance",
+          aargs: [
+            myaddress,
+            get_contractaddress("ERC1155[sales]", contractaddresses),
+          ], // ETH_TESTNET.
+        }).then((resp) => {
+          let allowanceineth = getethrep(resp);
+          LOGGER("8LYRxjNp8k", resp, allowanceineth);
+          setallowanceamount(allowanceineth);
+          //				setallowanceamount ( 100 )
+          if (allowanceineth > 0) {
+            setisallowanceok(false);
+          } else {
+          }
+        });
+        query_with_arg({
+          contractaddress: get_contractaddress(
+            "contract_USDT",
+            contractaddresses
+          ), // ETH_TESTNET.
+          abikind: "ERC20",
+          methodname: "balanceOf",
+          aargs: [myaddress],
+        }).then((resp) => {
+          LOGGER("", resp);
+          setmybalance(getethrep(resp, 4));
+        });
+        // query_noarg({
+        //   contractaddress: addresses.contr act_stake, // ETH_TESTNET.
+        //   abikind: "STAKE",
+        //   methodname: "_tvl",
+        // }).then((resp) => {
+        //   LOGGER("", resp);
+        //   settvl(getethrep(resp));
+        // });
+
+        query_with_arg({
+          contractaddress: get_contractaddress(
+            "contract_admin",
+            contractaddresses
+          ),
+          abikind: "ADMIN",
+          methodname: "_stakeplans",
+          aargs: [get_contractaddress("contract_USDT", contractaddresses)],
+        }).then((resp) => {
+          LOGGER("HSudcIgxuB", resp);
+          if (resp) {
+          } else {
+            return;
+          }
+          setMIN_STAKE_AMOUNT(getethrep(resp[4]));
+        });
+
+        query_eth_balance(myaddress).then((resp) => {
+          LOGGER("rmgUxgo5ye", resp);
+          setmyethbalance((+getethrep(resp)).toFixed(DECIMALS_DISP_DEF));
+        });
+      };
+      fetchdata();
+    });
   }, []);
 
   const getuserinfo = async () => {
@@ -158,6 +178,24 @@ export default function StakingPopup({ off }) {
       console.error(err);
     }
   };
+  const query_contractaddresses = async () => {
+    return new Promise(async (res, rej) => {
+      try {
+        let { data } = await axios.get(API.API_CADDR);
+        let { status, list } = data;
+        if (status == "OK") {
+          setContractaddresses(list);
+          if (contractaddresses.length > 0) {
+            res("Successfully fetched contractaddresses");
+          }
+        } else {
+          rej("Failed to fetch contractaddresses");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  };
 
   useEffect(() => {
     getuserinfo();
@@ -165,18 +203,22 @@ export default function StakingPopup({ off }) {
 
   const onclick_approve = async (_) => {
     LOGGER("");
+
     let myaddress = getmyaddress();
     let abistr = getabistr_forfunction({
-      contractaddress: addresses.contract_USDT, // ETH_TESTNET.
+      contractaddress: get_contractaddress("contract_USDT", contractaddresses), // ETH_TESTNET.
       abikind: "ERC20",
       methodname: "approve",
-      aargs: [addresses.contract_erc1155_sales, getweirep("" + 10 ** 6)], // .ETH_TESTNET
+      aargs: [
+        get_contractaddress("ERC1155[sales]", contractaddresses),
+        getweirep("" + 10 ** 6),
+      ], // .ETH_TESTNET
     });
     LOGGER("", abistr);
     setisloader_00(true);
     requesttransaction({
       from: myaddress,
-      to: addresses.contract_USDT, // ETH_TESTNET.
+      to: get_contractaddress("contract_USDT", contractaddresses), // ETH_TESTNET.
       data: abistr,
     }).then((resp) => {
       if (resp) {
@@ -205,8 +247,11 @@ export default function StakingPopup({ off }) {
               username: myaddress,
               typestr: "APPROVE",
               auxdata: {
-                erc20: addresses.contract_USDT, // .ETH_TESTNET
-                target: addresses.contract_erc1155_sales, // .ETH_TESTNET
+                erc20: get_contractaddress("contract_USDT", contractaddresses), // .ETH_TESTNET
+                target: get_contractaddress(
+                  "ERC1155[sales]",
+                  contractaddresses
+                ), // .ETH_TESTNET
                 nettype: net,
               },
               nettype: NETTYPE,
@@ -217,10 +262,16 @@ export default function StakingPopup({ off }) {
             });
 
           query_with_arg({
-            contractaddress: addresses.contract_USDT, // .ETH_TESTNET
+            contractaddress: get_contractaddress(
+              "contract_USDT",
+              contractaddresses
+            ), // .ETH_TESTNET
             abikind: "ERC20",
             methodname: "allowance",
-            aargs: [myaddress, addresses.contract_erc1155_sales], // ETH_TESTNET.
+            aargs: [
+              myaddress,
+              get_contractaddress("ERC1155[sales]", contractaddresses),
+            ], // ETH_TESTNET.
           }).then((resp) => {
             let allowanceineth = getethrep(resp);
             LOGGER("gCwXF6Jjkh", resp, allowanceineth);
@@ -247,11 +298,11 @@ export default function StakingPopup({ off }) {
       return;
     }
     let abistr = getabistr_forfunction({
-      contractaddress: addresses.contract_erc1155_sales, // .ETH_TESTNET
+      contractaddress: get_contractaddress("ERC1155[sales]", contractaddresses), // .ETH_TESTNET
       abikind: "ERC1155Sale",
       methodname: "mint_and_match_single_simple_legacy",
       aargs: [
-        addresses.contract_erc1155,
+        get_contractaddress("ERC1155[sales]", contractaddresses),
         itemid,
         "1",
         "0",
@@ -259,7 +310,7 @@ export default function StakingPopup({ off }) {
         userinfo?.refereraddress,
         "1",
         getweirep("" + 100),
-        addresses.contract_USDT,
+        get_contractaddress("contract_USDT", contractaddresses),
         addresses.admin_account_address,
       ],
     });
@@ -270,7 +321,7 @@ export default function StakingPopup({ off }) {
         setisloader_01(true);
         resp = await requesttransaction({
           from: myaddress,
-          to: addresses.contract_erc1155_sales, // .ETH_TESTNET
+          to: get_contractaddress("ERC1155[sales]", contractaddresses), // .ETH_TESTNET
           data: abistr,
         });
 
@@ -303,7 +354,10 @@ export default function StakingPopup({ off }) {
                 auxdata: {
                   amount: MIN_STAKE_AMOUNT,
                   currency: STAKE_CURRENCY,
-                  currencyaddress: addresses.contract_USDT, // ETH_TESTNET.
+                  currencyaddress: get_contractaddress(
+                    "contract_USDT",
+                    contractaddresses
+                  ), // ETH_TESTNET.
                   nettype: NETTYPE,
                 },
                 nettype: net,

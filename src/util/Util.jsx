@@ -87,6 +87,10 @@ export const generate_random_string = (length) => {
   return result;
 };
 
+export const get_contractaddress = (name, list) => {
+  return list.find((el) => el.name == name).address;
+};
+
 export const get_ipfsformatcid = () => {
   let str = generate_random_string(10);
   const hashFunction = Buffer.from("12", "hex"); // 0x20

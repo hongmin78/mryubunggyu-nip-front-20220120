@@ -59,6 +59,7 @@ const API = {
   API_POST_SALE: `${URL}/orders`,
   API_ALL_ITEMS_MARKET: URL + "/queries/orders",
   API_BANNERS: `${URL}/queries/rows/banners/isinuse/1/0/500/id/ASC`,
+  API_CADDR: `${URL}/queries/contractaddresses?nettype=${net}`,
 };
 
 export { API };
