@@ -4,7 +4,7 @@ import I_circleChk from "../../img/icon/I_circleChk.svg";
 import { D_recommendList } from "../../data/DmyPage";
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { strDot } from "../../util/Util";
+import { get_contractaddress, strDot } from "../../util/Util";
 import {
   D_rewardHeader,
   D_rewardList,
@@ -50,9 +50,25 @@ export default function Staking() {
   let [claimedamount, setclaimedamount] = useState();
   let [kingkong_list, set_kingkong_list] = useState([]);
   let [staked_count, set_staked_count] = useState(0);
+  const [contractaddresses, setContractaddresses] = useState([]);
+  const query_contractaddresses = async () => {
+    return new Promise(async (res, rej) => {
+      try {
+        let { data } = await axios.get(API.API_CADDR);
+        let { status, list } = data;
+        if (status == "OK") {
+          setContractaddresses(list);
+          res(list);
+        } else {
+          rej("Failed to fetch contractaddresses");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  };
   const fatchData = async () => {
     let myaddress = getmyaddress();
-    query_claimable_amount(myaddress);
     axios
       .get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`)
       .then((resp) => {
@@ -77,39 +93,57 @@ export default function Staking() {
     }
   };
   useEffect(() => {
-    fatchData();
-  }, []);
-  useEffect((_) => {
     let myaddress = getmyaddress();
-    // query_claimable_amount(myaddress);
-    query_claimed_reward();
-    queryTotalMinted(myaddress);
-  }, []);
-  console.log("logsataasdasd", ticketInfo); //claim_nipcoin_reward
 
-  const query_claimable_amount = (myaddress) => {
-    query_with_arg({
-      contractaddress: addresses.contract_kip17_staking,
-      abikind: "KIP17Stake", //
-      methodname: "query_claimable_amount",
-      aargs: [myaddress],
-    })
-      .then((resp) => {
-        LOGGER(`@query_claimable_amount`, resp);
-        setclaimbaleamount((+getethrep(resp)).toFixed(4));
-      })
-      .catch(LOGGER);
-  };
-  const query_claimed_reward = (_) => {
-    query_noarg({
-      contractaddress: addresses.contract_kip17_staking,
-      abikind: "KIP17Stake", //
-      methodname: "query_claimed_reward",
-    }).then((resp) => {
-      LOGGER("@query_claimed_reward", getethrep(resp));
-      setTotalClaimedReward((+getethrep(resp)).toFixed(4));
+    query_contractaddresses().then(async (resp) => {
+      fatchData();
+      const query_claimable_amount = async (myaddress) => {
+        query_with_arg({
+          contractaddress: await get_contractaddress("KIP17[staking]", resp),
+          abikind: "KIP17Stake", //
+          methodname: "query_claimable_amount",
+          aargs: [myaddress],
+        })
+          .then((resp) => {
+            LOGGER(`@query_claimable_amount`, resp);
+            setclaimbaleamount((+getethrep(resp)).toFixed(4));
+          })
+          .catch(LOGGER);
+      };
+      const query_claimed_reward = async (_) => {
+        query_noarg({
+          contractaddress: await get_contractaddress("KIP17[staking]", resp),
+          abikind: "KIP17Stake", //
+          methodname: "query_claimed_reward",
+        }).then((resp) => {
+          LOGGER("@query_claimed_reward", getethrep(resp));
+          setTotalClaimedReward((+getethrep(resp)).toFixed(4));
+        });
+      };
+      const queryTotalMinted = async (myaddress) => {
+        //    let myaddress = getmyaddress();
+        if (myaddress) {
+        } else {
+          return;
+        }
+        console.log("asdasdasdsad", myaddress);
+        query_with_arg({
+          contractaddress: await get_contractaddress("KIP17[staking]", resp),
+          //      abikind: "STAK ING", // NFT
+          abikind: "KIP17Stake", //
+          methodname: "balanceOf",
+          aargs: [myaddress],
+        }).then((res) => {
+          setTotalMinted(res);
+          console.log("@total minted", res);
+        });
+      };
+
+      query_claimable_amount(myaddress);
+      query_claimed_reward();
+      queryTotalMinted(myaddress);
     });
-  };
+  }, []);
 
   const make_employ_tx = async (itemDetail, _status) => {
     let myaddress = getmyaddress();
@@ -118,16 +152,30 @@ export default function Staking() {
     let { itemid, itemdata } = itemDetail;
     let options_arg = {
       withdraw: {
-        contractaddress: addresses.contract_kip17_staking, // ETH_TESTNET.
+        contractaddress: await get_contractaddress(
+          "KIP17[staking]",
+          contractaddresses
+        ), // ETH_TESTNET.
         abikind: "KIP17Stake",
         methodname: _status,
-        aargs: [addresses.contract_kip17, itemdata?.tokenid, myaddress], // .ETH_TESTNET
+        aargs: [
+          await get_contractaddress("KIP17", contractaddresses),
+          itemdata?.tokenid,
+          myaddress,
+        ], // .ETH_TESTNET
       },
       mint_deposit: {
-        contractaddress: addresses.contract_kip17_staking, // ETH_TESTNET.
+        contractaddress: await get_contractaddress(
+          "KIP17[staking]",
+          contractaddresses
+        ), // ETH_TESTNET.
         abikind: "KIP17Stake",
         methodname: _status,
-        aargs: [addresses.contract_kip17, itemid, 250], // .ETH_TESTNET
+        aargs: [
+          await get_contractaddress("KIP17", contractaddresses),
+          itemid,
+          250,
+        ], // .ETH_TESTNET
       },
     };
     console.log("__________asdfasdfaqwef", options_arg[_status]);
@@ -135,7 +183,7 @@ export default function Staking() {
     let abistr = await getabistr_forfunction(options_arg[_status]);
     requesttransaction({
       from: myaddress,
-      to: addresses.contract_kip17_staking, // ETH_TESTNET.
+      to: await get_contractaddress("KIP17[staking]", contractaddresses), // ETH_TESTNET.
       data: abistr,
     }).then((resp) => {
       LOGGER("@txresp", resp);
@@ -161,7 +209,10 @@ export default function Staking() {
               typestr: `${_status == "withdraw" ? "UN" : ""}EMPLOY_KINGKONG`,
               username: myaddress,
               itemid,
-              contractaddress: addresses.contract_kip17_staking,
+              contractaddress: await get_contractaddress(
+                "KIP17[staking]",
+                contractaddresses
+              ),
             })
             .then(async (_) => {
               window.location.reload();
@@ -170,25 +221,6 @@ export default function Staking() {
               console.log(err);
             }); //
         });
-    });
-  };
-  //count mint ( kingkong )
-  const queryTotalMinted = (myaddress) => {
-    //    let myaddress = getmyaddress();
-    if (myaddress) {
-    } else {
-      return;
-    }
-    console.log("asdasdasdsad", myaddress);
-    query_with_arg({
-      contractaddress: addresses.contract_kip17_staking,
-      //      abikind: "STAK ING", // NFT
-      abikind: "KIP17Stake", //
-      methodname: "balanceOf",
-      aargs: [myaddress],
-    }).then((res) => {
-      setTotalMinted(res);
-      console.log("@total minted", res);
     });
   };
 
@@ -205,7 +237,10 @@ export default function Staking() {
     //   return;
     // }
     const abistring = getabistr_forfunction({
-      contractaddress: addresses.contract_kip17_staking,
+      contractaddress: await get_contractaddress(
+        "KIP17[staking]",
+        contractaddresses
+      ),
       abikind: "KIP17Stake", // STAKING",
       methodname: "claim",
       aargs: [],
@@ -213,10 +248,10 @@ export default function Staking() {
     setSpinner(true);
     requesttransaction({
       from: myaddress,
-      to: addresses.contract_kip17_staking,
+      to: await get_contractaddress("KIP17[staking]", contractaddresses),
       data: abistring,
       value: "0x00",
-    }).then((res) => {
+    }).then(async (res) => {
       console.log(res);
       if (res) {
       } else {
@@ -240,7 +275,10 @@ export default function Staking() {
           amount: totalClaimedReward,
           auxdata: {
             toAmount: totalClaimedReward,
-            rewardTokenContract: addresses.contract_reward_token, // contract_nip_token,
+            rewardTokenContract: await get_contractaddress(
+              "ERC20",
+              contractaddresses
+            ), // contract_nip_token,
             rewardTokenSymbol: "NIP",
             nettype: net,
           },

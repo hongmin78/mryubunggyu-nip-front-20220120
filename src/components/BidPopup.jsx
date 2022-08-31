@@ -472,7 +472,6 @@ export default function BidPopup({ off, itemdata }) {
         },
 
         abistr: {
-          // contractaddress: addresses.contract_erc1155_ticket_sales,
           contractaddress: await get_contractaddress(
             "ERC1155[sales]",
             contractaddresses
