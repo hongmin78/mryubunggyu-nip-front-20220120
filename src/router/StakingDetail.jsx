@@ -49,12 +49,6 @@ export default function StakingDetail() {
     if (isLogin) {
       let resp = await querybalance();
       LOGGER("h8UpKsxO1Y", resp);
-      let respstakebalance = await query_with_arg({
-        contractaddress: addresses.contract_stake,
-        abikind: "STAKE",
-        methodname: "_balances",
-        aargs: [myaddress],
-      });
       if (stakecurrencybalance && stakecurrencybalance > 0) {
         setStakingPopup(true);
         if (MODE_DEV_PROD == "DEV") {
@@ -96,30 +90,7 @@ export default function StakingDetail() {
   };
 
   useEffect((_) => {
-    // setTimeout((_) => {
     query_stake_currency_balance();
-    // }, []);
-    // return //   alert(myaddress)
-    // LOGGER('', myaddress)
-    // if (myaddress) {
-    // } else {
-    //   LOGGER(messages.MSG_PLEASE_CONNECT_WALLET)
-    //   return
-    // }
-    //    LOGGER(API.API_MAX + `/tickets/serialnumber`)
-    //    return
-    /**     false && axios.get ( API.API_MAX + `/tickets/serialnumber?nettype=${net}`).then(resp=>{ LOGGER('' , resp.data )
-      let { status , payload } =resp.data
-      if ( status == 'OK' ){
-//        setcurrentserialnumber ( payload.max ? payload.max : 0 )
-      }
-    })*/
-    /*query_with_arg ( {contractaddress : addresses.contract_USDT
-      , abikind : 'ERC20'
-      , methodname : 'balanceOf'
-      , aargs : [ myaddress ] 
-    } )     .then(resp=>{         LOGGER( 'R6H63xkTcs' , resp )
-    }) */
   }, []);
   if (isMobile)
     return (
@@ -221,7 +192,6 @@ export default function StakingDetail() {
                 }}
               >
                 Staking
-                {/* You don’t have enough USDT */}
               </button>
               <span style={{ color: "#fff" }}>
                 <br />

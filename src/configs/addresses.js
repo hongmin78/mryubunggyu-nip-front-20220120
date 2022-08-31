@@ -56,8 +56,8 @@ const jaddresses = {
     contract_reward_token: "0xa934775D7863833f51BFcA6ce5dFfa97aAB83cb8",
 
     // minter contracts
-    contract_erc1155: "0x9910F229037accaA687d3e4467aB59510813f4a9", //
-    contract_kip17: "0x419c123980a27b06C1c9E8be278B0DFCAC9b6338", //
+    contract_erc1155: "0x9910F229037accaA687d3e4467aB59510813f4a9", // ticket contractaddress
+    contract_kip17: "0x419c123980a27b06C1c9E8be278B0DFCAC9b6338", // kingkong contractaddress
     // minter contracts
 
     // acting contracts

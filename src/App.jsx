@@ -104,10 +104,8 @@ function App() {
       LOGGER("asdasdasdasds", resp);
       let { status, respdata } = resp.data;
       if (status == "OK") {
-        if (parseInt(respdata._value) > CURRENT_TIME)
+        if (parseInt(respdata?._value) > CURRENT_TIME)
           window.location.reload("/");
-      } else {
-        return;
       }
     });
     let { ethereum } = window;

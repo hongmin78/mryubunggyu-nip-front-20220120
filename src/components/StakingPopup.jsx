@@ -133,23 +133,13 @@ export default function StakingPopup({ off }) {
         }
         setMIN_STAKE_AMOUNT(getethrep(resp[4]));
       });
-      false &&
-        query_with_arg({
-          contractaddress: addresses.contract_stake, // .ETH_TESTNET
-          abikind: "STAKE",
-          methodname: "_tvl_nft",
-        }).then((resp) => {
-          LOGGER("", resp);
-          //				settvlnft ( resp )
-        });
+
       query_eth_balance(myaddress).then((resp) => {
         LOGGER("rmgUxgo5ye", resp);
         setmyethbalance((+getethrep(resp)).toFixed(DECIMALS_DISP_DEF));
       });
     };
-    // setTimeout(() => {
     fetchdata();
-    // }, 1500);
   }, []);
   const onclick_approve = async (_) => {
     LOGGER("");
@@ -238,7 +228,6 @@ export default function StakingPopup({ off }) {
       ],
     });
 
-    LOGGER("", abistr); //		return
     const callreqtx = async (_) => {
       let resp;
       try {
