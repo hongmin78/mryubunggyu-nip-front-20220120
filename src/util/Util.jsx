@@ -88,7 +88,10 @@ export const generate_random_string = (length) => {
 };
 
 export const get_contractaddress = (name, list) => {
-  return list.find((el) => el.name == name).address;
+  return new Promise((resolve, reject) => {
+    const address = list.find((el) => el.name == name)?.address;
+    address ? resolve(address) : reject(null);
+  });
 };
 
 export const get_ipfsformatcid = () => {

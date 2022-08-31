@@ -60,7 +60,6 @@ export default function StakingPopup({ off }) {
   const [contractaddresses, setContractaddresses] = useState([]);
   useEffect((_) => {
     query_contractaddresses().then((res) => {
-      console.log("CONTRACTADDRESSES", contractaddresses);
       const spinner = spinnerHref.current; // document.querySelector("Spinner");
       spinner.animate(
         [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
@@ -97,16 +96,10 @@ export default function StakingPopup({ off }) {
         // LOGGER("uQJ2POHvP8", resp_balances);
         // setstakedbalance(getethrep(resp_balances));
         query_with_arg({
-          contractaddress: get_contractaddress(
-            "contract_USDT",
-            contractaddresses
-          ), // ETH_TESTNET.
+          contractaddress: await get_contractaddress("contract_USDT", res), // ETH_TESTNET.
           abikind: "ERC20",
           methodname: "allowance",
-          aargs: [
-            myaddress,
-            get_contractaddress("ERC1155[sales]", contractaddresses),
-          ], // ETH_TESTNET.
+          aargs: [myaddress, await get_contractaddress("ERC1155[sales]", res)], // ETH_TESTNET.
         }).then((resp) => {
           let allowanceineth = getethrep(resp);
           LOGGER("8LYRxjNp8k", resp, allowanceineth);
@@ -118,10 +111,7 @@ export default function StakingPopup({ off }) {
           }
         });
         query_with_arg({
-          contractaddress: get_contractaddress(
-            "contract_USDT",
-            contractaddresses
-          ), // ETH_TESTNET.
+          contractaddress: await get_contractaddress("contract_USDT", res), // ETH_TESTNET.
           abikind: "ERC20",
           methodname: "balanceOf",
           aargs: [myaddress],
@@ -139,13 +129,10 @@ export default function StakingPopup({ off }) {
         // });
 
         query_with_arg({
-          contractaddress: get_contractaddress(
-            "contract_admin",
-            contractaddresses
-          ),
+          contractaddress: await get_contractaddress("contract_admin", res),
           abikind: "ADMIN",
           methodname: "_stakeplans",
-          aargs: [get_contractaddress("contract_USDT", contractaddresses)],
+          aargs: [await get_contractaddress("contract_USDT", res)],
         }).then((resp) => {
           LOGGER("HSudcIgxuB", resp);
           if (resp) {
@@ -185,9 +172,7 @@ export default function StakingPopup({ off }) {
         let { status, list } = data;
         if (status == "OK") {
           setContractaddresses(list);
-          if (contractaddresses.length > 0) {
-            res("Successfully fetched contractaddresses");
-          }
+          res(list);
         } else {
           rej("Failed to fetch contractaddresses");
         }
@@ -206,11 +191,14 @@ export default function StakingPopup({ off }) {
 
     let myaddress = getmyaddress();
     let abistr = getabistr_forfunction({
-      contractaddress: get_contractaddress("contract_USDT", contractaddresses), // ETH_TESTNET.
+      contractaddress: await get_contractaddress(
+        "contract_USDT",
+        contractaddresses
+      ), // ETH_TESTNET.
       abikind: "ERC20",
       methodname: "approve",
       aargs: [
-        get_contractaddress("ERC1155[sales]", contractaddresses),
+        await get_contractaddress("ERC1155[sales]", contractaddresses),
         getweirep("" + 10 ** 6),
       ], // .ETH_TESTNET
     });
@@ -218,7 +206,7 @@ export default function StakingPopup({ off }) {
     setisloader_00(true);
     requesttransaction({
       from: myaddress,
-      to: get_contractaddress("contract_USDT", contractaddresses), // ETH_TESTNET.
+      to: await get_contractaddress("contract_USDT", contractaddresses), // ETH_TESTNET.
       data: abistr,
     }).then((resp) => {
       if (resp) {
@@ -231,7 +219,7 @@ export default function StakingPopup({ off }) {
       SetErrorBar(messages.MSG_TX_REQUEST_SENT);
       awaitTransactionMined
         .awaitTx(web3, txhash, TX_POLL_OPTIONS)
-        .then((minedtxreceipt) => {
+        .then(async (minedtxreceipt) => {
           LOGGER("asdasdasd", minedtxreceipt);
           let { status } = minedtxreceipt;
           if (status) {
@@ -247,8 +235,11 @@ export default function StakingPopup({ off }) {
               username: myaddress,
               typestr: "APPROVE",
               auxdata: {
-                erc20: get_contractaddress("contract_USDT", contractaddresses), // .ETH_TESTNET
-                target: get_contractaddress(
+                erc20: await get_contractaddress(
+                  "contract_USDT",
+                  contractaddresses
+                ), // .ETH_TESTNET
+                target: await get_contractaddress(
                   "ERC1155[sales]",
                   contractaddresses
                 ), // .ETH_TESTNET
@@ -262,7 +253,7 @@ export default function StakingPopup({ off }) {
             });
 
           query_with_arg({
-            contractaddress: get_contractaddress(
+            contractaddress: await get_contractaddress(
               "contract_USDT",
               contractaddresses
             ), // .ETH_TESTNET
@@ -270,7 +261,7 @@ export default function StakingPopup({ off }) {
             methodname: "allowance",
             aargs: [
               myaddress,
-              get_contractaddress("ERC1155[sales]", contractaddresses),
+              await get_contractaddress("ERC1155[sales]", contractaddresses),
             ], // ETH_TESTNET.
           }).then((resp) => {
             let allowanceineth = getethrep(resp);
@@ -298,11 +289,14 @@ export default function StakingPopup({ off }) {
       return;
     }
     let abistr = getabistr_forfunction({
-      contractaddress: get_contractaddress("ERC1155[sales]", contractaddresses), // .ETH_TESTNET
+      contractaddress: await get_contractaddress(
+        "ERC1155[sales]",
+        contractaddresses
+      ), // .ETH_TESTNET
       abikind: "ERC1155Sale",
       methodname: "mint_and_match_single_simple_legacy",
       aargs: [
-        get_contractaddress("ERC1155[sales]", contractaddresses),
+        await get_contractaddress("ERC1155[sales]", contractaddresses),
         itemid,
         "1",
         "0",
@@ -310,7 +304,7 @@ export default function StakingPopup({ off }) {
         userinfo?.refereraddress,
         "1",
         getweirep("" + 100),
-        get_contractaddress("contract_USDT", contractaddresses),
+        await get_contractaddress("contract_USDT", contractaddresses),
         addresses.admin_account_address,
       ],
     });
@@ -321,7 +315,7 @@ export default function StakingPopup({ off }) {
         setisloader_01(true);
         resp = await requesttransaction({
           from: myaddress,
-          to: get_contractaddress("ERC1155[sales]", contractaddresses), // .ETH_TESTNET
+          to: await get_contractaddress("ERC1155[sales]", contractaddresses), // .ETH_TESTNET
           data: abistr,
         });
 
@@ -354,7 +348,7 @@ export default function StakingPopup({ off }) {
                 auxdata: {
                   amount: MIN_STAKE_AMOUNT,
                   currency: STAKE_CURRENCY,
-                  currencyaddress: get_contractaddress(
+                  currencyaddress: await get_contractaddress(
                     "contract_USDT",
                     contractaddresses
                   ), // ETH_TESTNET.
