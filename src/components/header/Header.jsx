@@ -18,6 +18,7 @@ import { API } from "../../configs/api";
 import SetErrorBar from "../../util/SetErrorBar.js";
 import { messages } from "../../configs/messages";
 import { net } from "../../configs/net";
+import { addresses } from "../../configs/addresses-ropsten";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -115,13 +116,13 @@ export default function Header() {
       setmyaddress(myaddress);
       if (myaddress) {
         query_with_arg({
-          contractaddress: await get_contractaddress("contract_USDT", resp), // ETH_TESTNET.
+          contractaddress: addresses.contract_USDT, // ETH_TESTNET.
           abikind: "ERC20",
           methodname: "balanceOf",
           aargs: [myaddress],
         }).then((resp) => {
-          LOGGER("Ce4mDMhjbS", resp);
-          setmybalance(getethrep(resp));
+          console.log("RESPONSE-BALANCE", resp);
+          setmybalance(getethrep("" + resp));
         });
 
         window.ethereum.on("networkChanged", function (networkId) {

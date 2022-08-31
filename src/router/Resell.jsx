@@ -255,7 +255,7 @@ export default function Resell() {
 
       let options_data = {
         kingkong: {
-          username: itemDetail?.username,
+          username: myaddress,
           contractaddress: await get_contractaddress(
             "KIP17",
             contractaddresses
@@ -279,7 +279,7 @@ export default function Resell() {
           },
           expirystr: 4119051884,
           nettype: net,
-          seller: itemDetail?.username,
+          seller: myaddress,
           typestr: saleType,
           type: "kingkong",
         },

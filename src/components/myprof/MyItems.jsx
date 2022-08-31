@@ -982,16 +982,14 @@ export default function MyItems() {
                       <div className="key"></div>
                       <div className="value">
                         <strong className="price">
-                          {parseInt(item.amount).toFixed(2)} USDT
+                          {parseInt(item && item.amount).toFixed(2)} USDT
                         </strong>
                       </div>
 
                       <ul className="priceBox">
                         <li>
                           <p className="key">Current price</p>
-                          <p className="value">
-                            {parseInt(item.amount).toFixed(2)} USDT
-                          </p>
+                          {parseInt(item && item.amount).toFixed(2)} USDT
                         </li>
                       </ul>
                     </div>
@@ -1067,7 +1065,7 @@ export default function MyItems() {
                             <p className="key">Current price</p>
                             <p className="value">
                               {" "}
-                              {parseInt(item && item.buyprice).toFixed(2)} USDT
+                              {parseInt(item && item.amount).toFixed(2)} USDT
                             </p>
                           </li>
                           {item.group_ == "kingkong" && item.isstaked == 0 && (
