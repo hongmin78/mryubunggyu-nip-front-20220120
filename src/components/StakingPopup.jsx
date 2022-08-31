@@ -42,8 +42,8 @@ export default function StakingPopup({ off }) {
   let [mybalance, setmybalance] = useState();
   let [isallowanceok, setisallowanceok] = useState(false);
   let [allowanceamount, setallowanceamount] = useState();
-  let [stakedbalance, setstakedbalance] = useState();
-  let [tvl, settvl] = useState();
+  // let [stakedbalance, setstakedbalance] = useState();
+  // let [tvl, settvl] = useState();
   let [tickerusdt, settickerusdt] = useState(1);
   let [myethbalance, setmyethbalance] = useState();
   let [done, setDone] = useState(false);
@@ -80,20 +80,20 @@ export default function StakingPopup({ off }) {
         //		settickerusdt ( USDT )
       });
       let myaddress = getmyaddress();
-      LOGGER("", addresses.contract_stake, myaddress); // .ETH_TESTNET
-      let resp_balances = await query_with_arg({
-        contractaddress: addresses.contract_stake, // ETH_TESTNET.
-        abikind: "STAKE",
-        methodname: "_balances",
-        aargs: [myaddress],
-      });
-      LOGGER("uQJ2POHvP8", resp_balances);
-      setstakedbalance(getethrep(resp_balances));
+      // LOGGER("", addresses.con tract_stake, myaddress); // .ETH_TESTNET
+      // let resp_balances = await query_with_arg({
+      //   contractaddress: addresses.contra ct_stake, // ETH_TESTNET.
+      //   abikind: "STAKE",
+      //   methodname: "_balances",
+      //   aargs: [myaddress],
+      // });
+      // LOGGER("uQJ2POHvP8", resp_balances);
+      // setstakedbalance(getethrep(resp_balances));
       query_with_arg({
         contractaddress: addresses.contract_USDT, // ETH_TESTNET.
         abikind: "ERC20",
         methodname: "allowance",
-        aargs: [myaddress, addresses.contract_stake], // ETH_TESTNET.
+        aargs: [myaddress, addresses.contract_erc1155_sales], // ETH_TESTNET.
       }).then((resp) => {
         let allowanceineth = getethrep(resp);
         LOGGER("8LYRxjNp8k", resp, allowanceineth);
@@ -113,14 +113,14 @@ export default function StakingPopup({ off }) {
         LOGGER("", resp);
         setmybalance(getethrep(resp, 4));
       });
-      query_noarg({
-        contractaddress: addresses.contract_stake, // ETH_TESTNET.
-        abikind: "STAKE",
-        methodname: "_tvl",
-      }).then((resp) => {
-        LOGGER("", resp);
-        settvl(getethrep(resp));
-      });
+      // query_noarg({
+      //   contractaddress: addresses.contr act_stake, // ETH_TESTNET.
+      //   abikind: "STAKE",
+      //   methodname: "_tvl",
+      // }).then((resp) => {
+      //   LOGGER("", resp);
+      //   settvl(getethrep(resp));
+      // });
 
       query_with_arg({
         contractaddress: addresses.contract_admin,
@@ -170,13 +170,13 @@ export default function StakingPopup({ off }) {
       contractaddress: addresses.contract_USDT, // ETH_TESTNET.
       abikind: "ERC20",
       methodname: "approve",
-      aargs: [addresses.contract_stake, getweirep("" + 10 ** 10)], // .ETH_TESTNET
+      aargs: [addresses.contract_erc1155_sales, getweirep("" + 10 ** 6)], // .ETH_TESTNET
     });
     LOGGER("", abistr);
     setisloader_00(true);
     requesttransaction({
       from: myaddress,
-      to: addresses.contract_USDT, // ETH_TESTNET.
+      to: addresses.contract_erc1155_sales, // ETH_TESTNET.
       data: abistr,
     }).then((resp) => {
       if (resp) {
@@ -187,34 +187,40 @@ export default function StakingPopup({ off }) {
       }
       let txhash = resp;
       SetErrorBar(messages.MSG_TX_REQUEST_SENT);
-      axios
-        .post(API.API_TXS + `/${txhash}?nettype=${net}`, {
-          txhash,
-          username: myaddress,
-          typestr: "APPROVE",
-          auxdata: {
-            erc20: addresses.contract_USDT, // .ETH_TESTNET
-            target: addresses.contract_stake, // .ETH_TESTNET
-            nettype: net,
-          },
-          nettype: NETTYPE,
-        })
-        .then((resp) => {
-          LOGGER("", resp);
-          SetErrorBar(messages.MSG_TX_REQUEST_SENT);
-        });
-
       awaitTransactionMined
         .awaitTx(web3, txhash, TX_POLL_OPTIONS)
         .then((minedtxreceipt) => {
           LOGGER("asdasdasd", minedtxreceipt);
+          let { status } = minedtxreceipt;
+          if (status) {
+          } else {
+            SetErrorBar(messages.MSG_TX_FAILED);
+            return;
+          }
           SetErrorBar(messages.MSG_TX_FINALIZED);
+
+          axios
+            .post(API.API_TXS + `/${txhash}?nettype=${net}`, {
+              txhash,
+              username: myaddress,
+              typestr: "APPROVE",
+              auxdata: {
+                erc20: addresses.contract_USDT, // .ETH_TESTNET
+                target: addresses.contract_erc1155_sales, // .ETH_TESTNET
+                nettype: net,
+              },
+              nettype: NETTYPE,
+            })
+            .then((resp) => {
+              LOGGER("", resp);
+              SetErrorBar(messages.MSG_TX_REQUEST_SENT);
+            });
 
           query_with_arg({
             contractaddress: addresses.contract_USDT, // .ETH_TESTNET
             abikind: "ERC20",
             methodname: "allowance",
-            aargs: [myaddress, addresses.contract_stake], // ETH_TESTNET.
+            aargs: [myaddress, addresses.contract_erc1155_sales], // ETH_TESTNET.
           }).then((resp) => {
             let allowanceineth = getethrep(resp);
             LOGGER("gCwXF6Jjkh", resp, allowanceineth);
@@ -241,7 +247,7 @@ export default function StakingPopup({ off }) {
       return;
     }
     let abistr = getabistr_forfunction({
-      contractaddress: addresses.contract_stake, // .ETH_TESTNET
+      contractaddress: addresses.contract_erc1155_sales, // .ETH_TESTNET
       abikind: "ERC1155Sale",
       methodname: "mint_and_match_single_simple_legacy",
       aargs: [
@@ -252,6 +258,9 @@ export default function StakingPopup({ off }) {
         "0",
         userinfo?.refereraddress,
         "1",
+        getweirep("" + 100),
+        addresses.contract_USDT,
+        addresses.admin_account_address,
       ],
     });
 
@@ -261,7 +270,7 @@ export default function StakingPopup({ off }) {
         setisloader_01(true);
         resp = await requesttransaction({
           from: myaddress,
-          to: addresses.contract_stake, // .ETH_TESTNET
+          to: addresses.contract_erc1155_sales, // .ETH_TESTNET
           data: abistr,
         });
 
@@ -274,43 +283,44 @@ export default function StakingPopup({ off }) {
         // eslint-disable-next-line default-case
         let txhash = resp;
 
-        axios
-          .post(API.API_TXS + `/${txhash}?nettype=${net}`, {
-            txhash,
-            username: myaddress,
-            typestr: "STAKE",
-            auxdata: {
-              amount: MIN_STAKE_AMOUNT,
-              currency: STAKE_CURRENCY,
-              currencyaddress: addresses.contract_USDT, // ETH_TESTNET.
-              nettype: NETTYPE,
-            },
-            nettype: net,
-          })
-          .then((resp) => {
-            LOGGER("", resp);
-            SetErrorBar(messages.MSG_TX_REQUEST_SENT);
-            console.log("0");
-          });
-        /***** */
-
         awaitTransactionMined
           .awaitTx(web3, txhash, TX_POLL_OPTIONS)
           .then(async (minedtxreceipt) => {
             LOGGER("", minedtxreceipt);
-            console.log("2");
+            let { status } = minedtxreceipt;
+            if (status) {
+            } else {
+              SetErrorBar(messages.MSG_TX_FAILED);
+              return;
+            }
             SetErrorBar(messages.MSG_TX_FINALIZED);
             setisloader_01(true);
-            let resp_balances = await query_with_arg({
-              contractaddress: addresses.contract_stake,
-              abikind: "STAKE",
-              methodname: "_balances",
-              aargs: [myaddress],
-            });
+            axios
+              .post(API.API_TXS + `/${txhash}?nettype=${net}`, {
+                txhash,
+                username: myaddress,
+                typestr: "STAKE",
+                auxdata: {
+                  amount: MIN_STAKE_AMOUNT,
+                  currency: STAKE_CURRENCY,
+                  currencyaddress: addresses.contract_USDT, // ETH_TESTNET.
+                  nettype: NETTYPE,
+                },
+                nettype: net,
+              })
+              .then((resp) => {
+                LOGGER("", resp);
+                SetErrorBar(messages.MSG_TX_REQUEST_SENT);
+                console.log("0");
+              });
+            // let resp_balances = await query_with_arg({
+            //   contractaddress: addresses.contra ct_stake,
+            //   abikind: "STAKE",
+            //   methodname: "_balances",
+            //   aargs: [myaddress],
+            // });
             setDone(false);
             off(false);
-            LOGGER("uQJ2POHvP8", resp_balances);
-            setstakedbalance(getethrep(resp_balances));
             setisloader_01(false);
             navigate("/");
           });
@@ -365,14 +375,14 @@ export default function StakingPopup({ off }) {
                   <p className="key">Distribution</p>
                   <p className="value">2022-03-12 00:00 UTC</p>
                 </li> */}
-                <li style={MODE_DEV_PROD == "DEV" ? {} : { display: "none" }}>
+                {/* <li style={MODE_DEV_PROD == "DEV" ? {} : { display: "none" }}>
                   <p className="key">Total Staked</p>
                   <p className="value">{tvl} USDT</p>
-                </li>
-                <li>
+                </li> */}
+                {/* <li>
                   <p className="key">Your Stake</p>
                   <p className="value">{stakedbalance} USDT</p>
-                </li>
+                </li> */}
 
                 <li>
                   <p className="key">Your address</p>
@@ -501,14 +511,14 @@ export default function StakingPopup({ off }) {
                 <p className="key">Distribution</p>
                 <p className="value">2022-03-12 00:00 UTC</p>
               </li> */}
-              <li style={MODE_DEV_PROD == "DEV" ? {} : { display: "none" }}>
+              {/* <li style={MODE_DEV_PROD == "DEV" ? {} : { display: "none" }}>
                 <p className="key">Total Staked</p>
                 <p className="value">{tvl} USDT</p>
-              </li>
-              <li>
+              </li> */}
+              {/* <li>
                 <p className="key">Your Stake</p>
                 <p className="value">{stakedbalance} USDT</p>
-              </li>
+              </li> */}
 
               <li>
                 <p className="key">Your address</p>

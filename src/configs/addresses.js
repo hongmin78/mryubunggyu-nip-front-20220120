@@ -4,6 +4,7 @@ const jaddresses = {
   ETH_TESTNET: {
     admin: "0xa6d9B48b3D869271fF84F9E62B9E48986EE3Aa7b",
     contract_USDT: "0x34da0872bb4b215345f6e47ed6514d8c4cd5f8e0",
+    admin_account_address: "0xD312a74cf808f1827446b19351f627ef93762a40",
     //	 , contract_stake : '0xa30fec0c860659639247b66ebbe3b2ccc9145e4c' // ver0223 // 0x87ac1e8378cdb6ad11e85ea9565b385b03970279'
     contract_stake: "0xc964f791b8e92336abfb3fde5fd4738700110379",
     contract_admin: "0x005b38d678753f211abae8dbb38c45a9d159ecee", // 0xd24ff65996e94d79d3cd8a22e8f95c42fbec0e0f'
@@ -44,6 +45,7 @@ const jaddresses = {
     contract_stake: "0x53caf649502a39c1a6d360d77e12676425f74860",
     contract_admin: "0x59e84ece084a0e2cabc1e344320b71d8be117ea9",
     contract_ticketnft: "0x6208803CC8FAfdeCEA589666c96d40836daccB46",
+    admin_account_address: "0xD312a74cf808f1827446b19351f627ef93762a40",
     // contract_pay_for_assigned_item: "0xda90f3b82c531f32af791fa3a3e7a67b36aa0844",
     // contract_pay_for_assigned_item:
     //   "0x966C6627Ae93F01C4CE4bed607348690645F251D", //release 0520
