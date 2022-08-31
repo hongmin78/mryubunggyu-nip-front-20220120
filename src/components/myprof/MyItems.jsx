@@ -114,7 +114,6 @@ export default function MyItems() {
               setTickInfo(respdata);
             }
           });
-        //      } , 1500 )
       });
 
     query_with_arg({
@@ -141,7 +140,6 @@ export default function MyItems() {
         return;
       }
     });
-    // }, 1500);
   };
 
   const openModal = () => {

@@ -14,7 +14,6 @@ import {
   query_noarg,
   query_eth_balance,
 } from "../util/contract-calls";
-import { addresses } from "../configs/addresses";
 import { DECIMALS_DISP_DEF } from "../configs/configs"; // DueAmount,
 import { LOGGER, getmyaddress, getobjtype } from "../util/common";
 import { getweirep, getethrep } from "../util/eth";
@@ -427,7 +426,10 @@ export default function BidPopup({ off, itemdata }) {
           aargs: [
             await get_contractaddress("KIP17", contractaddresses), // target contractaddress
             "288", // author_royalty
-            addresses.admin, // admin account address
+            await get_contractaddress(
+              "admin_account_address",
+              contractaddresses
+            ), // admin account address
             `${itemdata?.itemid}`, // itemid
             await get_contractaddress("contract_USDT", contractaddresses), // paymeansaddress
             getweirep("" + itemdata?.price), // amounttopay

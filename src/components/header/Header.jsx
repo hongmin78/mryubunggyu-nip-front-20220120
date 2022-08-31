@@ -9,11 +9,10 @@ import I_headerLogoWhite from "../../img/icon/I_headerLogoWhite.png";
 import axios from "axios";
 import I_3line from "../../img/icon/I_3line.svg";
 import I_3lineWhite from "../../img/icon/I_3lineWhite.svg";
-import { strDot } from "../../util/Util";
+import { get_contractaddress, strDot } from "../../util/Util";
 import MmenuPopup from "./MmenuPopup";
 import { query_with_arg } from "../../util/contract-calls";
 import { LOGGER, getmyaddress } from "../../util/common";
-import { addresses } from "../../configs/addresses";
 import { getethrep } from "../../util/eth";
 import { API } from "../../configs/api";
 import SetErrorBar from "../../util/SetErrorBar.js";
@@ -35,6 +34,24 @@ export default function Header() {
   let [myaddress, setmyaddress] = useState();
   const [ticketInfo, setTickInfo] = useState();
   const [walletStatus, setWalletStatus] = useState("");
+  const [contractaddresses, setContractaddresses] = useState([]);
+
+  const query_contractaddresses = async () => {
+    return new Promise(async (res, rej) => {
+      try {
+        let { data } = await axios.get(API.API_CADDR);
+        let { status, list } = data;
+        if (status == "OK") {
+          setContractaddresses(list);
+          res(list);
+        } else {
+          rej("Failed to fetch contractaddresses");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  };
 
   useEffect(() => {
     // setTimeout(() => {
@@ -87,18 +104,20 @@ export default function Header() {
     }
   };
   const fetchdata = (_) => {
+    query_contractaddresses().then(async (resp) => {
+       
+ 
     // let myaddress = "0xb440393a03078b967000f09577e32c3252f15832";
     let myaddress = getmyaddress();
     if (myaddress) {
     } else {
-
       return;
     }
     LOGGER("MXZfykw8Mw", myaddress);
     setmyaddress(myaddress);
     if (myaddress) {
       query_with_arg({
-        contractaddress: addresses.contract_USDT, // ETH_TESTNET.
+        contractaddress: await get_contractaddress('contract_USDT', resp);, // ETH_TESTNET.
         abikind: "ERC20",
         methodname: "balanceOf",
         aargs: [myaddress],
@@ -114,7 +133,7 @@ export default function Header() {
     } else {
       return;
     }
-    console.log("asdoiajsod", addresses.contract_USDT, [myaddress]); // ETH_TESTNET.
+  });
   };
 
   useEffect(

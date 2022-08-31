@@ -18,7 +18,7 @@ import {
   query_noarg,
   query_eth_balance,
 } from "../util/contract-calls";
-import { addresses } from "../configs/addresses";
+
 import { DECIMALS_DISP_DEF } from "../configs/configs"; // MIN_STAKE_AMOUNT,
 import { LOGGER, getmyaddress, getobjtype } from "../util/common";
 import { getweirep, getethrep } from "../util/eth";
@@ -86,9 +86,9 @@ export default function StakingPopup({ off }) {
           //		settickerusdt ( USDT )
         });
         let myaddress = getmyaddress();
-        // LOGGER("", addresses.con tract_stake, myaddress); // .ETH_TESTNET
+        // LOGGER("", addre ses.con tract_stake, myaddress); // .ETH_TESTNET
         // let resp_balances = await query_with_arg({
-        //   contractaddress: addresses.contra ct_stake, // ETH_TESTNET.
+        //   contractaddress: addr esses.contra ct_stake, // ETH_TESTNET.
         //   abikind: "STAKE",
         //   methodname: "_balances",
         //   aargs: [myaddress],
@@ -120,7 +120,7 @@ export default function StakingPopup({ off }) {
           setmybalance(getethrep(resp, 4));
         });
         // query_noarg({
-        //   contractaddress: addresses.contr act_stake, // ETH_TESTNET.
+        //   contractaddress: addre sses.contr act_stake, // ETH_TESTNET.
         //   abikind: "STAKE",
         //   methodname: "_tvl",
         // }).then((resp) => {
@@ -305,7 +305,7 @@ export default function StakingPopup({ off }) {
         "1",
         getweirep("" + 100),
         await get_contractaddress("contract_USDT", contractaddresses),
-        addresses.admin_account_address,
+        await get_contractaddress("admin_account_address", contractaddresses),
       ],
     });
 
@@ -362,7 +362,7 @@ export default function StakingPopup({ off }) {
                 console.log("0");
               });
             // let resp_balances = await query_with_arg({
-            //   contractaddress: addresses.contra ct_stake,
+            //   contractaddress: addres ses.contra ct_stake,
             //   abikind: "STAKE",
             //   methodname: "_balances",
             //   aargs: [myaddress],

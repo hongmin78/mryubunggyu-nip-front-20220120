@@ -2,7 +2,7 @@ import styled from "styled-components";
 import I_x from "../img/icon/I_x.svg";
 import I_tIcon from "../img/icon/I_tIcon.png";
 import I_chkWhite from "../img/icon/I_chkWhite.svg";
-import { putCommaAtPrice } from "../util/Util";
+import { get_contractaddress, putCommaAtPrice } from "../util/Util";
 import { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import PopupBg from "./PopupBg";
@@ -14,7 +14,6 @@ import {
   query_noarg,
   query_eth_balance,
 } from "../util/contract-calls";
-import { addresses } from "../configs/addresses";
 import { DECIMALS_DISP_DEF } from "../configs/configs"; // MIN_STAKE_AMOUNT,
 import { LOGGER, getmyaddress, getobjtype } from "../util/common";
 import { getweirep, getethrep } from "../util/eth";
@@ -53,121 +52,108 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
   let [isloader_00, setisloader_00] = useState(false);
   let [isloader_01, setisloader_01] = useState(false);
   let [MIN_STAKE_AMOUNT, setMIN_STAKE_AMOUNT] = useState(0);
+  const [contractaddresses, setContractaddresses] = useState([]);
+
+  const query_contractaddresses = async () => {
+    return new Promise(async (res, rej) => {
+      try {
+        let { data } = await axios.get(API.API_CADDR);
+        let { status, list } = data;
+        if (status == "OK") {
+          setContractaddresses(list);
+          res(list);
+        } else {
+          rej("Failed to fetch contractaddresses");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  };
 
   useEffect((_) => {
-    const spinner = spinnerHref.current; // document.querySelector("Spinner");
-    spinner.animate(
-      [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
-      {
-        duration: 1000,
-        iterations: Infinity,
-      }
-    );
-    const spinner_approve = spinnerHref_approve.current; // document.querySelector("Spinner");
-    spinner_approve.animate(
-      [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
-      {
-        duration: 1000,
-        iterations: Infinity,
-      }
-    );
-    const fetchdata = async (_) => {
-      axios.get(API.API_TICKERS + `?nettype=${net}`).then((resp) => {
-        LOGGER("MDmEMQ5xde", resp.data);
-        let { status, payload, list } = resp;
-        //				let { USDT } = payload.list
-        //			LOGGER( 'mlB7HasjBh' , USDT )
-        //		settickerusdt ( USDT )
-      });
-      let myaddress = getmyaddress();
-      LOGGER("", addresses.payment_for_delinquency, myaddress); // .ETH_TESTNET
-      // let resp_balances = await query_with_arg({
-      //   contractaddress: addresses.contract_stake, // ETH_TESTNET.
-      //   abikind: "PAY",
-      //   methodname: "_balances",
-      //   aargs: [myaddress],
-      // });
-      // LOGGER("uQJ2POHvP8", resp_balances);
-      // setstakedbalance(getethrep(resp_balances));
-      query_with_arg({
-        contractaddress: addresses.contract_USDT, // ETH_TESTNET.
-        abikind: "ERC20",
-        methodname: "allowance",
-        aargs: [myaddress, addresses.payment_for_delinquency], // ETH_TESTNET.
-      }).then((resp) => {
-        let allowanceineth = getethrep(resp);
-        LOGGER("8LYRxjNp8k", resp, allowanceineth);
-        setallowanceamount(allowanceineth);
-        //				setallowanceamount ( 100 )
-        if (allowanceineth > 0) {
-          setisallowanceok(false);
-        } else {
+    query_contractaddresses().then(async (resp) => {
+      const spinner = spinnerHref.current; // document.querySelector("Spinner");
+      spinner.animate(
+        [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
+        {
+          duration: 1000,
+          iterations: Infinity,
         }
-      });
-      query_with_arg({
-        contractaddress: addresses.contract_USDT, // ETH_TESTNET.
-        abikind: "ERC20",
-        methodname: "balanceOf",
-        aargs: [myaddress],
-      }).then((resp) => {
-        LOGGER("mybalance", resp);
-        setmybalance(getethrep(resp, 4));
-      });
-      // query_noarg({
-      //   contractaddress: addresses.contract_stake, // ETH_TESTNET.
-      //   abikind: "STAKE",
-      //   methodname: "_tvl",
-      // }).then((resp) => {
-      //   LOGGER("", resp);
-      //   settvl(getethrep(resp));
-      // });
-
-      // query_with_arg({
-      //   contractaddress: addresses.contract_admin,
-      //   abikind: "ADMIN",
-      //   methodname: "_stakeplans",
-      //   aargs: [addresses.contract_USDT],
-      // }).then((resp) => {
-      //   LOGGER("HSudcIgxuB", resp);
-      //   if (resp) {
-      //   } else {
-      //     return;
-      //   }
-      //   setMIN_STAKE_AMOUNT(getethrep(resp[4]));
-      // });
-      false &&
-        query_with_arg({
-          contractaddress: addresses.contract_stake, // .ETH_TESTNET
-          abikind: "STAKE",
-          methodname: "_tvl_nft",
-        }).then((resp) => {
-          LOGGER("", resp);
-          //				settvlnft ( resp )
+      );
+      const spinner_approve = spinnerHref_approve.current; // document.querySelector("Spinner");
+      spinner_approve.animate(
+        [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
+        {
+          duration: 1000,
+          iterations: Infinity,
+        }
+      );
+      const fetchdata = async (_) => {
+        axios.get(API.API_TICKERS + `?nettype=${net}`).then((resp) => {
+          LOGGER("MDmEMQ5xde", resp.data);
+          let { status, payload, list } = resp;
         });
-      query_eth_balance(myaddress).then((resp) => {
-        LOGGER("rmgUxgo5ye", resp);
-        setmyethbalance((+getethrep(resp)).toFixed(DECIMALS_DISP_DEF));
-      });
-    };
-    // setTimeout(() => {
-    fetchdata();
-    // }, 1500);
+        let myaddress = getmyaddress();
+
+        query_with_arg({
+          contractaddress: await get_contractaddress("contract_USDT", resp), // ETH_TESTNET.
+          abikind: "ERC20",
+          methodname: "allowance",
+          aargs: [
+            myaddress,
+            await get_contractaddress("payment_for_delinquency", resp),
+          ], // ETH_TESTNET.
+        }).then((resp) => {
+          let allowanceineth = getethrep(resp);
+          LOGGER("8LYRxjNp8k", resp, allowanceineth);
+          setallowanceamount(allowanceineth);
+          //				setallowanceamount ( 100 )
+          if (allowanceineth > 0) {
+            setisallowanceok(false);
+          } else {
+          }
+        });
+        query_with_arg({
+          contractaddress: await get_contractaddress("contract_USDT", resp), // ETH_TESTNET.
+          abikind: "ERC20",
+          methodname: "balanceOf",
+          aargs: [myaddress],
+        }).then((resp) => {
+          LOGGER("mybalance", resp);
+          setmybalance(getethrep(resp, 4));
+        });
+
+        query_eth_balance(myaddress).then((resp) => {
+          LOGGER("rmgUxgo5ye", resp);
+          setmyethbalance((+getethrep(resp)).toFixed(DECIMALS_DISP_DEF));
+        });
+      };
+
+      fetchdata();
+    });
   }, []);
   const onclick_approve = async (_) => {
     LOGGER("");
     let myaddress = getmyaddress();
     let abistr = getabistr_forfunction({
-      contractaddress: addresses.contract_USDT, // ETH_TESTNET.
+      contractaddress: await get_contractaddress(
+        "contract_USDT",
+        contractaddresses
+      ), // ETH_TESTNET.
       abikind: "ERC20",
       methodname: "approve",
-      aargs: [addresses.payment_for_delinquency, getweirep("" + 10 ** 10)], // .ETH_TESTNET
+      aargs: [
+        await get_contractaddress("payment_for_delinquency", contractaddresses),
+        getweirep("" + 10 ** 10),
+      ], // .ETH_TESTNET
     });
     setisloader_00(true);
     requesttransaction({
       from: myaddress,
-      to: addresses.contract_USDT, // ETH_TESTNET.
+      to: await get_contractaddress("contract_USDT", contractaddresses), // ETH_TESTNET.
       data: abistr,
-    }).then((resp) => {
+    }).then(async (resp) => {
       if (resp) {
       } else {
         SetErrorBar(messages.MSG_USER_DENIED_TX);
@@ -182,8 +168,14 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
           username: myaddress,
           typestr: "APPROVE",
           auxdata: {
-            erc20: addresses.contract_USDT, // .ETH_TESTNET
-            target: addresses.payment_for_delinquency, // .ETH_TESTNET
+            erc20: await get_contractaddress(
+              "contract_USDT",
+              contractaddresses
+            ), // .ETH_TESTNET
+            target: await get_contractaddress(
+              "payment_for_delinquency",
+              contractaddresses
+            ), // .ETH_TESTNET
             nettype: net,
           },
           nettype: net,
@@ -195,15 +187,24 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
 
       awaitTransactionMined
         .awaitTx(web3, txhash, TX_POLL_OPTIONS)
-        .then((minedtxreceipt) => {
+        .then(async (minedtxreceipt) => {
           LOGGER("minedtxreceipt", minedtxreceipt);
           SetErrorBar(messages.MSG_TX_FINALIZED);
 
           query_with_arg({
-            contractaddress: addresses.contract_USDT, // .ETH_TESTNET
+            contractaddress: await get_contractaddress(
+              "contract_USDT",
+              contractaddresses
+            ), // .ETH_TESTNET
             abikind: "ERC20",
             methodname: "allowance",
-            aargs: [myaddress, addresses.payment_for_delinquency], // ETH_TESTNET.
+            aargs: [
+              myaddress,
+              await get_contractaddress(
+                "payment_for_delinquency",
+                contractaddresses
+              ),
+            ], // ETH_TESTNET.
           }).then((resp) => {
             let allowanceineth = getethrep(resp);
             LOGGER("gCwXF6Jjkh", resp, allowanceineth);
@@ -237,11 +238,14 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
 			return 
 		} */
     let abistr = getabistr_forfunction({
-      contractaddress: addresses.payment_for_delinquency, // .ETH_TESTNET
+      contractaddress: await get_contractaddress(
+        "payment_for_delinquency",
+        contractaddresses
+      ), // .ETH_TESTNET
       abikind: "DELINQUENT",
       methodname: "pay",
       aargs: [
-        addresses.contract_USDT, // .ETH_TESTNET
+        await get_contractaddress("contract_USDT", contractaddresses), // .ETH_TESTNET
         getweirep("" + delinquencyAmount),
         seller, // myaddress,
         "abc",
@@ -254,7 +258,10 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
         setisloader_01(true);
         resp = await requesttransaction({
           from: myaddress,
-          to: addresses.payment_for_delinquency, // .ETH_TESTNET
+          to: await get_contractaddress(
+            "payment_for_delinquency",
+            contractaddresses
+          ), // .ETH_TESTNET
           data: abistr,
           //			, value : ''
         });
@@ -293,7 +300,10 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
                 auxdata: {
                   amount: delinquencyAmount,
                   currency: PAY_CURRENCY,
-                  currencyaddress: addresses.contract_USDT, // ETH_TESTNET.
+                  currencyaddress: await get_contractaddress(
+                    "contract_USDT",
+                    contractaddresses
+                  ), // ETH_TESTNET.
                   nettype: net,
                 },
                 nettype: net,
