@@ -94,17 +94,6 @@ export default function BidPopup({ off, itemdata }) {
           if (resp.data && resp.data.respdata) {
             let { respdata } = resp.data;
             setuserinfo(respdata);
-            // if (respdata?.referer) {
-            //   axios
-            //     .get(
-            //       API.API_SINGLE_REFFERER +
-            //         `/${respdata.referer}?nettype=${net}`
-            //     )
-            //     .then((resp) => {
-            //       LOGGER("myticket", resp.data.respdata);
-            //       setuserinfo(resp.data.respdata);
-            //     });
-            // }
           }
         });
 
@@ -167,7 +156,7 @@ export default function BidPopup({ off, itemdata }) {
       });
     };
     // setTimeout(() => {
-      fetchdata();
+    fetchdata();
     // }, 1500);
   }, []);
 

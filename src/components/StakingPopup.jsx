@@ -51,6 +51,7 @@ export default function StakingPopup({ off }) {
   let spinnerHref_approve = useRef();
   let [isloader_00, setisloader_00] = useState(false);
   let [isloader_01, setisloader_01] = useState(false);
+  const [userinfo, setuserinfo] = useState({});
   let [MIN_STAKE_AMOUNT, setMIN_STAKE_AMOUNT] = useState("100");
   useEffect((_) => {
     const spinner = spinnerHref.current; // document.querySelector("Spinner");
@@ -69,6 +70,7 @@ export default function StakingPopup({ off }) {
         iterations: Infinity,
       }
     );
+
     const fetchdata = async (_) => {
       axios.get(API.API_TICKERS + `?nettype=${net}`).then((resp) => {
         LOGGER("MDmEMQ5xde", resp.data);
@@ -141,6 +143,26 @@ export default function StakingPopup({ off }) {
     };
     fetchdata();
   }, []);
+
+  const getuserinfo = async () => {
+    try {
+      let myaddress = getmyaddress();
+      let { data } = await axios.get(
+        API.API_USERINFO + `/${myaddress}?nettype=${net}`
+      );
+      let { status, respdata } = data;
+      if (status == "OK") {
+        setuserinfo(respdata);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    getuserinfo();
+  }, []);
+
   const onclick_approve = async (_) => {
     LOGGER("");
     let myaddress = getmyaddress();
@@ -220,12 +242,16 @@ export default function StakingPopup({ off }) {
     }
     let abistr = getabistr_forfunction({
       contractaddress: addresses.contract_stake, // .ETH_TESTNET
-      abikind: "STAKE",
-      methodname: "stake",
+      abikind: "ERC1155Sale",
+      methodname: "mint_and_match_single_simple_legacy",
       aargs: [
-        addresses.contract_USDT, // .ETH_TESTNET
-        getweirep("" + 100),
-        myaddress,
+        addresses.contract_erc1155,
+        itemid,
+        "1",
+        "0",
+        "0",
+        userinfo?.refereraddress,
+        "1",
       ],
     });
 
