@@ -2,7 +2,7 @@ import styled from "styled-components";
 import I_x from "../img/icon/I_x.svg";
 import I_tIcon from "../img/icon/I_tIcon.png";
 import I_chkWhite from "../img/icon/I_chkWhite.svg";
-import { putCommaAtPrice } from "../util/Util";
+import { get_ipfsformatcid, putCommaAtPrice } from "../util/Util";
 import { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import PopupBg from "./PopupBg";
@@ -207,6 +207,7 @@ export default function StakingPopup({ off }) {
     });
   };
   const onclick_buy = async (_) => {
+    let itemid = get_ipfsformatcid();
     setDone(true);
     LOGGER("YFVGAF0sBJ");
     let myaddress = getmyaddress();

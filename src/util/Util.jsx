@@ -1,3 +1,8 @@
+const CONSOLEON = 0;
+const bs58 = require("bs58");
+const crypto = require("crypto");
+const _characters =
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 export function strDot(str, startNum, endNum = 0) {
   if (str && str.length) {
   } else {
@@ -58,6 +63,43 @@ export function onClickNextBtn(ref, itemList, index, setIndex) {
   if (index < pageNum - 1) setIndex(index + 1);
   else setIndex(0);
 }
+
+export const get_ipfsformatcid_str = (str) => {
+  const hashFunction = Buffer.from("12", "hex"); // 0x20
+  const digest = crypto.createHash("sha256").update(str).digest(); // data
+  CONSOLEON && console.log(digest.toString("hex")); // b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9
+  const digestSize = Buffer.from(digest.byteLength.toString(16), "hex");
+  CONSOLEON && console.log(digestSize.toString("hex")); // 20
+  const combined = Buffer.concat([hashFunction, digestSize, digest]);
+  CONSOLEON && console.log(combined.toString("hex")); // 1220b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9
+  const multihash = bs58.encode(combined);
+  CONSOLEON && console.log(multihash.toString()); // QmaozNR7DZHQK1ZcU9p7QdrshMvXqWK6gpu5rmrkPdT3L4
+  return multihash.toString();
+};
+
+export const generate_random_string = (length) => {
+  var result = "";
+  var characters = _characters;
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+};
+
+export const get_ipfsformatcid = () => {
+  let str = generate_random_string(10);
+  const hashFunction = Buffer.from("12", "hex"); // 0x20
+  const digest = crypto.createHash("sha256").update(str).digest(); // data
+  CONSOLEON && console.log(digest.toString("hex")); // b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9
+  const digestSize = Buffer.from(digest.byteLength.toString(16), "hex");
+  CONSOLEON && console.log(digestSize.toString("hex")); // 20
+  const combined = Buffer.concat([hashFunction, digestSize, digest]);
+  CONSOLEON && console.log(combined.toString("hex")); // 1220b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9
+  const multihash = bs58.encode(combined);
+  CONSOLEON && console.log(multihash.toString()); // QmaozNR7DZHQK1ZcU9p7QdrshMvXqWK6gpu5rmrkPdT3L4
+  return multihash.toString();
+};
 
 export function swiperListener(ref, index) {
   if (!ref || !ref.current || !ref.current.children[0]) return;

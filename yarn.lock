@@ -4934,7 +4934,7 @@
     "escalade" "^3.0.2"
     "node-releases" "^1.1.61"
 
-"bs58@^4.0.0":
+"bs58@^4.0.0", "bs58@^4.0.1":
   "integrity" "sha1-vhYedsNU9veIrkBx9j806MTwpCo="
   "resolved" "https://registry.npmjs.org/bs58/-/bs58-4.0.1.tgz"
   "version" "4.0.1"
@@ -7959,7 +7959,7 @@
     "utf8" "^3.0.0"
     "uuid" "^3.3.2"
 
-"ethers@^5.0.0", "ethers@^5.0.1", "ethers@^5.0.2", "ethers@^5.5.2":
+"ethers@^5.0.0", "ethers@^5.0.1", "ethers@^5.5.2":
   "integrity" "sha512-lMGC2zv9HC5EC+8r429WaWu3uWJUCgUCt8xxKCFqkrFuBDZXDYIdzDUECxzjf2BMF8IVBByY1EBoGSL3RTm8RA=="
   "resolved" "https://registry.npmjs.org/ethers/-/ethers-5.6.9.tgz"
   "version" "5.6.9"
