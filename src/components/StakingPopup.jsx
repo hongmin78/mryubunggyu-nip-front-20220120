@@ -59,7 +59,7 @@ export default function StakingPopup({ off }) {
   let [MIN_STAKE_AMOUNT, setMIN_STAKE_AMOUNT] = useState("100");
   const [contractaddresses, setContractaddresses] = useState([]);
   useEffect((_) => {
-    query_contractaddresses().then((res) => {
+    query_contractaddresses().then(async (res) => {
       const spinner = spinnerHref.current; // document.querySelector("Spinner");
       spinner.animate(
         [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],

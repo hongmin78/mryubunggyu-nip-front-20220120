@@ -2,7 +2,7 @@ import styled from "styled-components";
 import I_x from "../img/icon/I_x.svg";
 import I_tIcon from "../img/icon/I_tIcon.png";
 import I_chkWhite from "../img/icon/I_chkWhite.svg";
-import { putCommaAtPrice } from "../util/Util";
+import { get_contractaddress, putCommaAtPrice } from "../util/Util";
 import { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import PopupBg from "./PopupBg";
@@ -56,108 +56,129 @@ export default function BidPopup({ off, itemdata }) {
   let [DueAmount, setDueAmount] = useState(parseInt(itemdata?.price));
   let [refererFeeRate, setRefererFeeRate] = useState("");
   let [userinfo, setuserinfo] = useState("");
+  const [contractaddresses, setContractaddresses] = useState([]);
+
+  const query_contractaddresses = async () => {
+    return new Promise(async (res, rej) => {
+      try {
+        let { data } = await axios.get(API.API_CADDR);
+        let { status, list } = data;
+        if (status == "OK") {
+          setContractaddresses(list);
+          res(list);
+        } else {
+          rej("Failed to fetch contractaddresses");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  };
 
   useEffect((_) => {
-    const spinner = spinnerHref.current; // document.querySelector("Spinner");
-    spinner.animate(
-      [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
-      {
-        duration: 1000,
-        iterations: Infinity,
-      }
-    );
-    const spinner_approve = spinnerHref_approve.current; // document.querySelector("Spinner");
-    spinner_approve.animate(
-      [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
-      {
-        duration: 1000,
-        iterations: Infinity,
-      }
-    );
-    axios
-      .get(API.API_QUERY_STRING("SALE_REFERER_FEE_RATE") + `?nettype=${net}`)
-      .then((res) => {
-        if (res.data && res.data.respdata) {
-          console.log("$fee_rate", res);
-          let { value_ } = res.data.respdata;
-          setRefererFeeRate(value_);
+    query_contractaddresses().then(async (resp) => {
+      const spinner = spinnerHref.current; // document.querySelector("Spinner");
+      spinner.animate(
+        [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
+        {
+          duration: 1000,
+          iterations: Infinity,
         }
-      })
-      .catch((err) => console.log(err));
-
-    const fetchdata = async (_) => {
-      let myaddress = getmyaddress();
-
+      );
+      const spinner_approve = spinnerHref_approve.current; // document.querySelector("Spinner");
+      spinner_approve.animate(
+        [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
+        {
+          duration: 1000,
+          iterations: Infinity,
+        }
+      );
       axios
-        .get(API.API_USERINFO + `/${myaddress}?nettype=${net}`)
-        .then((resp) => {
-          if (resp.data && resp.data.respdata) {
-            let { respdata } = resp.data;
-            setuserinfo(respdata);
+        .get(API.API_QUERY_STRING("SALE_REFERER_FEE_RATE") + `?nettype=${net}`)
+        .then((res) => {
+          if (res.data && res.data.respdata) {
+            console.log("$fee_rate", res);
+            let { value_ } = res.data.respdata;
+            setRefererFeeRate(value_);
           }
+        })
+        .catch((err) => console.log(err));
+
+      const fetchdata = async (_) => {
+        let myaddress = getmyaddress();
+
+        axios
+          .get(API.API_USERINFO + `/${myaddress}?nettype=${net}`)
+          .then((resp) => {
+            if (resp.data && resp.data.respdata) {
+              let { respdata } = resp.data;
+              setuserinfo(respdata);
+            }
+          });
+
+        const options_arg = {
+          kingkong: {
+            contractaddress: await get_contractaddress("contract_USDT", resp),
+            abikind: "ERC20",
+            methodname: "allowance",
+            aargs: [myaddress, await get_contractaddress("KIP17[sales]", resp)],
+          },
+          ticket: {
+            contractaddress: await get_contractaddress("contract_USDT", resp),
+            abikind: "ERC20",
+            methodname: "allowance",
+            aargs: [
+              myaddress,
+              await get_contractaddress("ERC1155[sales]", resp),
+            ],
+          },
+        };
+
+        if (itemdata?.type === "kingkong") {
+          query_with_arg(options_arg["kingkong"]).then((resp) => {
+            let allowanceineth = getethrep(resp);
+            console.log("_________allowance", allowanceineth);
+
+            setallowanceamount(allowanceineth);
+            //				setallowanceamount ( 100 )
+            if (allowanceineth > 0) {
+              setisallowanceok(false);
+            } else {
+            }
+          });
+        }
+
+        if (itemdata?.type === "ticket") {
+          query_with_arg(options_arg["ticket"]).then((resp) => {
+            let allowanceineth = getethrep(resp);
+
+            LOGGER("8LYRxjNp8k_ticket", resp, allowanceineth);
+            setallowanceamount(allowanceineth);
+            //				setallowanceamount ( 100 )
+            if (allowanceineth > 0) {
+              setisallowanceok(false);
+            } else {
+            }
+          });
+        }
+
+        query_with_arg({
+          contractaddress: await get_contractaddress("contract_USDT", resp), // ETH_TESTNET.
+          abikind: "ERC20",
+          methodname: "balanceOf",
+          aargs: [myaddress],
+        }).then((resp) => {
+          LOGGER("mybalance", resp);
+          setmybalance(getethrep(resp, 4));
         });
 
-      const options_arg = {
-        kingkong: {
-          contractaddress: addresses.contract_USDT,
-          abikind: "ERC20",
-          methodname: "allowance",
-          aargs: [myaddress, addresses.contract_kip17_salse],
-        },
-        ticket: {
-          contractaddress: addresses.contract_USDT,
-          abikind: "ERC20",
-          methodname: "allowance",
-          aargs: [myaddress, addresses.contract_erc1155_sales],
-        },
+        query_eth_balance(myaddress).then((resp) => {
+          LOGGER("rmgUxgo5ye", resp);
+          setmyethbalance((+getethrep(resp)).toFixed(DECIMALS_DISP_DEF));
+        });
       };
-
-      if (itemdata?.type === "kingkong") {
-        query_with_arg(options_arg["kingkong"]).then((resp) => {
-          let allowanceineth = getethrep(resp);
-          console.log("_________allowance", allowanceineth);
-
-          setallowanceamount(allowanceineth);
-          //				setallowanceamount ( 100 )
-          if (allowanceineth > 0) {
-            setisallowanceok(false);
-          } else {
-          }
-        });
-      }
-
-      if (itemdata?.type === "ticket") {
-        query_with_arg(options_arg["ticket"]).then((resp) => {
-          let allowanceineth = getethrep(resp);
-
-          LOGGER("8LYRxjNp8k_ticket", resp, allowanceineth);
-          setallowanceamount(allowanceineth);
-          //				setallowanceamount ( 100 )
-          if (allowanceineth > 0) {
-            setisallowanceok(false);
-          } else {
-          }
-        });
-      }
-
-      query_with_arg({
-        contractaddress: addresses.contract_USDT, // ETH_TESTNET.
-        abikind: "ERC20",
-        methodname: "balanceOf",
-        aargs: [myaddress],
-      }).then((resp) => {
-        LOGGER("mybalance", resp);
-        setmybalance(getethrep(resp, 4));
-      });
-
-      query_eth_balance(myaddress).then((resp) => {
-        LOGGER("rmgUxgo5ye", resp);
-        setmyethbalance((+getethrep(resp)).toFixed(DECIMALS_DISP_DEF));
-      });
-    };
-    // setTimeout(() => {
-    fetchdata();
-    // }, 1500);
+      fetchdata();
+    });
   }, []);
 
   const onclick_approve = async (_) => {
@@ -168,18 +189,30 @@ export default function BidPopup({ off, itemdata }) {
     const options_arg = {
       kingkong: {
         abistr: {
-          contractaddress: addresses.contract_USDT,
+          contractaddress: await get_contractaddress(
+            "contract_USDT",
+            contractaddresses
+          ),
           abikind: "ERC20",
           methodname: "approve",
-          aargs: [addresses.contract_kip17_salse, getweirep("" + 10000_0000)],
+          aargs: [
+            await get_contractaddress("KIP17[sales]", contractaddresses),
+            getweirep("" + 10000_0000),
+          ],
         },
       },
       ticket: {
         abistr: {
-          contractaddress: addresses.contract_USDT,
+          contractaddress: await get_contractaddress(
+            "contract_USDT",
+            contractaddresses
+          ),
           abikind: "ERC20",
           methodname: "approve",
-          aargs: [addresses.contract_erc1155_sales, getweirep("" + 10000_0000)],
+          aargs: [
+            await get_contractaddress("ERC1155[sales]", contractaddresses),
+            getweirep("" + 10000_0000),
+          ],
         },
       },
     };
@@ -188,7 +221,7 @@ export default function BidPopup({ off, itemdata }) {
       let abistr = getabistr_forfunction(options_arg["ticket"].abistr);
       requesttransaction({
         from: myaddress,
-        to: addresses.contract_USDT,
+        to: await get_contractaddress("contract_USDT", contractaddresses),
         data: abistr,
         value: "0x00",
       }).then((resp) => {
@@ -225,14 +258,23 @@ export default function BidPopup({ off, itemdata }) {
                 contractaddress: options_arg["ticket"].operator_contract,
                 nettype: net,
               })
-              .then((resp) => {
+              .then(async (resp) => {
                 LOGGER("APPROVE RESP", resp);
                 SetErrorBar(messages.MSG_TX_REQUEST_SENT);
                 query_with_arg({
-                  contractaddress: addresses.contract_USDT, // .ETH_TESTNET
+                  contractaddress: await get_contractaddress(
+                    "contract_USDT",
+                    contractaddresses
+                  ), // .ETH_TESTNET
                   abikind: "ERC20",
                   methodname: "allowance",
-                  aargs: [myaddress, addresses.contract_erc1155_sales], // ETH_TESTNET.
+                  aargs: [
+                    myaddress,
+                    await get_contractaddress(
+                      "ERC1155[sales]",
+                      contractaddresses
+                    ),
+                  ], // ETH_TESTNET.
                 }).then((resp) => {
                   let allowanceineth = getethrep(resp);
                   LOGGER("gCwXF6Jjkh", resp, allowanceineth);
@@ -253,7 +295,7 @@ export default function BidPopup({ off, itemdata }) {
       let abistr = getabistr_forfunction(options_arg["kingkong"].abistr);
       requesttransaction({
         from: myaddress,
-        to: addresses.contract_USDT,
+        to: await get_contractaddress("contract_USDT", contractaddresses),
         data: abistr,
         value: "0x00",
       }).then((resp) => {
@@ -289,14 +331,23 @@ export default function BidPopup({ off, itemdata }) {
                 contractaddress: options_arg["kingkong"].operator_contract,
                 nettype: net,
               })
-              .then((resp) => {
+              .then(async (resp) => {
                 LOGGER("APPROVE RESP", resp);
                 SetErrorBar(messages.MSG_TX_REQUEST_SENT);
                 query_with_arg({
-                  contractaddress: addresses.contract_USDT, // .ETH_TESTNET
+                  contractaddress: await get_contractaddress(
+                    "contract_USDT",
+                    contractaddresses
+                  ), // .ETH_TESTNET
                   abikind: "ERC20",
                   methodname: "allowance",
-                  aargs: [myaddress, addresses.contract_kip17_salse], // ETH_TESTNET.
+                  aargs: [
+                    myaddress,
+                    await get_contractaddress(
+                      "KIP17[sales]",
+                      contractaddresses
+                    ),
+                  ], // ETH_TESTNET.
                 }).then((resp) => {
                   let allowanceineth = getethrep(resp);
                   LOGGER("gCwXF6Jjkh", resp, allowanceineth);
@@ -331,7 +382,10 @@ export default function BidPopup({ off, itemdata }) {
 
     const options_abistr = {
       kingkong: {
-        operator_contract: addresses.contract_kip17_salse,
+        operator_contract: await get_contractaddress(
+          "KIP17[sales]",
+          contractaddresses
+        ),
         typestr: "BUY_NFT_ITEM",
         itemid: itemdata?.itemid,
         tokenid: itemdata?.tokenid,
@@ -347,7 +401,10 @@ export default function BidPopup({ off, itemdata }) {
         auxdata: {
           user_action: "BUY_NFT_ITEM",
           contract_type: "KIP17Sale", // .ETH_TESTNET
-          contractaddress: addresses.contract_kip17_salse, // .ETH_TESTNET
+          contractaddress: await get_contractaddress(
+            "KIP17[sales]",
+            contractaddresses
+          ), // .ETH_TESTNET
           my_address: myaddress,
           authorRoyalty: "0",
           itemid: itemdata?.itemid,
@@ -360,16 +417,19 @@ export default function BidPopup({ off, itemdata }) {
           nettype: net,
         },
         abistr: {
-          contractaddress: addresses.contract_kip17_salse,
+          contractaddress: await get_contractaddress(
+            "KIP17[sales]",
+            contractaddresses
+          ),
           abikind: "KIP17Sale",
           methodname: "match_single_simple_legacy",
           // eslint-disable-next-line no-sparse-arrays
           aargs: [
-            addresses.contract_kip17, // target contractaddress
+            await get_contractaddress("KIP17", contractaddresses), // target contractaddress
             "288", // author_royalty
             addresses.admin, // admin account address
             `${itemdata?.itemid}`, // itemid
-            addresses.contract_USDT, // paymeansaddress
+            await get_contractaddress("contract_USDT", contractaddresses), // paymeansaddress
             getweirep("" + itemdata?.price), // amounttopay
             itemdata?.seller, // seller
             userinfo?.refereraddress,
@@ -379,7 +439,10 @@ export default function BidPopup({ off, itemdata }) {
         },
       },
       ticket: {
-        operator_contract: addresses.contract_erc1155_sales,
+        operator_contract: await get_contractaddress(
+          "ERC1155[sales]",
+          contractaddresses
+        ),
         typestr: "BUY_NFT_ITEM_TICKET",
         amount: 1,
         uuid: itemdata?.uuid,
@@ -393,7 +456,10 @@ export default function BidPopup({ off, itemdata }) {
         auxdata: {
           user_action: "BUY_NFT_ITEM_TICKET",
           contract_type: "ERC1155TicketSale", // .ETH_TESTNET
-          contractaddress: addresses.itemData?.contractaddress, // .ETH_TESTNET
+          contractaddress: await get_contractaddress(
+            "ERC1155",
+            contractaddresses
+          ), // .ETH_TESTNET
           my_address: myaddress,
           authorRoyalty: "0",
           tokenid: itemdata?.tokenid,
@@ -407,12 +473,15 @@ export default function BidPopup({ off, itemdata }) {
 
         abistr: {
           // contractaddress: addresses.contract_erc1155_ticket_sales,
-          contractaddress: addresses.contract_erc1155_sales,
+          contractaddress: await get_contractaddress(
+            "ERC1155[sales]",
+            contractaddresses
+          ),
           abikind: "ERC1155Sale",
           methodname: "mint_and_match_single_simple_legacy",
           // eslint-disable-next-line no-sparse-arrays
           aargs: [
-            addresses.contract_erc1155, // target contractaddress
+            await get_contractaddress("ERC1155", contractaddresses), // target contractaddress
             `${itemdata?.id}`,
             "1", // amounttomint
             "0", // _decimals
@@ -420,7 +489,7 @@ export default function BidPopup({ off, itemdata }) {
             userinfo?.refereraddress,
             "1",
             getweirep("" + itemdata?.price),
-            addresses.contract_USDT, // sellersaddress
+            await get_contractaddress("contract_USDT", contractaddresses), // sellersaddress
             itemdata?.seller,
           ],
         },
@@ -435,7 +504,7 @@ export default function BidPopup({ off, itemdata }) {
         try {
           resp = await requesttransaction({
             from: myaddress,
-            to: addresses.contract_erc1155_sales, // .ETH_TESTNET
+            to: await get_contractaddress("ERC1155[sales]", contractaddresses), // .ETH_TESTNET
             data: abistr,
           });
           if (resp) {
@@ -476,7 +545,7 @@ export default function BidPopup({ off, itemdata }) {
                   auxdata: options_abistr["ticket"].auxdata,
                   contractaddress: options_abistr["ticket"].operator_contract,
                 })
-                .then((resp) => {
+                .then(async (resp) => {
                   LOGGER("", resp);
                   axios.put(API.API_UPDATE_ORDERS, {
                     matcher_contract:
@@ -486,7 +555,10 @@ export default function BidPopup({ off, itemdata }) {
                     uuid: itemdata?.uuid,
                     username: myaddress,
                     buyer: options_abistr["ticket"].buyer,
-                    paymeansaddress: addresses.contract_USDT,
+                    paymeansaddress: await get_contractaddress(
+                      "contract_USDT",
+                      contractaddresses
+                    ),
                     paymeansname: "USDT",
                     seller: options_abistr["ticket"].seller,
                     saletype: 0,
@@ -520,7 +592,7 @@ export default function BidPopup({ off, itemdata }) {
         try {
           resp = await requesttransaction({
             from: myaddress,
-            to: addresses.contract_kip17_salse, // .ETH_TESTNET
+            to: await get_contractaddress("KIP17[sales]", contractaddresses), // .ETH_TESTNET
             data: abistr,
           });
           if (resp) {
@@ -557,7 +629,7 @@ export default function BidPopup({ off, itemdata }) {
                   auxdata: options_abistr["kingkong"].auxdata,
                   contractaddress: options_abistr["kingkong"].operator_contract,
                 })
-                .then((resp) => {
+                .then(async (resp) => {
                   LOGGER("", resp);
                   axios.put(API.API_UPDATE_ORDERS, {
                     matcher_contract:
@@ -567,7 +639,10 @@ export default function BidPopup({ off, itemdata }) {
                     uuid: itemdata?.uuid,
                     username: myaddress,
                     buyer: options_abistr["kingkong"].buyer,
-                    paymeansaddress: addresses.contract_USDT,
+                    paymeansaddress: await get_contractaddress(
+                      "contract_USDT",
+                      contractaddresses
+                    ),
                     paymeansname: "USDT",
                     seller: options_abistr["kingkong"].seller,
                     saletype: 0,
