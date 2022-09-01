@@ -108,7 +108,6 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
           let allowanceineth = getethrep(resp);
           LOGGER("8LYRxjNp8k", resp, allowanceineth);
           setallowanceamount(allowanceineth);
-          //				setallowanceamount ( 100 )
           if (allowanceineth > 0) {
             setisallowanceok(false);
           } else {
@@ -282,6 +281,7 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
                 txhash,
                 username: myaddress,
                 typestr: "CLEAR_DELINQUENT",
+                itemid: "",
                 auxdata: {
                   amount: delinquencyAmount,
                   currency: PAY_CURRENCY,
@@ -297,7 +297,6 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
                 LOGGER("", resp);
                 SetErrorBar(messages.MSG_TX_REQUEST_SENT);
               });
-            SetErrorBar(messages.MSG_TX_FINALIZED);
             setDone(false);
             window.location.replace("/");
             setisloader_01(false);
