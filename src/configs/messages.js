@@ -21,5 +21,6 @@ const messages = {
   MSG_PLEASE_INPUT: "Please input",
   MSG_CONNECTWALET: "Please connect your wallet!",
   MSG_DUPLICATEEMAIL: "Dublicate email",
+  MSG_NO_METAMASK: "Please Install Metamask!",
 };
 export { messages };

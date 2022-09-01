@@ -47,6 +47,8 @@ import Employed from "./router/Employed";
 import Employ from "./router/Employ";
 import UnderConst from "./components/UnderConstruction/UnderConst";
 import NoMatch from "./components/NoMatch";
+import { web3 } from "./configs/configweb3";
+import { chainId, networks } from "./configs/chains";
 function App() {
   const dispatch = useDispatch();
   const [isavailable, setisavailable] = useState(1);
@@ -55,6 +57,33 @@ function App() {
     if (window.innerWidth > 1024) dispatch(setMobile(false));
     else dispatch(setMobile(true));
   }
+
+  useLayoutEffect(() => {
+    (async function () {
+      let { ethereum } = window;
+      if (ethereum) {
+      } else {
+        SetErrorBar(messages.MSG_NO_METAMASK);
+        return;
+      }
+      if (window.ethereum.networkVersion !== chainId) {
+        try {
+          await window.ethereum.request({
+            method: "wallet_switchEthereumChain",
+            params: [{ chainId: web3.utils.toHex(chainId) }],
+          });
+        } catch (err) {
+          console.error(err);
+          if (err.code === 4902) {
+            await window.ethereum.request({
+              method: "wallet_addEthereumChain",
+              params: [networks],
+            });
+          }
+        }
+      }
+    })();
+  });
 
   useEffect(() => {
     (async function getAddress() {
