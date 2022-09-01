@@ -743,7 +743,7 @@ export default function MyItems() {
                   <div className="saleBox">
                     <div className="price">
                       {/* 
-                        <strong className="value">{putCommaAtPrice(item.buyprice)} USDT</strong> */}
+                        <strong className="value">{putCommaAtPrice(item.amount)} USDT</strong> */}
                       <strong className="value"></strong>
                     </div>
                     {/* <div className="time">
@@ -765,7 +765,7 @@ export default function MyItems() {
                           return (
                             <p className="value">
                               {" "}
-                              {parseInt(item && item.buyprice).toFixed(2)} USDT
+                              {parseInt(item && item.amount).toFixed(2)} USDT
                             </p>
                           );
                       })}

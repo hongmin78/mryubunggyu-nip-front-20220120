@@ -18,7 +18,6 @@ import { API } from "../../configs/api";
 import SetErrorBar from "../../util/SetErrorBar.js";
 import { messages } from "../../configs/messages";
 import { net } from "../../configs/net";
-import { addresses } from "../../configs/addresses-ropsten";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -43,6 +42,7 @@ export default function Header() {
         let { data } = await axios.get(API.API_CADDR);
         let { status, list } = data;
         if (status == "OK") {
+          console.log("***************LIST", list);
           setContractaddresses(list);
           res(list);
         } else {
@@ -106,7 +106,6 @@ export default function Header() {
   };
   const fetchdata = (_) => {
     query_contractaddresses().then(async (resp) => {
-      // let myaddress = "0xb440393a03078b967000f09577e32c3252f15832";
       let myaddress = getmyaddress();
       if (myaddress) {
       } else {
@@ -116,7 +115,7 @@ export default function Header() {
       setmyaddress(myaddress);
       if (myaddress) {
         query_with_arg({
-          contractaddress: addresses.contract_USDT, // ETH_TESTNET.
+          contractaddress: await get_contractaddress("contract_USDT", resp), // ETH_TESTNET.
           abikind: "ERC20",
           methodname: "balanceOf",
           aargs: [myaddress],
