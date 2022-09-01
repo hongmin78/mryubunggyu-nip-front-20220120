@@ -1,12 +1,12 @@
-import { net } from "./net";
-import { web3 } from "./configweb3";
+const { net } = require("./net");
+const { web3 } = require("./configweb3");
 
-const chainId = {
+let chainId = {
   BSC_MAINNET: 56,
   ETH_TESTNET: 3,
 };
 
-const networks = {
+let networks = {
   BSC_MAINNET: {
     chainName: "Smart Chain",
     chainId: web3.utils.toHex(chainId[net]),
