@@ -220,28 +220,23 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
     });
   };
 
-  console.log(allowanceamount);
   const onclick_buy = async (_) => {
     setDone(true);
     LOGGER("YFVGAF0sBJ");
     let myaddress = getmyaddress();
-    // LOGGER("eYJAgMYkR5", myaddress);
+
     if (+mybalance >= +delinquencyAmount) {
     } else {
       SetErrorBar(messages.MSG_BALANCE_NOT_ENOUGH);
       setDone(false);
       return;
     }
-    /** 		if (myaddress){}
-		else { 
-			SetErrorBar( messages.MSG_PLEASE_ CONNECT_WALLET )
-			return 
-		} */
+
     let abistr = getabistr_forfunction({
       contractaddress: await get_contractaddress(
         "payment_for_delinquency",
         contractaddresses
-      ), // .ETH_TESTNET
+      ), //
       abikind: "DELINQUENT",
       methodname: "pay",
       aargs: [
@@ -263,24 +258,13 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
             contractaddresses
           ), // .ETH_TESTNET
           data: abistr,
-          //			, value : ''
         });
         if (resp) {
         } else {
           SetErrorBar(messages.MSG_USER_DENIED_TX);
           return;
         }
-        let resptype = getobjtype(resp);
-        let txhash;
-        switch (resptype) {
-          case "String":
-            txhash = resp;
-            break;
-          case "Object":
-            txhash = resp.txHash;
-            break;
-        }
-
+        let txhash = resp;
         /***** */
         awaitTransactionMined
           .awaitTx(web3, txhash, TX_POLL_OPTIONS)
@@ -292,6 +276,7 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
               SetErrorBar(messages.MSG_TX_FAILED);
               return;
             }
+            SetErrorBar(messages.MSG_TX_FINALIZED);
             axios
               .post(API.API_TXS + `/${txhash}?nettype=${net}`, {
                 txhash,
@@ -303,7 +288,7 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
                   currencyaddress: await get_contractaddress(
                     "contract_USDT",
                     contractaddresses
-                  ), // ETH_TESTNET.
+                  ), //
                   nettype: net,
                 },
                 nettype: net,
@@ -325,7 +310,6 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
       }
     };
     callreqtx();
-    //		.then(resp=>{ LOGGER( '' , resp )		})
   };
 
   if (isMobile)
