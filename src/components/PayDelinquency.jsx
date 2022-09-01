@@ -296,11 +296,11 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
               .then((resp) => {
                 LOGGER("", resp);
                 SetErrorBar(messages.MSG_TX_REQUEST_SENT);
+                setDone(false);
+                window.location.replace("/");
+                setisloader_01(false);
+                off();
               });
-            setDone(false);
-            window.location.replace("/");
-            setisloader_01(false);
-            off();
           });
       } catch (err) {
         setisloader_01(false);
@@ -491,7 +491,7 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
                 <p className="key">Your USDT balance</p>
                 <p className="value">{mybalance} USDT</p>
               </li>
-              <li style={allowanceamount ? { display: "block" } : {}}>
+              <li>
                 <p className="key">Allowance</p>
                 <p className="value">{allowanceamount} USDT</p>
               </li>
