@@ -16,11 +16,14 @@ export default function AuctionItem0228({ data, index, likeObj, setLikeObj }) {
     setLikeObj({ ...dataObj });
   }
 
+<<<<<<< HEAD
   function contentsReload(id) {
     window.location.reload(`/#/auction/detail/${id}`);
     window.scrollTo(0, 0);
   }
 
+=======
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
   if (isMobile)
     return (
       <Mitem

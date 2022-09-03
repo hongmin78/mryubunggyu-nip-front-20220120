@@ -19,7 +19,11 @@ import { getmyaddress, LOGGER } from "../util/common";
 import moment from "moment";
 import axios from "axios";
 import { API } from "../configs/api";
+<<<<<<< HEAD
 import { addresses } from "../configs/addresses";
+=======
+
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 import { TIME_FETCH_MYADDRESS_DEF } from "../configs/configs";
 import SetErrorBar from "../util/SetErrorBar.js";
 import { messages } from "../configs/messages";
@@ -29,7 +33,12 @@ export default function Mypage() {
   const navigate = useNavigate();
   const isLogin = useSelector((state) => state.common.isLogin);
   const isMobile = useSelector((state) => state.common.isMobile);
+<<<<<<< HEAD
   const [category, setCategory] = useState(0);
+=======
+  let _category = localStorage.getItem("category");
+  const [category, setCategory] = useState(_category ? +_category : 0);
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
   const [showEditBtn, setShowEditBtn] = useState(false);
   const [showCopyBtn, setShowCopyBtn] = useState(false);
   const [userinfo, setuserinfo] = useState();
@@ -113,7 +122,17 @@ export default function Mypage() {
           <article className="categoryCont">
             <ul className="categoryBar">
               {categoryList.map((cont, index) => (
+<<<<<<< HEAD
                 <li key={index} onClick={() => setCategory(index)}>
+=======
+                <li
+                  key={index}
+                  onClick={() => {
+                    setCategory(index);
+                    localStorage.setItem("category", index);
+                  }}
+                >
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                   <p>{cont}</p>
 
                   <div
@@ -194,7 +213,17 @@ export default function Mypage() {
           <article className="categoryCont">
             <ul className="categoryBar">
               {categoryList.map((cont, index) => (
+<<<<<<< HEAD
                 <li key={index} onClick={() => setCategory(index)}>
+=======
+                <li
+                  key={index}
+                  onClick={() => {
+                    setCategory(index);
+                    localStorage.setItem("category", index);
+                  }}
+                >
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                   <p>{cont}</p>
 
                   <div

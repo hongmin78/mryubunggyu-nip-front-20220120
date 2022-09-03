@@ -6,16 +6,27 @@ import Footer from "./Footer";
 import PopupBg from "../components/PopupBg";
 import MarketItem from "../components/MarketItem";
 import MarketItem0227 from "../components/MarketItem0227";
+<<<<<<< HEAD
 
+=======
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 import { D_marketItemList, D_sortList } from "../data/Dmarket";
 import SelectPopup from "../components/SelectPopup";
 import { useSelector } from "react-redux";
 import Header from "../components/header/Header";
 import { API } from "../configs/api";
+<<<<<<< HEAD
 import { LOGGER } from "../util/common";
 import axios from "axios";
 import { net } from "../configs/net";
 
+=======
+import { LOGGER, getmyaddress } from "../util/common";
+import axios from "axios";
+import { net } from "../configs/net";
+import SetErrorBar from "../util/SetErrorBar";
+import { messages } from "../configs/messages";
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 export default function Market() {
   const searchBoxRef = useRef();
   const sortBtnRef = useRef();
@@ -26,6 +37,7 @@ export default function Market() {
   const [likeObj, setLikeObj] = useState({});
   const [limit, setLimit] = useState(8);
   let [D_marketItemList, setD_marketItemList] = useState([]);
+<<<<<<< HEAD
   // const fetchdata = () => {
   //   axios.get(API.API_PREMIUMITEMS + `/items/group_/kingkong/0/128/id/DESC?nettype=${net}`).then((resp) => {
   //     LOGGER("", resp.data);
@@ -39,15 +51,45 @@ export default function Market() {
     try {
       const res = await axios.get(
         API.API_ALL_ITEMS_MARKET + `/active/1/0/100/id/DESC?nettype=${net}`
+=======
+  let [isstaked, setisstaked] = useState();
+
+  const fetchData = async () => {
+    try {
+      const res = await axios.get(
+        API.API_ALL_ITEMS_MARKET + `/status/1/0/100/id/DESC?nettype=${net}`
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
       );
       if (res.data && res.data.list) {
         let { list } = res.data;
         console.log("$market_items", res);
+<<<<<<< HEAD
         setD_marketItemList(list);
+=======
+        let notstaked = list.filter((el) =>
+          el.item ? el.item.isstaked == 0 : el
+        );
+        setD_marketItemList(notstaked);
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
       }
     } catch (err) {
       console.log(err);
     }
+<<<<<<< HEAD
+=======
+    let myaddress = getmyaddress();
+    LOGGER("myaddress", myaddress);
+    if (myaddress) {
+      let resp = await axios.get(
+        API.API_USERINFO + `/${myaddress}?nettype=${net}`
+      );
+      LOGGER("rBojncz0CD", resp.data);
+      let { status, respdata } = resp.data;
+      if (status == "OK") {
+        setisstaked(respdata.isstaked ? true : false);
+      }
+    }
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
   };
 
   useEffect(() => {
@@ -201,6 +243,10 @@ export default function Market() {
                       index={index}
                       likeObj={likeObj}
                       setLikeObj={setLikeObj}
+<<<<<<< HEAD
+=======
+                      isstaked={isstaked}
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                     />
                   </Fragment>
                 );

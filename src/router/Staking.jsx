@@ -28,7 +28,13 @@ export default function Staking(props) {
       let myaddress = getmyaddress();
       LOGGER("myaddress", myaddress);
       if (myaddress) {
+<<<<<<< HEAD
         let resp = await axios.get(API.API_USERINFO + `/${myaddress}?nettype=${net}`);
+=======
+        let resp = await axios.get(
+          API.API_USERINFO + `/${myaddress}?nettype=${net}`
+        );
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
         LOGGER("rBojncz0CD", resp.data);
         let { status, respdata } = resp.data;
         if (status == "OK") {
@@ -41,9 +47,15 @@ export default function Staking(props) {
         }
       }
     };
+<<<<<<< HEAD
     setTimeout(() => {
       fetchdata();
     }, 1500);
+=======
+    // setTimeout(() => {
+    fetchdata();
+    // }, 1500);
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
   }, []);
   const checkIf = (a) => {
     navigate(`/staking/detail/${a}`);
@@ -83,7 +95,14 @@ export default function Staking(props) {
                         Staked
                       </button>
                     ) : (
+<<<<<<< HEAD
                       <button className="buyBtn" onClick={(e) => checkIf(index)}>
+=======
+                      <button
+                        className="buyBtn"
+                        onClick={(e) => checkIf(index)}
+                      >
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                         Buy Now
                       </button>
                     )}
@@ -102,7 +121,13 @@ export default function Staking(props) {
         <Header />
         <PstakingDetailBox>
           <div className="innerBox">
+<<<<<<< HEAD
             <strong className="title">Stake to participate in the auction!</strong>
+=======
+            <strong className="title">
+              Stake to participate in the auction!
+            </strong>
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
             <ul className="ticketList">
               {[1, 2, 3, 4].map((cont, index) => (
                 <li key={index}>

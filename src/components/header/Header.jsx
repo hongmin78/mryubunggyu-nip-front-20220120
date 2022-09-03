@@ -9,11 +9,18 @@ import I_headerLogoWhite from "../../img/icon/I_headerLogoWhite.png";
 import axios from "axios";
 import I_3line from "../../img/icon/I_3line.svg";
 import I_3lineWhite from "../../img/icon/I_3lineWhite.svg";
+<<<<<<< HEAD
 import { strDot } from "../../util/Util";
 import MmenuPopup from "./MmenuPopup";
 import { query_with_arg } from "../../util/contract-calls";
 import { LOGGER, getmyaddress } from "../../util/common";
 import { addresses } from "../../configs/addresses";
+=======
+import { get_contractaddress, strDot } from "../../util/Util";
+import MmenuPopup from "./MmenuPopup";
+import { query_with_arg } from "../../util/contract-calls";
+import { LOGGER, getmyaddress } from "../../util/common";
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 import { getethrep } from "../../util/eth";
 import { API } from "../../configs/api";
 import SetErrorBar from "../../util/SetErrorBar.js";
@@ -35,6 +42,7 @@ export default function Header() {
   let [myaddress, setmyaddress] = useState();
   const [ticketInfo, setTickInfo] = useState();
   const [walletStatus, setWalletStatus] = useState("");
+<<<<<<< HEAD
 
   useEffect(() => {
     setTimeout(() => {
@@ -47,12 +55,46 @@ export default function Header() {
       axios.get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`).then((resp) => {
         LOGGER("API_ticketInfo", resp.data);
 
+=======
+  const [contractaddresses, setContractaddresses] = useState([]);
+
+  const query_contractaddresses = async () => {
+    return new Promise(async (res, rej) => {
+      try {
+        let { data } = await axios.get(API.API_CADDR);
+        let { status, list } = data;
+        if (status == "OK") {
+          console.log("***************LIST", list);
+          setContractaddresses(list);
+          res(list);
+        } else {
+          rej("Failed to fetch contractaddresses");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  };
+
+  useEffect(() => {
+    // setTimeout(() => {
+    // let myaddress = "0xb440393a03078b967000f09577e32c3252f15832";
+    let myaddress = getmyaddress();
+    if (myaddress) {
+    } else {
+      return;
+    }
+    axios
+      .get(API.API_GET_TICK_INFO + `/${myaddress}?nettype=${net}`)
+      .then((resp) => {
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
         let { status, respdata } = resp.data;
         if (status == "OK" && respdata !== null) {
           setTickInfo(respdata);
           awaitWallet();
         }
       });
+<<<<<<< HEAD
     }, 1000);
   }, []);
 
@@ -65,10 +107,26 @@ export default function Header() {
         setWalletStatus("Connect Wallet");
       }
     }, 1600);
+=======
+    // }, 1000);
+  }, []);
+
+  const awaitWallet = () => {
+    // let myaddress = "0xb440393a03078b967000f09577e32c3252f15832";
+    // setTimeout(() => {
+    let myaddress = getmyaddress();
+    if (myaddress) {
+      return;
+    } else {
+      setWalletStatus("Connect Wallet");
+    }
+    // }, 1500);
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
     setWalletStatus("Connecting...");
   };
 
   const fetchdataStaked = async () => {
+<<<<<<< HEAD
     let myaddress = getmyaddress();
     if (myaddress) {
     } else {
@@ -77,10 +135,23 @@ export default function Header() {
     }
     LOGGER("", myaddress);
     let resp = await axios.get(API.API_USERINFO + `/${myaddress}?nettype=${net}`);
+=======
+    // let myaddress = "0xb440393a03078b967000f09577e32c3252f15832";
+    let myaddress = getmyaddress();
+    if (myaddress) {
+    } else {
+      return;
+    }
+    LOGGER("", myaddress);
+    let resp = await axios.get(
+      API.API_USERINFO + `/${myaddress}?nettype=${net}`
+    );
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
     LOGGER("rBojncz0CD", resp.data);
     let { status, respdata } = resp.data;
     if (status == "OK") {
       setisstaked(respdata.isstaked ? true : false);
+<<<<<<< HEAD
       console.log("dddd", respdata);
     }
   };
@@ -112,6 +183,38 @@ export default function Header() {
       return;
     }
     console.log("asdoiajsod", addresses.contract_USDT, [myaddress]); // ETH_TESTNET.
+=======
+    }
+  };
+  const fetchdata = (_) => {
+    query_contractaddresses().then(async (resp) => {
+      let myaddress = getmyaddress();
+      if (myaddress) {
+      } else {
+        return;
+      }
+      LOGGER("MXZfykw8Mw", myaddress);
+      setmyaddress(myaddress);
+      if (myaddress) {
+        query_with_arg({
+          contractaddress: await get_contractaddress("contract_USDT", resp), // ETH_TESTNET.
+          abikind: "ERC20",
+          methodname: "balanceOf",
+          aargs: [myaddress],
+        }).then((resp) => {
+          console.log("RESPONSE-BALANCE", resp);
+          setmybalance(getethrep("" + resp));
+        });
+
+        window.ethereum.on("networkChanged", function (networkId) {
+          LOGGER("", networkId);
+          // Time to reload your interface with the new networkId
+        });
+      } else {
+        return;
+      }
+    });
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
   };
 
   useEffect(
@@ -139,7 +242,15 @@ export default function Header() {
       <>
         <MheaderBox style={{ background: isStaking && "unset" }}>
           <button className="logoBox" onClick={() => navigate("/")}>
+<<<<<<< HEAD
             <img className="logoImg" src={isStaking ? I_headerLogoWhite : I_headerLogo} alt="" />
+=======
+            <img
+              className="logoImg"
+              src={isStaking ? I_headerLogoWhite : I_headerLogo}
+              alt=""
+            />
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
           </button>
 
           <button className="menuBtn" onClick={() => setMenuPopup(true)}>
@@ -147,7 +258,17 @@ export default function Header() {
           </button>
         </MheaderBox>
 
+<<<<<<< HEAD
         {menuPopup && <MmenuPopup off={setMenuPopup} mybalance={mybalance} ticketInfo={ticketInfo} />}
+=======
+        {menuPopup && (
+          <MmenuPopup
+            off={setMenuPopup}
+            mybalance={mybalance}
+            ticketInfo={ticketInfo}
+          />
+        )}
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
       </>
     );
   } else {
@@ -155,7 +276,15 @@ export default function Header() {
       <PheaderBox style={{ background: isStaking && "unset" }}>
         <section className="innerBox">
           <button className="logoBox" onClick={() => navigate("/")}>
+<<<<<<< HEAD
             <img className="logoImg" src={isStaking ? I_headerLogoWhite : I_headerLogo} alt="" />
+=======
+            <img
+              className="logoImg"
+              src={isStaking ? I_headerLogoWhite : I_headerLogo}
+              alt=""
+            />
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
           </button>
 
           <article className="rightBox">
@@ -179,11 +308,16 @@ export default function Header() {
               <button
                 style={{ color: isStaking && "#fff" }}
                 onClick={() => {
+<<<<<<< HEAD
                   onclick_staked_val_btn("/market");
+=======
+                  navigate("/market");
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                 }}
               >
                 Marketplace
               </button>
+<<<<<<< HEAD
               <button
                 style={{ color: isStaking && "#fff" }}
                 onClick={() => {
@@ -193,6 +327,18 @@ export default function Header() {
               >
                 Employment
               </button>
+=======
+              {/* <button
+                style={{ color: isStaking && "#fff" }}
+                onClick={() => {
+                  // onclick_staked_val_btn("/employment");
+                  navigate("/employment");
+                  // SetErrorBar("Will soon");
+                }}
+              >
+                Employment
+              </button> */}
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
             </nav>
 
             {/**  <button className='menuBtn' >
@@ -205,11 +351,15 @@ export default function Header() {
                   background: isStaking && "#fff",
                 }}
                 onClick={() => {
+<<<<<<< HEAD
                   if (isstaked) {
                     setHeaderPopup(!headerPopup);
                   } else {
                     SetErrorBar("You need purchased tickets");
                   }
+=======
+                  setHeaderPopup(!headerPopup);
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                 }}
               >
                 <span className="balanceBox">

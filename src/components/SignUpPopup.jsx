@@ -9,11 +9,15 @@ import { chkValidEmail } from "../util/Util";
 import { signup, getRequestEmail } from "../api/Signup";
 import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
+<<<<<<< HEAD
 import {
   generaterandomstr_charset,
   LOGGER,
   getmyaddress,
 } from "../util/common";
+=======
+import { generaterandomstr_charset, LOGGER, getmyaddress } from "../util/common";
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 import axios from "axios";
 import { API } from "../configs/api";
 import { TIME_PAGE_TRANSITION_DEF } from "../configs/configs";
@@ -199,12 +203,16 @@ export default function SignUpPopup({ walletAddress }) {
             <p className="contTitle">Address</p>
             <div className="inputContainer">
               <div className="inputBox">
+<<<<<<< HEAD
                 <input
                   style={{ color: "#bbb" }}
                   type=""
                   value={myaddress}
                   disabled
                 />
+=======
+                <input style={{ color: "#bbb" }} type="" value={myaddress} disabled />
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
               </div>
             </div>
           </li>
@@ -229,12 +237,16 @@ export default function SignUpPopup({ walletAddress }) {
             <p className="contTitle">Password</p>
             <div className="inputContainer">
               <div className="inputBox">
+<<<<<<< HEAD
                 <input
                   type=""
                   value={pw}
                   onChange={(e) => setPw(e.target.value)}
                   placeholder="Password"
                 />
+=======
+                <input type="" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="Password" />
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
               </div>
             </div>
           </li>
@@ -293,9 +305,13 @@ export default function SignUpPopup({ walletAddress }) {
               <img src={I_chkWhite} alt="" />
             </button>
             <p>
+<<<<<<< HEAD
               Subscribe{" "}
               <u onClick={() => navigate("/term")}>Terms of Service</u>{" "}
               &#40;required&#41;
+=======
+              Subscribe <u onClick={() => navigate("/term")}>Terms of Service</u> &#40;required&#41;
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
             </p>
           </li>
 
@@ -307,10 +323,14 @@ export default function SignUpPopup({ walletAddress }) {
             >
               <img src={I_chkWhite} alt="" />
             </button>
+<<<<<<< HEAD
             <p>
               Personal lnformation Collection and Usage Agreement
               &#40;required&#41;
             </p>
+=======
+            <p>Personal lnformation Collection and Usage Agreement &#40;required&#41;</p>
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
           </li>
         </ul>
 
@@ -318,11 +338,15 @@ export default function SignUpPopup({ walletAddress }) {
           <button className="cancelBtn" onClick={() => navigate("/")}>
             Cancel
           </button>
+<<<<<<< HEAD
           <button
             className="confirmBtn"
             disabled={disableConfirm}
             onClick={onClickSignUpBtn}
           >
+=======
+          <button className="confirmBtn" disabled={disableConfirm} onClick={onClickSignUpBtn}>
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
             Sign up
           </button>
         </ul>
@@ -338,12 +362,16 @@ export default function SignUpPopup({ walletAddress }) {
             <p className="contTitle">Address</p>
             <div className="inputContainer">
               <div className="inputBox">
+<<<<<<< HEAD
                 <input
                   style={{ color: "#bbb" }}
                   type=""
                   value={myaddress}
                   disabled
                 />
+=======
+                <input style={{ color: "#bbb" }} type="" value={myaddress} disabled />
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
               </div>
             </div>
           </li>
@@ -396,12 +424,16 @@ export default function SignUpPopup({ walletAddress }) {
             <p className="contTitle">Password</p>
             <div className="inputContainer">
               <div className="inputBox">
+<<<<<<< HEAD
                 <input
                   type="password"
                   value={pw}
                   onChange={(e) => setPw(e.target.value)}
                   placeholder="Password"
                 />
+=======
+                <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="Password" />
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
               </div>
             </div>
           </li>
@@ -453,6 +485,7 @@ export default function SignUpPopup({ walletAddress }) {
 
         <ul className="agreeList">
           <li>
+<<<<<<< HEAD
             <button
               className={agreeList[0] ? "chkBtn on" : "chkBtn"}
               onClick={() => onClickAgreeList(0)}
@@ -463,6 +496,13 @@ export default function SignUpPopup({ walletAddress }) {
               Subscribe{" "}
               <u onClick={() => navigate("/term")}>Terms of Service</u>{" "}
               &#40;required&#41;
+=======
+            <button className={agreeList[0] ? "chkBtn on" : "chkBtn"} onClick={() => onClickAgreeList(0)}>
+              <img src={I_chkWhite} alt="" />
+            </button>
+            <p>
+              Subscribe <u onClick={() => navigate("/term")}>Terms of Service</u> &#40;required&#41;
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
             </p>
           </li>
 
@@ -474,10 +514,14 @@ export default function SignUpPopup({ walletAddress }) {
             >
               <img src={I_chkWhite} alt="" />
             </button>
+<<<<<<< HEAD
             <p>
               Personal lnformation Collection and Usage Agreement
               &#40;required&#41;
             </p>
+=======
+            <p>Personal lnformation Collection and Usage Agreement &#40;required&#41;</p>
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
           </li>
         </ul>
 
@@ -490,11 +534,15 @@ export default function SignUpPopup({ walletAddress }) {
           >
             Cancel
           </button>
+<<<<<<< HEAD
           <button
             className="confirmBtn"
             disabled={disableConfirm}
             onClick={onClickSignUpBtn}
           >
+=======
+          <button className="confirmBtn" disabled={disableConfirm} onClick={onClickSignUpBtn}>
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
             Sign up
           </button>
         </ul>

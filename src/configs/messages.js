@@ -7,6 +7,10 @@ const messages = {
   MSG_YOU_ALREADY_HAVE_STAKED: "Already purchased", // 이미 구매완료 되었습니다'
   MSG_USER_DENIED_TX: "Transaction has been denied", // 트랜잭션 요청을 거부하였습니다'
   MSG_TX_FINALIZED: "Transaction finalized",
+<<<<<<< HEAD
+=======
+  MSG_TX_FAILED: "Transaction failed!",
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
   MSG_DONE_LOGIN: "Logged in", // 로그인되었습니다'
   MSG_SERVER_ERR: "Server Error",
   MSG_EMAIL_SENT: "Email sent",
@@ -20,5 +24,9 @@ const messages = {
   MSG_PLEASE_INPUT: "Please input",
   MSG_CONNECTWALET: "Please connect your wallet!",
   MSG_DUPLICATEEMAIL: "Dublicate email",
+<<<<<<< HEAD
+=======
+  MSG_NO_METAMASK: "Please Install Metamask!",
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 };
 export { messages };

@@ -155,7 +155,13 @@ const getrandomwords = (N) => {
   }
 }; */
 const getmyaddress = (_) => {
+<<<<<<< HEAD
   /**  const walletConnector = new NodeWalletConnect(
+=======
+  return localStorage.getItem("walletaddress");
+};
+/**  const walletConnector = new NodeWalletConnect(
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
     {
       bridge: "https://bridge.walletconnect.org", // Required
     },
@@ -173,12 +179,19 @@ const getmyaddress = (_) => {
     return walletConnector._accounts[0];
   } else { */
 
+<<<<<<< HEAD
   window.ethereum &&
     window.ethereum.selectedAddress &&
     LOGGER(window.ethereum.selectedAddress);
   return window.ethereum ? window.ethereum.selectedAddress : null;
   //  }
 };
+=======
+// window.ethereum && window.ethereum.selectedAddress && LOGGER(window.ethereum.selectedAddress);
+// return window.ethereum ? window.ethereum.selectedAddress : null;
+//  }
+// };
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 const getmyaddress_async = async (_) => {
   /**  const walletConnector = new NodeWalletConnect(
     {

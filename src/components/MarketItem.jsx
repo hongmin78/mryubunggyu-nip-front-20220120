@@ -5,12 +5,20 @@ import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import moment from "moment";
+<<<<<<< HEAD
+=======
+import E_staking from "../img/common/E_staking.png";
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 
 export default function MarketItem({ data, index, likeObj, setLikeObj }) {
   const navigate = useNavigate();
 
   const isMobile = useSelector((state) => state.common.isMobile);
+<<<<<<< HEAD
 
+=======
+  console.log("data", data);
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
   function onClickItemLike(e, index) {
     e.stopPropagation();
     let dataObj = likeObj;
@@ -21,10 +29,14 @@ export default function MarketItem({ data, index, likeObj, setLikeObj }) {
 
   if (isMobile)
     return (
+<<<<<<< HEAD
       <Mitem
         className="item"
         onClick={() => navigate(`/market/detail/${data?.itemid}`)}
       >
+=======
+      <Mitem className="item" onClick={() => navigate(`/market/detail/${data?.itemid}`)}>
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
         <div className="topBar">
           <div className="profBox">
             <img src={data?.url} alt="" />
@@ -32,10 +44,14 @@ export default function MarketItem({ data, index, likeObj, setLikeObj }) {
           </div>
 
           {likeObj && (
+<<<<<<< HEAD
             <button
               className="likeBtn"
               onClick={(e) => onClickItemLike(e, index)}
             >
+=======
+            <button className="likeBtn" onClick={(e) => onClickItemLike(e, index)}>
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
               <img src={likeObj[index] ? I_heartO : I_heart} alt="" />
               <p
                 className="count"
@@ -74,6 +90,7 @@ export default function MarketItem({ data, index, likeObj, setLikeObj }) {
     return (
       <Pitem
         className="item"
+<<<<<<< HEAD
         onClick={() => navigate(`/market/detail/${data?.itemid}`)}
       >
         <div className="topBar">
@@ -87,6 +104,24 @@ export default function MarketItem({ data, index, likeObj, setLikeObj }) {
               className="likeBtn"
               onClick={(e) => onClickItemLike(e, index)}
             >
+=======
+        onClick={() => {
+          navigate(`/market/detail/${data.uuid}`);
+        }}
+      >
+        <div className="topBar">
+          <div className="profBox">
+            {data.item?.url ? (
+              <img className="itemImg" src={data.item?.url} alt="" />
+            ) : (
+              <img className="itemImg" src={E_staking} alt="" />
+            )}
+            <p className="address">{strDot(data?.username, 5, 4)}</p>
+          </div>
+
+          {likeObj && (
+            <button className="likeBtn" onClick={(e) => onClickItemLike(e, index)}>
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
               <img src={likeObj[index] ? I_heartO : I_heart} alt="" />
               <p
                 className="count"

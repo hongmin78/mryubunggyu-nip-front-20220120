@@ -6,10 +6,16 @@ import I_clip from "../img/icon/I_clip.svg";
 import E_detailItem from "../img/market/E_detailItem.png";
 import I_rtArw from "../img/icon/I_rtArw.svg";
 import { Fragment, useEffect, useRef, useState } from "react";
+<<<<<<< HEAD
 import { putCommaAtPrice } from "../util/Util";
 import { D_category, D_transactionHistory } from "../data/DauctionDetail";
 import Offer from "../components/itemDetail/Offer";
 import { marketPlaceList } from "../data/Dmain";
+=======
+import { putCommaAtPrice, strDot } from "../util/Util";
+import { D_category, D_transactionHistory } from "../data/DauctionDetail";
+import Offer from "../components/itemDetail/Offer";
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 import Details from "../components/itemDetail/Details";
 import Properties from "../components/itemDetail/Properties";
 import MarketItem from "../components/MarketItem";
@@ -18,7 +24,11 @@ import E_staking from "../img/common/E_staking.png";
 import BidPopup from "../components/BidPopup";
 import PopupBg from "../components/PopupBg";
 import { useSelector } from "react-redux";
+<<<<<<< HEAD
 import { useNavigate, useParams } from "react-router-dom";
+=======
+import { useNavigate, useParams, useLocation } from "react-router-dom";
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 import Header from "../components/header/Header";
 import axios from "axios";
 import { API } from "../configs/api"; // import API from "../api/API";
@@ -27,8 +37,17 @@ import { ITEM_PRICE_DEF } from "../configs/configs";
 import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
 import { net } from "../configs/net";
+<<<<<<< HEAD
 export default function MarketDetail() {
   const navigate = useNavigate();
+=======
+import I_tagWhite from "../img/icon/I_tagWhite.svg";
+
+export default function MarketDetail() {
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const data = useLocation().state;
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
   const params = useParams();
   const moreRef = useRef();
   const isMobile = useSelector((state) => state.common.isMobile);
@@ -40,6 +59,17 @@ export default function MarketDetail() {
   let [itemdata, setitemdata] = useState();
   let [marketPlaceList, setmarketPlaceList] = useState([]);
   const [saleStatus, setSaleStatus] = useState(1);
+<<<<<<< HEAD
+=======
+  let [isstaked, setisstaked] = useState();
+  const [transaction, setTranSaction] = useState([]);
+
+  console.log("marketPlaceList", data);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 
   const onclicklike = (_) => {
     let myaddress = getmyaddress();
@@ -97,7 +127,13 @@ export default function MarketDetail() {
       } else {
         moreRef.current.scrollTo({
           left: isMobile
+<<<<<<< HEAD
             ? moreRef.current.scrollLeft + moreRef.current.children[moreIndex].getBoundingClientRect().left - 20
+=======
+            ? moreRef.current.scrollLeft +
+              moreRef.current.children[moreIndex].getBoundingClientRect().left -
+              20
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
             : contWidth * itemNumByPage * moreIndex + itemNumByPage * 40,
           behavior: "smooth",
         });
@@ -105,6 +141,7 @@ export default function MarketDetail() {
     }
   }, [moreIndex]);
   const getitem = (_) => {
+<<<<<<< HEAD
     axios.get(API.API_ITEMDETAIL + `/${params.itemid}?nettype=${net}`).then((resp) => {
       LOGGER("BYLjMqzlfl", resp.data);
       let { status, respdata } = resp.data;
@@ -127,13 +164,80 @@ export default function MarketDetail() {
     getitem();
     getotheritems();
   }, []);
+=======
+    let myaddress = getmyaddress();
+    if (myaddress) {
+      axios
+        .get(API.API_USERINFO + `/${myaddress}?nettype=${net}`)
+        .then((resp) => {
+          LOGGER("rBojncz0CD", resp.data);
+          let { status, respdata } = resp.data;
+          if (status == "OK") {
+            setisstaked(respdata.isstaked);
+          }
+        });
+    }
+  };
+  const getotheritems = (_) => {
+    axios
+      .get(API.API_ALL_ITEMS_MARKET + `/status/1/0/100/id/DESC?nettype=${net}`)
+      .then((resp) => {
+        LOGGER("", resp.data);
+        let { status, list } = resp.data;
+        if (status == "OK") {
+          setmarketPlaceList(list);
+        }
+      });
+    if (data?.type === "ticket") {
+      axios
+        .get(
+          API.API_GET_TRANSACTIONS_TICKET + `/${data?.tokenid}?nettype=${net}`
+        )
+        .then((resp) => {
+          LOGGER("transction", resp.data);
+          let { status, respdata } = resp.data;
+          if (status === "OK") {
+            setTranSaction(resp.data.payload.rowdata.slice(-3));
+          }
+        });
+    }
+    if (data?.type === "kingkong") {
+      axios
+        .get(
+          API.API_GET_TRANSACTIONS_KING_KONG + `/${data?.itemid}?nettype=${net}`
+        )
+        .then((resp) => {
+          // LOGGER("transction", resp.data);
+          // let { status, respdata } = resp.data;
+          // if (status === "OK") {
+          //   setTranSaction(resp.data.list.slice(-3));
+          // }
+        });
+    }
+  };
+  useEffect(
+    (_) => {
+      getitem();
+      getotheritems();
+    },
+    [params?.itemid]
+  );
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
   if (isMobile)
     return (
       <>
         <Header />
         <MmarketDetailBox>
           <section className="itemInfoContainer">
+<<<<<<< HEAD
             <img className="itemImg" src={itemdata?.url} alt="" />
+=======
+            {data?.type === "kingkong" ? (
+              <img className="itemImg" src={data?.item.url} alt="" />
+            ) : (
+              <img className="itemImg" src={E_staking} alt="" />
+            )}
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 
             <article className="infoBox">
               <div className="itemInfoBox">
@@ -149,14 +253,28 @@ export default function MarketDetail() {
                         <img src={toggleLike ? I_heartO : I_heart} alt="" />
                       </button>
 
+<<<<<<< HEAD
                       <button className="moreBtn hoverBtn" onClick={() => setShowCopyBtn(true)}>
+=======
+                      <button
+                        className="moreBtn hoverBtn"
+                        onClick={() => setShowCopyBtn(true)}
+                      >
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                         <img src={I_3dot} alt="" />
                       </button>
                     </div>
 
                     {showCopyBtn && (
                       <>
+<<<<<<< HEAD
                         <button className="copyBtn displayBtn" onClick={() => setShowCopyBtn(false)}>
+=======
+                        <button
+                          className="copyBtn displayBtn"
+                          onClick={() => setShowCopyBtn(false)}
+                        >
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                           <img src={I_clip} alt="" />
                           Copy Link
                         </button>
@@ -164,13 +282,30 @@ export default function MarketDetail() {
                       </>
                     )}
                   </div>
+<<<<<<< HEAD
 
                   <strong className="title">King Kong {itemdata?.titlename} </strong>
+=======
+                  <strong className="title">
+                    {itemdata?.type === "ticket"
+                      ? `##LUCKY TICKET ${itemdata?.tokenid}`
+                      : `King Kong #${data?.item.titlename}`}{" "}
+                  </strong>
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                 </div>
 
                 <div className="ownedBox">
                   <p className="key">Owned by</p>
+<<<<<<< HEAD
                   <p className="value">@andyfeltham</p>
+=======
+                  <p className="value">
+                    @
+                    {itemdata?.type === "ticket"
+                      ? `${itemdata?.seller}`
+                      : `${data?.seller}`}
+                  </p>
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                 </div>
 
                 <div className="saleBox">
@@ -178,11 +313,20 @@ export default function MarketDetail() {
                     <p className="key">Current price</p>
                     <strong className="value">
                       {/* {itemdata?.group_ == "kong" ? "100" : ITEM_PRICE_DEF} USDT */}
+<<<<<<< HEAD
                       {itemdata && itemdata.itembalances?.buyprice} 372USDT
                     </strong>
                   </div>
 
                   <div className="time">{/* <p className="key">Ending in</p> */}</div>
+=======
+                      {itemdata?.type === "ticket"
+                        ? `${itemdata?.price}`
+                        : `${data?.price}`}{" "}
+                      USDT
+                    </strong>
+                  </div>
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                 </div>
               </div>
 
@@ -203,7 +347,13 @@ export default function MarketDetail() {
                 </ul>
 
                 <div className="contBox">
+<<<<<<< HEAD
                   {category === 0 && <Offer />}
+=======
+                  {category === 0 && (
+                    <Offer transaction={transaction} data={data} />
+                  )}
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                   {category === 1 && <Details />}
                   {category === 2 && <Properties />}
                 </div>
@@ -249,6 +399,7 @@ export default function MarketDetail() {
                 <ul className="itemList" ref={moreRef}>
                   {marketPlaceList.map((cont, index) => (
                     <Fragment key={index}>
+<<<<<<< HEAD
                       <MarketItem0227 data={cont} index={index} />
                     </Fragment>
                   ))}
@@ -256,6 +407,21 @@ export default function MarketDetail() {
                 <button className="nextBtn" onClick={onClickAuctionNextBtn}>
                   <img src={I_rtArw} alt="" />
                 </button>
+=======
+                      <MarketItem0227
+                        data={cont}
+                        index={index}
+                        isstaked={isstaked}
+                      />
+                    </Fragment>
+                  ))}
+                </ul>
+                {marketPlaceList.length > 4 ? (
+                  <button className="nextBtn" onClick={onClickAuctionNextBtn}>
+                    <img src={I_rtArw} alt="" />
+                  </button>
+                ) : null}
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
               </div>
             </div>
           </section>
@@ -279,8 +445,13 @@ export default function MarketDetail() {
         <Header />
         <PmarketDetailBox>
           <section className="itemInfoContainer">
+<<<<<<< HEAD
             {itemdata?.url ? (
               <img className="itemImg" src={itemdata?.url} alt="" />
+=======
+            {data?.type === "kingkong" ? (
+              <img className="itemImg" src={data?.item.url} alt="" />
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
             ) : (
               <img className="itemImg" src={E_staking} alt="" />
             )}
@@ -289,9 +460,16 @@ export default function MarketDetail() {
               <div className="itemInfoBox">
                 <div className="titleBox">
                   <strong className="title">
+<<<<<<< HEAD
                     {itemdata && itemdata.itembalances?.group_.toUpperCase()} {itemdata?.titlename}
                   </strong>
 
+=======
+                    {data?.type === "ticket"
+                      ? `##LUCKY TICKET ${data?.itemid}`
+                      : `King Kong #${data?.item.titlename}`}{" "}
+                  </strong>
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                   <div className="btnBox">
                     <div className="posBox">
                       <button
@@ -305,23 +483,61 @@ export default function MarketDetail() {
                     </div>
 
                     <div className="posBox">
+<<<<<<< HEAD
                       <button className="moreBtn hoverBtn" onClick={() => setShowCopyBtn(true)}>
+=======
+                      <button
+                        className="moreBtn hoverBtn"
+                        onClick={() => setShowCopyBtn(true)}
+                      >
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                         <img src={I_3dot} alt="" />
                       </button>
 
                       <div className="hoverBox">
+<<<<<<< HEAD
                         <button className="copyBtn displayBtn" onClick={() => setShowCopyBtn(false)}>
+=======
+                        <button
+                          className="copyBtn displayBtn"
+                          onClick={() => setShowCopyBtn(false)}
+                        >
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                           <img src={I_clip} alt="" />
                           Copy Link
                         </button>
                       </div>
+<<<<<<< HEAD
+=======
+                      {showCopyBtn && (
+                        <>
+                          <button
+                            className="copyBtn displayBtn"
+                            onClick={() => setShowCopyBtn(false)}
+                          >
+                            <img src={I_clip} alt="" />
+                            Copy Link
+                          </button>
+                          <PopupBg off={setShowCopyBtn} />
+                        </>
+                      )}
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                     </div>
                   </div>
                 </div>
 
                 <div className="ownedBox">
                   <p className="key">Owned by</p>
+<<<<<<< HEAD
                   <p className="value">@andyfeltham</p>
+=======
+                  <p className="value">
+                    @
+                    {data?.type === "ticket"
+                      ? `${data?.seller}`
+                      : `${data?.seller}`}
+                  </p>
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                 </div>
 
                 <div className="saleBox">
@@ -333,7 +549,14 @@ export default function MarketDetail() {
                   <div className="value">
                     <strong className="price">
                       {/* {itemdata?.group_ == "kong" ? "100" : ITEM_PRICE_DEF} USDT */}
+<<<<<<< HEAD
                       {itemdata && itemdata.itembalances?.buyprice} 372USDT
+=======
+                      {itemdata?.type === "ticket"
+                        ? `${data?.price}`
+                        : `${data?.price}`}{" "}
+                      USDT
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                     </strong>
                   </div>
                 </div>
@@ -360,7 +583,11 @@ export default function MarketDetail() {
                 </ul>
 
                 <div className="contBox">
+<<<<<<< HEAD
                   {category === 0 && <Offer />}
+=======
+                  {category === 0 && <Offer path="market" data={data} />}
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                   {category === 1 && <Details />}
                   {category === 2 && <Properties />}
                 </div>
@@ -372,6 +599,7 @@ export default function MarketDetail() {
             <article className="titleBox">
               <strong className="title">Transaction History</strong>
             </article>
+<<<<<<< HEAD
 
             {/* <ul className="historyList">
               {D_transactionHistory.map((cont, index) => (
@@ -396,6 +624,64 @@ export default function MarketDetail() {
                 </Fragment>
               ))}
             </ul> */}
+=======
+            {data?.type === "ticket" && (
+              <ul className="historyList">
+                {transaction?.map((cont, index) => (
+                  <Fragment key={index}>
+                    {index ? (
+                      <div className="sideBarBox">
+                        <span className="sideBar" />
+                      </div>
+                    ) : (
+                      <></>
+                    )}
+                    <li>
+                      <span className="iconBox">
+                        <img src={I_tagWhite} alt="" />
+                      </span>
+
+                      <div className="contBox">
+                        <p className="cont">
+                          {strDot(cont.username, 15)} /{" "}
+                          {putCommaAtPrice(cont?.price)} USDT{" "}
+                        </p>
+                        <p className="time">{cont.createdat?.split("T")[0]}</p>
+                      </div>
+                    </li>
+                  </Fragment>
+                ))}
+              </ul>
+            )}
+            {data?.type === "kingkong" && (
+              <ul className="historyList">
+                {transaction?.map((cont, index) => (
+                  <Fragment key={index}>
+                    {index ? (
+                      <div className="sideBarBox">
+                        <span className="sideBar" />
+                      </div>
+                    ) : (
+                      <></>
+                    )}
+                    <li>
+                      <span className="iconBox">
+                        <img src={I_tagWhite} alt="" />
+                      </span>
+
+                      <div className="contBox">
+                        <p className="cont">
+                          {strDot(cont.username, 15)} /{" "}
+                          {putCommaAtPrice(cont?.price)} USDT{" "}
+                        </p>
+                        <p className="time">{cont.createdat?.split("T")[0]}</p>
+                      </div>
+                    </li>
+                  </Fragment>
+                ))}
+              </ul>
+            )}
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
           </section>
 
           <section className="moreBox">
@@ -404,6 +690,7 @@ export default function MarketDetail() {
             <div className="listBox">
               <div className="posBox">
                 <ul className="itemList" ref={moreRef}>
+<<<<<<< HEAD
                   {marketPlaceList.map((cont, index) => (
                     <Fragment key={index}>
                       <MarketItem0227 data={cont} index={index} />
@@ -413,13 +700,34 @@ export default function MarketDetail() {
                 <button className="nextBtn" onClick={onClickAuctionNextBtn}>
                   <img src={I_rtArw} alt="" />
                 </button>
+=======
+                  {marketPlaceList?.map((cont, index) => (
+                    <Fragment key={index}>
+                      <MarketItem0227
+                        data={cont}
+                        index={index}
+                        isstaked={isstaked}
+                      />
+                    </Fragment>
+                  ))}
+                </ul>
+                {marketPlaceList?.length > 4 ? (
+                  <button className="nextBtn" onClick={onClickAuctionNextBtn}>
+                    <img src={I_rtArw} alt="" />
+                  </button>
+                ) : null}
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
               </div>
             </div>
           </section>
 
           {bidPopup && (
             <>
+<<<<<<< HEAD
               <BidPopup off={setBidPopup} itemdata={itemdata} />
+=======
+              <BidPopup off={setBidPopup} itemdata={data} />
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
               <PopupBg blur off={setBidPopup} />
             </>
           )}

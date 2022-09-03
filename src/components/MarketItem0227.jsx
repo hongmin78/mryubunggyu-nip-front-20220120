@@ -2,6 +2,7 @@ import { strDot } from "../util/Util";
 import I_heart from "../img/icon/I_heart.svg";
 import I_heartO from "../img/icon/I_heartO.svg";
 import styled from "styled-components";
+<<<<<<< HEAD
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import E_staking from "../img/common/E_staking.png";
@@ -10,6 +11,19 @@ import moment from "moment";
 export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
   const navigate = useNavigate();
   const isMobile = useSelector((state) => state.common.isMobile);
+=======
+import { useNavigate, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
+import E_staking from "../img/common/E_staking.png";
+import moment from "moment";
+import marketLogo from "../img/icon/marketlogo.png";
+import { messages } from "../configs/messages";
+import SetErrorBar from "../util/SetErrorBar";
+export default function MarketItem0227({ data, index, likeObj, setLikeObj, isstaked }) {
+  const navigate = useNavigate();
+  const isMobile = useSelector((state) => state.common.isMobile);
+  const { pathname } = useLocation();
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 
   function onClickItemLike(e, index) {
     e.stopPropagation();
@@ -18,31 +32,50 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
     setLikeObj({ ...dataObj });
   }
 
+<<<<<<< HEAD
   function contentsReload(id) {
     window.location.href = `/#/market/detail/${id}`;
     window.location.reload();
     window.scrollTo(0, 0);
   }
 
+=======
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
   if (isMobile)
     return (
       <Mitem
         className="item"
         onClick={() => {
+<<<<<<< HEAD
           contentsReload(data?.itemid);
+=======
+          data.type !== "ticket"
+            ? navigate(`/market/detail/${data.itemid}`, { state: data })
+            : isstaked
+            ? SetErrorBar(messages.MSG_YOU_ALREADY_HAVE_STAKED)
+            : navigate(`/market/detail/${data.uuid}`);
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
         }}
       >
         <div className="topBar">
           <div className="profBox">
+<<<<<<< HEAD
             <img src={data.url} alt="" />
+=======
+            <img src={marketLogo} alt="" />
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
             <p className="address">{strDot(data?.username, 5, 4)}</p>
           </div>
 
           {likeObj && (
+<<<<<<< HEAD
             <button
               className="likeBtn"
               onClick={(e) => onClickItemLike(e, index)}
             >
+=======
+            <button className="likeBtn" onClick={(e) => onClickItemLike(e, index)}>
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
               <img src={likeObj[index] ? I_heartO : I_heart} alt="" />
               <p
                 className="count"
@@ -56,7 +89,15 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
           )}
         </div>
 
+<<<<<<< HEAD
         <img className="itemImg" src={data?.url} alt="" />
+=======
+        {data.type !== "ticket" ? (
+          <img className="itemImg" src={data.item?.url} alt="" />
+        ) : (
+          <img className="itemImg" src={E_staking} alt="" />
+        )}
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 
         <div className="infoBox">
           <p className="title">{data?.titlename}</p>
@@ -82,20 +123,36 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
       <Pitem
         className="item"
         onClick={() => {
+<<<<<<< HEAD
           contentsReload(data?.itemid);
+=======
+          data.type !== "ticket"
+            ? navigate(`/market/detail/${data.itemid}`, { state: data })
+            : isstaked
+            ? SetErrorBar(messages.MSG_YOU_ALREADY_HAVE_STAKED)
+            : navigate(`/market/detail/${data.uuid}`, { state: data });
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
         }}
       >
         <div className="topBar">
           <div className="profBox">
+<<<<<<< HEAD
             <img src={data.url} alt="" />
+=======
+            <img src={marketLogo} alt="" />
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
             <p className="address">{strDot(data?.username, 5, 4)}</p>
           </div>
 
           {likeObj && (
+<<<<<<< HEAD
             <button
               className="likeBtn"
               onClick={(e) => onClickItemLike(e, index)}
             >
+=======
+            <button className="likeBtn" onClick={(e) => onClickItemLike(e, index)}>
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
               <img src={likeObj[index] ? I_heartO : I_heart} alt="" />
               <p
                 className="count"
@@ -109,7 +166,11 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
           )}
         </div>
 
+<<<<<<< HEAD
         {data.item?.url ? (
+=======
+        {data.type !== "ticket" ? (
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
           <img className="itemImg" src={data.item?.url} alt="" />
         ) : (
           <img className="itemImg" src={E_staking} alt="" />
@@ -125,7 +186,11 @@ export default function MarketItem0227({ data, index, likeObj, setLikeObj }) {
             <li style={{ color: "#fff" }}>
               <p>{data.price} USDT</p>
 
+<<<<<<< HEAD
               <p>{moment(data.createdat).fromNow()}</p>
+=======
+              <p>{data.updatedat === null ? moment(data.createdat).fromNow() : moment(data.updatedat).fromNow()}</p>
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
             </li>
           </ul>
         </div>

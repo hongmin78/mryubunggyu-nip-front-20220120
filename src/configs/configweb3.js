@@ -15,6 +15,12 @@ switch (net) {
   case "BSC_MAINNET":
     jconfigweb3 = require("./configweb3-bscmainnet");
     break;
+<<<<<<< HEAD
+=======
+
+  default:
+    jconfigweb3 = require("./configweb3-bscmainnet");
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 }
 let { web3, netkind, nettype, NETTYPE, BASE_CURRENCY, STAKE_CURRENCY } =
   jconfigweb3;

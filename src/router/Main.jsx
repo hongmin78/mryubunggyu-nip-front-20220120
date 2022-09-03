@@ -65,6 +65,11 @@ export default function Main() {
   const [typestrPay, setTypestrPay] = useState([]);
   const [pdfPopup, setPdfPopup] = useState(false);
   const [banners, setBanners] = useState([]);
+<<<<<<< HEAD
+=======
+  let [D_marketItemList, setD_marketItemList] = useState([]);
+  let [isstaked, setisstaked] = useState();
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
   const dispatch = useDispatch();
 
   console.log("auctionListFirst", auctionListFirst);
@@ -85,6 +90,7 @@ export default function Main() {
   }, []);
 
   useEffect(() => {
+<<<<<<< HEAD
     setTimeout(() => {
       let address = getmyaddress();
       let myaddress = address;
@@ -128,6 +134,50 @@ export default function Main() {
         })
         .catch((err) => console.log(err));
     }, 1500);
+=======
+    // setTimeout(() => {
+    let address = getmyaddress();
+    let myaddress = address;
+    console.log("address", address);
+    axios
+      .get(
+        `${API.API_DELINQUENCY}/${address}/0/10/id/DESC?nettype=${net}&itemdetail=1`
+      )
+      .then((res) => {
+        console.log("RES", res);
+        let { status } = res.data;
+
+        if (status === "OK") {
+          let { list } = res.data;
+          if (list && list?.length > 0) {
+            // const amount = list.reduce((a, b) => a.amount + b.amount, 0);
+            let sum = 0;
+            list.forEach((item) => {
+              sum += +item.amount;
+            });
+            dispatch(setDelinquencyAmount(sum.toFixed(2)));
+            localStorage.setItem("seller", list[0].seller);
+            SetErrorBar("Please pay delinquency fee");
+            navigate("/penalty");
+          }
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        alert(err.message);
+      });
+    axios
+      .get(API.API_RECEIVABLES + `/${address}` + `?nettype=${net}`)
+      .then((res) => {
+        let { list } = res.data;
+        LOGGER("receivables", list);
+        if (list?.length > 0) {
+          SetErrorBar("exists receivables");
+        }
+      })
+      .catch((err) => console.log(err));
+    // }, 1500);
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
   }, []);
 
   function shuffleArray(array) {
@@ -143,8 +193,13 @@ export default function Main() {
   }
 
   function fetchitems() {
+<<<<<<< HEAD
     axios
 
+=======
+    let myaddress = getmyaddress();
+    axios
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
       .get(
         API.API_COMMONITEMS +
           `/items/group_/kong/0/128/roundnumber/DESC?nettype=${net}` +
@@ -160,6 +215,7 @@ export default function Main() {
           setAuctionListSecond(roundNumber1.slice(64));
         }
       });
+<<<<<<< HEAD
     axios
       .get(
         API.API_PREMIUMITEMS +
@@ -172,6 +228,22 @@ export default function Main() {
           setpremiumitemlist(list);
         }
       });
+=======
+    if (myaddress) {
+      axios
+        .get(API.API_USERINFO + `/${myaddress}?nettype=${net}`)
+        .then((resp) => {
+          LOGGER("rBojncz0CD", resp.data);
+          let { status, respdata } = resp.data;
+          if (status == "OK") {
+            setisstaked(respdata.isstaked);
+          } else {
+            false && SetErrorBar("FYI: YOU NEED TO STAKE ");
+          }
+        });
+    }
+
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
     axios.get(API.API_TYPESTR + `?nettype=${net}`).then((resp) => {
       LOGGER("itemBalance", resp.data);
       let { status, payload } = resp.data;
@@ -179,6 +251,7 @@ export default function Main() {
         setTypestrPay(resp.data.list);
       }
     });
+<<<<<<< HEAD
   }
 
   function shufflearray(array) {
@@ -189,6 +262,25 @@ export default function Main() {
       array[j] = temp;
     }
   }
+=======
+    axios
+      .get(API.API_ALL_ITEMS_MARKET + `/status/1/0/100/id/DESC?nettype=${net}`)
+      .then((resp) => {
+        LOGGER("itemBalance", resp.data);
+        let { status, payload } = resp.data;
+        if (status == "OK") {
+          let { list } = resp.data;
+          let notstaked = list.filter((el) =>
+            el.item ? el.item.isstaked == 0 : el
+          );
+          setD_marketItemList(notstaked);
+          setpremiumitemlist(notstaked);
+        }
+      });
+  }
+
+  console.log("ddsetD_marketItemList", D_marketItemList);
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 
   useEffect(() => {
     fetchitems();
@@ -399,6 +491,7 @@ export default function Main() {
 
             <article className="marketplaceBox itemListBox">
               <strong className="title">Marketplace</strong>
+<<<<<<< HEAD
               {/* <div className="posBox">
                 <ul className="itemList" ref={premiumref}>
                   {premiumitemlist.map((cont, index) => (
@@ -414,6 +507,38 @@ export default function Main() {
                   <img src={I_rtArw} alt="" />
                 </button>
               </div> */}
+=======
+              <div className="posBox">
+                <ul className="itemList" ref={premiumref}>
+                  {premiumitemlist.map((cont, index) => (
+                    <Fragment key={index}>
+                      <MarketItem0227
+                        data={cont}
+                        index={index}
+                        likeObj={likeObj}
+                        setLikeObj={setLikeObj}
+                        isstaked={isstaked}
+                      />
+                    </Fragment>
+                  ))}
+                </ul>
+                {premiumitemlist.length > 4 && (
+                  <button
+                    className="nextBtn"
+                    onClick={() =>
+                      onClickNextBtn(
+                        premiumref,
+                        premiumitemlist,
+                        premiumIndex,
+                        setPremiumIndex
+                      )
+                    }
+                  >
+                    <img src={I_rtArw} alt="" />
+                  </button>
+                )}
+              </div>
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
             </article>
 
             <article className="ticketBox itemListBox">
@@ -425,7 +550,10 @@ export default function Main() {
                     <li key={index} className="item">
                       <div className="topBar">
                         <p className="key">LUCKY TICKET</p>
+<<<<<<< HEAD
                         <p className="value">#{`${index}`.padStart(5, "0")}</p>
+=======
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                       </div>
 
                       <img src={E_staking} alt="" />
@@ -534,6 +662,7 @@ export default function Main() {
             <ul ref={headLineRef}>
               {banners?.map((value, index) => (
                 <li key={index}>
+<<<<<<< HEAD
                   {/* <article className="leftBox">
                     <span className="interview">
                       <img src={E_interview} alt="" />
@@ -549,6 +678,8 @@ export default function Main() {
 
                     <p className="bottomText">ON THE FRONTIER OF NFTS.</p>
                   </article> */}
+=======
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                   <img
                     className="mainImg"
                     src={value.imageurlpc ? value.imageurlpc : E_staking}
@@ -683,6 +814,7 @@ export default function Main() {
               </div>
             </article>
 
+<<<<<<< HEAD
             <article
               className="marketplaceBox itemListBox"
               style={{ display: "none" }}
@@ -693,14 +825,28 @@ export default function Main() {
                   {marketPlaceList.map((cont, index) => (
                     <Fragment key={index}>
                       <MarketItem
+=======
+            <article className="marketplaceBox itemListBox">
+              <strong className="title">Marketplace</strong>
+              <div className="posBox">
+                <ul className="itemList" ref={premiumref}>
+                  {premiumitemlist.map((cont, index) => (
+                    <Fragment key={index}>
+                      <MarketItem0227
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                         data={cont}
                         index={index}
                         likeObj={likeObj}
                         setLikeObj={setLikeObj}
+<<<<<<< HEAD
+=======
+                        isstaked={isstaked}
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                       />
                     </Fragment>
                   ))}
                 </ul>
+<<<<<<< HEAD
                 <button
                   className="nextBtn"
                   onClick={() =>
@@ -733,6 +879,23 @@ export default function Main() {
                 >
                   <img src={I_rtArw} alt="" />
                 </button> */}
+=======
+                {premiumitemlist.length > 4 && (
+                  <button
+                    className="nextBtn"
+                    onClick={() =>
+                      onClickNextBtn(
+                        premiumref,
+                        premiumitemlist,
+                        premiumIndex,
+                        setPremiumIndex
+                      )
+                    }
+                  >
+                    <img src={I_rtArw} alt="" />
+                  </button>
+                )}
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
               </div>
             </article>
 
@@ -745,7 +908,10 @@ export default function Main() {
                     <li key={index} className="item">
                       <div className="topBar">
                         <p className="key">LUCKY TICKET</p>
+<<<<<<< HEAD
                         <p className="value">#{`${index}`.padStart(5, "0")}</p>
+=======
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                       </div>
 
                       <img src={E_staking} alt="" />

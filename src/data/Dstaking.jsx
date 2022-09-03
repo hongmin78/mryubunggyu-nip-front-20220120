@@ -4,6 +4,15 @@ import E_prof3 from "../img/staking/E_prof3.png";
 
 const D_vaultHeader = ["Stake", "Staking Amount", "Start", "Ended", ""];
 
+<<<<<<< HEAD
+=======
+const D_stakeHeader = [
+  "Total Staking Token",
+  "Total Claimed Reward",
+  "Claimable Amount",
+];
+
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 const D_vaultList = [
   {
     img: E_prof1,
@@ -28,7 +37,17 @@ const D_vaultList = [
   },
 ];
 
+<<<<<<< HEAD
 const D_rewardHeader = ["Earned item", "Staking Amount", "APY", "Reward Distribution Cycle", "Earned"];
+=======
+const D_rewardHeader = [
+  "Earned item",
+  "Staking Amount",
+  "APY",
+  "Reward Distribution Cycle",
+  "Earned",
+];
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 
 const D_rewardList = [
   {
@@ -49,4 +68,14 @@ const D_rewardList = [
   },
 ];
 
+<<<<<<< HEAD
 export { D_vaultHeader, D_vaultList, D_rewardHeader, D_rewardList };
+=======
+export {
+  D_vaultHeader,
+  D_vaultList,
+  D_rewardHeader,
+  D_rewardList,
+  D_stakeHeader,
+};
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027

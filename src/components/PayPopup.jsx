@@ -2,7 +2,11 @@ import styled from "styled-components";
 import I_x from "../img/icon/I_x.svg";
 import I_tIcon from "../img/icon/I_tIcon.png";
 import I_chkWhite from "../img/icon/I_chkWhite.svg";
+<<<<<<< HEAD
 import { putCommaAtPrice } from "../util/Util";
+=======
+import { get_contractaddress, putCommaAtPrice } from "../util/Util";
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 import { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import PopupBg from "./PopupBg";
@@ -14,7 +18,10 @@ import {
   query_noarg,
   query_eth_balance,
 } from "../util/contract-calls";
+<<<<<<< HEAD
 import { addresses } from "../configs/addresses";
+=======
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 import { DECIMALS_DISP_DEF } from "../configs/configs"; // DueAmount,
 import { LOGGER, getmyaddress, getobjtype } from "../util/common";
 import { getweirep, getethrep } from "../util/eth";
@@ -42,7 +49,12 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
   let [myaddress, setmyaddress] = useState(getmyaddress());
   let [mybalance, setmybalance] = useState();
   let [isallowanceok, setisallowanceok] = useState(false);
+<<<<<<< HEAD
   let [allowanceamount, setallowanceamount] = useState();
+=======
+  let [allowanceamount, setallowanceamount] = useState(0);
+  let [approve, setApprove] = useState(false);
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
   // let [st akedbalance, setsta kedbalance] = useState();
   let [tvl, settvl] = useState();
   let [tickerusdt, settickerusdt] = useState(1);
@@ -54,6 +66,7 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
   let [isloader_01, setisloader_01] = useState(false);
   let [DueAmount, setDueAmount] = useState(receivables.amount);
   let [refererFeeRate, setRefererFeeRate] = useState("");
+<<<<<<< HEAD
   useEffect((_) => {
     const spinner = spinnerHref.current; // document.querySelector("Spinner");
     spinner.animate(
@@ -133,26 +146,143 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
     setTimeout(() => {
       fetchdata();
     }, 1500);
+=======
+  const [contractaddresses, setContractaddresses] = useState([]);
+
+  const query_contractaddresses = async () => {
+    return new Promise(async (res, rej) => {
+      try {
+        let { data } = await axios.get(API.API_CADDR);
+        let { status, list } = data;
+        if (status == "OK") {
+          setContractaddresses(list);
+          res(list);
+        } else {
+          rej("Failed to fetch contractaddresses");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  };
+
+  useEffect((_) => {
+    query_contractaddresses().then(async (resp) => {
+      const spinner = spinnerHref.current; // document.querySelector("Spinner");
+      spinner.animate(
+        [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
+        {
+          duration: 1000,
+          iterations: Infinity,
+        }
+      );
+      const spinner_approve = spinnerHref_approve.current; // document.querySelector("Spinner");
+      spinner_approve.animate(
+        [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
+        {
+          duration: 1000,
+          iterations: Infinity,
+        }
+      );
+      axios
+        .get(API.API_QUERY_STRING("SALE_REFERER_FEE_RATE") + `?nettype=${net}`)
+        .then((res) => {
+          if (res.data && res.data.respdata) {
+            console.log("$fee_rate", res);
+            let { value_ } = res.data.respdata;
+            setRefererFeeRate(value_);
+          }
+        })
+        .catch((err) => console.log(err));
+
+      const fetchdata = async (_) => {
+        axios.get(API.API_TICKERS + `?nettype=${net}`).then((resp) => {
+          LOGGER("MDmEMQ5xde", resp.data);
+          let { status, payload, list } = resp;
+        });
+        let myaddress = getmyaddress();
+
+        query_with_arg({
+          contractaddress: await get_contractaddress("contract_USDT", resp),
+          abikind: "ERC20",
+          methodname: "allowance",
+          aargs: [
+            myaddress,
+            await get_contractaddress("payment_for_assigned_item", resp),
+          ], // ETH_TESTNET.
+        }).then((resp) => {
+          let allowanceineth = getethrep(resp);
+          console.log("__allowance", resp);
+          LOGGER("8LYRxjNp8k", resp, allowanceineth);
+          setallowanceamount(+allowanceineth);
+          //				setallowanceamount ( 100 )
+          if (+allowanceineth > 0) {
+            setisallowanceok(false);
+            setApprove(true);
+            setisloader_00(false);
+          } else {
+          }
+        });
+        query_with_arg({
+          contractaddress: await get_contractaddress("contract_USDT", resp), // ETH_TESTNET.
+          abikind: "ERC20",
+          methodname: "balanceOf",
+          aargs: [myaddress],
+        }).then((resp) => {
+          LOGGER("mybalance", resp);
+          setmybalance(getethrep(resp, 4));
+        });
+
+        query_eth_balance(myaddress).then((resp) => {
+          LOGGER("rmgUxgo5ye", resp);
+          setmyethbalance((+getethrep(resp)).toFixed(DECIMALS_DISP_DEF));
+        });
+      };
+
+      fetchdata();
+    });
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
   }, []);
   const onclick_approve = async (_) => {
     LOGGER("");
     setisloader_00(true);
     let myaddress = getmyaddress();
     let abistr = getabistr_forfunction({
+<<<<<<< HEAD
       contractaddress: addresses.contract_USDT, // ETH_TESTNET.
       abikind: "ERC20",
       methodname: "approve",
       aargs: [
         addresses.contract_pay_for_assigned_item,
         getweirep("" + 10 ** 18),
+=======
+      contractaddress: await get_contractaddress(
+        "contract_USDT",
+        contractaddresses
+      ), // ETH_TESTNET.
+      abikind: "ERC20",
+      methodname: "approve",
+      aargs: [
+        await get_contractaddress(
+          "payment_for_assigned_item",
+          contractaddresses
+        ),
+        getweirep("" + 10 ** 6),
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
       ], // .ETH_TESTNET
     });
     LOGGER("", abistr);
     requesttransaction({
       from: myaddress,
+<<<<<<< HEAD
       to: addresses.contract_USDT, // ETH_TESTNET.
       data: abistr,
     }).then((resp) => {
+=======
+      to: await get_contractaddress("contract_USDT", contractaddresses), // ETH_TESTNET.
+      data: abistr,
+    }).then(async (resp) => {
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
       if (resp) {
       } else {
         SetErrorBar(messages.MSG_USER_DENIED_TX);
@@ -167,8 +297,19 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
           username: myaddress,
           typestr: "APPROVE",
           auxdata: {
+<<<<<<< HEAD
             erc20: addresses.contract_USDT, // .ETH_TESTNET
             target: addresses.contract_pay_for_assigned_item, // .ETH_TESTNET
+=======
+            erc20: await get_contractaddress(
+              "contract_USDT",
+              contractaddresses
+            ), // .ETH_TESTNET
+            target: await get_contractaddress(
+              "payment_for_assigned_item",
+              contractaddresses
+            ), // .ETH_TESTNET
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
             nettype: net,
           },
           nettype: NETTYPE,
@@ -179,6 +320,7 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
         });
       awaitTransactionMined
         .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+<<<<<<< HEAD
         .then((minedtxreceipt) => {
           LOGGER("minedtxreceipt", minedtxreceipt);
           SetErrorBar(messages.MSG_TX_FINALIZED);
@@ -191,6 +333,30 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
             let allowanceineth = getethrep(resp);
             LOGGER("gCwXF6Jjkh", resp, allowanceineth);
             setallowanceamount(allowanceineth); //				setallowanceamount ( 100 )
+=======
+        .then(async (minedtxreceipt) => {
+          LOGGER("minedtxreceipt", minedtxreceipt);
+          SetErrorBar(messages.MSG_TX_FINALIZED);
+          setApprove(true);
+          query_with_arg({
+            contractaddress: await get_contractaddress(
+              "contract_USDT",
+              contractaddresses
+            ), // .ETH_TESTNET
+            abikind: "ERC20",
+            methodname: "allowance",
+            aargs: [
+              myaddress,
+              await get_contractaddress(
+                "payment_for_assigned_item",
+                contractaddresses
+              ),
+            ], // ETH_TESTNET.
+          }).then((resp) => {
+            let allowanceineth = getethrep(resp);
+            LOGGER("gCwXF6Jjkh", resp, allowanceineth);
+            setallowanceamount(+allowanceineth); //				setallowanceamount ( 100 )
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
             setisloader_00(false);
             if (allowanceineth > 0) {
               setisallowanceok(false);
@@ -220,7 +386,11 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
 
     console.log(
       "$INPUTS",
+<<<<<<< HEAD
       addresses.contract_USDT, // .ETH_TESTNET
+=======
+      await get_contractaddress("contract_USDT", contractaddresses), // .ETH_TESTNET
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
       getweirep("" + receivables.amount),
       receivables.seller,
       receivables.itemid,
@@ -230,11 +400,22 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
     );
     if (receivables.seller) {
       let abistr = getabistr_forfunction({
+<<<<<<< HEAD
         contractaddress: addresses.contract_pay_for_assigned_item, // .ETH_TESTNET
         abikind: "PAY",
         methodname: "pay",
         aargs: [
           addresses.contract_USDT, // .ETH_TESTNET
+=======
+        contractaddress: await get_contractaddress(
+          "payment_for_assigned_item",
+          contractaddresses
+        ), // .ETH_TESTNET
+        abikind: "PAY",
+        methodname: "pay",
+        aargs: [
+          await get_contractaddress("contract_USDT", contractaddresses), // .ETH_TESTNET
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
           getweirep("" + receivables.amount),
           // getweirep("" + receivables.amount),
           receivables.seller,
@@ -249,7 +430,14 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
         try {
           resp = await requesttransaction({
             from: myaddress,
+<<<<<<< HEAD
             to: addresses.contract_pay_for_assigned_item, // .ETH_TESTNET
+=======
+            to: await get_contractaddress(
+              "payment_for_assigned_item",
+              contractaddresses
+            ), // .ETH_TESTNET
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
             data: abistr,
           });
           if (resp) {
@@ -260,6 +448,7 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
             return;
           }
           let txhash = resp;
+<<<<<<< HEAD
           axios
             .post(API.API_TXS + `/${txhash}?nettype=${net}`, {
               txhash,
@@ -281,15 +470,55 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
               LOGGER("", resp);
               SetErrorBar(messages.MSG_TX_REQUEST_SENT);
             });
+=======
+
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
           /***** */
           awaitTransactionMined
             .awaitTx(web3, txhash, TX_POLL_OPTIONS)
             .then(async (minedtxreceipt) => {
               LOGGER("minedtxreceipt", minedtxreceipt);
+<<<<<<< HEAD
+=======
+              let { status } = minedtxreceipt;
+              if (status) {
+              } else {
+                SetErrorBar(messages.MSG_TX_FAILED);
+                return;
+              }
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
               SetErrorBar(messages.MSG_TX_FINALIZED);
               setDone(false);
               setisloader_01(false);
               off();
+<<<<<<< HEAD
+=======
+              window.location.reload();
+              axios
+                .post(API.API_TXS + `/${txhash}?nettype=${net}`, {
+                  txhash,
+                  username: myaddress,
+                  typestr: "PAY",
+                  itemid: receivables.itemid,
+                  nettype: net,
+
+                  auxdata: {
+                    referfeeamount: receivables.amount,
+                    feerate: refererFeeRate,
+                    currency: PAY_CURRENCY || "USDT",
+                    currencyaddress: await get_contractaddress(
+                      "contract_USDT",
+                      contractaddresses
+                    ), // ETH_TESTNET.
+                    nettype: net,
+                    amount: receivables.amount,
+                  },
+                })
+                .then((resp) => {
+                  LOGGER("", resp);
+                  SetErrorBar(messages.MSG_TX_REQUEST_SENT);
+                });
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
             });
         } catch (err) {
           SetErrorBar(messages.MSG_USER_DENIED_TX);
@@ -299,6 +528,10 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
         }
       };
       callreqtx();
+<<<<<<< HEAD
+=======
+
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
       //		.then(resp=>{ LOGGER( '' , resp )		})
     } else {
       SetErrorBar("셀러가 없습니다 관리자에게 문의 해 주세요");
@@ -381,11 +614,15 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
                   onclick_approve();
                   false && navigate(-1);
                 }}
+<<<<<<< HEAD
                 style={
                   allowanceamount && +allowanceamount
                     ? { display: "none" }
                     : { display: "inline" }
                 }
+=======
+                style={approve ? { display: "none" } : { display: "inline" }}
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
               >
                 Approve!
                 <img
@@ -405,6 +642,10 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
                 {" "}
                 <button
                   className="confirmBtn"
+<<<<<<< HEAD
+=======
+                  disabled={approve === false ? true : false}
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                   onClick={() => {
                     onclick_buy();
                     false && navigate(-1);
@@ -463,7 +704,11 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
               </li>
               <li style={allowanceamount ? { display: "block" } : {}}>
                 <p className="key">Allowance:</p>
+<<<<<<< HEAD
                 <p className="value">{allowanceamount} USDT</p>
+=======
+                <p className="value">{allowanceamount.toFixed(2)} USDT</p>
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
               </li>
               <li>
                 <p className="key">Your {BASE_CURRENCY} balance</p>
@@ -484,11 +729,15 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
               onClick={() => {
                 onclick_approve();
               }}
+<<<<<<< HEAD
               style={
                 allowanceamount && +allowanceamount
                   ? { display: "none" }
                   : { display: "inline" }
               }
+=======
+              style={approve ? { display: "none" } : { display: "inline" }}
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
             >
               Approve
               <img
@@ -508,7 +757,11 @@ export default function PayPopup({ off, userInfo, receivables, itemDataInfo }) {
 
             <button
               className="confirmBtn"
+<<<<<<< HEAD
               disabled={done}
+=======
+              disabled={approve === false ? true : false || done === true}
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
               onClick={() => {
                 onclick_buy();
                 false && off();

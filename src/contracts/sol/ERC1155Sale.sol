@@ -1,10 +1,14 @@
 // pragma solidity ^0.8.0;
 pragma solidity>=0.8.0;
+<<<<<<< HEAD
 // import "./ERC1155.sol"; 
 // import "./presets/ERC1155PresetMinterPauser.sol" ;
 // import "./IERC1155.sol" ;
 // import "../ERC20/IERC20.sol" ;
 // SPDX-License-Identifier: MIT
+=======
+
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 interface IERC20 {
     function totalSupply() external view returns (uint256);
     function balanceOf(address account) external view returns (uint256);
@@ -15,12 +19,16 @@ interface IERC20 {
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
+<<<<<<< HEAD
 /**  contract adminconfigs {
 	uint256 external _mindeltabid ;
 	function getmindeltabid() returns (uint256){
 		return _mindeltabid ;
 	}
 } */
+=======
+
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 interface IAdmin_nft {
 	function isadmin( address ) external view returns (uint );
 	function get_admin_fee (string memory _action ) external view returns (uint ) ;
@@ -66,7 +74,10 @@ abstract contract Context {
     function _msgSender() internal view virtual returns (address) {
         return msg.sender;
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
     function _msgData() internal view virtual returns (bytes calldata) {
         this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
         return msg.data;
@@ -120,7 +131,11 @@ interface IERC1155  { // is IERC165
 				, bytes memory // , IERC1155 (_mintinfo._targ et_contract).increment_tokencount_assign ()
     ) external;
 	function mint (
+<<<<<<< HEAD
 			address _author // _sell er
+=======
+			address _seller // _sell er
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 			, string memory _itemid
 			, uint256 _amounttomint // _am ount
 			, uint256 _author_royalty
@@ -129,6 +144,7 @@ interface IERC1155  { // is IERC165
 	) external  returns (uint256 );
 	function _itemhash_tokenid ( string memory ) external view returns ( uint256 );
 	function _author_royalty ( uint256 ) external view returns ( uint256 ) ;
+<<<<<<< HEAD
 	function _author ( uint256 ) external view returns ( address ) ;
 }
 /**  interface Mint {
@@ -163,6 +179,11 @@ interface Bid {
 		uint256 _bidcount ;
 	}
 }*/
+=======
+	
+}
+
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 contract ERC1155Sales is  // Mint 	, Sale 	,
   IERC1155Receiver , ERC165 , Ownable
 	{ // ERC1155, ERC1155PresetMinterPauser
@@ -217,7 +238,11 @@ contract ERC1155Sales is  // Mint 	, Sale 	,
 		 uint256 _amounttomint ;// 2 
 		 uint256 _decimals ;// 3
      uint256 _author_royalty; // 4 //        , uint256 _decimals // 5  //		, address _paymeans // 6
+<<<<<<< HEAD
 		 address _author ;// 5
+=======
+		 address _seller ;// 5
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 	}
 	struct Sale_info {
 		 uint256 _amounttobuy ; // 6
@@ -236,6 +261,7 @@ contract ERC1155Sales is  // Mint 	, Sale 	,
 		require ( _status != _is_function_mint_and_match_single_simple_legacy , "ERR() redundant call" ) ;
 		_is_function_mint_and_match_single_simple_legacy = _status ;
 	}
+<<<<<<< HEAD
 	function mint_and_match_single_simple_legacy (
 		address _target_erc1155_contract // 0
 		, string memory _itemid //1 //		, uint256 _tokenid // 2 ignored for now
@@ -243,20 +269,53 @@ contract ERC1155Sales is  // Mint 	, Sale 	,
 		, uint256 _decimals // 3
     , uint256 _author_royalty // 4 //        , uint256 _decimals // 5  //		, address _paymeans // 6
 		, address _author // 5
+=======
+	uint256 public _admin_fee =288 ;
+	function set_admin_fee( uint256 __admin_fee) public {
+		_admin_fee = __admin_fee ;
+	}
+	uint256 public _referer_feerate= 12 ;
+	function set__referer_feerate( uint256 __referer_fee) public {
+		_referer_feerate = __referer_fee ;
+	}
+	function get_admin_fee() public returns ( uint256){		return _admin_fee ;
+	}
+	address public _feecollector_for_sales  ;
+	function set_feecollector_for_sales ( address __feecollector_for_sales ) public {
+		_feecollector_for_sales = __feecollector_for_sales ;
+	}
+	
+	function mint_and_match_single_simple_legacy (
+		  address _target_erc1155_contract // 0
+		, string memory _itemid //1 //		, uint256 _tokenid // 2 ignored for now
+		, uint256 _amounttomint // 2 
+		, uint256 _decimals // 3
+        , uint256 _author_royalty // 4 //        , uint256 _decimals // 5  //		, address _paymeans // 6
+		, address _referer // 5
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 		, uint256 _amounttobuy // 6
 		, uint256 _amounttopay // 7 //		, uint256 _pr ice // 7
 		, address _paymeansaddress // 8
 		, address _seller // 9
+<<<<<<< HEAD
 //		, address _to // 9
 //		, address _referer // 10
 	) public payable {
 //		require( _t o != address(0) , "ERR() invalid beneficiary" );
+=======
+	) public payable {
+
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 		require ( _is_function_mint_and_match_single_simple_legacy , "ERR() function not accessible");
 		require( _seller != address(0) , "ERR() invalid seller" );
 		uint256 tokenid ; // 10
 		if ( ( tokenid = IERC1155( _target_erc1155_contract)._itemhash_tokenid( _itemid ) ) == 0 ){
 			tokenid = IERC1155( _target_erc1155_contract ).mint (
+<<<<<<< HEAD
 			_author // _sell er
+=======
+			_seller // _sell er
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 			, _itemid
 			, _amounttomint // _am ount
 			, _author_royalty
@@ -266,7 +325,12 @@ contract ERC1155Sales is  // Mint 	, Sale 	,
 		} else {
 		}
 		/******* settlement */ //		
+<<<<<<< HEAD
 		uint256 remaining_amount;  // order_buy.asset_amount_bid[0] ;
+=======
+		uint256 remaining_amount;  
+        IERC20( _paymeansaddress ).transferFrom ( msg.sender , address( this ), _amounttopay );
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 		if ( _paymeansaddress == address(0) ) {
 			require( msg.value >= _amounttopay , "ERR() declared value inconsistent") ;
  			remaining_amount = _amounttopay ; // msg.value ;
@@ -276,6 +340,7 @@ contract ERC1155Sales is  // Mint 	, Sale 	,
 			else { revert("ERR() price not met"); }
 			remaining_amount = _amounttopay ;
 		}
+<<<<<<< HEAD
 //			uint256 msg.value = msg.value; // order_buy.asset_amount_bid [ 0 ] ; // msg.value ;
 	//		if( remaining_amount >= order_sell.asset_amount_ask [ 0]  ){} // asset_price[ 1 ]
 		//	else { revert( "ERR() price not met" ); return; }
@@ -337,6 +402,37 @@ contract ERC1155Sales is  // Mint 	, Sale 	,
 				else {}			
 			/***** remaining of sales proceeds */
 //			payable ( _seller ).call { value : remaining_amount } ("") ;
+=======
+		
+
+			uint256 admin_fee_amount = remaining_amount * _admin_fee / 10000 ;
+     
+			if ( admin_fee_amount> 0 ) { //			
+				if(_feecollector_for_sales == address(0)){}
+                else{
+    makepayment ( _paymeansaddress 
+					, admin_fee_amount
+					, _feecollector_for_sales ) ;
+				remaining_amount -= admin_fee_amount ; 
+                     } 
+                }
+            
+                else {}
+				if ( _referer_feerate > 0 ) {
+				
+					if (_referer == address(0)){}
+					else {
+						uint256 referer_fee_amount = remaining_amount * _referer_feerate / 10000 ;
+			
+						makepayment ( _paymeansaddress
+							, referer_fee_amount
+							, _referer
+						)  ;
+						remaining_amount -= referer_fee_amount ;	
+					}
+				}
+				else {}			
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 			makepayment ( _paymeansaddress 
 				, remaining_amount
 				, _seller
@@ -367,6 +463,7 @@ contract ERC1155Sales is  // Mint 	, Sale 	,
 			) ;
 		} else {}
 	}
+<<<<<<< HEAD
 /*	function mint_and_take_ownership (
 		Mint memory _mintinfo
 		, Sale memory _saleinfo
@@ -419,4 +516,7 @@ contract ERC1155Sales is  // Mint 	, Sale 	,
 			IERC20( payment_token ).transfer( seller , price ) ;
 		}
 	} */
+=======
+
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 }

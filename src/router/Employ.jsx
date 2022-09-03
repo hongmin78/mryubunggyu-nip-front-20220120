@@ -1,0 +1,1016 @@
+import { useState, useEffect } from "react";
+import styled from "styled-components";
+import I_ltArw from "../img/icon/I_ltArw.svg";
+import I_dnArw from "../img/icon/I_dnArw.svg";
+import I_info from "../img/icon/I_info.svg";
+import E_item3 from "../img/mypage/E_item3.png";
+import PopupBg from "../components/PopupBg";
+import SelectPopup from "../components/SelectPopup";
+import { D_expDateList, D_startDateList } from "../data/Dresell";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useParams } from "react-router";
+import { useSelector } from "react-redux";
+import DetailHeader from "../components/header/DetailHeader";
+import Header from "../components/header/Header";
+import axios from "axios";
+import { net } from "../configs/net";
+import { API } from "../configs/api";
+import { getmyaddress } from "../util/common";
+import { messages } from "../configs/messages";
+import SetErrorBar from "../util/SetErrorBar";
+import ticketImg from "../img/staking/E_prof1.png";
+import moment from "moment";
+import { getabistr_forfunction, query_with_arg } from "../util/contract-calls";
+import { requesttransaction } from "../services/metamask";
+import awaitTransactionMined from "await-transaction-mined";
+import { nettype, web3 } from "../configs/configweb3-ropsten";
+import { TX_POLL_OPTIONS } from "../configs/configs";
+import { getethrep, getweirep } from "../util/eth";
+import { get_contractaddress } from "../util/Util";
+const LOGGER = console.log;
+
+export default function Employ() {
+  const navigate = useNavigate();
+  const isMobile = useSelector((state) => state.common.isMobile);
+  const ticketInfo = useLocation().state;
+  const [bid, setBid] = useState("");
+  const [sign, setSign] = useState();
+  let [userInfo, setUserInfo] = useState();
+  let [itemDetail, setItemDetail] = useState();
+  const { id } = useParams();
+  const { type } = useParams();
+  const { tokenId } = useParams();
+  const [saleType, setSaleType] = useState("COMMON");
+  const [isApprovedForAll, set_isApprovedForAll] = useState(false);
+  let [spinner, setSpinner] = useState(false);
+  let [myaddress, setmyaddress] = useState(null);
+  const [contractaddresses, setContractaddresses] = useState([]);
+
+  const query_contractaddresses = async () => {
+    return new Promise(async (res, rej) => {
+      try {
+        let { data } = await axios.get(API.API_CADDR);
+        let { status, list } = data;
+        if (status == "OK") {
+          setContractaddresses(list);
+          res(list);
+        } else {
+          rej("Failed to fetch contractaddresses");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  };
+  console.log("ticketInfo", itemDetail);
+  const getUserInfo = async () => {
+    try {
+      let myaddress = getmyaddress();
+      if (myaddress) {
+      } else {
+        SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+        return;
+      }
+      const resp = await axios.get(
+        API.API_USERINFO + `/${myaddress}?nettype=${net}`
+      );
+      if (resp.data && resp.data.respdata) {
+        let { respdata } = resp.data;
+        setUserInfo(respdata);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const queryItemDetail = async () => {
+    if (type === "kingkong") {
+      try {
+        const resp = await axios.get(
+          API.API_GET_ITEMS_DETAIL + `/${tokenId}?nettype=${net}`
+        );
+        if (resp.data && resp.data.respdata) {
+          let { respdata } = resp.data;
+          console.log("$itemdetail_ITEMDETAIL", respdata);
+          if (resp.data.status === "OK") {
+            setItemDetail(respdata);
+          }
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    if (type === "ticket") {
+      try {
+        const resp = await axios.get(
+          API.API_LOGSTAKES + `/${id}?nettype=${net}`
+        );
+        if (resp.data && resp.data.respdata) {
+          let { respdata } = resp.data;
+          console.log("$itemdetail_ITEMDETAIL", respdata);
+          if (resp.data.status === "OK") {
+            setItemDetail(respdata);
+          }
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  };
+
+  const approveForAll = async () => {
+    let myaddress = getmyaddress();
+    setSpinner(true);
+    if (myaddress) {
+    } else {
+      SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+      setSpinner(false);
+      return;
+    }
+    if (type === "kingkong") {
+      let abistr = getabistr_forfunction({
+        contractaddress: await get_contractaddress("KIP17", contractaddresses),
+        abikind: "KIP17", // KIP17
+        methodname: "setApprovalForAll",
+        aargs: [
+          await get_contractaddress("KIP17[staking]", contractaddresses),
+          true, //
+        ], // contr act_kip17_salse
+      });
+      requesttransaction({
+        from: myaddress,
+        to: await get_contractaddress("KIP17", contractaddresses),
+        data: abistr,
+        value: "0x00",
+      }).then((resp) => {
+        if (resp) {
+          console.log("resp", resp);
+          set_isApprovedForAll(resp);
+        } else {
+          SetErrorBar(messages.MSG_USER_DENIED_TX);
+          return;
+        }
+        let txhash = resp;
+        awaitTransactionMined
+          .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+          .then(async (minedtxreceipt) => {
+            console.log(minedtxreceipt);
+            SetErrorBar(messages.MSG_TX_FINALIZED);
+            setSpinner(false);
+          });
+      });
+    }
+  };
+
+  const onClickSignRequest = async () => {
+    let myaddress = getmyaddress();
+    const { ethereum } = window; //    const exampleMessage = "Test `personal_sign` message";
+    const from = myaddress; // store.isLogin;
+    let msg; // = `0x${Buffer.from(exampleMessage, "utf8").toString("hex")}`;
+    if (type === "kingkong") {
+      msg = `Token id:${itemDetail.itemid}, ${getweirep(
+        bid
+      )},Contract address :${await get_contractaddress(
+        "ERC1155[sales]",
+        contractaddresses
+      )}, wallet: ${myaddress}`;
+    }
+    if (type === "ticket") {
+      msg = `Token id:${
+        ticketInfo?.itemid ? ticketInfo.itemid : ticketInfo?.id
+      }, ${getweirep(bid)},Contract address :${await get_contractaddress(
+        "ERC1155[sales]",
+        contractaddresses
+      )}, wallet: ${myaddress}`;
+    }
+    const sign = await ethereum.request({
+      method: "personal_sign",
+      params: [msg, from],
+    });
+    setSign(sign);
+    return sign;
+  };
+  const make_employ_tx = async (_status) => {
+    let myaddress = getmyaddress();
+    console.log("res", itemDetail); //    let msg;
+    setSpinner(true);
+    let { itemid, tokenid } = itemDetail;
+    let options_arg = {
+      withdraw: {
+        contractaddress: await get_contractaddress(
+          "KIP17[staking]",
+          contractaddresses
+        ), // ETH_TESTNET.
+        abikind: "KIP17Stake",
+        methodname: _status,
+        aargs: [
+          await get_contractaddress("KIP17", contractaddresses),
+          tokenid,
+          myaddress,
+        ], // .ETH_TESTNET
+      },
+      mint_deposit: {
+        contractaddress: await get_contractaddress(
+          "KIP17[staking]",
+          contractaddresses
+        ), // ETH_TESTNET.
+        abikind: "KIP17Stake",
+        methodname: _status,
+        aargs: [
+          await get_contractaddress("KIP17", contractaddresses),
+          itemid,
+          250,
+        ], // .ETH_TESTNET
+      },
+    };
+    console.log("__________asdfasdfaqwef", options_arg[_status]);
+
+    let abistr = await getabistr_forfunction(options_arg[_status]);
+    requesttransaction({
+      from: myaddress,
+      to: await get_contractaddress("KIP17[staking]", contractaddresses), // ETH_TESTNET.
+      data: abistr,
+    }).then((resp) => {
+      LOGGER("@txresp", resp);
+      let txhash = resp;
+      awaitTransactionMined
+        .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+        .then(async (minedtxreceipt) => {
+          LOGGER("minedtxreceipt", minedtxreceipt);
+          let { status } = minedtxreceipt;
+          if (status) {
+          } else {
+            SetErrorBar(messages.MSG_TX_FAILED);
+            return;
+          }
+          SetErrorBar(messages.MSG_TX_FINALIZED);
+          setSpinner(false);
+          axios
+            .post(API.API_TXS + `/${resp}?nettype=${nettype}`, {
+              typestr: `${_status == "withdraw" ? "UN" : ""}EMPLOY_KINGKONG`,
+              username: myaddress,
+              itemid,
+              contractaddress: await get_contractaddress(
+                "KIP17[staking]",
+                contractaddresses
+              ),
+            })
+            .then(async (_) => {
+              window.location.reload();
+            })
+            .catch((err) => {
+              console.log(err);
+            }); //
+        });
+    });
+  };
+
+  useEffect(() => {
+    query_contractaddresses().then(async (resp) => {
+      const queryApprovalForAll = async (item) => {
+        setSpinner(true);
+        try {
+          let myaddress = getmyaddress();
+          if (myaddress) {
+          } else {
+            SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+            return;
+          }
+          const options_arg = {
+            kingkong: {
+              contractaddress: await get_contractaddress("KIP17", resp),
+              abikind: "KIP17",
+              methodname: "isApprovedForAll",
+              aargs: [
+                myaddress,
+                await get_contractaddress("KIP17[staking]", resp),
+              ], // contract_ki p17_salse
+            },
+          };
+          query_with_arg(options_arg["kingkong"]).then((resp) => {
+            console.log("$sell-isApprovedForAll?", resp);
+            set_isApprovedForAll(resp);
+            setSpinner(false);
+          });
+        } catch (err) {
+          console.log(err);
+        }
+      };
+      setmyaddress(getmyaddress());
+      queryApprovalForAll();
+      queryItemDetail();
+      getUserInfo();
+    });
+  }, []);
+
+  if (isMobile)
+    return (
+      <>
+        <DetailHeader title="Employ your kingkong for reward" />
+        <MresellBox>
+          <img className="itemImg" src={E_item3} alt="" />
+
+          <article className="sellSec">
+            <div className="topBar">
+              <p className="title">
+                {" "}
+                {type === "ticket"
+                  ? `Lucky Ticket #${
+                      itemDetail.itemid === null
+                        ? itemDetail.id
+                        : itemDetail.itemid
+                    }`
+                  : `King Kong #${itemDetail.titlename}`}
+              </p>
+            </div>
+
+            <ul className="sellBox">
+              <li className="transactionBox contBox">
+                <p className="title">
+                  Summary of
+                  <br /> transaction information
+                </p>
+
+                <p className="explain">
+                  The auction begins. If the bid is more than 10 USDT, the bid
+                  will be awarded at 19:05 on July 17, 2022
+                </p>
+
+                <div className="priceBox">
+                  <p className="priceTitle">Fees</p>
+                  <ul className="priceList">
+                    <li>
+                      <p className="key">platform fee</p>
+                      <p className="value">2.88%</p>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+
+              {/**              <li className="bidBox contBox" style={{display : 'none'}}>
+                <div className="titleBox">
+                  <p className="title">Minimum bid</p>
+                  <span className="hovInfo">
+                    <img src={I_info} alt="" />
+                    <div className="hovPopup">
+                      <p>
+                        You can always accept a sale even if you are offered a price that is higher than your minimum
+                        bid and lower than your target bid.
+                      </p>
+                    </div>
+                  </span>
+                </div>
+
+                <div className="inputBox">
+                  <input
+                    value={bid}
+                    onChange={(e) => setBid(e.target.value)}
+                    placeholder={type === "ticket" ? "Ticket Minimun bid 90$" : "Enter Minimum bid"}
+                  />
+                  <strong className="unit">USDT</strong>
+                </div>
+                <p className="explain">Suggested: 0%, 10%, 20%. Maximum is 25%</p>
+              </li>
+*/}
+
+              <li className="instructionBox contBox">
+                <p className="title">Instruction</p>
+
+                <div className="textBox">
+                  <p>
+                    When you sell items for the first time in your account, you
+                    need to go through the contract approval process
+                  </p>
+
+                  <ul className="processList">
+                    <li>
+                      <p>
+                        - If you are trading for the first time, you will need
+                        to reset your account. The process of sending 0 USDT to
+                        verify that the account is a valid account proceeds.
+                      </p>
+                    </li>
+                    <li>
+                      <p>
+                        - Please complete the signature to create a sales list.
+                      </p>
+                    </li>
+                    <li>
+                      <p>
+                        - Gas fee is paid only for the first time, and
+                        subsequent listings are supported free of charge.
+                      </p>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+
+              <button className="actionBtn" onClick={() => make_employ_tx()}>
+                Sales start
+              </button>
+            </ul>
+          </article>
+        </MresellBox>
+      </>
+    );
+  else
+    return (
+      <>
+        <Header />
+        <PresellBox>
+          <article className="sellSec">
+            <div className="topBar">
+              <button className="exitBtn" onClick={() => navigate(-1)}>
+                <img src={I_ltArw} alt="" />
+              </button>
+              <p className="title">Employ your kingkong for reward</p>
+            </div>
+
+            <ul className="sellBox">
+              {/**               <li className="bidBox contBox">
+                <div className="titleBox">
+                  <p className="title">Minimum bid</p>
+
+                  <span className="hovInfo">
+                    <img src={I_info} alt="" />
+
+                    <div className="hovPopup">
+                      <p>
+                        You can always accept a sale even if you are offered a price that is higher than your minimum
+                        bid and lower than your target bid.
+                      </p>
+                    </div>
+                  </span>
+                </div>
+
+                <div className="inputBox">
+                  <input
+                    style={{ width: "100%" }}
+                    value={bid}
+                    onChange={(e) => setBid(e.target.value)}
+                    onBlur={(e) => {
+                      if (type === "ticket" && parseInt(bid) < 90) {
+                        setBid("");
+                        SetErrorBar("Ticket minumum bid 90 USDT");
+                      }
+                    }}
+                    placeholder={type === "ticket" ? "Minimun bid 90 USDT" : "Enter Minimum bid"}
+                  />
+                  <strong className="unit">USDT</strong>
+                </div>
+                <p className="explain">Suggested: 0%, 10%, 20%. Maximum is 25%</p>
+              </li> */}
+              <li className="instructionBox contBox">
+                <p className="title">Instruction</p>
+
+                <div className="textBox">
+                  <p>
+                    When you sell items for the first time in your account, you
+                    need to go through the contract approval process
+                  </p>
+
+                  <ul className="processList">
+                    <li>
+                      <p>
+                        - If you are trading for the first time, you will need
+                        to reset your account. The process of sending 0 USDT to
+                        verify that the account is a valid account proceeds.
+                      </p>
+                    </li>
+                    <li>
+                      <p>
+                        - Please complete the signature to create a sales list.
+                      </p>
+                    </li>
+                    <li>
+                      <p>
+                        - Gas fee is paid only for the first time, and
+                        subsequent listings are supported free of charge.
+                      </p>
+                    </li>
+                  </ul>
+                </div>
+              </li>{" "}
+              <div className="employment">
+                {/* <button className="actionBtn" onCl ick={() => {}}>
+                  Employ
+                </button>
+                <button className="actionBtn" onCl ick={() => {}}>
+                  UnEmploy
+                </button> */}
+              </div>
+              {isApprovedForAll ? (
+                itemDetail && itemDetail.itembalances?.isstaked == 1 ? (
+                  <button
+                    className="actionBtn"
+                    disabled={false}
+                    onClick={() => make_employ_tx("withdraw")}
+                  >
+                    {spinner ? <div id="loading"></div> : "Unemploy"}
+                  </button>
+                ) : (
+                  <button
+                    className="actionBtn"
+                    disabled={false}
+                    onClick={() => make_employ_tx("mint_deposit")}
+                  >
+                    {spinner ? <div id="loading"></div> : "Employ"}
+                  </button>
+                )
+              ) : (
+                <button className="actionBtn" onClick={() => approveForAll()}>
+                  {spinner ? <div id="loading"></div> : "Approve for all"}
+                </button>
+              )}
+            </ul>
+          </article>
+
+          <ul className="itemSec">
+            <li className="itemBox">
+              {type === "ticket" ? (
+                <img style={{ width: "8vw" }} src={ticketImg} alt="" />
+              ) : itemDetail && itemDetail.url ? (
+                <img className="itemImg" src={itemDetail.url} alt="" />
+              ) : (
+                <img className="itemImg" src="" alt="broken_image" />
+              )}
+              <p className="title">
+                {" "}
+                {type === "ticket"
+                  ? `Lucky Ticket #${
+                      ticketInfo.itemid === null
+                        ? ticketInfo.id
+                        : ticketInfo.itemid
+                    }`
+                  : `King Kong #${itemDetail?.titlename}`}
+              </p>
+              {/* <p className="title">Series {itemDetail && itemDetail.itembalances?.group_.toUpperCase()} #112</p> */}
+            </li>
+
+            <li className="transactionBox">
+              <p className="title">
+                Summary of
+                <br /> transaction information
+              </p>
+            </li>
+
+            <li className="priceBox">
+              <p className="title">Fees : 3%</p>
+            </li>
+          </ul>
+        </PresellBox>
+      </>
+    );
+}
+
+const MresellBox = styled.section`
+  padding: 56px 0 0 0;
+
+  .itemImg {
+    width: 100%;
+    height: 100vw;
+    object-fit: contain;
+  }
+
+  .sellSec {
+    padding: 0 5.55vw 9.44vw 5.55vw;
+
+    .topBar {
+      display: flex;
+      align-items: center;
+      height: 15vw;
+
+      .title {
+        font-size: 5vw;
+        font-weight: 600;
+        line-height: 5vw;
+      }
+    }
+
+    .sellBox {
+      display: flex;
+      flex-direction: column;
+      gap: 4.44vw;
+      padding: 4.44vw 0 0 0;
+      border-top: 1px solid #d9d9d9;
+
+      * {
+        font-family: "Roboto", sans-serif;
+      }
+
+      .contBox {
+        display: flex;
+        flex-direction: column;
+
+        .title {
+          font-size: 4.44vw;
+          font-weight: 600;
+        }
+
+        .inputBox {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          height: 12.22vw;
+          margin: 4.44vw 0 0 0;
+          padding: 0 3.33vw 0 4.44vw;
+          border: 1px solid #d9d9d9;
+          border-radius: 3.33vw;
+        }
+
+        .explain {
+          margin: 2.77vw 0 0 0;
+          font-size: 3.88vw;
+          color: #7a7a7a;
+        }
+
+        &.transactionBox {
+          gap: 3.88vw;
+
+          .priceBox {
+            display: flex;
+            flex-direction: column;
+            gap: 4.44vw;
+            padding: 4.44vw;
+            background: #f6f6f6;
+
+            .priceTitle {
+              font-size: 4.44vw;
+              font-weight: 600;
+              font-family: "Poppins", sans-serif;
+            }
+
+            .priceList {
+              display: flex;
+              flex-direction: column;
+              gap: 2.22vw;
+              font-size: 3.88vw;
+              color: #7a7a7a;
+
+              li {
+                display: flex;
+                justify-content: space-between;
+
+                &.total {
+                  font-size: 4.44vw;
+                  font-weight: 500;
+                  color: #000;
+                }
+              }
+            }
+          }
+        }
+
+        &.bidBox {
+          margin: 4.44vw 0 0 0;
+
+          .titleBox {
+            display: flex;
+            align-items: center;
+            gap: 2.5vw;
+            position: relative;
+
+            .hovInfo {
+              display: flex;
+              align-items: center;
+              cursor: pointer;
+
+              img {
+                width: 5.55vw;
+              }
+
+              &:hover {
+                .hovPopup {
+                  display: block;
+                }
+              }
+
+              .hovPopup {
+                display: none;
+                width: 10000%;
+                max-width: 88.9vw;
+                padding: 2.77vw 3.33vw;
+                font-size: 3.88vw;
+                color: #fff;
+                background: rgba(0, 0, 0, 0.6);
+                border-radius: 2.22vw;
+                top: 0;
+                left: 50%;
+                position: absolute;
+                transform: translate(-50%, 10vw);
+                z-index: 2;
+
+                p {
+                  font-family: "Roboto", sans-serif;
+                }
+              }
+            }
+          }
+
+          .inputBox {
+            .unit {
+              font-size: 4.44vw;
+            }
+          }
+        }
+
+        &.dateBox {
+          .posBox {
+            position: relative;
+            width: 100%;
+            cursor: pointer;
+
+            input {
+              cursor: pointer;
+            }
+          }
+        }
+
+        &.instructionBox {
+          .textBox {
+            display: flex;
+            flex-direction: column;
+            gap: 5vw;
+            padding: 5.55vw 4.44vw;
+            margin: 4.44vw 0 0 0;
+            font-size: 3.33vw;
+            color: #7a7a7a;
+            font-family: "Roboto", sans-serif;
+            border: 1px solid #d9d9d9;
+            border-radius: 3.33vw;
+
+            .processList {
+              display: flex;
+              flex-direction: column;
+              gap: 2.77vw;
+            }
+          }
+        }
+      }
+
+      .actionBtn {
+        height: 13.88vw;
+        font-size: 5vw;
+        font-weight: 500;
+        color: #fff;
+        background: #000;
+        border-radius: 3.33vw;
+      }
+    }
+  }
+`;
+
+const PresellBox = styled.section`
+  display: flex;
+  justify-content: space-between;
+  padding: 190px 0 0 0;
+  margin: 0 auto;
+  max-width: 1134px;
+
+  .sellSec {
+    max-width: 800px;
+    box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.16);
+    border-radius: 20px;
+
+    .topBar {
+      display: flex;
+      align-items: center;
+      gap: 26px;
+      height: 84px;
+      padding: 0 32px;
+
+      .title {
+        font-size: 24px;
+        font-weight: 600;
+        line-height: 24px;
+      }
+    }
+
+    .sellBox {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      padding: 44px 50px;
+      border-top: 1px solid #d9d9d9;
+
+      .contBox {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+
+        .title {
+          font-size: 18px;
+          font-weight: 600;
+        }
+
+        .inputBox {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          height: 44px;
+          padding: 0 20px 0 16px;
+          border: 1px solid #d9d9d9;
+          border-radius: 12px;
+
+          * {
+            font-size: 16px;
+            font-family: "Roboto", sans-serif;
+          }
+
+          input {
+            font-weight: 500;
+
+            &::placeholder {
+              color: #d9d9d9;
+            }
+          }
+        }
+
+        .explain {
+          font-size: 16px;
+          color: #7a7a7a;
+          font-family: "Roboto", sans-serif;
+        }
+
+        &.bidBox {
+          .titleBox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            .hovInfo {
+              display: flex;
+              align-items: center;
+              position: relative;
+              cursor: pointer;
+
+              &:hover {
+                .hovPopup {
+                  display: block;
+                }
+              }
+
+              .hovPopup {
+                display: none;
+                width: 10000%;
+                max-width: 380px;
+                padding: 10px 12px;
+                font-size: 16px;
+                color: #fff;
+                background: rgba(0, 0, 0, 0.6);
+                border-radius: 8px;
+                top: 0;
+                left: 0;
+                position: absolute;
+                transform: translate(-22px, 26px);
+                z-index: 2;
+
+                p {
+                  font-family: "Roboto", sans-serif;
+                }
+              }
+            }
+          }
+        }
+
+        &.dateContainer {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          gap: 24px;
+
+          .dateBox {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+
+            .posBox {
+              position: relative;
+              width: 100%;
+              cursor: pointer;
+
+              input {
+                cursor: pointer;
+              }
+            }
+          }
+        }
+
+        &.instructionBox {
+          .textBox {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            padding: 20px 18px;
+            font-size: 16px;
+            color: #7a7a7a;
+            font-family: "Roboto", sans-serif;
+            border: 1px solid #d9d9d9;
+            border-radius: 12px;
+
+            .processList {
+              display: flex;
+              flex-direction: column;
+              gap: 10px;
+              line-height: 18px;
+            }
+          }
+        }
+      }
+
+      .employment {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        .actionBtn {
+          width: 320px;
+        }
+      }
+
+      .actionBtn {
+        height: 60px;
+        font-size: 20px;
+        font-weight: 500;
+        color: #fff;
+        background: #000;
+        border-radius: 12px;
+        #loading {
+          display: inline-block;
+          width: 38px;
+          height: 38px;
+          border: 3px solid rgba(255, 255, 255, 0.3);
+          border-radius: 50%;
+          border-top-color: #fff;
+          animation: spin 1s ease-in-out infinite;
+          -webkit-animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+          to {
+            -webkit-transform: rotate(360deg);
+          }
+        }
+        @-webkit-keyframes spin {
+          to {
+            -webkit-transform: rotate(360deg);
+          }
+        }
+      }
+    }
+  }
+
+  .itemSec {
+    width: 100%;
+    max-width: 310px;
+    height: 100%;
+    padding: 30px;
+    box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.16);
+    border-radius: 20px;
+
+    & > li {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding-bottom: 20px;
+
+      &:nth-of-type(n + 2) {
+        border-top: 1px solid #d9d9d9;
+        padding-top: 20px;
+      }
+      &:last-of-type {
+        padding-bottom: 0;
+      }
+
+      .title {
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      &.itemBox {
+        .itemImg {
+          width: 100%;
+          max-height: 250px;
+          object-fit: contain;
+          border-radius: 12px;
+        }
+      }
+
+      &.transactionBox {
+      }
+
+      &.priceBox {
+        .priceList {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          color: #7a7a7a;
+
+          .total {
+            color: #000;
+            font-weight: 500;
+          }
+        }
+      }
+    }
+  }
+`;

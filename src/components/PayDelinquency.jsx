@@ -2,14 +2,27 @@ import styled from "styled-components";
 import I_x from "../img/icon/I_x.svg";
 import I_tIcon from "../img/icon/I_tIcon.png";
 import I_chkWhite from "../img/icon/I_chkWhite.svg";
+<<<<<<< HEAD
 import { putCommaAtPrice } from "../util/Util";
+=======
+import { get_contractaddress, putCommaAtPrice } from "../util/Util";
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 import { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import PopupBg from "./PopupBg";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+<<<<<<< HEAD
 import { getabistr_forfunction, query_with_arg, query_noarg, query_eth_balance } from "../util/contract-calls";
 import { addresses } from "../configs/addresses";
+=======
+import {
+  getabistr_forfunction,
+  query_with_arg,
+  query_noarg,
+  query_eth_balance,
+} from "../util/contract-calls";
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 import { DECIMALS_DISP_DEF } from "../configs/configs"; // MIN_STAKE_AMOUNT,
 import { LOGGER, getmyaddress, getobjtype } from "../util/common";
 import { getweirep, getethrep } from "../util/eth";
@@ -18,7 +31,16 @@ import SetErrorBar from "../util/SetErrorBar";
 import { messages } from "../configs/messages";
 import { API } from "../configs/api";
 import awaitTransactionMined from "await-transaction-mined";
+<<<<<<< HEAD
 import { web3, BASE_CURRENCY, PAY_CURRENCY, NETTYPE } from "../configs/configweb3";
+=======
+import {
+  web3,
+  BASE_CURRENCY,
+  PAY_CURRENCY,
+  NETTYPE,
+} from "../configs/configweb3";
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 import { TX_POLL_OPTIONS } from "../configs/configs";
 import I_spinner from "../img/icon/I_spinner.svg";
 import { strDot } from "../util/Util";
@@ -43,6 +65,7 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
   let [isloader_00, setisloader_00] = useState(false);
   let [isloader_01, setisloader_01] = useState(false);
   let [MIN_STAKE_AMOUNT, setMIN_STAKE_AMOUNT] = useState(0);
+<<<<<<< HEAD
 
   useEffect((_) => {
     const spinner = spinnerHref.current; // document.querySelector("Spinner");
@@ -136,11 +159,93 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
     setTimeout(() => {
       fetchdata();
     }, 1500);
+=======
+  const [contractaddresses, setContractaddresses] = useState([]);
+
+  const query_contractaddresses = async () => {
+    return new Promise(async (res, rej) => {
+      try {
+        let { data } = await axios.get(API.API_CADDR);
+        let { status, list } = data;
+        if (status == "OK") {
+          setContractaddresses(list);
+          res(list);
+        } else {
+          rej("Failed to fetch contractaddresses");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  };
+
+  useEffect((_) => {
+    query_contractaddresses().then(async (resp) => {
+      const spinner = spinnerHref.current; // document.querySelector("Spinner");
+      spinner.animate(
+        [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
+        {
+          duration: 1000,
+          iterations: Infinity,
+        }
+      );
+      const spinner_approve = spinnerHref_approve.current; // document.querySelector("Spinner");
+      spinner_approve.animate(
+        [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
+        {
+          duration: 1000,
+          iterations: Infinity,
+        }
+      );
+      const fetchdata = async (_) => {
+        axios.get(API.API_TICKERS + `?nettype=${net}`).then((resp) => {
+          LOGGER("MDmEMQ5xde", resp.data);
+          let { status, payload, list } = resp;
+        });
+        let myaddress = getmyaddress();
+
+        query_with_arg({
+          contractaddress: await get_contractaddress("contract_USDT", resp), // ETH_TESTNET.
+          abikind: "ERC20",
+          methodname: "allowance",
+          aargs: [
+            myaddress,
+            await get_contractaddress("payment_for_delinquency", resp),
+          ], // ETH_TESTNET.
+        }).then((resp) => {
+          let allowanceineth = getethrep(resp);
+          LOGGER("8LYRxjNp8k", resp, allowanceineth);
+          setallowanceamount(allowanceineth);
+          if (allowanceineth > 0) {
+            setisallowanceok(false);
+          } else {
+          }
+        });
+        query_with_arg({
+          contractaddress: await get_contractaddress("contract_USDT", resp), // ETH_TESTNET.
+          abikind: "ERC20",
+          methodname: "balanceOf",
+          aargs: [myaddress],
+        }).then((resp) => {
+          LOGGER("mybalance", resp);
+          setmybalance(getethrep(resp, 4));
+        });
+
+        query_eth_balance(myaddress).then((resp) => {
+          LOGGER("rmgUxgo5ye", resp);
+          setmyethbalance((+getethrep(resp)).toFixed(DECIMALS_DISP_DEF));
+        });
+      };
+
+      fetchdata();
+    });
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
   }, []);
   const onclick_approve = async (_) => {
     LOGGER("");
     let myaddress = getmyaddress();
     let abistr = getabistr_forfunction({
+<<<<<<< HEAD
       contractaddress: addresses.contract_USDT, // ETH_TESTNET.
       abikind: "ERC20",
       methodname: "approve",
@@ -153,6 +258,25 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
       to: addresses.contract_USDT, // ETH_TESTNET.
       data: abistr,
     }).then((resp) => {
+=======
+      contractaddress: await get_contractaddress(
+        "contract_USDT",
+        contractaddresses
+      ), // ETH_TESTNET.
+      abikind: "ERC20",
+      methodname: "approve",
+      aargs: [
+        await get_contractaddress("payment_for_delinquency", contractaddresses),
+        getweirep("" + 10 ** 10),
+      ], // .ETH_TESTNET
+    });
+    setisloader_00(true);
+    requesttransaction({
+      from: myaddress,
+      to: await get_contractaddress("contract_USDT", contractaddresses), // ETH_TESTNET.
+      data: abistr,
+    }).then(async (resp) => {
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
       if (resp) {
       } else {
         SetErrorBar(messages.MSG_USER_DENIED_TX);
@@ -167,8 +291,19 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
           username: myaddress,
           typestr: "APPROVE",
           auxdata: {
+<<<<<<< HEAD
             erc20: addresses.contract_USDT, // .ETH_TESTNET
             target: addresses.payment_for_delinquency, // .ETH_TESTNET
+=======
+            erc20: await get_contractaddress(
+              "contract_USDT",
+              contractaddresses
+            ), // .ETH_TESTNET
+            target: await get_contractaddress(
+              "payment_for_delinquency",
+              contractaddresses
+            ), // .ETH_TESTNET
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
             nettype: net,
           },
           nettype: net,
@@ -178,6 +313,7 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
           SetErrorBar(messages.MSG_TX_REQUEST_SENT);
         });
 
+<<<<<<< HEAD
       awaitTransactionMined.awaitTx(web3, txhash, TX_POLL_OPTIONS).then((minedtxreceipt) => {
         LOGGER("minedtxreceipt", minedtxreceipt);
         SetErrorBar(messages.MSG_TX_FINALIZED);
@@ -203,17 +339,59 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
   };
 
   console.log(allowanceamount);
+=======
+      awaitTransactionMined
+        .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+        .then(async (minedtxreceipt) => {
+          LOGGER("minedtxreceipt", minedtxreceipt);
+          SetErrorBar(messages.MSG_TX_FINALIZED);
+
+          query_with_arg({
+            contractaddress: await get_contractaddress(
+              "contract_USDT",
+              contractaddresses
+            ), // .ETH_TESTNET
+            abikind: "ERC20",
+            methodname: "allowance",
+            aargs: [
+              myaddress,
+              await get_contractaddress(
+                "payment_for_delinquency",
+                contractaddresses
+              ),
+            ], // ETH_TESTNET.
+          }).then((resp) => {
+            let allowanceineth = getethrep(resp);
+            LOGGER("gCwXF6Jjkh", resp, allowanceineth);
+            setallowanceamount(allowanceineth); //				setallowanceamount ( 100 )
+            setisloader_00(false);
+            if (allowanceineth > 0) {
+              setisallowanceok(false);
+            } else {
+            }
+          });
+          //					Setisloader(false);
+        });
+    });
+  };
+
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
   const onclick_buy = async (_) => {
     setDone(true);
     LOGGER("YFVGAF0sBJ");
     let myaddress = getmyaddress();
+<<<<<<< HEAD
     // LOGGER("eYJAgMYkR5", myaddress);
+=======
+
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
     if (+mybalance >= +delinquencyAmount) {
     } else {
       SetErrorBar(messages.MSG_BALANCE_NOT_ENOUGH);
       setDone(false);
       return;
     }
+<<<<<<< HEAD
     /** 		if (myaddress){}
 		else { 
 			SetErrorBar( messages.MSG_PLEASE_ CONNECT_WALLET )
@@ -225,6 +403,18 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
       methodname: "pay",
       aargs: [
         addresses.contract_USDT, // .ETH_TESTNET
+=======
+
+    let abistr = getabistr_forfunction({
+      contractaddress: await get_contractaddress(
+        "payment_for_delinquency",
+        contractaddresses
+      ), //
+      abikind: "DELINQUENT",
+      methodname: "pay",
+      aargs: [
+        await get_contractaddress("contract_USDT", contractaddresses), // .ETH_TESTNET
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
         getweirep("" + delinquencyAmount),
         seller, // myaddress,
         "abc",
@@ -237,15 +427,24 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
         setisloader_01(true);
         resp = await requesttransaction({
           from: myaddress,
+<<<<<<< HEAD
           to: addresses.payment_for_delinquency, // .ETH_TESTNET
           data: abistr,
           //			, value : ''
+=======
+          to: await get_contractaddress(
+            "payment_for_delinquency",
+            contractaddresses
+          ), // .ETH_TESTNET
+          data: abistr,
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
         });
         if (resp) {
         } else {
           SetErrorBar(messages.MSG_USER_DENIED_TX);
           return;
         }
+<<<<<<< HEAD
         let resptype = getobjtype(resp);
         let txhash;
         switch (resptype) {
@@ -282,6 +481,47 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
           setisloader_01(false);
           off();
         });
+=======
+        let txhash = resp;
+        /***** */
+        awaitTransactionMined
+          .awaitTx(web3, txhash, TX_POLL_OPTIONS)
+          .then(async (minedtxreceipt) => {
+            LOGGER("minedtxreceipt", minedtxreceipt);
+            let { status } = minedtxreceipt;
+            if (status) {
+            } else {
+              SetErrorBar(messages.MSG_TX_FAILED);
+              return;
+            }
+            SetErrorBar(messages.MSG_TX_FINALIZED);
+            axios
+              .post(API.API_TXS + `/${txhash}?nettype=${net}`, {
+                txhash,
+                username: myaddress,
+                typestr: "CLEAR_DELINQUENT",
+                itemid: "",
+                auxdata: {
+                  amount: delinquencyAmount,
+                  currency: PAY_CURRENCY,
+                  currencyaddress: await get_contractaddress(
+                    "contract_USDT",
+                    contractaddresses
+                  ), //
+                  nettype: net,
+                },
+                nettype: net,
+              })
+              .then((resp) => {
+                LOGGER("", resp);
+                SetErrorBar(messages.MSG_TX_REQUEST_SENT);
+                setDone(false);
+                window.location.replace("/");
+                setisloader_01(false);
+                off();
+              });
+          });
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
       } catch (err) {
         setisloader_01(false);
         LOGGER();
@@ -289,7 +529,10 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
       }
     };
     callreqtx();
+<<<<<<< HEAD
     //		.then(resp=>{ LOGGER( '' , resp )		})
+=======
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
   };
 
   if (isMobile)
@@ -314,7 +557,14 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
                 <ul className="priceList">
                   <li className="price">{delinquencyAmount} USDT</li>
                   <li className="exchange">
+<<<<<<< HEAD
                     ${+MIN_STAKE_AMOUNT && tickerusdt ? putCommaAtPrice(+MIN_STAKE_AMOUNT * +tickerusdt) : null}
+=======
+                    $
+                    {+MIN_STAKE_AMOUNT && tickerusdt
+                      ? putCommaAtPrice(+MIN_STAKE_AMOUNT * +tickerusdt)
+                      : null}
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                   </li>
                 </ul>
               </div>
@@ -345,7 +595,17 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
                   <p className="key">Your USDT balance</p>
                   <p className="value">{mybalance} USDT</p>
                 </li>
+<<<<<<< HEAD
                 <li style={allowanceamount && +allowanceamount ? { display: "block" } : {}}>
+=======
+                <li
+                  style={
+                    allowanceamount && +allowanceamount
+                      ? { display: "block" }
+                      : {}
+                  }
+                >
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                   <p className="key">Allowance</p>
                   <p className="value">{allowanceamount} USDT</p>
                 </li>
@@ -393,7 +653,15 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
                   onclick_approve();
                   false && navigate(-1);
                 }}
+<<<<<<< HEAD
                 style={allowanceamount && +allowanceamount ? { display: "none" } : { display: "inline" }}
+=======
+                style={
+                  allowanceamount && +allowanceamount
+                    ? { display: "none" }
+                    : { display: "inline" }
+                }
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
               >
                 Approve!
                 <img
@@ -459,7 +727,11 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
                 <p className="key">Your USDT balance</p>
                 <p className="value">{mybalance} USDT</p>
               </li>
+<<<<<<< HEAD
               <li style={allowanceamount ? { display: "block" } : {}}>
+=======
+              <li>
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                 <p className="key">Allowance</p>
                 <p className="value">{allowanceamount} USDT</p>
               </li>
@@ -478,7 +750,15 @@ export default function PayDelinquency({ off, delinquencyAmount }) {
               onClick={() => {
                 onclick_approve();
               }}
+<<<<<<< HEAD
               style={allowanceamount && +allowanceamount ? { display: "none" } : { display: "inline" }}
+=======
+              style={
+                allowanceamount && +allowanceamount
+                  ? { display: "none" }
+                  : { display: "inline" }
+              }
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
             >
               {" "}
               Approve

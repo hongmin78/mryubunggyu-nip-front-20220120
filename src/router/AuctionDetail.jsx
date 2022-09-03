@@ -51,7 +51,11 @@ export default function AuctionDetail() {
     let myaddress = getmyaddress();
     if (myaddress) {
     } else {
+<<<<<<< HEAD
       SetErrorBar(messages.MSG_PLEASE_CONNECT_WALLET);
+=======
+
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
       return;
     }
     axios
@@ -104,7 +108,11 @@ export default function AuctionDetail() {
       LOGGER("transction", resp.data);
       let { status, respdata } = resp.data;
       if (status === "OK") {
+<<<<<<< HEAD
         setTranSaction(resp.data.list);
+=======
+        setTranSaction(resp.data.list.splice(1, resp.data.list.length - 1));
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
       }
     });
   };
@@ -250,7 +258,11 @@ export default function AuctionDetail() {
                 </ul>
 
                 <div className="contBox">
+<<<<<<< HEAD
                   {category === 0 && <Offer params={params} />}
+=======
+                  {category === 0 && <Offer params={params} path="auction" />}
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                   {category === 1 && <Details0303 attributes={attributes} />}
                   {category === 2 && <Properties itemdata={itemdata} />}
                 </div>
@@ -406,7 +418,11 @@ export default function AuctionDetail() {
                 </ul>
 
                 <div className="contBox">
+<<<<<<< HEAD
                   {category === 0 && <Offer params={params} />}
+=======
+                  {category === 0 && <Offer params={params} type="aution" />}
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                   {category === 1 && <Details0303 attributes={attributes} />}
                   {category === 2 && <Properties itemdata={itemdata} />}
                 </div>
@@ -436,7 +452,11 @@ export default function AuctionDetail() {
 
                     <div className="contBox">
                       <p className="cont">
+<<<<<<< HEAD
                         {strDot(itm.username, 15)} / {putCommaAtPrice(parseInt(itemdata?.circulations?.price))} USDT{" "}
+=======
+                        {strDot(itm.username, 15)} / {putCommaAtPrice(parseInt(itm?.amount))} USDT{" "}
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                       </p>
                       <p className="time">{itm.createdat?.split("T")[0]}</p>
                     </div>

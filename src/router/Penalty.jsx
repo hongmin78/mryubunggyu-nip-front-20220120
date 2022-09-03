@@ -19,7 +19,13 @@ export default function Penalty() {
   const navigate = useNavigate();
   let address = getmyaddress();
   const isMobile = useSelector((state) => state.common.isMobile);
+<<<<<<< HEAD
   const delinquencyAmount = useSelector((state) => state.common.delinquencyAmount);
+=======
+  const delinquencyAmount = useSelector(
+    (state) => state.common.delinquencyAmount
+  );
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 
   const [like, setLike] = useState(false);
   const [openModal, setOpenModal] = useState(false);
@@ -31,7 +37,14 @@ export default function Penalty() {
 
   const fatchData = () => {
     axios
+<<<<<<< HEAD
       .get(`${API.API_DELINQUENCY}/${address}/0/10/id/DESC` + `?nettype=${net}&itemdetail=1`)
+=======
+      .get(
+        `${API.API_DELINQUENCY}/${address}/0/10/id/DESC` +
+          `?nettype=${net}&itemdetail=1`
+      )
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
       .then((res) => {
         console.log("Pay", res);
         let { status, list } = res.data;
@@ -65,7 +78,14 @@ export default function Penalty() {
                 </div>
 
                 <div className="explain">
+<<<<<<< HEAD
                   <p className="cong">Your profile is blocked temporarily. Please pay for your delinquency.</p>
+=======
+                  <p className="cong">
+                    Your profile is blocked temporarily. Please pay for your
+                    delinquency.
+                  </p>
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                 </div>
               </div>
             </article>
@@ -74,7 +94,13 @@ export default function Penalty() {
               <div className="topBar">
                 <div className="profBox">
                   <img src={E_marketProf1} alt="" />
+<<<<<<< HEAD
                   <p className="address">{payList[0] ? strDot(payList[0].username, 4, 10) : null}</p>
+=======
+                  <p className="address">
+                    {payList[0] ? strDot(payList[0].username, 4, 10) : null}
+                  </p>
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                 </div>
 
                 <button className="likeBtn" onClick={() => setLike(!like)}>
@@ -107,7 +133,13 @@ export default function Penalty() {
                   ))}
               </div>
             </article>
+<<<<<<< HEAD
             <p style={{ fontSize: "6vw", fontWeight: "bold" }}>Please pay Total {delinquencyAmount} USDT</p>
+=======
+            <p style={{ fontSize: "6vw", fontWeight: "bold" }}>
+              Please pay Total {delinquencyAmount} USDT
+            </p>
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
             <article className="btnBox">
               <button className="confirmBtn" onClick={modalToggle}>
                 Pay now
@@ -134,7 +166,13 @@ export default function Penalty() {
                 <div className="topBar">
                   <div className="profBox">
                     <img src={E_marketProf1} alt="" />
+<<<<<<< HEAD
                     <p className="address">{payList[0] ? strDot(payList[0].username, 4, 10) : null}</p>
+=======
+                    <p className="address">
+                      {payList[0] ? strDot(payList[0].username, 4, 10) : null}
+                    </p>
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                   </div>
 
                   <button className="likeBtn" onClick={() => setLike(!like)}>
@@ -158,10 +196,22 @@ export default function Penalty() {
                           <p>Series Kong {item.item.titlename}</p>
                         </li>
                         <li className="price">
+<<<<<<< HEAD
                           <p>Price : {parseInt(item.circulations.price).toFixed(2)} USDT</p>
                         </li>
                         <li className="price">
                           <p>Penalty : {parseInt(item.amount).toFixed(2)} USDT</p>
+=======
+                          <p>
+                            Price :{" "}
+                            {parseInt(item.circulations?.price).toFixed(2)} USDT
+                          </p>
+                        </li>
+                        <li className="price">
+                          <p>
+                            Penalty : {parseInt(item.amount).toFixed(2)} USDT
+                          </p>
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                         </li>
                       </ul>
                     ))}
@@ -176,8 +226,18 @@ export default function Penalty() {
                   </strong>
 
                   <div className="explain">
+<<<<<<< HEAD
                     <p className="pay">Your profile is blocked temporarily. Please pay for your delinquency.</p>
                     <p className="cong">Please pay Total {delinquencyAmount} USDT</p>
+=======
+                    <p className="pay">
+                      Your profile is blocked temporarily. Please pay for your
+                      delinquency.
+                    </p>
+                    <p className="cong">
+                      Please pay Total {delinquencyAmount} USDT
+                    </p>
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
                   </div>
                 </div>
 
@@ -189,7 +249,16 @@ export default function Penalty() {
               </div>
             </article>
           </section>
+<<<<<<< HEAD
           {openModal && <PayDelinquency off={modalToggle} delinquencyAmount={delinquencyAmount} />}
+=======
+          {openModal && (
+            <PayDelinquency
+              off={modalToggle}
+              delinquencyAmount={delinquencyAmount}
+            />
+          )}
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
         </PpenaltyBox>
       </>
     );

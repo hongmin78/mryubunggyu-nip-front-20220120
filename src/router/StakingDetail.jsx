@@ -9,7 +9,10 @@ import StakingPopup from "../components/StakingPopup";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import Header from "../components/header/Header";
+<<<<<<< HEAD
 import { addresses } from "../configs/addresses";
+=======
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 import axios from "axios";
 import { API } from "../configs/api";
 import { LOGGER } from "../util/common";
@@ -22,6 +25,10 @@ import {
   TIME_FETCH_MYADDRESS_DEF,
 } from "../configs/configs";
 import { getethrep } from "../util/eth";
+<<<<<<< HEAD
+=======
+import { get_contractaddress } from "../util/Util";
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
 // import { useSelector } from "react-redux";
 // const MODE_DEV_PROD='DEV'
 const MODE_DEV_PROD = "PROD";
@@ -34,6 +41,7 @@ export default function StakingDetail() {
   let [stakecurrencybalance, setstakecurrencybalance] = useState();
   let myaddress = getmyaddress();
   let isLogin = useSelector((state) => state.common.isLogin);
+<<<<<<< HEAD
 
   const onclickstakingbutton = async (_) => {
     let myaddress = getmyaddress();
@@ -41,6 +49,35 @@ export default function StakingDetail() {
       console.log("", addresses.contract_USDT, [myaddress]); // ETH_TESTNET.
       return query_with_arg({
         contractaddress: addresses.contract_USDT, // ETH_TESTNET.
+=======
+  const [contractaddresses, setContractaddresses] = useState([]);
+
+  const query_contractaddresses = async () => {
+    return new Promise(async (res, rej) => {
+      try {
+        let { data } = await axios.get(API.API_CADDR);
+        let { status, list } = data;
+        if (status == "OK") {
+          setContractaddresses(list);
+          res(list);
+        } else {
+          rej("Failed to fetch contractaddresses");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  };
+
+  const onclickstakingbutton = async (_) => {
+    let myaddress = getmyaddress();
+    const querybalance = async (_) => {
+      return query_with_arg({
+        contractaddress: await get_contractaddress(
+          "contract_USDT",
+          contractaddresses
+        ), // ETH_TESTNET.
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
         abikind: "ERC20",
         methodname: "balanceOf",
         aargs: [myaddress],
@@ -49,12 +86,15 @@ export default function StakingDetail() {
     if (isLogin) {
       let resp = await querybalance();
       LOGGER("h8UpKsxO1Y", resp);
+<<<<<<< HEAD
       let respstakebalance = await query_with_arg({
         contractaddress: addresses.contract_stake,
         abikind: "STAKE",
         methodname: "_balances",
         aargs: [myaddress],
       });
+=======
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
       if (stakecurrencybalance && stakecurrencybalance > 0) {
         setStakingPopup(true);
         if (MODE_DEV_PROD == "DEV") {
@@ -78,6 +118,7 @@ export default function StakingDetail() {
     },
     [isLogin]
   );
+<<<<<<< HEAD
   const query_stake_currency_balance = (_) => {
     let myaddress = getmyaddress();
     if (myaddress) {
@@ -120,6 +161,28 @@ export default function StakingDetail() {
       , aargs : [ myaddress ] 
     } )     .then(resp=>{         LOGGER( 'R6H63xkTcs' , resp )
     }) */
+=======
+
+  useEffect((_) => {
+    query_contractaddresses().then(async (resp) => {
+      const query_stake_currency_balance = async (_) => {
+        let myaddress = getmyaddress();
+        if (myaddress) {
+          query_with_arg({
+            contractaddress: await get_contractaddress("contract_USDT", resp), // ETH_TESTNET.
+            abikind: "ERC20",
+            methodname: "balanceOf",
+            aargs: [myaddress],
+          }).then((resp) => {
+            setstakecurrencybalance(getethrep(resp, 4));
+          });
+        } else {
+          return;
+        }
+      };
+      query_stake_currency_balance();
+    });
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
   }, []);
   if (isMobile)
     return (
@@ -221,7 +284,10 @@ export default function StakingDetail() {
                 }}
               >
                 Staking
+<<<<<<< HEAD
                 {/* You don’t have enough USDT */}
+=======
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
               </button>
               <span style={{ color: "#fff" }}>
                 <br />

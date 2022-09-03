@@ -296,8 +296,13 @@ interface IERC1155Receiver is IERC165 {
 	mapping ( uint256 => string ) _tokenid_metadataurl ; // ipfs | http
 	mapping ( uint256 => string ) _tokenid_rawfileurl ;  // ipfs
 	string public _version ;
+<<<<<<< HEAD
 	string public name = "NFTINFINITY";
 	string public symbol = "NFTi";
+=======
+	string public name = "NIP Tickets";
+	string public symbol = "NIPT";
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
   /**     * @dev See {_setURI}.
   */
 /**  	function _beforeTokenTransfer 

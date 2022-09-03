@@ -9,7 +9,11 @@ export default function SelectPopup({ off, dataList, select, setFunc }) {
       <MselectPopupBox className="sortPopup" onClick={() => off()}>
         {dataList.map((cont, index) => (
           <li key={index} onClick={() => setFunc(cont.title)}>
+<<<<<<< HEAD
             {cont.title}
+=======
+            {cont}
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
           </li>
         ))}
       </MselectPopupBox>
@@ -24,7 +28,11 @@ export default function SelectPopup({ off, dataList, select, setFunc }) {
               setFunc(cont);
             }}
           >
+<<<<<<< HEAD
             {cont.title}
+=======
+            {cont}
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
           </li>
         ))}
       </PselectPopupBox>
@@ -50,10 +58,18 @@ const MselectPopupBox = styled.ul`
     font-weight: 500;
     border-radius: 2.22vw;
     cursor: pointer;
+<<<<<<< HEAD
 
     &:hover {
       color: #fff;
       background: #000;
+=======
+    color: #000;
+
+    &:hover {
+      color: #000;
+      background: #fff;
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
     }
   }
 `;
@@ -77,10 +93,18 @@ const PselectPopupBox = styled.ul`
     font-weight: 500;
     border-radius: 8px;
     cursor: pointer;
+<<<<<<< HEAD
 
     &:hover {
       color: #fff;
       background: #000;
+=======
+    color: #000;
+
+    &:hover {
+      color: #000;
+      background: #fff;
+>>>>>>> e3b25a1379ffc00240579323ae1e74fa7f02f027
     }
   }
 `;
