@@ -206,7 +206,10 @@ contract Staker is Stakeplan {
 	}
 	function deploy_ticket_nft_contract () public {
 		ERC1155 __ticket_nft = new ERC1155 (
-            "", _admin  , address(0) , string (abi.encodePacked ( block.timestamp))
+            ""
+            , _admin  
+//            , address(0) 
+            , string (abi.encodePacked ( block.timestamp))
         ) ;
 		_ticket_nft = address ( __ticket_nft ) ;
 	}
@@ -236,7 +239,7 @@ contract Staker is Stakeplan {
 			IERC1155( _ticket_nft ).safeTransferFrom (
 					_seller
 				, _buyer
-				, IERC1155( _ticket_nft ).get_itemhash_tokenid ( _itemid )
+				, IERC1155( _ticket_nft )._itemhash_tokenid ( _itemid )
 				, 1
 				, "0x00"
 			) ;

@@ -98,7 +98,6 @@ export default function Main() {
       .then((res) => {
         console.log("RES", res);
         let { status } = res.data;
-
         if (status === "OK") {
           let { list } = res.data;
           if (list && list?.length > 0) {
