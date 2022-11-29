@@ -10,7 +10,7 @@ import "../../utils/introspection/ERC165.sol";
 // import "./IAdmin.sol" ;
 // import "../ERC20/ERC20.sol" ;
 // import "../ERC20/IER C20.sol";
-import "./ERC1155.sol" ;
+import "./ERC1155-staker.sol" ;
 interface IERC20 {
     function totalSupply() external view returns (uint256);
     function balanceOf(address account) external view returns (uint256);
